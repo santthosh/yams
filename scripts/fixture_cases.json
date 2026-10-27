@@ -1,0 +1,884 @@
+[
+  {
+    "schema_version": 1,
+    "label": "SYNTHETIC_DATA_ONLY",
+    "seed": 42,
+    "tolerances": {
+      "cash_usd": "exact cents",
+      "quantity": "exact 6dp",
+      "weights_absolute": "0.00000001",
+      "small_statistics_absolute": "0.000000000001"
+    },
+    "id": "FIX-01",
+    "owner_issues": [
+      32,
+      33
+    ],
+    "intent": "Features, population z-score, ties, zero-volatility exclusion and simultaneous caps",
+    "inputs": {
+      "snapshot": "../snapshot/manifest.json",
+      "feature_vector": [
+        1,
+        2,
+        3
+      ],
+      "constant_vector": [
+        2,
+        2,
+        2
+      ],
+      "momentum": {
+        "first": "50",
+        "last": "60",
+        "sessions": 126
+      },
+      "tied_candidates": [
+        {
+          "asset_id": "SYN:BBB",
+          "momentum_long": 2,
+          "momentum_short": 2,
+          "volatility": 2
+        },
+        {
+          "asset_id": "SYN:AAA",
+          "momentum_long": 2,
+          "momentum_short": 2,
+          "volatility": 2
+        },
+        {
+          "asset_id": "SYN:CCC",
+          "momentum_long": 2,
+          "momentum_short": 2,
+          "volatility": 2
+        }
+      ],
+      "zero_volatility": {
+        "require_positive_trend": false,
+        "max_positions": 1,
+        "candidates": [
+          {
+            "asset_id": "SYN:ZERO",
+            "score": 2,
+            "volatility": 0
+          },
+          {
+            "asset_id": "SYN:BBB",
+            "score": 1,
+            "volatility": 0.1
+          }
+        ]
+      },
+      "allocation": {
+        "equal_positive_volatility": 0.1,
+        "eight_ids": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E",
+          "F",
+          "G",
+          "H"
+        ],
+        "position_cap": "0.20",
+        "sector_cap": "0.40",
+        "cash_floor": "0.05"
+      }
+    },
+    "expected": {
+      "mean": 2,
+      "population_variance": 0.6666666666666666,
+      "z_scores": [
+        -1.224744871391589,
+        0,
+        1.224744871391589
+      ],
+      "constant_z_scores": [
+        0,
+        0,
+        0
+      ],
+      "momentum_long": 0.2,
+      "tie_scores": [
+        0,
+        0,
+        0
+      ],
+      "tie_rank": [
+        "SYN:AAA",
+        "SYN:BBB",
+        "SYN:CCC"
+      ],
+      "zero_volatility_selected": [
+        "SYN:BBB"
+      ],
+      "zero_volatility_exclusion": "ZERO_VOLATILITY",
+      "eight_distinct_sectors": {
+        "per_asset_weight": "0.11875",
+        "cash_weight": "0.05"
+      },
+      "eight_same_sector": {
+        "per_asset_weight": "0.05",
+        "cash_weight": "0.60"
+      },
+      "two_distinct_sectors": {
+        "per_asset_weight": "0.20",
+        "cash_weight": "0.60"
+      },
+      "all_zero_volatility_cash": "1",
+      "config_sha256": "2093c63d190815eba052508d6d42d8ae0c93400cf777602d2c5f759627f43f21",
+      "full_snapshot_probe": {
+        "asset_id": "SYN:AAA",
+        "session_index": 400,
+        "as_of_session": "2028-07-17",
+        "momentum126": 0.0989010989010989,
+        "momentum63": 0.04712041884816754,
+        "volatility60": 0.00014776165676800928,
+        "sma200": "65.025",
+        "median_dollar_volume20": "69525000.000"
+      }
+    },
+    "derivation": "mean=2; population variance=((1-2)^2+0+(3-2)^2)/3=2/3; z=(x-2)/sqrt(2/3). Constant features yield zero. Momentum=60/50-1. Equal inverse rates split budget .95/8; sector .40/8 freezes all simultaneously; two .20 caps leave .60 cash.",
+    "negative_cases": [
+      {
+        "mutation": "delete a scheduled bar inside final 252-session window, retain older bars",
+        "expected": "MISSING_HISTORY"
+      },
+      {
+        "mutation": "shuffle tied candidates",
+        "expected": "identical rank and weights"
+      },
+      {
+        "mutation": "include unsupported strategy operator",
+        "expected": "VALIDATION_ERROR"
+      }
+    ]
+  },
+  {
+    "schema_version": 1,
+    "label": "SYNTHETIC_DATA_ONLY",
+    "seed": 42,
+    "tolerances": {
+      "cash_usd": "exact cents",
+      "quantity": "exact 6dp",
+      "weights_absolute": "0.00000001",
+      "small_statistics_absolute": "0.000000000001"
+    },
+    "id": "FIX-02",
+    "owner_issues": [
+      29,
+      32,
+      48
+    ],
+    "intent": "Original-cutoff evidence remains invariant under future-only changes",
+    "inputs": {
+      "cutoff": "2030-01-03T21:00:01Z",
+      "history": [
+        {
+          "session_date": "2029-07-01",
+          "adjusted_close": "50",
+          "available_at": "2029-07-01T20:00:01Z"
+        },
+        {
+          "session_date": "2030-01-03",
+          "adjusted_close": "60",
+          "available_at": "2030-01-03T21:00:01Z"
+        }
+      ],
+      "future": {
+        "session_date": "2030-01-04",
+        "adjusted_close": "999",
+        "available_at": "2030-01-04T21:00:01Z"
+      },
+      "mutation": {
+        "future_adjusted_close": "1",
+        "future_available_at": "2030-01-04T21:00:02Z"
+      }
+    },
+    "expected": {
+      "as_of_closes": [
+        "50",
+        "60"
+      ],
+      "before_mutation_momentum": 0.2,
+      "after_mutation_momentum": 0.2,
+      "eligible_future_rows": 0
+    },
+    "derivation": "The two-row operator probe is not a production warmup. Filter available_at<=cutoff before selecting evidence; only 50 and 60 survive. Changing a future row cannot change 60/50-1=.2. The shared full snapshot supplies contiguous warmup for integration consumers.",
+    "negative_cases": [
+      {
+        "mutation": "move last required bar availability one second beyond cutoff",
+        "expected": "INSUFFICIENT_ALIGNED_HISTORY"
+      },
+      {
+        "mutation": "change a manifest-referenced availability timestamp without rehashing",
+        "expected": "INTEGRITY_FAILURE"
+      }
+    ]
+  },
+  {
+    "schema_version": 1,
+    "label": "SYNTHETIC_DATA_ONLY",
+    "seed": 42,
+    "tolerances": {
+      "cash_usd": "exact cents",
+      "quantity": "exact 6dp",
+      "weights_absolute": "0.00000001",
+      "small_statistics_absolute": "0.000000000001"
+    },
+    "id": "FIX-03",
+    "owner_issues": [
+      35,
+      44
+    ],
+    "intent": "Decimal costs, fractional sizing, half-even cash and sell-before-buy",
+    "inputs": {
+      "cash": "1000.00",
+      "raw_price": "100.00",
+      "quantity": "2.000000",
+      "slippage_fraction": "0.001",
+      "commission": "0.00",
+      "affordability": {
+        "cash": "100.00",
+        "requested_quantity": "1.000000"
+      },
+      "rounding": {
+        "cash_amounts": [
+          "1.005",
+          "1.015"
+        ]
+      },
+      "minimum_trade_usd": "5.00",
+      "below_minimum": {
+        "cash": "4.99",
+        "raw_price": "100.00"
+      },
+      "same_batch": {
+        "initial_cash": "0.00",
+        "sell_quantity": "2.000000",
+        "buy_quantity": "1.000000"
+      }
+    },
+    "expected": {
+      "buy_price": "100.10000",
+      "buy_debit": "200.20",
+      "cash_after_buy": "799.80",
+      "sell_price": "99.90000",
+      "sell_credit": "199.80",
+      "cash_after_sell": "999.60",
+      "position_after_roundtrip": "0.000000",
+      "affordable_quantity": "0.999000",
+      "affordable_debit": "100.00",
+      "affordable_remaining_cash": "0.00",
+      "closed_shortfall_quantity": "0.001000",
+      "half_even_cash": [
+        "1.00",
+        "1.02"
+      ],
+      "below_minimum_fill_count": 0,
+      "below_minimum_reason": "BELOW_MIN_TRADE",
+      "same_batch_cash_after_sell": "199.80",
+      "same_batch_cash_after_buy": "99.70"
+    },
+    "derivation": "100*1.001=100.1; 2*100.1=200.20. Sell 2*99.9=199.80. floor_6(100/100.1)=.999000; debit99.9999 rounds100.00. Fees zero. Posted199.80 sell proceeds immediately fund100.10 buy; preview proceeds cannot fund it.",
+    "negative_cases": [
+      {
+        "mutation": "use float/round half-up for 1.005",
+        "expected": "cash mismatch"
+      },
+      {
+        "mutation": "spend pending sale proceeds before posting",
+        "expected": "INSUFFICIENT_CASH"
+      },
+      {
+        "mutation": "round affordable quantity upward to .999001",
+        "expected": "quantity bound violation"
+      }
+    ]
+  },
+  {
+    "schema_version": 1,
+    "label": "SYNTHETIC_DATA_ONLY",
+    "seed": 42,
+    "tolerances": {
+      "cash_usd": "exact cents",
+      "quantity": "exact 6dp",
+      "weights_absolute": "0.00000001",
+      "small_statistics_absolute": "0.000000000001"
+    },
+    "id": "FIX-04",
+    "owner_issues": [
+      44,
+      46
+    ],
+    "intent": "Duplicate economic event has one expected posting",
+    "inputs": {
+      "initial_cash": "1000.00",
+      "deliveries": [
+        {
+          "event_key": "fill/order-A/session-2030-01-04",
+          "side": "BUY",
+          "quantity": "2.000000",
+          "cash_delta": "-200.20"
+        },
+        {
+          "event_key": "fill/order-A/session-2030-01-04",
+          "side": "BUY",
+          "quantity": "2.000000",
+          "cash_delta": "-200.20"
+        }
+      ]
+    },
+    "expected": {
+      "posting_count": 1,
+      "cash": "799.80",
+      "quantity": "2.000000",
+      "portfolio_revision_delta": 1
+    },
+    "derivation": "Both deliveries identify the same economic effect; one unique posting debits200.20. Two effects would yield599.60 and4 shares, a deliberate failure signature.",
+    "negative_cases": [
+      {
+        "mutation": "same idempotency key with different quantity",
+        "expected": "IDEMPOTENCY_CONFLICT"
+      },
+      {
+        "mutation": "omit unique-event constraint",
+        "expected": "duplicate posting detected by consumer test"
+      }
+    ]
+  },
+  {
+    "schema_version": 1,
+    "label": "SYNTHETIC_DATA_ONLY",
+    "seed": 42,
+    "tolerances": {
+      "cash_usd": "exact cents",
+      "quantity": "exact 6dp",
+      "weights_absolute": "0.00000001",
+      "small_statistics_absolute": "0.000000000001"
+    },
+    "id": "FIX-05",
+    "owner_issues": [
+      29,
+      35,
+      44
+    ],
+    "intent": "Split basis conservation and dividend entitlement without adjusted-price double counting",
+    "inputs": {
+      "initial_quantity": "2.000000",
+      "unit_basis": "100.00",
+      "total_basis": "200.00",
+      "split": {
+        "event_key": "split-A",
+        "ratio_numerator": 2,
+        "ratio_denominator": 1,
+        "effective_session": "2030-01-04",
+        "raw_before": "100.00",
+        "raw_after": "50.00",
+        "adjusted_before": "50.00",
+        "adjusted_after": "50.00"
+      },
+      "dividend": {
+        "event_key": "dividend-A",
+        "entitled_quantity": "4.000000",
+        "per_share": "1.25",
+        "ex_session": "2030-01-08",
+        "payable_session": "2030-01-15",
+        "sell_all_session": "2030-01-09",
+        "raw_before": "50.00",
+        "raw_ex": "48.75",
+        "adjusted_before": "48.75",
+        "adjusted_ex": "48.75",
+        "delivery_count": 2
+      }
+    },
+    "expected": {
+      "quantity_after_split": "4.000000",
+      "unit_basis_after_split": "50.00",
+      "total_basis_after_split": "200.00",
+      "split_cash_delta": "0.00",
+      "cash_dividend_before_payable": "0.00",
+      "cash_dividend_on_payable": "5.00",
+      "dividend_posting_count": 1,
+      "entitlement_survives_sale": true,
+      "adjusted_split_return": 0,
+      "adjusted_dividend_return": 0
+    },
+    "derivation": "2*2=4 shares;100/2=50 basis;4*50=200 unchanged. Entitlement4*1.25=5 payable once even after sale. Flat adjusted closes already incorporate the action, so feature return0; do not add cash dividend to adjusted return.",
+    "negative_cases": [
+      {
+        "mutation": "post dividend on ex-date without payable evidence",
+        "expected": "PENDING_DATA"
+      },
+      {
+        "mutation": "apply split to already adjusted ledger price",
+        "expected": "basis mismatch"
+      },
+      {
+        "mutation": "credit dividend twice",
+        "expected": "cash mismatch"
+      }
+    ]
+  },
+  {
+    "schema_version": 1,
+    "label": "SYNTHETIC_DATA_ONLY",
+    "seed": 42,
+    "tolerances": {
+      "cash_usd": "exact cents",
+      "quantity": "exact 6dp",
+      "weights_absolute": "0.00000001",
+      "small_statistics_absolute": "0.000000000001"
+    },
+    "id": "FIX-06",
+    "owner_issues": [
+      29,
+      35,
+      46
+    ],
+    "intent": "Strict eligible open, explicit holiday, missing open, stale quote and DST",
+    "inputs": {
+      "cutoff": "2030-01-03T21:00:00Z",
+      "schedule": [
+        {
+          "session_date": "2030-01-04",
+          "open_at": "2030-01-04T14:30:00Z",
+          "close_at": "2030-01-04T21:00:00Z"
+        },
+        {
+          "session_date": "2030-01-08",
+          "open_at": "2030-01-08T14:30:00Z",
+          "close_at": "2030-01-08T21:00:00Z"
+        }
+      ],
+      "approvals": [
+        "2030-01-04T14:29:59Z",
+        "2030-01-04T14:30:00Z",
+        "2030-01-04T14:30:01Z"
+      ],
+      "missing_open_session": "2030-01-08",
+      "stale_quote": {
+        "quote_session": "2030-01-04",
+        "eligible_session": "2030-01-08",
+        "price": "100.00"
+      },
+      "dst_mapping": {
+        "cutoff": "2030-01-01T21:00:00Z",
+        "horizon_calendar_days": 90,
+        "closes": [
+          "2030-01-02T21:00:00Z",
+          "2030-01-03T21:00:00Z",
+          "2030-04-01T20:00:00Z",
+          "2030-04-02T20:00:00Z"
+        ]
+      }
+    },
+    "expected": {
+      "eligible_sessions": [
+        "2030-01-04",
+        "2030-01-08",
+        "2030-01-08"
+      ],
+      "missing_open_status": "pending",
+      "missing_open_reason": "PENDING_DATA",
+      "fill_count": 0,
+      "stale_quote_usable": false,
+      "horizon_end_at": "2030-04-01T20:00:00Z",
+      "future_session_count": 3,
+      "empty_schedule_reason": "ZERO_SESSION_HORIZON"
+    },
+    "derivation": "An opening must be strictly later than max(cutoff,approval); equality excludes Jan4. Jan5\u20137 are explicitly absent in this synthetic schedule. Missing Jan8 open cannot use Jan4 close. Ninety local dates crosses DST, retaining16:00 local and changing UTC21:00 to20:00.",
+    "negative_cases": [
+      {
+        "mutation": "approve exactly at open and fill that open",
+        "expected": "timestamp invariant failure"
+      },
+      {
+        "mutation": "substitute stale price for missing eligible opening",
+        "expected": "fabricated-fill regression"
+      },
+      {
+        "mutation": "use 90 trading sessions or 2160 UTC hours",
+        "expected": "horizon mismatch"
+      }
+    ]
+  },
+  {
+    "schema_version": 1,
+    "label": "SYNTHETIC_DATA_ONLY",
+    "seed": 42,
+    "tolerances": {
+      "cash_usd": "exact cents",
+      "quantity": "exact 6dp",
+      "weights_absolute": "0.00000001",
+      "small_statistics_absolute": "0.000000000001"
+    },
+    "id": "FIX-07",
+    "owner_issues": [
+      39,
+      40
+    ],
+    "intent": "Returns, drawdown, annualization and gross-notional turnover",
+    "inputs": {
+      "nav_usd": [
+        "100.00",
+        "120.00",
+        "90.00",
+        "108.00"
+      ],
+      "session_count": 4,
+      "return_periods": 3,
+      "sessions_per_year": 252,
+      "benchmark_nav_usd": [
+        "100.00",
+        "100.00",
+        "100.00",
+        "100.00"
+      ],
+      "gross_trade_notionals_usd": [
+        "40.00",
+        "60.00"
+      ],
+      "fees_usd": "0.00"
+    },
+    "expected": {
+      "cumulative_return": 0.08,
+      "max_drawdown": 0.25,
+      "period_returns": [
+        0.2,
+        -0.25,
+        0.2
+      ],
+      "mean_nav_usd": "104.50",
+      "turnover": 0.9569377990430622,
+      "benchmark_cumulative_return": 0,
+      "annualized_return_expression": "(108/100)^(252/3)-1",
+      "annualized_volatility_expression": "sample_std([.2,-.25,.2])*sqrt(252)",
+      "sharpe_expression": "mean([.2,-.25,.2])/sample_std([.2,-.25,.2])*sqrt(252)",
+      "annualized_return": 641.0893416360514,
+      "annualized_volatility": 4.124318125460256,
+      "sharpe": 3.0550504633038935
+    },
+    "derivation": "108/100-1=.08. Peak120 to90 is .25; recovery to108 does not erase drawdown. Four-point meanNAV418/4=104.5; gross100/104.5=200/209. Three returns, not four, enter annualization; sample standard deviation uses n-1. Benchmark dates align exactly.",
+    "negative_cases": [
+      {
+        "mutation": "use current NAV108 denominator for turnover",
+        "expected": "turnover mismatch"
+      },
+      {
+        "mutation": "divide volatility variance by n",
+        "expected": "sample-volatility mismatch"
+      },
+      {
+        "mutation": "drop benchmark session and align surviving rows",
+        "expected": "INSUFFICIENT_MARKET_DATA"
+      }
+    ]
+  },
+  {
+    "schema_version": 1,
+    "label": "SYNTHETIC_DATA_ONLY",
+    "seed": 42,
+    "tolerances": {
+      "cash_usd": "exact cents",
+      "quantity": "exact 6dp",
+      "weights_absolute": "0.00000001",
+      "small_statistics_absolute": "0.000000000001"
+    },
+    "id": "FIX-08",
+    "owner_issues": [
+      48
+    ],
+    "intent": "Correlated whole-vector blocks, common shocks, quantiles and cash cost",
+    "inputs": {
+      "small_operator_probe": {
+        "not_production_request": true,
+        "vectors": [
+          [
+            0.1,
+            -0.1
+          ],
+          [
+            0.2,
+            -0.2
+          ],
+          [
+            0.3,
+            -0.3
+          ]
+        ],
+        "block_length": 2,
+        "starts": [
+          1,
+          0
+        ],
+        "horizon": 3,
+        "weights": [
+          "0.5",
+          "0.5"
+        ]
+      },
+      "quantile_probe": {
+        "sorted_returns": [
+          -0.2,
+          -0.1,
+          0,
+          0.1,
+          0.2
+        ],
+        "initial_nav_usd": "1000.00"
+      },
+      "cash_probe": {
+        "initial_nav_usd": "1000.00",
+        "proposed_upfront_cost_usd": "10.00",
+        "cash_weight": "1"
+      },
+      "production_sampling": {
+        "seed": 42,
+        "generator": "PCG64",
+        "numpy_version": "2.5.4",
+        "history_rows": 252,
+        "block_length": 5,
+        "paths": 5000,
+        "horizon_sessions": 63,
+        "low": 0,
+        "high_exclusive": 248,
+        "dtype": "little-endian int64",
+        "shape": [
+          5000,
+          13
+        ]
+      },
+      "constant_vector_probe": {
+        "history_rows": 252,
+        "vector": [
+          0.01,
+          -0.01
+        ],
+        "horizon_sessions": 63,
+        "current_weights": [
+          "0.5",
+          "0.5"
+        ],
+        "proposed_weights": [
+          "0.75",
+          "0.25"
+        ],
+        "upfront_cost_usd": "0.00",
+        "initial_nav_usd": "1000.00"
+      }
+    },
+    "expected": {
+      "small_sampled_rows": [
+        1,
+        2,
+        0
+      ],
+      "small_sampled_vectors": [
+        [
+          0.2,
+          -0.2
+        ],
+        [
+          0.3,
+          -0.3
+        ],
+        [
+          0.1,
+          -0.1
+        ]
+      ],
+      "small_current_return": 0,
+      "small_identical_proposal_return": 0,
+      "p10": -0.16,
+      "p50": 0,
+      "p90": 0.16,
+      "loss_probability": 0.4,
+      "cash_current_ending_usd": "1000.00",
+      "cash_proposed_ending_usd": "990.00",
+      "cash_proposed_return": -0.01,
+      "cash_proposed_loss_probability": 1,
+      "constant_current_return": 0,
+      "constant_proposed_return_expression": "(1.005)^63-1",
+      "constant_proposed_loss_probability": 0,
+      "missing_history": {
+        "status": "unavailable",
+        "proposed": null,
+        "hold_unchanged": null,
+        "unavailable_reason": "INSUFFICIENT_ALIGNED_HISTORY"
+      },
+      "constant_proposed_return": 0.36918423720526605,
+      "constant_proposed_ending_usd": "1369.18",
+      "indices_sha256": "b7795d3889530bb259a8b5a3e42cf41663dd7555bfe2d0f5251d7bc0febec332",
+      "array_sha256": "7a07213da0aeac9f45918ffd8141b6a0af179b68a34f9eeb9f01271936b4f90f",
+      "first_path_starts": [
+        22,
+        191,
+        162,
+        108,
+        107,
+        212,
+        21,
+        172,
+        49,
+        23,
+        130,
+        241,
+        182
+      ]
+    },
+    "derivation": "Whole vectors selected at rows1,2,0 preserve exact anti-correlation. .5*x+.5*(-x)=0 at every step. For five sorted paths, (N-1)*q gives0.4/2/3.6, hence-.16/0/.16. Constant-vector75/25 case earns .005 per step, independently evaluable as1.005^63. A 63-session count is an explicit sampling probe, never a hard-coded 90-day mapping.",
+    "negative_cases": [
+      {
+        "mutation": "draw separate per-asset streams",
+        "expected": "paired-vector mismatch"
+      },
+      {
+        "mutation": "wrap blocks at row251",
+        "expected": "sampled-index violation"
+      },
+      {
+        "mutation": "replace a missing required close with an older row",
+        "expected": "INSUFFICIENT_ALIGNED_HISTORY"
+      },
+      {
+        "mutation": "charge proposed cost at every step",
+        "expected": "cash outcome mismatch"
+      }
+    ]
+  },
+  {
+    "schema_version": 1,
+    "label": "SYNTHETIC_DATA_ONLY",
+    "seed": 42,
+    "tolerances": {
+      "cash_usd": "exact cents",
+      "quantity": "exact 6dp",
+      "weights_absolute": "0.00000001",
+      "small_statistics_absolute": "0.000000000001"
+    },
+    "id": "FIX-09",
+    "owner_issues": [
+      23,
+      44,
+      46
+    ],
+    "intent": "Recovery input traces; no actual worker/database proof",
+    "inputs": {
+      "diagnostic": {
+        "job_id": "00000000-0000-4000-8000-000000000009",
+        "attempt1_token": "old-token",
+        "attempt2_token": "new-token",
+        "events": [
+          "claim_attempt1",
+          "lease_expires",
+          "claim_attempt2",
+          "attempt1_publish",
+          "attempt2_publish"
+        ]
+      },
+      "financial": {
+        "approved_at": "2030-01-04T14:29:59Z",
+        "eligible_open_at": "2030-01-04T14:30:00Z",
+        "fill_key": "fill/order-A/2030-01-04",
+        "cash_before": "1000.00",
+        "cash_debit": "200.20",
+        "events": [
+          "post_fill_commit",
+          "process_crash_before_ack",
+          "redeliver_same_fill"
+        ]
+      },
+      "cancel_races": [
+        [
+          "cancel_commit",
+          "fill_attempt"
+        ],
+        [
+          "fill_commit",
+          "cancel_attempt"
+        ]
+      ]
+    },
+    "expected": {
+      "stale_attempt_publications": 0,
+      "diagnostic_result_count": 1,
+      "financial_posting_count": 1,
+      "financial_cash": "799.80",
+      "recovered_approved_at": "2030-01-04T14:29:59Z",
+      "cancel_first_fill_count": 0,
+      "fill_first_fill_count": 1
+    },
+    "derivation": "Lease tokens fence publication: expired token cannot publish. Durable unique fill key turns redelivery into a read of one committed effect. Cancellation serializes with posting; it cannot rewrite a posted fill. These are expected traces for integration tests, not an implemented queue.",
+    "negative_cases": [
+      {
+        "mutation": "allow old lease token to publish",
+        "expected": "stale publication"
+      },
+      {
+        "mutation": "replace approval time with recovery clock",
+        "expected": "chronology mismatch"
+      },
+      {
+        "mutation": "reset filled state on cancel",
+        "expected": "lost ledger effect"
+      }
+    ]
+  },
+  {
+    "schema_version": 1,
+    "label": "SYNTHETIC_DATA_ONLY",
+    "seed": 42,
+    "tolerances": {
+      "cash_usd": "exact cents",
+      "quantity": "exact 6dp",
+      "weights_absolute": "0.00000001",
+      "small_statistics_absolute": "0.000000000001"
+    },
+    "id": "FIX-10",
+    "owner_issues": [
+      55,
+      56
+    ],
+    "intent": "Equal initial terms and isolated portfolio arithmetic only",
+    "inputs": {
+      "start_at": "2030-01-04T14:29:59Z",
+      "policy": "us_eod_next_open_v1",
+      "entrants": [
+        {
+          "id": "A",
+          "cash_usd": "1000.00",
+          "quantity": "0.000000"
+        },
+        {
+          "id": "B",
+          "cash_usd": "1000.00",
+          "quantity": "0.000000"
+        }
+      ],
+      "a_only_fill": {
+        "quantity": "2.000000",
+        "cash_debit": "200.20"
+      }
+    },
+    "expected": {
+      "a_cash_usd": "799.80",
+      "a_quantity": "2.000000",
+      "b_cash_usd": "1000.00",
+      "b_quantity": "0.000000",
+      "equal_start_and_policy": true,
+      "cross_funding_usd": "0.00"
+    },
+    "derivation": "Debit only A's independent ledger:1000-200.20=799.80. B remains1000.00 with no holdings. This does not define launch authorization, promotion, scheduling or earlier historical participation.",
+    "negative_cases": [
+      {
+        "mutation": "share cash balance between entrants",
+        "expected": "isolation mismatch"
+      },
+      {
+        "mutation": "credit pre-launch trades",
+        "expected": "chronology violation"
+      }
+    ]
+  }
+]

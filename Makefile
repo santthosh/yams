@@ -6,8 +6,8 @@ install:
 
 lint: lint-backend lint-web
 lint-backend:
-	uv run --locked ruff check backend
-	uv run --locked ruff format --check backend
+	uv run --locked ruff check backend scripts
+	uv run --locked ruff format --check backend scripts
 lint-web:
 	pnpm lint
 
@@ -36,3 +36,9 @@ contracts:
 contracts-check:
 	uv run --locked python -m backend.api.openapi --check
 	pnpm --filter @yams/web exec node scripts/contracts.mjs --check
+
+.PHONY: fixtures fixtures-check
+fixtures:
+	uv run --locked python scripts/generate_fixtures.py
+fixtures-check:
+	uv run --locked python scripts/generate_fixtures.py --check
