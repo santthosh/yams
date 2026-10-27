@@ -1,0 +1,135 @@
+import json
+from pathlib import Path
+from uuid import UUID
+
+import pytest
+from fastapi.testclient import TestClient
+from pydantic import ValidationError
+from starlette.exceptions import HTTPException
+
+from backend.api.main import create_app
+from backend.api.openapi import export
+from backend.domain.common import PageRequest
+from backend.domain.strategy import StrategyConfigV1
+
+
+@pytest.mark.parametrize("limit", [0, 101, -1, True, "25"])
+def test_pagination_rejects_invalid_limits(limit: object) -> None:
+    with pytest.raises(ValidationError):
+        PageRequest.model_validate({"limit": limit})
+
+
+def test_pagination_defaults_bounds_and_opaque_cursor() -> None:
+    assert PageRequest().limit == 25
+    assert PageRequest(limit=100, cursor="opaque-abc_123").limit == 100
+    with pytest.raises(ValidationError):
+        PageRequest(cursor="../../anything")
+
+
+def test_raw_json_contract_route_rejects_duplicates_and_lost_precision() -> None:
+    app = create_app()
+
+    @app.post("/contract-probe")
+    def validate(config: StrategyConfigV1) -> dict[str, str]:
+        return {"hash": config.config_hash()}
+
+    data = (Path(__file__).parent / "examples/strategy.json").read_text()
+    client = TestClient(app)
+    good = client.post(
+        "/contract-probe", content=data, headers={"content-type": "application/json"}
+    )
+    assert good.status_code == 200
+    for bad in (
+        data.replace('"schema_version": 1,', '"schema_version":1,"schema_version":1,'),
+        data.replace('"momentum_long": 0.60', '"momentum_long": 0.60000000000000000001'),
+        data.replace('"momentum_long": 0.60', '"momentum_long": NaN'),
+    ):
+        response = client.post(
+            "/contract-probe", content=bad, headers={"content-type": "application/json"}
+        )
+        assert response.status_code == 422
+        body = response.json()
+        assert set(body) == {"error"}
+        assert body["error"]["code"] == "VALIDATION_ERROR"
+        assert set(body["error"]) == {"code", "message", "details", "retryable", "correlation_id"}
+        UUID(body["error"]["correlation_id"])
+        assert "Risk-Adjusted Momentum" not in response.text
+        assert body["error"]["details"]["field_paths"]
+
+
+def test_method_error_preserves_status_and_allow_header() -> None:
+    response = TestClient(create_app()).post("/livez")
+    assert response.status_code == 405
+    assert response.json()["error"]["code"] == "METHOD_NOT_ALLOWED"
+    assert response.headers["allow"] == "GET"
+
+
+def test_internal_errors_never_expose_exception_payloads(caplog: pytest.LogCaptureFixture) -> None:
+    app = create_app()
+
+    @app.get("/broken-probe")
+    def broken() -> None:
+        raise RuntimeError("secret-provider-token")
+
+    response = TestClient(app, raise_server_exceptions=False).get("/broken-probe")
+    assert response.status_code == 500
+    assert response.json()["error"]["code"] == "INTERNAL_ERROR"
+    assert "secret-provider-token" not in response.text
+    assert response.json()["error"]["correlation_id"] in caplog.text
+    assert "secret-provider-token" not in caplog.text
+
+
+@pytest.mark.parametrize(
+    ("status", "code"),
+    [
+        (400, "VALIDATION_ERROR"),
+        (401, "HTTP_ERROR"),
+        (409, "STATE_CONFLICT"),
+        (422, "VALIDATION_ERROR"),
+        (429, "LIMIT_EXCEEDED"),
+        (503, "PROVIDER_UNAVAILABLE"),
+    ],
+)
+def test_http_exception_keeps_status_without_detail_leak(status: int, code: str) -> None:
+    app = create_app()
+
+    @app.get("/http-probe")
+    def broken() -> None:
+        raise HTTPException(status, "secret-provider-token", headers={"Retry-After": "2"})
+
+    response = TestClient(app).get("/http-probe")
+    assert response.status_code == status
+    assert response.json()["error"]["code"] == code
+    assert "secret-provider-token" not in response.text
+    assert response.headers["retry-after"] == "2"
+    assert response.json()["error"]["retryable"] is (status == 503)
+
+
+def test_export_is_deterministic_and_detects_changed_schema(tmp_path: Path) -> None:
+    export(tmp_path, check=False)
+    export(tmp_path, check=True)
+    schema = tmp_path / "contracts/schemas.json"
+    original = schema.read_bytes()
+    modified = json.loads(original)
+    modified["StrategyConfigV1.validation"]["properties"]["schema_version"]["const"] = 99
+    schema.write_text(json.dumps(modified))
+    with pytest.raises(SystemExit, match="Contract drift"):
+        export(tmp_path, check=True)
+    export(tmp_path, check=False)
+    assert schema.read_bytes() == original
+
+
+def test_openapi_does_not_activate_future_handlers() -> None:
+    app = create_app()
+    schema = app.openapi()
+    assert set(schema["paths"]) == {"/livez"}
+    components = schema["components"]["schemas"]
+    for name in (
+        "MarketBarV1",
+        "ForecastV1",
+        "RecommendationV1",
+        "PaperOrderBatchV1",
+        "ExperimentRunV1",
+    ):
+        assert name in components
+    assert TestClient(app).get("/api/v1/forecasts/anything").status_code == 404

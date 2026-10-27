@@ -5,6 +5,10 @@ from typing import Literal
 from fastapi import FastAPI
 from pydantic import BaseModel
 
+from backend.api.errors import register_error_handlers
+from backend.api.openapi import ContractAPI
+from backend.api.routing import ContractRoute
+
 
 class Liveness(BaseModel):
     status: Literal["alive"] = "alive"
@@ -12,7 +16,9 @@ class Liveness(BaseModel):
 
 
 def create_app() -> FastAPI:
-    app = FastAPI(title="YAMS", version="0.0.1")
+    app = ContractAPI(title="YAMS", version="0.0.1")
+    app.router.route_class = ContractRoute
+    register_error_handlers(app)
 
     @app.get("/livez", response_model=Liveness, tags=["operations"])
     def liveness() -> Liveness:

@@ -15,4 +15,7 @@ def test_unimplemented_routes_do_not_claim_readiness_or_financial_results() -> N
         for path in ("/api/v1/health", "/api/v1/portfolios", "/missing"):
             response = client.get(path)
             assert response.status_code == 404
-            assert response.json() == {"detail": "Not Found"}
+            error = response.json()["error"]
+            assert error["code"] == "NOT_FOUND"
+            assert error["retryable"] is False
+            assert error["details"] == {}

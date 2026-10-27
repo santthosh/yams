@@ -1,0 +1,31 @@
+{
+  "id": "00000000-0000-4000-8000-000000000001",
+  "portfolio_id": "00000000-0000-4000-8000-000000000001",
+  "recommendation_id": "00000000-0000-4000-8000-000000000001",
+  "approval_idempotency_key": "00000000-0000-4000-8000-000000000001",
+  "approved_revision": 0,
+  "approved_at": "2030-01-01T21:00:00Z",
+  "decision_cutoff_utc": "2030-01-01T21:00:00Z",
+  "snapshot_id": "00000000-0000-4000-8000-000000000001",
+  "calendar_version": "0000000000000000000000000000000000000000000000000000000000000000",
+  "execution_policy_id": "us_eod_next_open_v1",
+  "eligible_open_at": "2030-01-02T14:30:00Z",
+  "status": "pending",
+  "terminal": false,
+  "reason": "WAITING_FOR_ELIGIBLE_OPEN",
+  "orders": [
+    {
+      "id": "00000000-0000-4000-8000-000000000001",
+      "asset_id": "DEMO:AAA",
+      "side": "BUY",
+      "requested_quantity": "1.000000",
+      "filled_quantity": "0.000000",
+      "pending_quantity": "1.000000",
+      "cancelled_or_skipped_quantity": "0.000000",
+      "earliest_fill_session": "2030-01-02",
+      "status": "pending",
+      "terminal": false,
+      "reason": "WAITING_FOR_ELIGIBLE_OPEN"
+    }
+  ]
+}

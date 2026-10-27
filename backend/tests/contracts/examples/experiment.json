@@ -1,0 +1,32 @@
+{
+  "id": "00000000-0000-4000-8000-000000000001",
+  "job_id": "00000000-0000-4000-8000-000000000001",
+  "status": "queued",
+  "inputs": {
+    "strategy_version_id": "00000000-0000-4000-8000-000000000001",
+    "snapshot_id": "00000000-0000-4000-8000-000000000001",
+    "start_session": "2030-01-01",
+    "end_session_exclusive": "2031-01-01",
+    "initial_capital_usd": "1000.00",
+    "benchmark_asset_id": "ARCX:SPY",
+    "execution_policy_id": "us_eod_next_open_v1",
+    "random_seed": 42,
+    "evaluation_split": {
+      "kind": "chronological",
+      "holdout_fraction": 0.25
+    }
+  },
+  "config_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "snapshot_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "data_status": "synthetic_fixture",
+  "created_at": "2030-01-01T21:00:00Z",
+  "engine_version": "contract-fixture",
+  "metrics": null,
+  "curve_artifact": null,
+  "trade_artifact": null,
+  "reproducibility_manifest": null,
+  "warnings": [
+    "SYNTHETIC_DATA_ONLY"
+  ],
+  "error": null
+}

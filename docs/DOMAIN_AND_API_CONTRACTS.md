@@ -44,7 +44,9 @@
 }
 ```
 
-Standard codes: `VALIDATION_ERROR` (422), `NOT_FOUND` (404), `STATE_CONFLICT` (409), `IDEMPOTENCY_CONFLICT` (409, key reused for different body), `STALE_DATA` (409), `INSUFFICIENT_MARKET_DATA` (422), `LIMIT_EXCEEDED` (422/429), `PROVIDER_UNAVAILABLE` (503), `FORECAST_UNAVAILABLE` (422/200 with unavailable state when part of a larger recommendation), `JOB_FAILED` (200 job resource with status), and `INTERNAL_ERROR` (500 without leaking secrets).
+Standard codes: `VALIDATION_ERROR` (422), `NOT_FOUND` (404), `METHOD_NOT_ALLOWED` (405, preserving the `Allow` header), `STATE_CONFLICT` (409), `IDEMPOTENCY_CONFLICT` (409, key reused for different body), `STALE_DATA` (409), `INSUFFICIENT_MARKET_DATA` (422), `LIMIT_EXCEEDED` (422/429), `PROVIDER_UNAVAILABLE` (503), `FORECAST_UNAVAILABLE` (422/200 with unavailable state when part of a larger recommendation), `JOB_FAILED` (200 job resource with status), and `INTERNAL_ERROR` (500 without leaking secrets).
+
+Contract validation errors include `details.field_paths` as an array of dotted locations (for example `body.score_weights.momentum_long`), without echoing submitted values or exception messages. Feature handlers use typed errors for their documented statuses. Generic HTTP exceptions preserve their status and headers: 400/422 map to `VALIDATION_ERROR`, 409 to `STATE_CONFLICT`, and other unclassified 4xx responses use `HTTP_ERROR`. Explicit 503 exceptions map to retryable `PROVIDER_UNAVAILABLE`; other server HTTP exceptions retain their 5xx status with `INTERNAL_ERROR`. Unexpected unclassified exceptions become sanitized 500 responses. Server failures log their code, status and correlation ID without exception messages or request values.
 
 ## 2. Domain aggregate map and keys
 

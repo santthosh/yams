@@ -1,0 +1,2435 @@
+{
+  "components": {
+    "schemas": {
+      "ActionEvidence": {
+        "additionalProperties": false,
+        "properties": {
+          "current_weight": {
+            "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$",
+            "title": "Current Weight",
+            "type": "string"
+          },
+          "position_cap": {
+            "anyOf": [
+              {
+                "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Position Cap"
+          }
+        },
+        "required": [
+          "position_cap",
+          "current_weight"
+        ],
+        "title": "ActionEvidence",
+        "type": "object"
+      },
+      "ArtifactReference": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "schema_version": {
+            "minimum": 1,
+            "title": "Schema Version",
+            "type": "integer"
+          },
+          "sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Sha256",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "sha256",
+          "schema_version"
+        ],
+        "title": "ArtifactReference",
+        "type": "object"
+      },
+      "AssetV1": {
+        "additionalProperties": false,
+        "properties": {
+          "asset_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "title": "Asset Id",
+            "type": "string"
+          },
+          "currency": {
+            "const": "USD",
+            "title": "Currency",
+            "type": "string"
+          },
+          "instrument": {
+            "enum": [
+              "ordinary_equity",
+              "etf"
+            ],
+            "title": "Instrument",
+            "type": "string"
+          },
+          "provider": {
+            "title": "Provider",
+            "type": "string"
+          },
+          "provider_id": {
+            "title": "Provider Id",
+            "type": "string"
+          },
+          "sector": {
+            "minLength": 1,
+            "title": "Sector",
+            "type": "string"
+          },
+          "symbol": {
+            "maxLength": 32,
+            "minLength": 1,
+            "title": "Symbol",
+            "type": "string"
+          },
+          "venue": {
+            "pattern": "^[A-Z0-9]{4}$",
+            "title": "Venue",
+            "type": "string"
+          }
+        },
+        "required": [
+          "asset_id",
+          "venue",
+          "symbol",
+          "currency",
+          "instrument",
+          "sector",
+          "provider",
+          "provider_id"
+        ],
+        "title": "AssetV1",
+        "type": "object"
+      },
+      "CalendarReference": {
+        "additionalProperties": false,
+        "properties": {
+          "artifact_path": {
+            "title": "Artifact Path",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "timezone": {
+            "const": "America/New_York",
+            "title": "Timezone",
+            "type": "string"
+          },
+          "version": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "timezone",
+          "version",
+          "artifact_path"
+        ],
+        "title": "CalendarReference",
+        "type": "object"
+      },
+      "CandidateEvidence": {
+        "additionalProperties": false,
+        "properties": {
+          "asset_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "title": "Asset Id",
+            "type": "string"
+          },
+          "contributions": {
+            "items": {
+              "$ref": "#/components/schemas/FeatureValue"
+            },
+            "title": "Contributions",
+            "type": "array"
+          },
+          "exclusion_reasons": {
+            "items": {
+              "pattern": "^[A-Z][A-Z0-9_]*$",
+              "type": "string"
+            },
+            "title": "Exclusion Reasons",
+            "type": "array"
+          },
+          "features": {
+            "items": {
+              "$ref": "#/components/schemas/FeatureValue"
+            },
+            "title": "Features",
+            "type": "array"
+          },
+          "score": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Score"
+          }
+        },
+        "required": [
+          "asset_id",
+          "features",
+          "score",
+          "exclusion_reasons",
+          "contributions"
+        ],
+        "title": "CandidateEvidence",
+        "type": "object"
+      },
+      "ErrorDetail": {
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "enum": [
+              "VALIDATION_ERROR",
+              "NOT_FOUND",
+              "METHOD_NOT_ALLOWED",
+              "HTTP_ERROR",
+              "STATE_CONFLICT",
+              "IDEMPOTENCY_CONFLICT",
+              "STALE_DATA",
+              "INSUFFICIENT_MARKET_DATA",
+              "LIMIT_EXCEEDED",
+              "PROVIDER_UNAVAILABLE",
+              "FORECAST_UNAVAILABLE",
+              "JOB_FAILED",
+              "INTERNAL_ERROR",
+              "WORKLOAD_LIMIT",
+              "RESOURCE_EXHAUSTED",
+              "TIME_LIMIT"
+            ],
+            "title": "Code",
+            "type": "string"
+          },
+          "correlation_id": {
+            "format": "uuid",
+            "title": "Correlation Id",
+            "type": "string"
+          },
+          "details": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "boolean"
+                },
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                }
+              ]
+            },
+            "title": "Details",
+            "type": "object"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "retryable": {
+            "title": "Retryable",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "code",
+          "message",
+          "details",
+          "retryable",
+          "correlation_id"
+        ],
+        "title": "ErrorDetail",
+        "type": "object"
+      },
+      "ErrorEnvelope": {
+        "additionalProperties": false,
+        "properties": {
+          "error": {
+            "$ref": "#/components/schemas/ErrorDetail"
+          }
+        },
+        "required": [
+          "error"
+        ],
+        "title": "ErrorEnvelope",
+        "type": "object"
+      },
+      "EvaluationSplit": {
+        "additionalProperties": false,
+        "properties": {
+          "holdout_fraction": {
+            "gt": 0,
+            "lt": 1,
+            "title": "Holdout Fraction",
+            "type": "number"
+          },
+          "kind": {
+            "const": "chronological",
+            "title": "Kind",
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "holdout_fraction"
+        ],
+        "title": "EvaluationSplit",
+        "type": "object"
+      },
+      "ExecutionPolicy": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "const": "us_eod_next_open_v1",
+            "title": "Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "title": "ExecutionPolicy",
+        "type": "object"
+      },
+      "ExperimentMetrics": {
+        "additionalProperties": false,
+        "properties": {
+          "annualized_return_fraction": {
+            "$ref": "#/components/schemas/MetricValue"
+          },
+          "annualized_volatility_fraction": {
+            "$ref": "#/components/schemas/MetricValue"
+          },
+          "cumulative_return_fraction": {
+            "$ref": "#/components/schemas/MetricValue"
+          },
+          "fees_usd": {
+            "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Fees Usd",
+            "type": "string"
+          },
+          "max_drawdown_fraction": {
+            "$ref": "#/components/schemas/MetricValue"
+          },
+          "sharpe_ratio": {
+            "$ref": "#/components/schemas/MetricValue"
+          },
+          "slippage_usd": {
+            "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Slippage Usd",
+            "type": "string"
+          },
+          "trade_count": {
+            "minimum": 0,
+            "title": "Trade Count",
+            "type": "integer"
+          },
+          "turnover_fraction": {
+            "$ref": "#/components/schemas/MetricValue"
+          }
+        },
+        "required": [
+          "cumulative_return_fraction",
+          "annualized_return_fraction",
+          "annualized_volatility_fraction",
+          "max_drawdown_fraction",
+          "turnover_fraction",
+          "sharpe_ratio",
+          "slippage_usd",
+          "fees_usd",
+          "trade_count"
+        ],
+        "title": "ExperimentMetrics",
+        "type": "object"
+      },
+      "ExperimentRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "benchmark_asset_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "title": "Benchmark Asset Id",
+            "type": "string"
+          },
+          "end_session_exclusive": {
+            "format": "date",
+            "title": "End Session Exclusive",
+            "type": "string"
+          },
+          "evaluation_split": {
+            "$ref": "#/components/schemas/EvaluationSplit"
+          },
+          "execution_policy_id": {
+            "const": "us_eod_next_open_v1",
+            "title": "Execution Policy Id",
+            "type": "string"
+          },
+          "initial_capital_usd": {
+            "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Initial Capital Usd",
+            "type": "string"
+          },
+          "random_seed": {
+            "maximum": 18446744073709551615,
+            "minimum": 0,
+            "title": "Random Seed",
+            "type": "integer"
+          },
+          "snapshot_id": {
+            "format": "uuid",
+            "title": "Snapshot Id",
+            "type": "string"
+          },
+          "start_session": {
+            "format": "date",
+            "title": "Start Session",
+            "type": "string"
+          },
+          "strategy_version_id": {
+            "format": "uuid",
+            "title": "Strategy Version Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "strategy_version_id",
+          "snapshot_id",
+          "start_session",
+          "end_session_exclusive",
+          "initial_capital_usd",
+          "benchmark_asset_id",
+          "execution_policy_id",
+          "random_seed",
+          "evaluation_split"
+        ],
+        "title": "ExperimentRequest",
+        "type": "object"
+      },
+      "ExperimentRunV1": {
+        "additionalProperties": false,
+        "properties": {
+          "config_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Config Sha256",
+            "type": "string"
+          },
+          "created_at": {
+            "format": "date-time",
+            "pattern": "Z$",
+            "title": "Created At",
+            "type": "string"
+          },
+          "curve_artifact": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ArtifactReference"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "data_status": {
+            "enum": [
+              "synthetic_fixture",
+              "research_market_data"
+            ],
+            "title": "Data Status",
+            "type": "string"
+          },
+          "engine_version": {
+            "title": "Engine Version",
+            "type": "string"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ErrorDetail"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "inputs": {
+            "$ref": "#/components/schemas/ExperimentRequest"
+          },
+          "job_id": {
+            "format": "uuid",
+            "title": "Job Id",
+            "type": "string"
+          },
+          "metrics": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ExperimentMetrics"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "reproducibility_manifest": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ArtifactReference"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "snapshot_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Snapshot Sha256",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "queued",
+              "running",
+              "cancel_requested",
+              "completed",
+              "failed",
+              "cancelled"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "trade_artifact": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ArtifactReference"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "warnings": {
+            "items": {
+              "pattern": "^[A-Z][A-Z0-9_]*$",
+              "type": "string"
+            },
+            "title": "Warnings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "job_id",
+          "status",
+          "inputs",
+          "config_sha256",
+          "snapshot_sha256",
+          "data_status",
+          "created_at",
+          "engine_version",
+          "metrics",
+          "curve_artifact",
+          "trade_artifact",
+          "reproducibility_manifest",
+          "warnings",
+          "error"
+        ],
+        "title": "ExperimentRunV1",
+        "type": "object"
+      },
+      "FeatureValue": {
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "unavailable_reason": {
+            "anyOf": [
+              {
+                "pattern": "^[A-Z][A-Z0-9_]*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unavailable Reason"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value"
+          }
+        },
+        "required": [
+          "name",
+          "value",
+          "unavailable_reason"
+        ],
+        "title": "FeatureValue",
+        "type": "object"
+      },
+      "ForecastAllocation": {
+        "additionalProperties": false,
+        "properties": {
+          "cash_weight": {
+            "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$",
+            "title": "Cash Weight",
+            "type": "string"
+          },
+          "upfront_cost_usd": {
+            "anyOf": [
+              {
+                "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Upfront Cost Usd"
+          },
+          "weights": {
+            "items": {
+              "$ref": "#/components/schemas/ForecastWeight"
+            },
+            "title": "Weights",
+            "type": "array"
+          }
+        },
+        "required": [
+          "weights",
+          "cash_weight",
+          "upfront_cost_usd"
+        ],
+        "title": "ForecastAllocation",
+        "type": "object"
+      },
+      "ForecastOutcome": {
+        "additionalProperties": false,
+        "properties": {
+          "median_ending_value_usd": {
+            "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Median Ending Value Usd",
+            "type": "string"
+          },
+          "median_return_fraction": {
+            "ge": -1,
+            "title": "Median Return Fraction",
+            "type": "number"
+          },
+          "p10_return_fraction": {
+            "ge": -1,
+            "title": "P10 Return Fraction",
+            "type": "number"
+          },
+          "p90_return_fraction": {
+            "ge": -1,
+            "title": "P90 Return Fraction",
+            "type": "number"
+          },
+          "probability_of_loss": {
+            "ge": 0,
+            "le": 1,
+            "title": "Probability Of Loss",
+            "type": "number"
+          }
+        },
+        "required": [
+          "median_return_fraction",
+          "p10_return_fraction",
+          "p90_return_fraction",
+          "probability_of_loss",
+          "median_ending_value_usd"
+        ],
+        "title": "ForecastOutcome",
+        "type": "object"
+      },
+      "ForecastV1": {
+        "additionalProperties": false,
+        "properties": {
+          "as_of_session": {
+            "format": "date",
+            "title": "As Of Session",
+            "type": "string"
+          },
+          "block_length_sessions": {
+            "maximum": 5,
+            "minimum": 5,
+            "title": "Block Length Sessions",
+            "type": "integer"
+          },
+          "calendar_version": {
+            "anyOf": [
+              {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Calendar Version"
+          },
+          "cash_return_fraction": {
+            "ge": 0,
+            "le": 0,
+            "title": "Cash Return Fraction",
+            "type": "number"
+          },
+          "comparability": {
+            "const": "common_shock_paths",
+            "title": "Comparability",
+            "type": "string"
+          },
+          "current_allocation": {
+            "$ref": "#/components/schemas/ForecastAllocation"
+          },
+          "data_status": {
+            "enum": [
+              "synthetic_fixture",
+              "research_market_data"
+            ],
+            "title": "Data Status",
+            "type": "string"
+          },
+          "decision_cutoff_utc": {
+            "format": "date-time",
+            "pattern": "Z$",
+            "title": "Decision Cutoff Utc",
+            "type": "string"
+          },
+          "engine_version": {
+            "title": "Engine Version",
+            "type": "string"
+          },
+          "fingerprint": {
+            "anyOf": [
+              {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fingerprint"
+          },
+          "fingerprint_schema_version": {
+            "maximum": 1,
+            "minimum": 1,
+            "title": "Fingerprint Schema Version",
+            "type": "integer"
+          },
+          "future_sessions": {
+            "anyOf": [
+              {
+                "items": {
+                  "format": "date",
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Future Sessions"
+          },
+          "hold_unchanged": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ForecastOutcome"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "horizon_calendar_days": {
+            "maximum": 90,
+            "minimum": 90,
+            "title": "Horizon Calendar Days",
+            "type": "integer"
+          },
+          "horizon_end_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "pattern": "Z$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Horizon End At"
+          },
+          "horizon_trading_sessions": {
+            "anyOf": [
+              {
+                "maximum": 90,
+                "minimum": 0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Horizon Trading Sessions"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "initial_value_usd": {
+            "anyOf": [
+              {
+                "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Initial Value Usd"
+          },
+          "input_array_sha256": {
+            "anyOf": [
+              {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Input Array Sha256"
+          },
+          "limitations": {
+            "items": {
+              "pattern": "^[A-Z][A-Z0-9_]*$",
+              "type": "string"
+            },
+            "title": "Limitations",
+            "type": "array"
+          },
+          "lookback_sessions": {
+            "maximum": 252,
+            "minimum": 252,
+            "title": "Lookback Sessions",
+            "type": "integer"
+          },
+          "median_return_delta_fraction": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Median Return Delta Fraction"
+          },
+          "method": {
+            "const": "multivariate_block_bootstrap_v1",
+            "title": "Method",
+            "type": "string"
+          },
+          "proposed": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ForecastOutcome"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "proposed_allocation": {
+            "$ref": "#/components/schemas/ForecastAllocation"
+          },
+          "rng": {
+            "$ref": "#/components/schemas/RNGMetadata"
+          },
+          "sampled_indices": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ArtifactReference"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "seed": {
+            "maximum": 18446744073709551615,
+            "minimum": 0,
+            "title": "Seed",
+            "type": "integer"
+          },
+          "simulation_count": {
+            "maximum": 5000,
+            "minimum": 5000,
+            "title": "Simulation Count",
+            "type": "integer"
+          },
+          "snapshot_id": {
+            "format": "uuid",
+            "title": "Snapshot Id",
+            "type": "string"
+          },
+          "snapshot_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Snapshot Sha256",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "available",
+              "unavailable"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "unavailable_reason": {
+            "anyOf": [
+              {
+                "pattern": "^[A-Z][A-Z0-9_]*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unavailable Reason"
+          }
+        },
+        "required": [
+          "id",
+          "status",
+          "unavailable_reason",
+          "as_of_session",
+          "decision_cutoff_utc",
+          "data_status",
+          "snapshot_id",
+          "snapshot_sha256",
+          "calendar_version",
+          "horizon_calendar_days",
+          "horizon_trading_sessions",
+          "horizon_end_at",
+          "future_sessions",
+          "method",
+          "seed",
+          "simulation_count",
+          "lookback_sessions",
+          "block_length_sessions",
+          "cash_return_fraction",
+          "initial_value_usd",
+          "current_allocation",
+          "proposed_allocation",
+          "rng",
+          "input_array_sha256",
+          "sampled_indices",
+          "fingerprint",
+          "fingerprint_schema_version",
+          "engine_version",
+          "proposed",
+          "hold_unchanged",
+          "median_return_delta_fraction",
+          "comparability",
+          "limitations"
+        ],
+        "title": "ForecastV1",
+        "type": "object"
+      },
+      "ForecastWeight": {
+        "additionalProperties": false,
+        "properties": {
+          "asset_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "title": "Asset Id",
+            "type": "string"
+          },
+          "weight": {
+            "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$",
+            "title": "Weight",
+            "type": "string"
+          }
+        },
+        "required": [
+          "asset_id",
+          "weight"
+        ],
+        "title": "ForecastWeight",
+        "type": "object"
+      },
+      "JobResult": {
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "enum": [
+              "diagnostic",
+              "resource"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "resource_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resource Id"
+          }
+        },
+        "required": [
+          "kind",
+          "resource_id",
+          "message"
+        ],
+        "title": "JobResult",
+        "type": "object"
+      },
+      "JobV1": {
+        "additionalProperties": false,
+        "properties": {
+          "attempts": {
+            "minimum": 0,
+            "title": "Attempts",
+            "type": "integer"
+          },
+          "created_at": {
+            "format": "date-time",
+            "pattern": "Z$",
+            "title": "Created At",
+            "type": "string"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ErrorDetail"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "max_attempts": {
+            "minimum": 1,
+            "title": "Max Attempts",
+            "type": "integer"
+          },
+          "progress": {
+            "ge": 0,
+            "le": 100,
+            "title": "Progress",
+            "type": "number"
+          },
+          "result": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/JobResult"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "status": {
+            "enum": [
+              "queued",
+              "running",
+              "cancel_requested",
+              "completed",
+              "failed",
+              "cancelled"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "pattern": "Z$",
+            "title": "Updated At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "status",
+          "attempts",
+          "max_attempts",
+          "progress",
+          "created_at",
+          "updated_at",
+          "result",
+          "error"
+        ],
+        "title": "JobV1",
+        "type": "object"
+      },
+      "Liveness": {
+        "properties": {
+          "paper_only": {
+            "const": true,
+            "default": true,
+            "title": "Paper Only",
+            "type": "boolean"
+          },
+          "status": {
+            "const": "alive",
+            "default": "alive",
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "title": "Liveness",
+        "type": "object"
+      },
+      "MarketBarV1": {
+        "additionalProperties": false,
+        "properties": {
+          "adjusted_close": {
+            "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$",
+            "title": "Adjusted Close",
+            "type": "string"
+          },
+          "asset_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "title": "Asset Id",
+            "type": "string"
+          },
+          "availability_basis": {
+            "enum": [
+              "published",
+              "observed",
+              "synthetic"
+            ],
+            "title": "Availability Basis",
+            "type": "string"
+          },
+          "available_at": {
+            "format": "date-time",
+            "pattern": "Z$",
+            "title": "Available At",
+            "type": "string"
+          },
+          "close": {
+            "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$",
+            "title": "Close",
+            "type": "string"
+          },
+          "currency": {
+            "const": "USD",
+            "title": "Currency",
+            "type": "string"
+          },
+          "high": {
+            "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$",
+            "title": "High",
+            "type": "string"
+          },
+          "ingested_at": {
+            "format": "date-time",
+            "pattern": "Z$",
+            "title": "Ingested At",
+            "type": "string"
+          },
+          "low": {
+            "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$",
+            "title": "Low",
+            "type": "string"
+          },
+          "open": {
+            "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$",
+            "title": "Open",
+            "type": "string"
+          },
+          "price_basis": {
+            "enum": [
+              "raw_as_traded",
+              "provider_unverified"
+            ],
+            "title": "Price Basis",
+            "type": "string"
+          },
+          "provider": {
+            "title": "Provider",
+            "type": "string"
+          },
+          "published_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "pattern": "Z$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Published At"
+          },
+          "quality_flags": {
+            "items": {
+              "pattern": "^[A-Z][A-Z0-9_]*$",
+              "type": "string"
+            },
+            "title": "Quality Flags",
+            "type": "array"
+          },
+          "schema_version": {
+            "const": 1,
+            "title": "Schema Version",
+            "type": "integer"
+          },
+          "session_date": {
+            "format": "date",
+            "title": "Session Date",
+            "type": "string"
+          },
+          "volume": {
+            "minimum": 0,
+            "title": "Volume",
+            "type": "integer"
+          },
+          "volume_basis": {
+            "title": "Volume Basis",
+            "type": "string"
+          }
+        },
+        "required": [
+          "schema_version",
+          "asset_id",
+          "session_date",
+          "open",
+          "high",
+          "low",
+          "close",
+          "adjusted_close",
+          "volume",
+          "currency",
+          "provider",
+          "published_at",
+          "available_at",
+          "ingested_at",
+          "availability_basis",
+          "price_basis",
+          "volume_basis",
+          "quality_flags"
+        ],
+        "title": "MarketBarV1",
+        "type": "object"
+      },
+      "MetricValue": {
+        "additionalProperties": false,
+        "properties": {
+          "unavailable_reason": {
+            "anyOf": [
+              {
+                "pattern": "^[A-Z][A-Z0-9_]*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unavailable Reason"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value"
+          }
+        },
+        "required": [
+          "value",
+          "unavailable_reason"
+        ],
+        "title": "MetricValue",
+        "type": "object"
+      },
+      "MissingSession": {
+        "additionalProperties": false,
+        "properties": {
+          "asset_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "title": "Asset Id",
+            "type": "string"
+          },
+          "session_date": {
+            "format": "date",
+            "title": "Session Date",
+            "type": "string"
+          }
+        },
+        "required": [
+          "asset_id",
+          "session_date"
+        ],
+        "title": "MissingSession",
+        "type": "object"
+      },
+      "PageRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "cursor": {
+            "anyOf": [
+              {
+                "maxLength": 2048,
+                "minLength": 1,
+                "pattern": "^[A-Za-z0-9_-]+$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Cursor"
+          },
+          "limit": {
+            "default": 25,
+            "maximum": 100,
+            "minimum": 1,
+            "title": "Limit",
+            "type": "integer"
+          }
+        },
+        "title": "PageRequest",
+        "type": "object"
+      },
+      "PaperOrderBatchV1": {
+        "additionalProperties": false,
+        "properties": {
+          "approval_idempotency_key": {
+            "format": "uuid",
+            "title": "Approval Idempotency Key",
+            "type": "string"
+          },
+          "approved_at": {
+            "format": "date-time",
+            "pattern": "Z$",
+            "title": "Approved At",
+            "type": "string"
+          },
+          "approved_revision": {
+            "minimum": 0,
+            "title": "Approved Revision",
+            "type": "integer"
+          },
+          "calendar_version": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Calendar Version",
+            "type": "string"
+          },
+          "decision_cutoff_utc": {
+            "format": "date-time",
+            "pattern": "Z$",
+            "title": "Decision Cutoff Utc",
+            "type": "string"
+          },
+          "eligible_open_at": {
+            "format": "date-time",
+            "pattern": "Z$",
+            "title": "Eligible Open At",
+            "type": "string"
+          },
+          "execution_policy_id": {
+            "const": "us_eod_next_open_v1",
+            "title": "Execution Policy Id",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "orders": {
+            "items": {
+              "$ref": "#/components/schemas/PaperOrderV1"
+            },
+            "minItems": 1,
+            "title": "Orders",
+            "type": "array"
+          },
+          "portfolio_id": {
+            "format": "uuid",
+            "title": "Portfolio Id",
+            "type": "string"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "pattern": "^[A-Z][A-Z0-9_]*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          },
+          "recommendation_id": {
+            "format": "uuid",
+            "title": "Recommendation Id",
+            "type": "string"
+          },
+          "snapshot_id": {
+            "format": "uuid",
+            "title": "Snapshot Id",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "pending",
+              "partially_filled",
+              "filled",
+              "cancelled",
+              "rejected"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "terminal": {
+            "title": "Terminal",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "portfolio_id",
+          "recommendation_id",
+          "approval_idempotency_key",
+          "approved_revision",
+          "approved_at",
+          "decision_cutoff_utc",
+          "snapshot_id",
+          "calendar_version",
+          "execution_policy_id",
+          "eligible_open_at",
+          "status",
+          "terminal",
+          "orders",
+          "reason"
+        ],
+        "title": "PaperOrderBatchV1",
+        "type": "object"
+      },
+      "PaperOrderV1": {
+        "additionalProperties": false,
+        "properties": {
+          "asset_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "title": "Asset Id",
+            "type": "string"
+          },
+          "cancelled_or_skipped_quantity": {
+            "pattern": "^(0|[1-9][0-9]{0,23})(\\.[0-9]{1,6})?$",
+            "title": "Cancelled Or Skipped Quantity",
+            "type": "string"
+          },
+          "earliest_fill_session": {
+            "format": "date",
+            "title": "Earliest Fill Session",
+            "type": "string"
+          },
+          "filled_quantity": {
+            "pattern": "^(0|[1-9][0-9]{0,23})(\\.[0-9]{1,6})?$",
+            "title": "Filled Quantity",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "pending_quantity": {
+            "pattern": "^(0|[1-9][0-9]{0,23})(\\.[0-9]{1,6})?$",
+            "title": "Pending Quantity",
+            "type": "string"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "pattern": "^[A-Z][A-Z0-9_]*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          },
+          "requested_quantity": {
+            "pattern": "^(0|[1-9][0-9]{0,23})(\\.[0-9]{1,6})?$",
+            "title": "Requested Quantity",
+            "type": "string"
+          },
+          "side": {
+            "enum": [
+              "BUY",
+              "SELL"
+            ],
+            "title": "Side",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "pending",
+              "partially_filled",
+              "filled",
+              "cancelled",
+              "rejected"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "terminal": {
+            "title": "Terminal",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "asset_id",
+          "side",
+          "requested_quantity",
+          "filled_quantity",
+          "pending_quantity",
+          "cancelled_or_skipped_quantity",
+          "earliest_fill_session",
+          "status",
+          "terminal",
+          "reason"
+        ],
+        "title": "PaperOrderV1",
+        "type": "object"
+      },
+      "PortfolioConfig": {
+        "additionalProperties": false,
+        "properties": {
+          "max_position_weight": {
+            "pattern": "^(0|1)(\\.[0-9]{1,6})?$",
+            "title": "Max Position Weight",
+            "type": "string"
+          },
+          "max_positions": {
+            "maximum": 100,
+            "minimum": 1,
+            "title": "Max Positions",
+            "type": "integer"
+          },
+          "max_sector_weight": {
+            "pattern": "^(0|1)(\\.[0-9]{1,6})?$",
+            "title": "Max Sector Weight",
+            "type": "string"
+          },
+          "min_cash_weight": {
+            "pattern": "^(0|1)(\\.[0-9]{1,6})?$",
+            "title": "Min Cash Weight",
+            "type": "string"
+          },
+          "min_trade_usd": {
+            "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Min Trade Usd",
+            "type": "string"
+          },
+          "rebalance_band_absolute_weight": {
+            "pattern": "^(0|1)(\\.[0-9]{1,6})?$",
+            "title": "Rebalance Band Absolute Weight",
+            "type": "string"
+          },
+          "weighting": {
+            "const": "inverse_volatility",
+            "title": "Weighting",
+            "type": "string"
+          }
+        },
+        "required": [
+          "max_positions",
+          "weighting",
+          "max_position_weight",
+          "max_sector_weight",
+          "min_cash_weight",
+          "min_trade_usd",
+          "rebalance_band_absolute_weight"
+        ],
+        "title": "PortfolioConfig",
+        "type": "object"
+      },
+      "RNGMetadata": {
+        "additionalProperties": false,
+        "properties": {
+          "generator": {
+            "const": "PCG64",
+            "title": "Generator",
+            "type": "string"
+          },
+          "initial_state": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ArtifactReference"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "numpy_version": {
+            "title": "Numpy Version",
+            "type": "string"
+          },
+          "sampling_version": {
+            "const": "noncircular_c_order_v1",
+            "title": "Sampling Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "generator",
+          "numpy_version",
+          "sampling_version",
+          "initial_state"
+        ],
+        "title": "RNGMetadata",
+        "type": "object"
+      },
+      "RebalanceConfig": {
+        "additionalProperties": false,
+        "properties": {
+          "frequency": {
+            "const": "monthly",
+            "title": "Frequency",
+            "type": "string"
+          }
+        },
+        "required": [
+          "frequency"
+        ],
+        "title": "RebalanceConfig",
+        "type": "object"
+      },
+      "RecommendationV1": {
+        "additionalProperties": false,
+        "properties": {
+          "actions": {
+            "items": {
+              "$ref": "#/components/schemas/RecommendedAction"
+            },
+            "title": "Actions",
+            "type": "array"
+          },
+          "as_of_session": {
+            "format": "date",
+            "title": "As Of Session",
+            "type": "string"
+          },
+          "candidates": {
+            "items": {
+              "$ref": "#/components/schemas/CandidateEvidence"
+            },
+            "title": "Candidates",
+            "type": "array"
+          },
+          "cash_target_weight": {
+            "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$",
+            "title": "Cash Target Weight",
+            "type": "string"
+          },
+          "created_at": {
+            "format": "date-time",
+            "pattern": "Z$",
+            "title": "Created At",
+            "type": "string"
+          },
+          "data_status": {
+            "enum": [
+              "synthetic_fixture",
+              "research_market_data"
+            ],
+            "title": "Data Status",
+            "type": "string"
+          },
+          "decision_cutoff_utc": {
+            "format": "date-time",
+            "pattern": "Z$",
+            "title": "Decision Cutoff Utc",
+            "type": "string"
+          },
+          "engine_version": {
+            "title": "Engine Version",
+            "type": "string"
+          },
+          "estimated_total_trade_cost_usd": {
+            "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Estimated Total Trade Cost Usd",
+            "type": "string"
+          },
+          "forecast_id": {
+            "format": "uuid",
+            "title": "Forecast Id",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "portfolio_id": {
+            "format": "uuid",
+            "title": "Portfolio Id",
+            "type": "string"
+          },
+          "portfolio_revision": {
+            "minimum": 0,
+            "title": "Portfolio Revision",
+            "type": "integer"
+          },
+          "snapshot_id": {
+            "format": "uuid",
+            "title": "Snapshot Id",
+            "type": "string"
+          },
+          "snapshot_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Snapshot Sha256",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "ready",
+              "applied",
+              "dismissed",
+              "expired"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "strategy_version_id": {
+            "format": "uuid",
+            "title": "Strategy Version Id",
+            "type": "string"
+          },
+          "summary_action": {
+            "enum": [
+              "BUY",
+              "SELL",
+              "HOLD",
+              "REBALANCE",
+              "ALLOCATE_TO_CASH"
+            ],
+            "title": "Summary Action",
+            "type": "string"
+          },
+          "target_weights": {
+            "items": {
+              "$ref": "#/components/schemas/TargetWeight"
+            },
+            "title": "Target Weights",
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "portfolio_id",
+          "portfolio_revision",
+          "strategy_version_id",
+          "snapshot_id",
+          "snapshot_sha256",
+          "as_of_session",
+          "decision_cutoff_utc",
+          "data_status",
+          "summary_action",
+          "target_weights",
+          "cash_target_weight",
+          "actions",
+          "candidates",
+          "estimated_total_trade_cost_usd",
+          "forecast_id",
+          "engine_version",
+          "created_at",
+          "status"
+        ],
+        "title": "RecommendationV1",
+        "type": "object"
+      },
+      "RecommendedAction": {
+        "additionalProperties": false,
+        "properties": {
+          "asset_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "title": "Asset Id",
+            "type": "string"
+          },
+          "current_weight": {
+            "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$",
+            "title": "Current Weight",
+            "type": "string"
+          },
+          "estimated_notional_usd": {
+            "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Estimated Notional Usd",
+            "type": "string"
+          },
+          "estimated_quantity": {
+            "pattern": "^(0|[1-9][0-9]{0,23})(\\.[0-9]{1,6})?$",
+            "title": "Estimated Quantity",
+            "type": "string"
+          },
+          "evidence": {
+            "$ref": "#/components/schemas/ActionEvidence"
+          },
+          "explanation": {
+            "title": "Explanation",
+            "type": "string"
+          },
+          "label": {
+            "enum": [
+              "INCREASE",
+              "REDUCE",
+              "HOLD"
+            ],
+            "title": "Label",
+            "type": "string"
+          },
+          "reason_codes": {
+            "items": {
+              "pattern": "^[A-Z][A-Z0-9_]*$",
+              "type": "string"
+            },
+            "minItems": 1,
+            "title": "Reason Codes",
+            "type": "array"
+          },
+          "side": {
+            "enum": [
+              "BUY",
+              "SELL",
+              "HOLD"
+            ],
+            "title": "Side",
+            "type": "string"
+          },
+          "target_weight": {
+            "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$",
+            "title": "Target Weight",
+            "type": "string"
+          }
+        },
+        "required": [
+          "asset_id",
+          "side",
+          "label",
+          "current_weight",
+          "target_weight",
+          "estimated_notional_usd",
+          "estimated_quantity",
+          "reason_codes",
+          "evidence",
+          "explanation"
+        ],
+        "title": "RecommendedAction",
+        "type": "object"
+      },
+      "ScoreWeights": {
+        "additionalProperties": false,
+        "properties": {
+          "momentum_long": {
+            "maximum": 1,
+            "minimum": -1,
+            "multipleOf": 1e-06,
+            "title": "Momentum Long",
+            "type": "number"
+          },
+          "momentum_short": {
+            "maximum": 1,
+            "minimum": -1,
+            "multipleOf": 1e-06,
+            "title": "Momentum Short",
+            "type": "number"
+          },
+          "volatility_penalty": {
+            "maximum": 1,
+            "minimum": -1,
+            "multipleOf": 1e-06,
+            "title": "Volatility Penalty",
+            "type": "number"
+          }
+        },
+        "required": [
+          "momentum_long",
+          "momentum_short",
+          "volatility_penalty"
+        ],
+        "title": "ScoreWeights",
+        "type": "object"
+      },
+      "SignalConfig": {
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "const": "risk_adjusted_momentum",
+            "title": "Kind",
+            "type": "string"
+          },
+          "momentum_long_sessions": {
+            "maximum": 2519,
+            "minimum": 1,
+            "title": "Momentum Long Sessions",
+            "type": "integer"
+          },
+          "momentum_short_sessions": {
+            "maximum": 2519,
+            "minimum": 1,
+            "title": "Momentum Short Sessions",
+            "type": "integer"
+          },
+          "require_positive_trend": {
+            "title": "Require Positive Trend",
+            "type": "boolean"
+          },
+          "trend_sma_sessions": {
+            "maximum": 2520,
+            "minimum": 1,
+            "title": "Trend Sma Sessions",
+            "type": "integer"
+          },
+          "volatility_sessions": {
+            "maximum": 2519,
+            "minimum": 2,
+            "title": "Volatility Sessions",
+            "type": "integer"
+          },
+          "z_score_weights": {
+            "$ref": "#/components/schemas/ScoreWeights"
+          }
+        },
+        "required": [
+          "kind",
+          "momentum_long_sessions",
+          "momentum_short_sessions",
+          "volatility_sessions",
+          "trend_sma_sessions",
+          "require_positive_trend",
+          "z_score_weights"
+        ],
+        "title": "SignalConfig",
+        "type": "object"
+      },
+      "SnapshotArtifact": {
+        "additionalProperties": false,
+        "properties": {
+          "format": {
+            "enum": [
+              "parquet",
+              "json"
+            ],
+            "title": "Format",
+            "type": "string"
+          },
+          "path": {
+            "pattern": "^[A-Za-z0-9_./-]+$",
+            "title": "Path",
+            "type": "string"
+          },
+          "role": {
+            "enum": [
+              "bars",
+              "assets",
+              "actions",
+              "universe",
+              "calendar",
+              "provenance",
+              "coverage"
+            ],
+            "title": "Role",
+            "type": "string"
+          },
+          "row_count": {
+            "anyOf": [
+              {
+                "minimum": 0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Row Count"
+          },
+          "schema_version": {
+            "minimum": 1,
+            "title": "Schema Version",
+            "type": "integer"
+          },
+          "sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Sha256",
+            "type": "string"
+          },
+          "size_bytes": {
+            "minimum": 0,
+            "title": "Size Bytes",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "path",
+          "role",
+          "format",
+          "schema_version",
+          "sha256",
+          "size_bytes",
+          "row_count"
+        ],
+        "title": "SnapshotArtifact",
+        "type": "object"
+      },
+      "SnapshotCoverage": {
+        "additionalProperties": false,
+        "properties": {
+          "asset_ids": {
+            "items": {
+              "maxLength": 160,
+              "minLength": 1,
+              "type": "string"
+            },
+            "title": "Asset Ids",
+            "type": "array"
+          },
+          "first_session": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "First Session"
+          },
+          "last_session": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Session"
+          },
+          "latest_completed_session": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latest Completed Session"
+          },
+          "membership_basis": {
+            "enum": [
+              "point_in_time",
+              "current_only",
+              "synthetic"
+            ],
+            "title": "Membership Basis",
+            "type": "string"
+          },
+          "missing_sessions": {
+            "items": {
+              "$ref": "#/components/schemas/MissingSession"
+            },
+            "title": "Missing Sessions",
+            "type": "array"
+          }
+        },
+        "required": [
+          "asset_ids",
+          "first_session",
+          "last_session",
+          "latest_completed_session",
+          "missing_sessions",
+          "membership_basis"
+        ],
+        "title": "SnapshotCoverage",
+        "type": "object"
+      },
+      "SnapshotManifestV1": {
+        "additionalProperties": false,
+        "properties": {
+          "artifacts": {
+            "items": {
+              "$ref": "#/components/schemas/SnapshotArtifact"
+            },
+            "minItems": 1,
+            "title": "Artifacts",
+            "type": "array"
+          },
+          "calendar": {
+            "$ref": "#/components/schemas/CalendarReference"
+          },
+          "coverage": {
+            "$ref": "#/components/schemas/SnapshotCoverage"
+          },
+          "mode": {
+            "enum": [
+              "synthetic_fixture",
+              "research_market_data"
+            ],
+            "title": "Mode",
+            "type": "string"
+          },
+          "price_basis": {
+            "$ref": "#/components/schemas/SnapshotPriceBasis"
+          },
+          "quality": {
+            "enum": [
+              "usable",
+              "usable_with_warnings",
+              "blocked"
+            ],
+            "title": "Quality",
+            "type": "string"
+          },
+          "schema_version": {
+            "const": 1,
+            "title": "Schema Version",
+            "type": "integer"
+          },
+          "source": {
+            "$ref": "#/components/schemas/SnapshotSource"
+          },
+          "warnings": {
+            "items": {
+              "pattern": "^[A-Z][A-Z0-9_]*$",
+              "type": "string"
+            },
+            "title": "Warnings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "schema_version",
+          "mode",
+          "source",
+          "price_basis",
+          "calendar",
+          "coverage",
+          "quality",
+          "warnings",
+          "artifacts"
+        ],
+        "title": "SnapshotManifestV1",
+        "type": "object"
+      },
+      "SnapshotPriceBasis": {
+        "additionalProperties": false,
+        "properties": {
+          "adjusted_close": {
+            "title": "Adjusted Close",
+            "type": "string"
+          },
+          "corporate_action_policy": {
+            "title": "Corporate Action Policy",
+            "type": "string"
+          },
+          "currency": {
+            "const": "USD",
+            "title": "Currency",
+            "type": "string"
+          },
+          "ohlc": {
+            "enum": [
+              "raw_as_traded",
+              "provider_unverified"
+            ],
+            "title": "Ohlc",
+            "type": "string"
+          },
+          "volume": {
+            "title": "Volume",
+            "type": "string"
+          }
+        },
+        "required": [
+          "ohlc",
+          "adjusted_close",
+          "volume",
+          "currency",
+          "corporate_action_policy"
+        ],
+        "title": "SnapshotPriceBasis",
+        "type": "object"
+      },
+      "SnapshotSource": {
+        "additionalProperties": false,
+        "properties": {
+          "adapter_version": {
+            "title": "Adapter Version",
+            "type": "string"
+          },
+          "capabilities_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Capabilities Sha256",
+            "type": "string"
+          },
+          "normalization_version": {
+            "title": "Normalization Version",
+            "type": "string"
+          },
+          "provider": {
+            "title": "Provider",
+            "type": "string"
+          },
+          "rights_reference": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rights Reference"
+          },
+          "rights_status": {
+            "enum": [
+              "synthetic_owned",
+              "verified_local_use",
+              "unverified"
+            ],
+            "title": "Rights Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "provider",
+          "adapter_version",
+          "normalization_version",
+          "rights_reference",
+          "rights_status",
+          "capabilities_sha256"
+        ],
+        "title": "SnapshotSource",
+        "type": "object"
+      },
+      "StrategyConfigV1": {
+        "additionalProperties": false,
+        "properties": {
+          "display_name": {
+            "title": "Display Name",
+            "type": "string"
+          },
+          "execution_policy": {
+            "$ref": "#/components/schemas/ExecutionPolicy"
+          },
+          "portfolio": {
+            "$ref": "#/components/schemas/PortfolioConfig"
+          },
+          "rebalance": {
+            "$ref": "#/components/schemas/RebalanceConfig"
+          },
+          "schema_version": {
+            "const": 1,
+            "title": "Schema Version",
+            "type": "integer"
+          },
+          "signals": {
+            "$ref": "#/components/schemas/SignalConfig"
+          },
+          "universe": {
+            "$ref": "#/components/schemas/UniverseConfig"
+          }
+        },
+        "required": [
+          "schema_version",
+          "display_name",
+          "universe",
+          "signals",
+          "portfolio",
+          "rebalance",
+          "execution_policy"
+        ],
+        "title": "StrategyConfigV1",
+        "type": "object"
+      },
+      "TargetWeight": {
+        "additionalProperties": false,
+        "properties": {
+          "asset_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "title": "Asset Id",
+            "type": "string"
+          },
+          "reason_codes": {
+            "items": {
+              "pattern": "^[A-Z][A-Z0-9_]*$",
+              "type": "string"
+            },
+            "minItems": 1,
+            "title": "Reason Codes",
+            "type": "array"
+          },
+          "weight": {
+            "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$",
+            "title": "Weight",
+            "type": "string"
+          }
+        },
+        "required": [
+          "asset_id",
+          "weight",
+          "reason_codes"
+        ],
+        "title": "TargetWeight",
+        "type": "object"
+      },
+      "UniverseConfig": {
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "const": "liquid_us_equities",
+            "title": "Kind",
+            "type": "string"
+          },
+          "min_history_sessions": {
+            "maximum": 2520,
+            "minimum": 252,
+            "title": "Min History Sessions",
+            "type": "integer"
+          },
+          "min_median_dollar_volume_usd": {
+            "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Min Median Dollar Volume Usd",
+            "type": "string"
+          },
+          "min_price_usd": {
+            "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Min Price Usd",
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "min_price_usd",
+          "min_median_dollar_volume_usd",
+          "min_history_sessions"
+        ],
+        "title": "UniverseConfig",
+        "type": "object"
+      }
+    }
+  },
+  "info": {
+    "description": "Only paths listed here are implemented. Components include versioned contracts for later feature owners; their presence does not activate endpoints.",
+    "title": "YAMS",
+    "version": "0.0.1"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/livez": {
+      "get": {
+        "description": "Process liveness only: not database, fixture or worker readiness.",
+        "operationId": "liveness_livez_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Liveness"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Liveness",
+        "tags": [
+          "operations"
+        ]
+      }
+    }
+  }
+}
