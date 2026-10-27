@@ -319,11 +319,13 @@ Every approved batch records `approved_at`, original input snapshot, approval id
 
 ## 8. Idempotency, consistency and concurrency rules
 
+[ADR-004](adr/0004-portfolio-ledger.md) ratifies event schemas, numeric scales, portfolio locking with revision checks, one active batch as the exclusive reservation, partial-result termination, corrections, replay and staged migration ownership. Batch/order responses include `terminal` and filled/pending/cancelled-or-skipped quantities so a terminal cash-reduced fill is not mistaken for an outstanding order.
+
 1. `Idempotency-Key` is required on paper authorization and creation of any posting command. Key + semantic request payload hash + portfolio ID defines retry identity; same key/different payload returns `409 IDEMPOTENCY_CONFLICT`.
 2. The DB transaction posts fill, cash delta, share delta, and status atomically; a unique fill key prevents double accounting.
 3. Use `Decimal` end-to-end for prices/cash/quantities. Round completed cash postings to USD cents using one documented rounding mode (DEFAULT `ROUND_HALF_EVEN`); fractional share quantities max 6dp, truncated on affordable buys.
 4. A recommendation cannot be applied twice as two independent batches. Explicit additional re-evaluations require a new recommendation and as-of data. `apply` on obsolete portfolio version, stale data or changed strategy references returns `409 STATE_CONFLICT` or `STALE_DATA`.
-5. Use optimistic portfolio revision or row locking when approving batches; competing approvals cannot overdraw cash.
+5. Use portfolio row locking plus an expected revision when approving batches. Only one nonterminal batch may reserve a portfolio at a time; conflicting approvals return `409 STATE_CONFLICT`. Exact idempotent retries return the prior result before checking a now-obsolete revision. Competing approvals cannot overdraw cash.
 6. GET never mutates financial state. Only workers under the approved batch apply fills; restart repeats are safe.
 7. Snapshot IDs and strategy-version IDs remain stable across reboots. Backup includes both PostgreSQL metadata and Parquet manifests/artifacts.
 8. Under approved Q01 and [ADR-001](adr/0001-execution-semantics.md), executed/posted sale proceeds can fund subsequent buys immediately within a synthetic rebalance; no settlement delay is modeled. Pending sells/approval do not create available cash. Cancellation cannot reverse a posted fill.
