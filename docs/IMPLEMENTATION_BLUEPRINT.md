@@ -13,6 +13,8 @@ This is the engineering decision record that prevents independent agents from in
 
 **Architecture shape:** Next.js web (browser), FastAPI API (request/validation), Python worker (jobs/scheduler), PostgreSQL (transactions/metadata/jobs), local Parquet (market snapshots/artifacts), embedded DuckDB (read-only analytics). Exactly four long-running services, no cloud requirement.
 
+**Progressive first run:** 0.0.1 demonstrates the seeded workspace, labeled fixture metadata, navigation, health and restart persistence. It does not seed fake computed experiments, recommendations or portfolios. Candidate diagnostics arrive in 0.0.2, experiments in 0.0.3, accounts in 0.0.4, the complete core journey in 0.0.5 and Journal outcomes in 0.0.7. [ADR-008](adr/0008-lifecycle-api-additions.md) and the API endpoint ownership matrix make these boundaries explicit; later runtime producers are not foundation prerequisites.
+
 ## 2. Execution principles and document ownership
 
 - One **shared engine** implements the decisions, constraints and synthetic-execution rules for live-like paper portfolios, backtests, and Arena entrants. Backtests supply historical as-of timestamps; portfolio evaluation supplies the latest completed session; neither bypasses the contract.

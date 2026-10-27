@@ -109,7 +109,7 @@ Required foreign key and unique constraints: `strategy_version(strategy_id, vers
 }
 ```
 
-**MUST:** validation checks fraction ranges, score weights, lookbacks, supported operators, duplicate names, and the chosen universe data availability. A strategy version **cannot be edited in place**. Forking creates a new version; experiments and portfolios may continue referencing earlier versions. `config_hash` is canonicalized, ordered-key JSON SHA-256 and includes `schema_version`.
+**MUST:** validation checks fraction ranges, score weights, lookbacks, supported operators, duplicate names, and the chosen universe data availability. A strategy version **cannot be edited in place**. Forking creates a new version; experiments and portfolios may continue referencing earlier versions. `config_hash` is canonicalized, ordered-key JSON SHA-256 and includes `schema_version`. V1 publishes immutable versions directly; no editable draft backend. Strategy names are trimmed, 1–120 characters, contain no control characters, and are unique within the singleton workspace under Unicode casefold comparison. Invalid names return `422 VALIDATION_ERROR`; duplicate names return `409 STATE_CONFLICT`. Config display labels are not separate unique identities. See [ADR-008](adr/0008-lifecycle-api-additions.md).
 
 Other `signals.kind` values become supported only with documented operator contracts and golden fixtures. Never evaluate user/LLM-submitted code.
 
@@ -230,41 +230,59 @@ All forecast numbers above are **fabricated contract examples**. The `horizon_tr
 
 ## 6. Resource endpoints (minimum contracts)
 
-| Method & route | Action | Response | Milestone |
-|---|---|---|---|
-| `GET /health` | Liveness/readiness (DB and fixture ability) | 200 diagnostics | 0.0.1 |
-| `GET /workspace` | Singleton config | 200 workspace | 0.0.1 |
-| `GET /data/snapshots` | Local immutable datasets, freshness | 200 collection | 0.0.2 |
-| `POST /data/refresh` | Queue optional external ingest | 202 job; explicit fixture/live mode | 0.0.2 |
-| `GET /data/assets?query=` | Provider-derived searchable universe | 200 paginated | 0.0.2 |
-| `GET /strategies` | List templates/custom strategies | 200 paginated | 0.0.2 |
-| `POST /strategies` | Create named strategy with initial version | 201 strategy/version | 0.0.3 |
-| `GET /strategies/{id}/versions` | Browse immutable versions | 200 paginated | 0.0.3 |
-| `POST /strategies/{id}/versions` | Fork/edit config into new version | 201 strategy version | 0.0.3 |
-| `POST /experiments` | Create backtest job | 202 job + experiment ID | 0.0.3 |
-| `GET /experiments/{id}` | Read results/provenance/warnings | 200 experiment | 0.0.3 |
-| `GET /experiments/{id}/series` | Equity curve and benchmark samples | 200 windowed points | 0.0.3 |
-| `GET /experiments/{id}/trades` | Backtest trades | 200 paginated | 0.0.3 |
-| `GET /jobs/{id}` | Poll status/progress/result | 200 job | 0.0.1 |
-| `POST /jobs/{id}/cancel` | Request cooperative cancel | 202/409 | 0.0.3 |
-| `GET /portfolios` | List paper accounts | 200 paginated | 0.0.4 |
-| `POST /portfolios` | Create paper account, default $1,000 | 201 portfolio | 0.0.4 |
-| `GET /portfolios/{id}` | Valuation, holdings, cash | 200 portfolio | 0.0.4 |
-| `GET /portfolios/{id}/transactions` | Fills/ledger and cash history | 200 paginated | 0.0.4 |
-| `POST /portfolios/{id}/recommendations` | Evaluate strategy against holdings | 202 job | 0.0.5 |
-| `GET /portfolios/{id}/recommendations` | Recommendation history | 200 paginated | 0.0.5 |
-| `GET /recommendations/{id}` | Full proposed orders/explanations | 200 immutable recommendation | 0.0.5 |
-| `GET /forecasts/{id}` | Numerical scenario details | 200 forecast or unavailable | 0.0.5 |
-| `POST /recommendations/{id}/apply` | **Authorize synthetic** order batch; requires key | 202 order batch / 409 stale | 0.0.5 |
-| `GET /order-batches/{id}` | Pending/fill/reconcile state | 200 batch | 0.0.5 |
-| `POST /arenas` | Create fair prospective competition | 201 arena | 0.0.6 |
-| `GET /arenas/{id}` | Arena entrants and results | 200 arena | 0.0.6 |
-| `POST /arenas/{id}/entrants` | Launch entrant with frozen version | 201 entrant | 0.0.6 |
-| `GET /journal` | Filterable decision log | 200 paginated | 0.0.7 |
-| `GET /journal/{id}` | Frozen decision evidence + later outcome | 200 journal record | 0.0.7 |
-| `POST /authoring/proposals` | Optional AI-to-config *proposal*, never execute | 202 proposal job | 0.0.8 |
+| Method & route | Action | Response | Milestone | Primary owner |
+|---|---|---|---|---|
+| `GET /health` | Liveness/readiness (DB and fixture ability) | 200 diagnostics | 0.0.1 | #22 |
+| `GET /workspace` | Singleton config | 200 workspace | 0.0.1 | #22 |
+| `GET /data/snapshots` | Local immutable datasets, freshness | 200 collection | 0.0.2 | #31 |
+| `POST /data/refresh` | Queue optional external ingest | 202 job; explicit fixture/live mode | 0.0.2 | #31 |
+| `GET /data/assets?query=` | Provider-derived searchable universe | 200 paginated | 0.0.2 | #31 |
+| `GET /strategies` | List templates/custom strategies | 200 paginated | 0.0.2 | #71 |
+| `POST /strategies` | Create named strategy with initial version | 201 strategy/version | 0.0.3 | #36 |
+| `GET /strategies/{id}/versions` | Browse immutable versions | 200 paginated | 0.0.3 | #36 |
+| `POST /strategies/{id}/versions` | Fork/edit config into new version | 201 strategy version | 0.0.3 | #36 |
+| `POST /experiments` | Create backtest job | 202 job + experiment ID | 0.0.3 | #41 |
+| `GET /experiments/{id}` | Read results/provenance/warnings | 200 experiment | 0.0.3 | #41 |
+| `GET /experiments/{id}/series` | Equity curve and benchmark samples | 200 windowed points | 0.0.3 | #41 |
+| `GET /experiments/{id}/trades` | Backtest trades | 200 paginated | 0.0.3 | #41 |
+| `GET /jobs/{id}` | Poll status/progress/result | 200 job | 0.0.1 | #23 |
+| `POST /jobs/{id}/cancel` | Request cooperative cancel | 202/409 | 0.0.3 | #41 |
+| `GET /portfolios` | List paper accounts | 200 paginated | 0.0.4 | #45 |
+| `POST /portfolios` | Create paper account, default $1,000 | 201 portfolio | 0.0.4 | #45 |
+| `GET /portfolios/{id}` | Valuation, holdings, cash | 200 portfolio | 0.0.4 | #45 |
+| `GET /portfolios/{id}/transactions` | Fills/ledger and cash history | 200 paginated | 0.0.4 | #45 |
+| `POST /portfolios/{id}/recommendations` | Evaluate strategy against holdings | 202 job | 0.0.5 | #49 |
+| `GET /portfolios/{id}/recommendations` | Recommendation history | 200 paginated | 0.0.5 | #49 |
+| `GET /recommendations/{id}` | Full proposed orders/explanations | 200 immutable recommendation | 0.0.5 | #49 |
+| `GET /forecasts/{id}` | Numerical scenario details | 200 forecast or unavailable | 0.0.5 | #49 |
+| `POST /recommendations/{id}/apply` | **Authorize synthetic** order batch; requires key | 202 order batch / 409 stale | 0.0.5 | #50 |
+| `GET /order-batches/{id}` | Pending/fill/reconcile state | 200 batch | 0.0.5 | #50 |
+| `POST /arenas` | Create fair prospective competition | 201 arena | 0.0.6 | #55 |
+| `GET /arenas/{id}` | Arena entrants and results | 200 arena | 0.0.6 | #55 |
+| `POST /arenas/{id}/entrants` | Launch entrant with frozen version | 201 entrant | 0.0.6 | #55 |
+| `GET /journal` | Filterable decision log | 200 paginated | 0.0.7 | #58 |
+| `GET /journal/{id}` | Frozen decision evidence + later outcome | 200 journal record | 0.0.7 | #58 |
+| `POST /authoring/proposals` | Optional AI-to-config *proposal*, never execute | 202 proposal job | 0.0.8 | #62 |
+| `POST /strategy-evaluations` | Compute candidate/target diagnostics (§6.1) | 202 job + evaluation ID | 0.0.2 | #34 |
+| `GET /strategy-evaluations/{id}` | Read immutable diagnostic result | 200 evaluation | 0.0.2 | #34 |
+| `GET /strategies/{id}` | Strategy metadata and latest immutable version reference | 200 strategy | 0.0.3 | #36 |
 
 Only `127.0.0.1:3000` is exposed by Compose; requests from browser go via Next.js same-origin proxy to internal FastAPI. No user, tenant, session, login, subscription, or brokerage API resources.
+
+
+A route listed here is a planned contract, not a claim that 0.0.1 implements it. Foundation registers only its owned runtime routes. Generated schema artifacts may describe later types without misleading runtime handlers.
+
+### 6.1 Candidate diagnostics (0.0.2, owner #34)
+
+`POST /strategy-evaluations` accepts exactly `strategy_version_id` (UUID), `snapshot_id` (UUID) and `as_of_session` (exchange-local date). Return `202` with UUID `job_id` and `evaluation_id`. Inputs are immutable. The worker derives and records `decision_cutoff_utc` under ADR-001 from the pinned calendar and validated closing-bar availability, at or after session close; calendar close alone is not proof that the bar was available. Unknown references return `404 NOT_FOUND`; invalid/future/uncovered sessions return `422 VALIDATION_ERROR` or `INSUFFICIENT_MARKET_DATA`; data blocked/stale for the requested evaluation returns `409 STALE_DATA`. Historical evaluation reads only evidence available at its cutoff, even if the snapshot contains later rows.
+
+`GET /strategy-evaluations/{id}` returns `200` with `id`, `job_id`, job `status`, immutable inputs and `result`/`error`. Result is null until successful completion; failed/cancelled output cannot appear completed. Error details follow §1. Unknown IDs return `404 NOT_FOUND`.
+
+A completed result includes `decision_cutoff_utc`, mode/warnings, eligible candidates with feature values/contributions and deterministic ranks, rejected candidates with reasons, complete `target_weights`, `cash_target_weight`, constraint evidence and a reproducibility manifest (config/snapshot hashes and engine build). Serialization follows §1; weights plus cash sum to one within `1e-8`. Empty eligible universe is a completed result with `target_weights=[]`, `cash_target_weight="1.00"` and exclusion evidence. Repeated requests may have different IDs, but identical pinned inputs and engine version reproduce financial results. The flow performs no portfolio, recommendation, forecast, order, cash or holdings writes.
+
+### 6.2 Staged operations
+
+[ADR-008](adr/0008-lifecycle-api-additions.md#deferred-lifecycle-contracts-and-handoffs) assigns dismiss, pending-order cancellation, idempotency recovery, Arena lifecycle, settings, backup and export contracts to owning issues. Each owner defines exact transport and tests before exposing an action. In 0.0.1, workspace/health expose labeled fixture metadata rather than fabricated later resources. Public job cancellation remains staged to 0.0.3 even though its internal queue service exists earlier.
 
 ## 7. Lifecycle state machines
 
@@ -291,7 +309,7 @@ Every approved batch records `approved_at`, original input snapshot, approval id
 
 ### 7.3 Strategy, forecast and Journal
 
-- Strategy version: `draft` (editable before publishing if implemented) → `published` immutable. Simpler v1 may create published immutable versions directly.
+- Strategy version: created directly as `published`, immutable. Unsaved edits are local UI form state; publication creates a new version. Persistent editable drafts require a future reviewed contract change.
 - Recommendation: `ready` → `applied` or `dismissed` or `expired`; the immutable content never changes, only the review disposition.
 - Forecast: `available` or `unavailable` immutable; never overwrite with outcome.
 - Journal outcome: `pending_horizon` → `matured` or `cannot_evaluate` with reason. Corrections are appended with provenance, not silent edits.
@@ -319,6 +337,8 @@ Every time-series endpoint returns `mode` and source warnings: `synthetic_fixtur
 - JSON schema golden files for `StrategyConfigV1`, `MarketBarV1`, `RecommendationV1`, `ForecastV1`, `PaperOrderBatchV1`, `ExperimentRunV1`.
 - API integration tests for pagination, type validation, stable errors, idempotency conflicts, job lifecycle, stale snapshot blocks and double-apply protection.
 - Property tests for weights summing to <= 1 with explicit cash residual, no shorts/negative cash, exact replay of ledger, no future-data leakage, consistent calendar horizons.
-- One offline E2E: fresh boot → default recommendation → experiment → paper approval → pending fill → deterministic subsequent price → settled account → restart → Journal link.
+- 0.0.1 offline E2E: fresh boot → seeded workspace/labeled fixture metadata → health/navigation/basic settings → restart → same workspace identity; later financial actions are hidden.
+- 0.0.5 core E2E: fresh boot → default recommendation → experiment → paper approval → pending fill → deterministic subsequent price → settled account → restart.
+- 0.0.7 extends the core flow with Journal evidence and maturity; it is not a prerequisite for earlier releases.
 
 **Contract change policy:** an incompatible schema or lifecycle update requires a reviewed ADR or tracked API contract issue, regeneration of clients, updated fixtures, migration strategy and at least one cross-layer integration test. No agent can redefine semantics locally inside its assigned module.
