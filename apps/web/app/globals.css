@@ -1,0 +1,81 @@
+:root {
+  color-scheme: light;
+  font-family: Arial, Helvetica, sans-serif;
+  color: #18352f;
+  background: #f4f5f0;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+}
+main {
+  max-width: 960px;
+  margin: auto;
+  padding: 32px 24px;
+}
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+.wordmark {
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -1px;
+}
+.badge {
+  border: 1px solid #54796c;
+  border-radius: 24px;
+  padding: 8px 14px;
+  font-size: 14px;
+}
+section {
+  padding: 80px 0;
+  max-width: 680px;
+}
+.eyebrow {
+  color: #42685c;
+  font-size: 14px;
+}
+h1 {
+  font-size: clamp(36px, 7vw, 64px);
+  line-height: 1.1;
+  letter-spacing: -2px;
+  margin: 20px 0;
+}
+p {
+  font-size: 18px;
+  line-height: 1.7;
+}
+.notice {
+  background: #fff;
+  border: 1px solid #d8ded5;
+  padding: 24px;
+  border-radius: 12px;
+  margin-top: 36px;
+}
+h2 {
+  font-size: 19px;
+  margin-top: 0;
+}
+.notice p {
+  font-size: 16px;
+  margin-bottom: 0;
+}
+footer {
+  border-top: 1px solid #d8ded5;
+  padding-top: 24px;
+  font-size: 13px;
+  color: #42685c;
+}
+@media (max-width: 480px) {
+  section {
+    padding: 48px 0;
+  }
+  main {
+    padding: 24px 20px;
+  }
+}
