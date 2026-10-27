@@ -122,7 +122,12 @@ def test_export_is_deterministic_and_detects_changed_schema(tmp_path: Path) -> N
 def test_openapi_does_not_activate_future_handlers() -> None:
     app = create_app()
     schema = app.openapi()
-    assert set(schema["paths"]) == {"/livez", "/api/v1/health", "/api/v1/workspace"}
+    assert set(schema["paths"]) == {
+        "/livez",
+        "/api/v1/health",
+        "/api/v1/workspace",
+        "/api/v1/jobs/{job_id}",
+    }
     components = schema["components"]["schemas"]
     for name in (
         "MarketBarV1",
