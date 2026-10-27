@@ -1,13 +1,13 @@
 # CI verification
 
 Issue #26, PR #93. This record distinguishes controlled failures from successful
-delivery. The passing PR and actual main runs must be recorded before closure.
+delivery. Passing PR, merged-main and docs-only runs are recorded below.
 
 | Probe | Hosted evidence | Observation |
 |---|---|---|
 | Cancellation | [40601868198](https://github.com/santthosh/yams/actions/runs/40601868198) | Quality/runtime cancelled; `CI / required` failed |
 | Deliberate Python type mismatch | [40601987707](https://github.com/santthosh/yams/actions/runs/40601987707) | Mypy rejected `str` assigned to `int`; required aggregate failed |
-| Deliberate OpenAPI drift | [40602354519](https://github.com/santthosh/yams/actions/runs/40602354519) | Contract check rejected the edited schema; runtime passed and aggregate must reject the quality failure |
+| Deliberate OpenAPI drift | [40602354519](https://github.com/santthosh/yams/actions/runs/40602354519) | Contract check rejected the edited schema; runtime passed and required aggregate failed |
 
 Type-probe artifacts identify tested candidate
 `ad81fbeab3a198c6d7e24270f80c27e2c5e57412`; drift-probe artifacts identify
@@ -40,3 +40,28 @@ The full hosted smoke passed in `yams-smoke-85679115e71e`, including deliberate
 migration failure and recovery (the retained failure log is expected evidence).
 The contract probe was restored with the normal OpenAPI generator; local
 `make contracts-check` then passed.
+
+## Passing implementation PR
+
+[Run 40603003538](https://github.com/santthosh/yams/actions/runs/40603003538)
+passed scope, docs, quality, runtime and the actual emitted `CI / required` check.
+The tested merge candidate was `bdf1046feed14a8d797ad6109d9743e6bae0c8cb`.
+Quality included 152 Python tests, 42 web tests, ten browser tests, both builds,
+separate type checks and contract/fixture drift checks. Runtime included all 37
+PostgreSQL/process/restart tests and the full isolated offline Docker journey.
+
+MergeWatch reviewed head `a2c0d9bf549632545dc85bc01eda72526ad83b43` with SUCCESS,
+5/5 and no findings. PR #93 merged as `b8a3119f2cdcebcb45351b46333db5c9b41d65c4`.
+[Main run 40603628997](https://github.com/santthosh/yams/actions/runs/40603628997)
+passed all five jobs against that exact merged SHA, including integration and
+Docker smoke. Its scope artifact records the previous main SHA and runtime=true.
+
+[Docs-only run 40603692241](https://github.com/santthosh/yams/actions/runs/40603692241)
+passed scope/docs/required on candidate `bcf61bd2548a0d52d9af3caf4467df505aff1b9c`.
+Its only changed file was this document and runtime=false; quality/runtime were
+explicitly skipped. MergeWatch reported its configured neutral “Only docs changed”
+skip, not a substantive code review. No runtime skip is described as a test pass.
+
+Superseded PR run 40601913859 was cancelled when the next source head arrived;
+the independent aggregate tests additionally reject unexpected skip and missing
+job results. Final documentation follow-up run links are retained in #26.
