@@ -288,7 +288,7 @@ These are **representative routes**; the authoritative endpoint list and exact r
 
 ### Background-job policy
 
-Use a PostgreSQL job table and a small dedicated worker. Atomically claim pending jobs (`FOR UPDATE SKIP LOCKED` or a supported library), persist progress, provide heartbeats, handle cancellation cooperatively, and apply bounded retries with backoff only to transient failures. Use idempotency keys for data refresh, repeated portfolio evaluation, and synthetic fills.
+Use a PostgreSQL job table and a small dedicated worker with direct `FOR UPDATE SKIP LOCKED` claiming. [ADR-005](adr/0005-worker-queue.md) specifies lease-token fencing, separate supervision, cancellation, bounded transient retries and measured initial resource budgets. Use idempotency keys for data refresh, repeated portfolio evaluation, and synthetic fills. A valid queue lease never replaces financial event uniqueness or portfolio locking.
 
 Recommended job classes: market refresh, backtest, scenario forecast, scheduled portfolio evaluation, Arena evaluation, and journal outcome maturation. The worker owns a lightweight local scheduler; **scheduled work happens only while YAMS is running**, with safe catch-up on restart. Never claim always-on monitoring when the Docker application is stopped.
 
