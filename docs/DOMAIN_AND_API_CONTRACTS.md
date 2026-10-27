@@ -209,6 +209,8 @@ In a real result `target_weights` must include the **complete** target allocatio
 
 **Forecast object** (`GET /forecasts/{id}`):
 
+[ADR-006](adr/0006-forecast-baseline.md) defines common-history alignment, calendar-day horizon mapping, seeded block sampling, fingerprints, costs, constant weights and unavailable results. Its provenance/assumption fields supplement the abbreviated example below; all comparison outcomes are null when unavailable. Q03 fixes cash return at zero.
+
 ```json
 {
   "id": "f6b4a887-8220-4f9f-967f-94dd79672a47",
