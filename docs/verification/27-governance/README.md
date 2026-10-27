@@ -45,3 +45,14 @@ and final read-back are recorded in #27 before closure. No destructive force-pus
 or deletion probe was attempted; those restrictions were inspected in settings.
 
 Reference: [GitHub required-check semantics](https://docs.github.com/en/pull-requests/how-tos/merge-and-close-pull-requests/troubleshooting-required-status-checks).
+
+## Allowed protected merge
+
+[Implementation run 40604860035](https://github.com/santthosh/yams/actions/runs/40604860035)
+passed all gates on candidate `426551e44197c7ec83da2f1ede582cfbe8e9c342`.
+The retained review log explicitly verifies app 3052814 on head
+`0e11924ace9a7a29e1e324207a61fc3c984eae1b`. The normal squash merge of PR #95 then
+succeeded with exact-head matching and no bypass, delivering commit `46590da`.
+This contrasts with the two rejected calls above; protection was not disabled
+between tests. The evidence branch was updated to that main commit before its
+final checks, honoring strict current-base enforcement.
