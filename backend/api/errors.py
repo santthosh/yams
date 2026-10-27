@@ -26,7 +26,7 @@ def error_response(
             code=code,
             message=message,
             details={"field_paths": field_paths} if field_paths else {},
-            retryable=code == "PROVIDER_UNAVAILABLE",
+            retryable=code in {"PROVIDER_UNAVAILABLE", "NOT_READY"},
             correlation_id=uuid4(),
         )
     )

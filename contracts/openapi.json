@@ -209,6 +209,7 @@
               "NOT_FOUND",
               "METHOD_NOT_ALLOWED",
               "HTTP_ERROR",
+              "NOT_READY",
               "STATE_CONFLICT",
               "IDEMPOTENCY_CONFLICT",
               "STALE_DATA",
@@ -610,6 +611,50 @@
         "title": "FeatureValue",
         "type": "object"
       },
+      "FixtureMetadata": {
+        "additionalProperties": false,
+        "properties": {
+          "asset_count": {
+            "title": "Asset Count",
+            "type": "integer"
+          },
+          "first_session": {
+            "format": "date",
+            "title": "First Session",
+            "type": "string"
+          },
+          "label": {
+            "const": "SYNTHETIC_DATA_ONLY",
+            "title": "Label",
+            "type": "string"
+          },
+          "last_session": {
+            "format": "date",
+            "title": "Last Session",
+            "type": "string"
+          },
+          "manifest_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Manifest Sha256",
+            "type": "string"
+          },
+          "snapshot_id": {
+            "format": "uuid",
+            "title": "Snapshot Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "label",
+          "snapshot_id",
+          "manifest_sha256",
+          "first_session",
+          "last_session",
+          "asset_count"
+        ],
+        "title": "FixtureMetadata",
+        "type": "object"
+      },
       "ForecastAllocation": {
         "additionalProperties": false,
         "properties": {
@@ -1007,6 +1052,57 @@
         "title": "ForecastWeight",
         "type": "object"
       },
+      "HealthV1": {
+        "additionalProperties": false,
+        "properties": {
+          "database": {
+            "$ref": "#/components/schemas/ReadinessCheck"
+          },
+          "fixture_metadata": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/FixtureMetadata"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "fixtures": {
+            "$ref": "#/components/schemas/ReadinessCheck"
+          },
+          "migration": {
+            "$ref": "#/components/schemas/ReadinessCheck"
+          },
+          "paper_only": {
+            "const": true,
+            "default": true,
+            "title": "Paper Only",
+            "type": "boolean"
+          },
+          "status": {
+            "enum": [
+              "ready",
+              "not_ready"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "workspace": {
+            "$ref": "#/components/schemas/ReadinessCheck"
+          }
+        },
+        "required": [
+          "status",
+          "database",
+          "migration",
+          "workspace",
+          "fixtures",
+          "fixture_metadata"
+        ],
+        "title": "HealthV1",
+        "type": "object"
+      },
       "JobResult": {
         "additionalProperties": false,
         "properties": {
@@ -1131,6 +1227,7 @@
         "title": "JobV1",
         "type": "object"
       },
+      "JsonValue": {},
       "Liveness": {
         "properties": {
           "paper_only": {
@@ -1665,6 +1762,37 @@
           "initial_state"
         ],
         "title": "RNGMetadata",
+        "type": "object"
+      },
+      "ReadinessCheck": {
+        "additionalProperties": false,
+        "properties": {
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          },
+          "status": {
+            "enum": [
+              "ready",
+              "failed",
+              "unchecked"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status",
+          "reason"
+        ],
+        "title": "ReadinessCheck",
         "type": "object"
       },
       "RebalanceConfig": {
@@ -2399,6 +2527,45 @@
         ],
         "title": "UniverseConfig",
         "type": "object"
+      },
+      "WorkspaceV1": {
+        "additionalProperties": false,
+        "properties": {
+          "default_benchmark": {
+            "title": "Default Benchmark",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "locale": {
+            "title": "Locale",
+            "type": "string"
+          },
+          "paper_only": {
+            "const": true,
+            "default": true,
+            "title": "Paper Only",
+            "type": "boolean"
+          },
+          "preferences": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/JsonValue"
+            },
+            "title": "Preferences",
+            "type": "object"
+          }
+        },
+        "required": [
+          "id",
+          "locale",
+          "default_benchmark",
+          "preferences"
+        ],
+        "title": "WorkspaceV1",
+        "type": "object"
       }
     }
   },
@@ -2409,6 +2576,62 @@
   },
   "openapi": "3.1.0",
   "paths": {
+    "/api/v1/health": {
+      "get": {
+        "operationId": "health_api_v1_health_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthV1"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthV1"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "summary": "Health"
+      }
+    },
+    "/api/v1/workspace": {
+      "get": {
+        "operationId": "workspace_api_v1_workspace_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkspaceV1"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "summary": "Workspace"
+      }
+    },
     "/livez": {
       "get": {
         "description": "Process liveness only: not database, fixture or worker readiness.",

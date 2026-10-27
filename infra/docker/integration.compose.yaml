@@ -1,0 +1,27 @@
+services:
+  postgres:
+    image: postgres:16@sha256:ca0bd484cb98bf4b24eb1010e73fb3fcbd6714d240fbc1a10eea5b7dbecb641d
+    environment:
+      POSTGRES_DB: yams_test
+      POSTGRES_USER: yams_test
+      POSTGRES_PASSWORD: disposable_test_only
+    healthcheck:
+      test: [CMD-SHELL, "pg_isready -U yams_test -d yams_test"]
+      interval: 1s
+      timeout: 3s
+      retries: 30
+    volumes:
+      - database:/var/lib/postgresql/data
+  test:
+    build:
+      context: ../..
+      dockerfile: infra/docker/integration.Dockerfile
+    environment:
+      DATABASE_URL: postgresql+psycopg://yams_test:disposable_test_only@postgres:5432/yams_test
+      YAMS_TEST_ISOLATED: "1"
+      YAMS_FIXTURE_ROOT: /app/data/fixtures
+    volumes:
+      - evidence:/evidence
+volumes:
+  database:
+  evidence:

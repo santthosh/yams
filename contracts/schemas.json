@@ -130,6 +130,7 @@
               "NOT_FOUND",
               "METHOD_NOT_ALLOWED",
               "HTTP_ERROR",
+              "NOT_READY",
               "STATE_CONFLICT",
               "IDEMPOTENCY_CONFLICT",
               "STALE_DATA",
@@ -217,6 +218,7 @@
               "NOT_FOUND",
               "METHOD_NOT_ALLOWED",
               "HTTP_ERROR",
+              "NOT_READY",
               "STATE_CONFLICT",
               "IDEMPOTENCY_CONFLICT",
               "STALE_DATA",
@@ -505,6 +507,7 @@
               "NOT_FOUND",
               "METHOD_NOT_ALLOWED",
               "HTTP_ERROR",
+              "NOT_READY",
               "STATE_CONFLICT",
               "IDEMPOTENCY_CONFLICT",
               "STALE_DATA",
@@ -911,6 +914,7 @@
               "NOT_FOUND",
               "METHOD_NOT_ALLOWED",
               "HTTP_ERROR",
+              "NOT_READY",
               "STATE_CONFLICT",
               "IDEMPOTENCY_CONFLICT",
               "STALE_DATA",
@@ -2205,6 +2209,262 @@
     "title": "ForecastV1",
     "type": "object"
   },
+  "HealthV1.serialization": {
+    "$defs": {
+      "FixtureMetadata": {
+        "additionalProperties": false,
+        "properties": {
+          "asset_count": {
+            "title": "Asset Count",
+            "type": "integer"
+          },
+          "first_session": {
+            "format": "date",
+            "title": "First Session",
+            "type": "string"
+          },
+          "label": {
+            "const": "SYNTHETIC_DATA_ONLY",
+            "title": "Label",
+            "type": "string"
+          },
+          "last_session": {
+            "format": "date",
+            "title": "Last Session",
+            "type": "string"
+          },
+          "manifest_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Manifest Sha256",
+            "type": "string"
+          },
+          "snapshot_id": {
+            "format": "uuid",
+            "title": "Snapshot Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "label",
+          "snapshot_id",
+          "manifest_sha256",
+          "first_session",
+          "last_session",
+          "asset_count"
+        ],
+        "title": "FixtureMetadata",
+        "type": "object"
+      },
+      "ReadinessCheck": {
+        "additionalProperties": false,
+        "properties": {
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          },
+          "status": {
+            "enum": [
+              "ready",
+              "failed",
+              "unchecked"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status",
+          "reason"
+        ],
+        "title": "ReadinessCheck",
+        "type": "object"
+      }
+    },
+    "additionalProperties": false,
+    "properties": {
+      "database": {
+        "$ref": "#/$defs/ReadinessCheck"
+      },
+      "fixture_metadata": {
+        "anyOf": [
+          {
+            "$ref": "#/$defs/FixtureMetadata"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "fixtures": {
+        "$ref": "#/$defs/ReadinessCheck"
+      },
+      "migration": {
+        "$ref": "#/$defs/ReadinessCheck"
+      },
+      "paper_only": {
+        "const": true,
+        "default": true,
+        "title": "Paper Only",
+        "type": "boolean"
+      },
+      "status": {
+        "enum": [
+          "ready",
+          "not_ready"
+        ],
+        "title": "Status",
+        "type": "string"
+      },
+      "workspace": {
+        "$ref": "#/$defs/ReadinessCheck"
+      }
+    },
+    "required": [
+      "status",
+      "database",
+      "migration",
+      "workspace",
+      "fixtures",
+      "fixture_metadata"
+    ],
+    "title": "HealthV1",
+    "type": "object"
+  },
+  "HealthV1.validation": {
+    "$defs": {
+      "FixtureMetadata": {
+        "additionalProperties": false,
+        "properties": {
+          "asset_count": {
+            "title": "Asset Count",
+            "type": "integer"
+          },
+          "first_session": {
+            "format": "date",
+            "title": "First Session",
+            "type": "string"
+          },
+          "label": {
+            "const": "SYNTHETIC_DATA_ONLY",
+            "title": "Label",
+            "type": "string"
+          },
+          "last_session": {
+            "format": "date",
+            "title": "Last Session",
+            "type": "string"
+          },
+          "manifest_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Manifest Sha256",
+            "type": "string"
+          },
+          "snapshot_id": {
+            "format": "uuid",
+            "title": "Snapshot Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "label",
+          "snapshot_id",
+          "manifest_sha256",
+          "first_session",
+          "last_session",
+          "asset_count"
+        ],
+        "title": "FixtureMetadata",
+        "type": "object"
+      },
+      "ReadinessCheck": {
+        "additionalProperties": false,
+        "properties": {
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          },
+          "status": {
+            "enum": [
+              "ready",
+              "failed",
+              "unchecked"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status",
+          "reason"
+        ],
+        "title": "ReadinessCheck",
+        "type": "object"
+      }
+    },
+    "additionalProperties": false,
+    "properties": {
+      "database": {
+        "$ref": "#/$defs/ReadinessCheck"
+      },
+      "fixture_metadata": {
+        "anyOf": [
+          {
+            "$ref": "#/$defs/FixtureMetadata"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "fixtures": {
+        "$ref": "#/$defs/ReadinessCheck"
+      },
+      "migration": {
+        "$ref": "#/$defs/ReadinessCheck"
+      },
+      "paper_only": {
+        "const": true,
+        "default": true,
+        "title": "Paper Only",
+        "type": "boolean"
+      },
+      "status": {
+        "enum": [
+          "ready",
+          "not_ready"
+        ],
+        "title": "Status",
+        "type": "string"
+      },
+      "workspace": {
+        "$ref": "#/$defs/ReadinessCheck"
+      }
+    },
+    "required": [
+      "status",
+      "database",
+      "migration",
+      "workspace",
+      "fixtures",
+      "fixture_metadata"
+    ],
+    "title": "HealthV1",
+    "type": "object"
+  },
   "JobV1.serialization": {
     "$defs": {
       "ErrorDetail": {
@@ -2216,6 +2476,7 @@
               "NOT_FOUND",
               "METHOD_NOT_ALLOWED",
               "HTTP_ERROR",
+              "NOT_READY",
               "STATE_CONFLICT",
               "IDEMPOTENCY_CONFLICT",
               "STALE_DATA",
@@ -2414,6 +2675,7 @@
               "NOT_FOUND",
               "METHOD_NOT_ALLOWED",
               "HTTP_ERROR",
+              "NOT_READY",
               "STATE_CONFLICT",
               "IDEMPOTENCY_CONFLICT",
               "STALE_DATA",
@@ -5307,6 +5569,90 @@
       "execution_policy"
     ],
     "title": "StrategyConfigV1",
+    "type": "object"
+  },
+  "WorkspaceV1.serialization": {
+    "$defs": {
+      "JsonValue": {}
+    },
+    "additionalProperties": false,
+    "properties": {
+      "default_benchmark": {
+        "title": "Default Benchmark",
+        "type": "string"
+      },
+      "id": {
+        "format": "uuid",
+        "title": "Id",
+        "type": "string"
+      },
+      "locale": {
+        "title": "Locale",
+        "type": "string"
+      },
+      "paper_only": {
+        "const": true,
+        "default": true,
+        "title": "Paper Only",
+        "type": "boolean"
+      },
+      "preferences": {
+        "additionalProperties": {
+          "$ref": "#/$defs/JsonValue"
+        },
+        "title": "Preferences",
+        "type": "object"
+      }
+    },
+    "required": [
+      "id",
+      "locale",
+      "default_benchmark",
+      "preferences"
+    ],
+    "title": "WorkspaceV1",
+    "type": "object"
+  },
+  "WorkspaceV1.validation": {
+    "$defs": {
+      "JsonValue": {}
+    },
+    "additionalProperties": false,
+    "properties": {
+      "default_benchmark": {
+        "title": "Default Benchmark",
+        "type": "string"
+      },
+      "id": {
+        "format": "uuid",
+        "title": "Id",
+        "type": "string"
+      },
+      "locale": {
+        "title": "Locale",
+        "type": "string"
+      },
+      "paper_only": {
+        "const": true,
+        "default": true,
+        "title": "Paper Only",
+        "type": "boolean"
+      },
+      "preferences": {
+        "additionalProperties": {
+          "$ref": "#/$defs/JsonValue"
+        },
+        "title": "Preferences",
+        "type": "object"
+      }
+    },
+    "required": [
+      "id",
+      "locale",
+      "default_benchmark",
+      "preferences"
+    ],
+    "title": "WorkspaceV1",
     "type": "object"
   }
 }

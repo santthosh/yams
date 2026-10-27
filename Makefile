@@ -42,3 +42,9 @@ fixtures:
 	uv run --locked python scripts/generate_fixtures.py
 fixtures-check:
 	uv run --locked python scripts/generate_fixtures.py --check
+
+.PHONY: db-bootstrap test-integration
+db-bootstrap:
+	uv run --locked python -m backend.persistence.bootstrap
+test-integration:
+	uv run --locked python scripts/test_integration.py
