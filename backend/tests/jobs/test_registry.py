@@ -51,3 +51,34 @@ def test_workload_ceiling_is_enforced_without_registering_future_handlers() -> N
     ):
         with pytest.raises(ValueError):
             validate_workload(**values)
+
+
+@pytest.mark.parametrize(
+    "raw",
+    [
+        "not json",
+        "null",
+        "[]",
+        '{"memory_mib":-1}',
+        '{"cpu_count":3}',
+        '{"wall_seconds":"3"}',
+        '{"unknown":1}',
+        '{"version":true}',
+        '{"numerical_threads":true}',
+        '{"heartbeat_seconds":2,"lease_seconds":2}',
+    ],
+)
+def test_invalid_environment_limits_fail_without_echoing_input(
+    monkeypatch: pytest.MonkeyPatch,
+    raw: str,
+) -> None:
+    monkeypatch.setenv("YAMS_JOB_LIMITS", raw)
+    with pytest.raises(ValueError, match="^Invalid YAMS_JOB_LIMITS configuration$"):
+        JobLimits.from_environment()
+
+
+def test_lowered_environment_limits(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("YAMS_JOB_LIMITS", '{"wall_seconds":30,"memory_mib":512}')
+    limits = JobLimits.from_environment()
+    assert limits.wall_seconds == 30 and limits.memory_mib == 512
+    assert limits.max_attempts == 3

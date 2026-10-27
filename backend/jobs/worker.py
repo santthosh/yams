@@ -21,7 +21,7 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from backend.domain.common import ErrorCode
 from backend.jobs.queue import Lease, Queue
-from backend.jobs.registry import JobLimits, validate_payload
+from backend.jobs.registry import AttemptMetrics, JobLimits, validate_payload
 from backend.persistence.database import Settings, database_engine
 
 logger = logging.getLogger(__name__)
@@ -62,7 +62,12 @@ def verify_container_budget(root: Path = Path("/sys/fs/cgroup")) -> None:
 
 
 def child_entry(
-    handler: Handler, lease: Lease, cancelled: Event, pipe: PipeConnection, parent: int
+    handler: Handler,
+    lease: Lease,
+    cancelled: Event,
+    pipe: PipeConnection,
+    parent: int,
+    deadline: float,
 ) -> None:
     # This is server-owned code, never an import path supplied in a payload.
     try:
@@ -71,6 +76,9 @@ def child_entry(
             raise RuntimeError("Parent-death protection unavailable")
         if os.getppid() != parent:
             os._exit(1)
+        # Kernel wall-clock termination remains active even if the supervisor is waiting on DB I/O.
+        signal.signal(signal.SIGALRM, signal.SIG_DFL)
+        signal.setitimer(signal.ITIMER_REAL, max(0.001, deadline - time.monotonic()))
         cap = lease.limits.memory_mib * 1024 * 1024
         resource.setrlimit(resource.RLIMIT_AS, (cap, cap))
         resource.setrlimit(
@@ -130,9 +138,7 @@ class Worker:
             if not locked:
                 return False
             try:
-                if time.monotonic() >= self.next_schedule_tick:
-                    self.queue.catch_up()
-                    self.next_schedule_tick = time.monotonic() + JobLimits().scheduler_tick_seconds
+                self.schedule_if_due()
                 self.queue.recover()
                 lease = self.queue.claim(self.owner)
                 if lease is None:
@@ -142,12 +148,25 @@ class Worker:
             finally:
                 guard.execute(text("SELECT pg_advisory_unlock(1497451860)"))
 
+    def schedule_if_due(self) -> None:
+        if time.monotonic() >= self.next_schedule_tick:
+            self.queue.catch_up(self.queue.limits.catchup_batch)
+            self.next_schedule_tick = time.monotonic() + self.queue.limits.scheduler_tick_seconds
+
     def execute(self, lease: Lease) -> None:
         context = mp.get_context("spawn")
         cancelled = context.Event()
         reader, writer = context.Pipe(duplex=False)
         process = context.Process(
-            target=child_entry, args=(self.handler, lease, cancelled, writer, os.getpid())
+            target=child_entry,
+            args=(
+                self.handler,
+                lease,
+                cancelled,
+                writer,
+                os.getpid(),
+                time.monotonic() + lease.limits.wall_seconds,
+            ),
         )
         started = time.monotonic()
         last_heartbeat = started
@@ -155,11 +174,25 @@ class Worker:
         cancellation_seen: float | None = None
         message: tuple[Any, ...] | None = None
         failure: ErrorCode | None = None
-        process.start()
-        writer.close()
+        usage_before = resource.getrusage(resource.RUSAGE_CHILDREN)
+        peak_rss: int | None = None
         try:
+            try:
+                process.start()
+            except (OSError, RuntimeError):
+                self.queue.fail(lease, "RESOURCE_EXHAUSTED")
+                return
+            finally:
+                writer.close()
             while process.is_alive():
                 now = time.monotonic()
+                if process.pid is not None:
+                    try:
+                        for line in Path(f"/proc/{process.pid}/status").read_text().splitlines():
+                            if line.startswith("VmHWM:"):
+                                peak_rss = max(peak_rss or 0, int(line.split()[1]))
+                    except (FileNotFoundError, ProcessLookupError):
+                        pass
                 # Poll status separately from the 5s heartbeat so cancellation remains responsive.
                 status = self.queue.get(lease.job_id)
                 if status is None or status.status not in {"running", "cancel_requested"}:
@@ -183,8 +216,10 @@ class Worker:
                         cancelled.set()
                         stop_child(process, 0)
                         return
-                    max_gap = max(max_gap, now - last_heartbeat)
-                    last_heartbeat = now
+                    heartbeat_done = time.monotonic()
+                    max_gap = max(max_gap, heartbeat_done - last_heartbeat)
+                    last_heartbeat = heartbeat_done
+                self.schedule_if_due()
                 if reader.poll():
                     try:
                         message = reader.recv()
@@ -197,15 +232,38 @@ class Worker:
                     message = reader.recv()
                 except EOFError:
                     pass
+            usage_after = resource.getrusage(resource.RUSAGE_CHILDREN)
+            if message and message[0] == "ok":
+                peak_rss = max(peak_rss or 0, int(message[2]))
+            self.queue.record_metrics(
+                lease,
+                AttemptMetrics(
+                    elapsed_seconds=time.monotonic() - started,
+                    max_heartbeat_gap_seconds=max_gap,
+                    cpu_seconds=max(
+                        0,
+                        usage_after.ru_utime
+                        + usage_after.ru_stime
+                        - usage_before.ru_utime
+                        - usage_before.ru_stime,
+                    ),
+                    peak_rss_kib=peak_rss,
+                ),
+            )
             if cancellation_seen is not None:
                 self.queue.acknowledge_cancel(lease)
             elif failure is not None:
                 self.queue.fail(lease, failure)
             elif process.exitcode == 0 and message and message[0] == "ok":
-                if not self.queue.complete_diagnostic(lease, message[1]):
-                    self.queue.acknowledge_cancel(lease)
+                try:
+                    if not self.queue.complete_diagnostic(lease, message[1]):
+                        self.queue.acknowledge_cancel(lease)
+                except ValueError:
+                    self.queue.fail(lease, "VALIDATION_ERROR")
             else:
                 code: ErrorCode = "JOB_FAILED"
+                if process.exitcode == -signal.SIGALRM:
+                    code = "TIME_LIMIT"
                 if message and message[:2] == ("error", "RESOURCE_EXHAUSTED"):
                     code = "RESOURCE_EXHAUSTED"
                 self.queue.fail(lease, code)
@@ -229,12 +287,16 @@ class Worker:
 
 def main() -> None:
     logging.basicConfig(level=logging.INFO, format="%(message)s")
+    try:
+        limits = JobLimits.from_environment()
+    except ValueError:
+        raise SystemExit("Invalid YAMS_JOB_LIMITS configuration") from None
     settings = Settings.from_environment()
     if not settings.database_url:
         raise SystemExit("Worker requires DATABASE_URL")
     verify_container_budget()
     engine = database_engine(settings.database_url)
-    worker = Worker(Queue(engine))
+    worker = Worker(Queue(engine, limits=limits))
     try:
         while True:
             try:
@@ -243,7 +305,7 @@ def main() -> None:
                 logger.warning("Worker database unavailable; no handler publication permitted")
                 worked = False
             if not worked:
-                time.sleep(0.1)
+                time.sleep(limits.poll_milliseconds / 1000)
     finally:
         engine.dispose()
 

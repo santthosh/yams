@@ -233,3 +233,98 @@ def test_unmaterialized_earlier_occurrence_blocks_later_target_job(database: Eng
     with Session(database) as session:
         row = session.get(Job, lease.job_id)
         assert row is not None and row.scheduled_at == now - timedelta(seconds=10)
+
+
+def test_poisoned_persisted_payload_fails_without_starving_next_job(database: Engine) -> None:
+    service = queue(database)
+    poison = service.enqueue("diagnostic", PAYLOAD, uuid4())
+    healthy = service.enqueue("diagnostic", PAYLOAD, uuid4())
+    # Simulate storage corruption in this disposable database, not a public write path.
+    with database.begin() as connection:
+        connection.execute(text("ALTER TABLE job DISABLE TRIGGER immutable_job_inputs"))
+        connection.execute(text("UPDATE job SET payload = '{}' WHERE id = :id"), {"id": poison})
+        connection.execute(text("ALTER TABLE job ENABLE TRIGGER immutable_job_inputs"))
+    assert service.claim("poison") is None
+    failed = service.get(poison)
+    assert failed is not None and failed.status == "failed" and failed.attempts == 0
+    assert failed.error is not None and failed.error.code == "VALIDATION_ERROR"
+    lease = service.claim("healthy")
+    assert lease is not None and lease.job_id == healthy
+
+
+def test_default_limit_change_does_not_mutate_accepted_job(
+    database: Engine,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    bootstrap(database)
+    monkeypatch.setenv("YAMS_JOB_LIMITS", '{"wall_seconds":30}')
+    service = Queue(database)
+    first = service.enqueue("diagnostic", PAYLOAD, uuid4())
+    monkeypatch.setenv("YAMS_JOB_LIMITS", '{"wall_seconds":10}')
+    restarted = Queue(database)
+    second = restarted.enqueue("diagnostic", PAYLOAD, uuid4())
+    with Session(database) as session:
+        first_row, second_row = session.get(Job, first), session.get(Job, second)
+        assert first_row is not None and second_row is not None
+        assert first_row.limits["wall_seconds"] == 30
+        assert second_row.limits["wall_seconds"] == 10
+
+
+def test_cancel_complete_race_has_one_legal_winner(database: Engine) -> None:
+    service = queue(database)
+    identity = service.enqueue("diagnostic", PAYLOAD, uuid4())
+    lease = service.claim("racing")
+    assert lease is not None
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        completion = executor.submit(service.complete_diagnostic, lease, 45)
+        cancellation = executor.submit(service.cancel, identity)
+        completed = completion.result(timeout=5)
+        assert cancellation.result(timeout=5) is not None
+    result = service.get(identity)
+    assert result is not None
+    if completed:
+        assert result.status == "completed" and result.result is not None
+    else:
+        assert result.status == "cancel_requested" and result.result is None
+        assert service.acknowledge_cancel(lease)
+    with Session(database) as session:
+        assert session.scalar(select(func.count()).select_from(DiagnosticEffect)) == int(completed)
+
+
+def test_concurrent_recoverers_abandon_one_attempt(database: Engine) -> None:
+    bootstrap(database)
+    now = datetime(2030, 1, 1, tzinfo=UTC)
+    service = Queue(database, clock=lambda _: now)
+    identity = service.enqueue("diagnostic", PAYLOAD, uuid4())
+    assert service.claim("old") is not None
+    now += timedelta(seconds=30)
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        recovered = list(executor.map(lambda _: service.recover(), range(2)))
+    assert sum(recovered) == 1
+    now += timedelta(seconds=1)
+    replacement = service.claim("replacement")
+    assert replacement is not None and replacement.attempt == 2
+    with Session(database) as session:
+        attempt = session.get(JobAttempt, (identity, 1))
+        assert attempt is not None and attempt.outcome == "abandoned"
+        assert attempt.diagnostics["backoff_seconds"] == 1
+
+
+def test_transient_retry_exhaustion_retains_correlation(database: Engine) -> None:
+    bootstrap(database)
+    now = datetime(2030, 1, 1, tzinfo=UTC)
+    service = Queue(database, clock=lambda _: now)
+    correlation = uuid4()
+    identity = service.enqueue("diagnostic", PAYLOAD, uuid4(), correlation_id=correlation)
+    for attempt in range(1, 4):
+        lease = service.claim("transient")
+        assert lease is not None and lease.attempt == attempt
+        assert service.fail(lease, "PROVIDER_UNAVAILABLE", retryable=True)
+        if attempt < 3:
+            assert service.claim("too-early") is None
+            now += timedelta(seconds=2 ** (attempt - 1))
+    result = service.get(identity)
+    assert result is not None and result.status == "failed" and result.error is not None
+    assert result.error.correlation_id == correlation
+    assert result.error.code == "PROVIDER_UNAVAILABLE" and result.attempts == 3
+    assert service.claim("no-fourth") is None

@@ -13,7 +13,7 @@ from sqlalchemy.orm import Session, aliased
 
 from backend.domain.common import ErrorCode, ErrorDetail, JobResult, JobV1
 from backend.domain.types import canonical_json
-from backend.jobs.registry import JobLimits, validate_payload
+from backend.jobs.registry import AttemptMetrics, JobLimits, validate_payload
 from backend.persistence.models.job import DiagnosticEffect, Job, JobAttempt, Schedule
 
 TERMINAL = {"completed", "failed", "cancelled"}
@@ -42,9 +42,16 @@ def database_now(session: Session) -> datetime:
 
 
 class Queue:
-    def __init__(self, engine: Engine, clock: Callable[[Session], datetime] = database_now):
+    def __init__(
+        self,
+        engine: Engine,
+        clock: Callable[[Session], datetime] = database_now,
+        *,
+        limits: JobLimits | None = None,
+    ):
         self.engine = engine
         self.clock = clock
+        self.limits = limits if limits is not None else JobLimits.from_environment()
 
     def enqueue(
         self,
@@ -80,7 +87,7 @@ class Queue:
         schedule: Schedule | None = None,
     ) -> UUID:
         validated = validate_payload(kind, payload).model_dump(mode="json")
-        effective = limits or JobLimits()
+        effective = limits or self.limits
         if scheduled_at is not None and (
             scheduled_at.tzinfo is None or scheduled_at.utcoffset() != timedelta(0)
         ):
@@ -168,7 +175,7 @@ class Queue:
                     target=target,
                     kind=kind,
                     payload=validated,
-                    limits=(limits or JobLimits()).model_dump(mode="json"),
+                    limits=(limits or self.limits).model_dump(mode="json"),
                     interval_seconds=interval_seconds,
                     next_due_at=first_due_at,
                     enabled=True,
@@ -256,7 +263,7 @@ class Queue:
         if attempt is not None:
             attempt.ended_at = now
             attempt.outcome = outcome
-            attempt.diagnostics = details
+            attempt.diagnostics = {**attempt.diagnostics, **details}
         row.lease_token = None
         row.lease_owner = None
         row.lease_expires_at = None
@@ -366,6 +373,16 @@ class Queue:
             row.updated_at = now
             row.progress = progress
             return row.status
+
+    def record_metrics(self, lease: Lease, metrics: AttemptMetrics) -> bool:
+        with Session(self.engine) as session, session.begin():
+            row, _ = self.owned(session, lease)
+            if row is None:
+                return False
+            attempt = session.get(JobAttempt, (row.id, row.attempts))
+            assert attempt is not None
+            attempt.diagnostics = {**attempt.diagnostics, **metrics.model_dump(mode="json")}
+            return True
 
     def complete_diagnostic(self, lease: Lease, value: int) -> bool:
         """Seal effect and result atomically; no handler can publish directly."""

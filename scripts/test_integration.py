@@ -61,6 +61,22 @@ def main() -> None:
             ],
             check=True,
         )
+        evidence = subprocess.check_output(
+            [*compose, "run", "--rm", "test", "cat", "/evidence/worker.jsonl"],
+            text=True,
+        )
+        records = [json.loads(line) for line in evidence.splitlines()]
+        destination = ROOT / "test-results" / "integration" / project
+        destination.mkdir(parents=True, exist_ok=True)
+        (destination / "worker.json").write_text(
+            json.dumps(
+                {"project": project, "records": records},
+                indent=2,
+                sort_keys=True,
+            )
+            + "\n"
+        )
+        print(f"Worker measurements retained at {destination / 'worker.json'}")
         print(f"PostgreSQL bootstrap/restart verified in isolated project {project}")
     finally:
         # Only resources created with this random project label are removed.

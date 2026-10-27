@@ -1,8 +1,9 @@
 """Closed payloads and persisted ADR-005 limits; never import code from payloads."""
 
+import os
 from typing import Annotated, Literal, Self
 
-from pydantic import Field, model_validator
+from pydantic import Field, field_validator, model_validator
 
 from backend.domain.types import Contract
 
@@ -21,6 +22,24 @@ class JobLimits(Contract):
     numerical_threads: Literal[1] = 1
     catchup_batch: Annotated[int, Field(strict=True, ge=1, le=100)] = 100
     scheduler_tick_seconds: Annotated[int, Field(strict=True, ge=1, le=5)] = 5
+
+    @field_validator("version", "numerical_threads", mode="before")
+    @classmethod
+    def strict_one(cls, value: object) -> object:
+        if type(value) is not int:
+            raise ValueError("Version and numerical threads must be integers")
+        return value
+
+    @classmethod
+    def from_environment(cls) -> "JobLimits":
+        raw = os.environ.get("YAMS_JOB_LIMITS", "{}")
+        try:
+            if len(raw) > 8192:
+                raise ValueError("Oversized limits")
+            return cls.model_validate_json(raw)
+        except ValueError:
+            # Configuration is operator input; never echo arbitrary values into logs.
+            raise ValueError("Invalid YAMS_JOB_LIMITS configuration") from None
 
     @model_validator(mode="after")
     def coherent_timing(self) -> Self:
@@ -58,3 +77,10 @@ def validate_workload(
         or paths * steps * union_assets > 7200000
     ):
         raise ValueError("WORKLOAD_LIMIT")
+
+
+class AttemptMetrics(Contract):
+    elapsed_seconds: Annotated[float, Field(ge=0, allow_inf_nan=False)]
+    max_heartbeat_gap_seconds: Annotated[float, Field(ge=0, allow_inf_nan=False)]
+    cpu_seconds: Annotated[float, Field(ge=0, allow_inf_nan=False)]
+    peak_rss_kib: Annotated[int, Field(strict=True, ge=0)] | None

@@ -19,7 +19,7 @@ Read the relevant sections of the following source-of-truth documents **in this 
 
 Each document owns the area described above. Normative contracts take precedence over illustrative examples. When authoritative rules conflict, **stop implementation of the conflicting part**, describe the conflict to the user (and in the GitHub issue/PR when publishing is authorized), and propose an ADR. Do not silently choose the easiest interpretation. Contract changes require coordinating the engine, API, frontend, docs, tests, and data fixtures.
 
-The repository contains the local `ship` skill, a FastAPI/Next.js scaffold, versioned contracts, canonical synthetic fixtures and PostgreSQL workspace persistence. `make install`, `make lint`, `make typecheck`, `make test`, `make build`, `make contracts-check`, `make fixtures-check`, `make db-bootstrap` and isolated `make test-integration` are implemented; see README for pinned runtimes and separate targets. Worker execution, application Compose and E2E commands remain foundation targets until their owning issues land. Verify what exists before using other commands below.
+The repository contains the local `ship` skill, a FastAPI/Next.js scaffold, versioned contracts, canonical synthetic fixtures and PostgreSQL workspace/job persistence with a supervised diagnostic worker. `make install`, `make lint`, `make typecheck`, `make test`, `make build`, `make contracts-check`, `make fixtures-check`, `make db-bootstrap` and isolated `make test-integration` are implemented; see README for pinned runtimes and separate targets. Application Compose and E2E commands remain foundation targets until their owning issues land. Verify what exists before using other commands below.
 
 ### Working approach
 

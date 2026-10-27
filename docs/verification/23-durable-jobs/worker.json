@@ -1,0 +1,247 @@
+{
+  "project": "yams-it-cacb6b6b3761",
+  "records": [
+    {
+      "architecture": "aarch64",
+      "case": "idle_handler",
+      "container_limits": {
+        "cpu.max": "200000 100000",
+        "memory.max": "2147483648",
+        "memory.swap.max": "0",
+        "pids.max": "64"
+      },
+      "cpu_seconds": 0.629835,
+      "elapsed_seconds": 3.17101766820997,
+      "iteration": 0,
+      "max_heartbeat_gap_seconds": 1.1166724590584636,
+      "peak_rss_kib": 112748,
+      "python": "3.13.12",
+      "warmup": true
+    },
+    {
+      "architecture": "aarch64",
+      "case": "busy_handler",
+      "container_limits": {
+        "cpu.max": "200000 100000",
+        "memory.max": "2147483648",
+        "memory.swap.max": "0",
+        "pids.max": "64"
+      },
+      "cpu_seconds": 3.087064,
+      "elapsed_seconds": 3.08798941783607,
+      "iteration": 0,
+      "max_heartbeat_gap_seconds": 1.0999816246330738,
+      "peak_rss_kib": 113132,
+      "python": "3.13.12",
+      "warmup": true
+    },
+    {
+      "architecture": "aarch64",
+      "case": "idle_handler",
+      "container_limits": {
+        "cpu.max": "200000 100000",
+        "memory.max": "2147483648",
+        "memory.swap.max": "0",
+        "pids.max": "64"
+      },
+      "cpu_seconds": 0.6320249999999994,
+      "elapsed_seconds": 3.145235501229763,
+      "iteration": 1,
+      "max_heartbeat_gap_seconds": 1.0904805827885866,
+      "peak_rss_kib": 113516,
+      "python": "3.13.12",
+      "warmup": false
+    },
+    {
+      "architecture": "aarch64",
+      "case": "busy_handler",
+      "container_limits": {
+        "cpu.max": "200000 100000",
+        "memory.max": "2147483648",
+        "memory.swap.max": "0",
+        "pids.max": "64"
+      },
+      "cpu_seconds": 3.0923339999999997,
+      "elapsed_seconds": 3.092757417820394,
+      "iteration": 1,
+      "max_heartbeat_gap_seconds": 1.0813565840944648,
+      "peak_rss_kib": 113516,
+      "python": "3.13.12",
+      "warmup": false
+    },
+    {
+      "architecture": "aarch64",
+      "case": "idle_handler",
+      "container_limits": {
+        "cpu.max": "200000 100000",
+        "memory.max": "2147483648",
+        "memory.swap.max": "0",
+        "pids.max": "64"
+      },
+      "cpu_seconds": 0.6391980000000014,
+      "elapsed_seconds": 3.15912345983088,
+      "iteration": 2,
+      "max_heartbeat_gap_seconds": 1.1091132927685976,
+      "peak_rss_kib": 113516,
+      "python": "3.13.12",
+      "warmup": false
+    },
+    {
+      "architecture": "aarch64",
+      "case": "busy_handler",
+      "container_limits": {
+        "cpu.max": "200000 100000",
+        "memory.max": "2147483648",
+        "memory.swap.max": "0",
+        "pids.max": "64"
+      },
+      "cpu_seconds": 3.088035,
+      "elapsed_seconds": 3.088787210173905,
+      "iteration": 2,
+      "max_heartbeat_gap_seconds": 1.087949750944972,
+      "peak_rss_kib": 113644,
+      "python": "3.13.12",
+      "warmup": false
+    },
+    {
+      "architecture": "aarch64",
+      "case": "idle_handler",
+      "container_limits": {
+        "cpu.max": "200000 100000",
+        "memory.max": "2147483648",
+        "memory.swap.max": "0",
+        "pids.max": "64"
+      },
+      "cpu_seconds": 0.640300999999999,
+      "elapsed_seconds": 3.187833751551807,
+      "iteration": 3,
+      "max_heartbeat_gap_seconds": 1.1094741262495518,
+      "peak_rss_kib": 114028,
+      "python": "3.13.12",
+      "warmup": false
+    },
+    {
+      "architecture": "aarch64",
+      "case": "busy_handler",
+      "container_limits": {
+        "cpu.max": "200000 100000",
+        "memory.max": "2147483648",
+        "memory.swap.max": "0",
+        "pids.max": "64"
+      },
+      "cpu_seconds": 3.095592000000002,
+      "elapsed_seconds": 3.0961133344098926,
+      "iteration": 3,
+      "max_heartbeat_gap_seconds": 1.0965051669627428,
+      "peak_rss_kib": 114668,
+      "python": "3.13.12",
+      "warmup": false
+    },
+    {
+      "architecture": "aarch64",
+      "backoff_seconds": 0,
+      "case": "TIME_LIMIT",
+      "code": "TIME_LIMIT",
+      "container_limits": {
+        "cpu.max": "200000 100000",
+        "memory.max": "2147483648",
+        "memory.swap.max": "0",
+        "pids.max": "64"
+      },
+      "cpu_seconds": 0.5306749999999996,
+      "elapsed_seconds": 1.0143446261063218,
+      "max_heartbeat_gap_seconds": 0.0,
+      "peak_rss_kib": 93856,
+      "python": "3.13.12"
+    },
+    {
+      "architecture": "aarch64",
+      "backoff_seconds": 0,
+      "case": "RESOURCE_EXHAUSTED",
+      "code": "RESOURCE_EXHAUSTED",
+      "container_limits": {
+        "cpu.max": "200000 100000",
+        "memory.max": "2147483648",
+        "memory.swap.max": "0",
+        "pids.max": "64"
+      },
+      "cpu_seconds": 0.6471140000000025,
+      "elapsed_seconds": 0.6473380830138922,
+      "max_heartbeat_gap_seconds": 0.0,
+      "peak_rss_kib": 93788,
+      "python": "3.13.12"
+    },
+    {
+      "architecture": "aarch64",
+      "backoff_seconds": 0,
+      "case": "JOB_FAILED",
+      "code": "JOB_FAILED",
+      "container_limits": {
+        "cpu.max": "200000 100000",
+        "memory.max": "2147483648",
+        "memory.swap.max": "0",
+        "pids.max": "64"
+      },
+      "cpu_seconds": 0.5723149999999976,
+      "elapsed_seconds": 0.5725840013474226,
+      "max_heartbeat_gap_seconds": 0.0,
+      "peak_rss_kib": 90028,
+      "python": "3.13.12"
+    },
+    {
+      "architecture": "aarch64",
+      "backoff_seconds": 0,
+      "case": "VALIDATION_ERROR",
+      "code": "VALIDATION_ERROR",
+      "container_limits": {
+        "cpu.max": "200000 100000",
+        "memory.max": "2147483648",
+        "memory.swap.max": "0",
+        "pids.max": "64"
+      },
+      "cpu_seconds": 0.6410119999999988,
+      "elapsed_seconds": 0.6412872076034546,
+      "max_heartbeat_gap_seconds": 0.0,
+      "peak_rss_kib": 114924,
+      "python": "3.13.12"
+    },
+    {
+      "architecture": "aarch64",
+      "cancellation_seconds": 1.1736382087692618,
+      "case": "unresponsive_cancel",
+      "container_limits": {
+        "cpu.max": "200000 100000",
+        "memory.max": "2147483648",
+        "memory.swap.max": "0",
+        "pids.max": "64"
+      },
+      "python": "3.13.12"
+    },
+    {
+      "architecture": "aarch64",
+      "attempts": 2,
+      "case": "crash_before_publication",
+      "container_limits": {
+        "cpu.max": "200000 100000",
+        "memory.max": "2147483648",
+        "memory.swap.max": "0",
+        "pids.max": "64"
+      },
+      "python": "3.13.12",
+      "recovery_seconds": 2.7988471258431673
+    },
+    {
+      "architecture": "aarch64",
+      "attempts": 1,
+      "case": "crash_after_commit",
+      "container_limits": {
+        "cpu.max": "200000 100000",
+        "memory.max": "2147483648",
+        "memory.swap.max": "0",
+        "pids.max": "64"
+      },
+      "python": "3.13.12",
+      "recovery_seconds": null
+    }
+  ]
+}
