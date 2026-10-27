@@ -4,7 +4,7 @@ Yet Another Market Simulator is a local, single-user paper research workspace. I
 
 ## Current state
 
-The `0.0.1` foundation provides an importable FastAPI package, a labeled Next.js shell, versioned contracts, synthetic fixtures, PostgreSQL workspace migrations and working quality commands. `/livez` checks only that the API process responds; `/api/v1/health` checks database/migration/workspace/fixture readiness. Durable jobs, application Compose, CI and release packaging remain tracked foundation work. No portfolio values or investment results are seeded by this foundation.
+The `0.0.1` foundation provides an importable FastAPI package, a labeled Next.js shell, versioned contracts, synthetic fixtures, PostgreSQL workspace/job migrations, a bounded diagnostic worker and working quality commands. `/livez` checks only that the API process responds; `/api/v1/health` checks database/migration/workspace/fixture readiness. Application Compose, CI and release packaging remain tracked foundation work. No portfolio values or investment results are seeded by this foundation.
 
 ## Development setup
 
@@ -17,7 +17,7 @@ npm install --global pnpm@10.23.0
 make install
 ```
 
-Install uv 0.8.0 with your preferred tool installer. `make install` uses `uv sync --locked` and `pnpm install --frozen-lockfile`; neither is allowed to resolve a different dependency graph. Both installs need registry access initially. Python dependencies are shared by the API and future worker through the `backend` package. The web workspace is `apps/web`. Exact direct dependencies and transitive resolutions are committed in the manifests/lockfiles.
+Install uv 0.8.0 with your preferred tool installer. `make install` uses `uv sync --locked` and `pnpm install --frozen-lockfile`; neither is allowed to resolve a different dependency graph. Both installs need registry access initially. Python dependencies are shared by the API and worker through the `backend` package. The web workspace is `apps/web`. Exact direct dependencies and transitive resolutions are committed in the manifests/lockfiles.
 
 In separate terminals:
 
@@ -48,11 +48,11 @@ Read [AGENTS.md](AGENTS.md), the [implementation blueprint](docs/IMPLEMENTATION_
 
 `backend/domain` implements closed Pydantic contracts for strategies, market bars and snapshot manifests, recommendations, forecasts, paper orders, experiments, jobs, errors and pagination. Money, quantities, prices and allocation weights remain decimal strings; statistical numbers must be finite. Cross-field validators enforce complete allocations and lifecycle-dependent results. These validators do not implement financial calculations, storage, calendar verification or artifact-byte verification.
 
-Run `make contracts` after changing a model or route. It regenerates `contracts/openapi.json`, input/output JSON schema goldens and `apps/web/src/api/generated/` using pinned tools. Commit these artifacts together. `make contracts-check` compares them byte-for-byte without rewriting; Python and frontend tests deliberately introduce isolated schema drift and require failure before regeneration. The generated `createApiClient` accepts a base URL and optional fetch implementation. Implemented typed paths are `/livez`, `/api/v1/health` and `/api/v1/workspace`; future domain components do not activate financial endpoints.
+Run `make contracts` after changing a model or route. It regenerates `contracts/openapi.json`, input/output JSON schema goldens and `apps/web/src/api/generated/` using pinned tools. Commit these artifacts together. `make contracts-check` compares them byte-for-byte without rewriting; Python and frontend tests deliberately introduce isolated schema drift and require failure before regeneration. The generated `createApiClient` accepts a base URL and optional fetch implementation. Implemented typed paths are `/livez`, `/api/v1/health`, `/api/v1/workspace` and `/api/v1/jobs/{job_id}`; future domain components do not activate financial endpoints.
 
 New API routers must use `APIRouter(route_class=ContractRoute)` from `backend.api.routing` to preserve exact JSON score numbers and reject duplicate keys/NaN before Pydantic validation. Direct routes on `create_app()` already use this class. For raw offline strategy documents, use `StrategyConfigV1.from_json`; parsing with ordinary float-based `json.loads` first loses precision. Serialize validated models with `model_dump(mode="json")` or FastAPI response models. Use the shared typed error envelope and `error_response` for documented feature failures; validation errors expose field paths without submitted values.
 
-Payload examples in `backend/tests/contracts/examples/` are **SYNTHETIC_DATA_ONLY**, illustrative contract shapes, not market evidence or engine outputs. IDs and hashes are placeholders; the forecast uses an abbreviated synthetic calendar and a zero-return all-cash case. Actual snapshot bytes, exchange calendars, forecast arithmetic, transactions and durable job behavior remain with their owning feature issues. The schema and client checks require no database, Docker or provider network.
+Payload examples in `backend/tests/contracts/examples/` are **SYNTHETIC_DATA_ONLY**, illustrative contract shapes, not market evidence or engine outputs. IDs and hashes are placeholders; the forecast uses an abbreviated synthetic calendar and a zero-return all-cash case. Actual snapshot bytes, exchange calendars, forecast arithmetic, transactions and financial job behavior remain with their owning feature issues. The schema and client checks require no database, Docker or provider network.
 
 ## Offline synthetic fixtures
 
@@ -69,3 +69,20 @@ Migration `0001_workspace` owns only `local_workspace` and Alembic metadata. Def
 `GET /api/v1/health` returns200 only when database, schema, workspace and all synthetic snapshot artifact checks pass; otherwise503 with safe reason codes and no connection strings. Invalid database configuration is distinguished as `DATABASE_MISCONFIGURED`. Server logs identify failed probe components and exception classes without messages, SQL, values or tracebacks; bootstrap failures likewise expose only the exception class. `GET /api/v1/workspace` returns persisted configuration, or retryable `503 NOT_READY` when its database/schema/workspace is unavailable. Fixture metadata is explicitly synthetic. These read-only checks do not register snapshots, execute jobs or prove financial calculations.
 
 `make test-integration` builds a hash-locked test image and starts a unique disposable Compose project, publishes no host ports, and tests empty/concurrent/repeated bootstrap, singleton enforcement, preferences, unavailable DB, mismatched schema, failed-migration rollback and missing fixtures. It restarts the actual PostgreSQL container and verifies identity/preferences afterward, then removes only its own containers/network/volumes. Existing user volumes are never reset. Docker and initial registry access are required; cached tests use no provider service. Unit tests exclude the `integration` marker explicitly; integration is a separate required command. After dependency changes, regenerate the test image's requirements with `uv export --locked --format requirements-txt --no-emit-project --output-file infra/docker/integration-requirements.txt`.
+
+## Durable diagnostic jobs
+
+Migration `0002_jobs` adds immutable job envelopes, attempt history, fixed-interval
+schedules and one idempotent diagnostic effect per job. The PostgreSQL queue uses
+fenced leases and bounded recovery; a Linux supervisor renews heartbeats while a
+separate resource-limited process executes the diagnostic. No financial handlers
+are registered. `GET /api/v1/jobs/{job_id}` is read-only; public cancellation is
+owned by #41, not this foundation endpoint.
+
+See [worker operations](docs/operations/durable-jobs.md) for configuration,
+enqueue/schedule/cancel service examples, guarantees and deployment limitations.
+`make test-integration` also exercises queue contention, cancellation, bounded
+retries, scheduler catch-up, actual process crashes and resource failures. It
+retains measurements in ignored `test-results/integration/<project>/worker.json`.
+The [verification report](docs/verification/23-durable-jobs/README.md) records the
+measured environment and committed evidence; these are not financial benchmarks.

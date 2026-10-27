@@ -15,7 +15,7 @@ from sqlalchemy.engine import make_url
 from sqlalchemy.exc import IntegrityError
 
 from backend.api.main import create_app
-from backend.persistence.bootstrap import MIGRATIONS, bootstrap
+from backend.persistence.bootstrap import MIGRATIONS, bootstrap, expected_revision
 from backend.persistence.database import Settings, database_engine
 from backend.persistence.readiness import read_workspace, readiness
 
@@ -70,7 +70,14 @@ def test_fresh_repeat_and_concurrent_bootstrap_preserves_identity_and_preference
     workspace = read_workspace(database)
     assert workspace.locale == "fr-CA"
     assert workspace.preferences == {"theme": "dark", "retained": True}
-    assert set(inspect(database).get_table_names()) == {"alembic_version", "local_workspace"}
+    assert set(inspect(database).get_table_names()) == {
+        "alembic_version",
+        "local_workspace",
+        "job",
+        "job_attempt",
+        "schedule",
+        "job_diagnostic_effect",
+    }
     with database.connect() as connection:
         assert connection.execute(text("SELECT count(*) FROM local_workspace")).scalar_one() == 1
     for singleton in (1, 2):
@@ -103,7 +110,10 @@ def test_api_workspace_and_readiness_failures(
         assert client.get("/api/v1/workspace").status_code == 503
         assert "disposable_test_only" not in bad.text
     with database.begin() as connection:
-        connection.execute(text("UPDATE alembic_version SET version_num = '0001_workspace'"))
+        connection.execute(
+            text("UPDATE alembic_version SET version_num = :revision"),
+            {"revision": expected_revision()},
+        )
     with TestClient(create_app(Settings(url, tmp_path))) as client:
         missing = client.get("/api/v1/health")
         assert missing.status_code == 503
@@ -125,9 +135,9 @@ def test_failed_migration_rolls_back_and_does_not_reseed(database: Engine, tmp_p
     before = read_workspace(database)
     migrations = tmp_path / "migrations"
     shutil.copytree(MIGRATIONS, migrations)
-    (migrations / "versions/0002_failure.py").write_text(
+    (migrations / "versions/9999_failure.py").write_text(
         "from alembic import op\n"
-        "revision = '0002_failure'\ndown_revision = '0001_workspace'\n"
+        f"revision = '9999_failure'\ndown_revision = '{expected_revision()}'\n"
         "def upgrade():\n"
         "    op.execute('CREATE TABLE must_rollback (id integer)')\n"
         "    raise RuntimeError('deliberate migration failure')\n"
@@ -140,7 +150,7 @@ def test_failed_migration_rolls_back_and_does_not_reseed(database: Engine, tmp_p
     with database.connect() as connection:
         assert (
             connection.execute(text("SELECT version_num FROM alembic_version")).scalar_one()
-            == "0001_workspace"
+            == expected_revision()
         )
 
 
