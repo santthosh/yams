@@ -74,6 +74,9 @@ jobs:
         run: |
           mkdir -p test-results/ci
           git rev-parse HEAD > test-results/ci/tested-sha.txt
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: '3.13.12'
       - uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6
         with:
           version: '0.8.0'
@@ -117,6 +120,9 @@ jobs:
         run: |
           mkdir -p test-results/ci
           git rev-parse HEAD > test-results/ci/tested-sha.txt
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: '3.13.12'
       - uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6
         with:
           version: '0.8.0'
