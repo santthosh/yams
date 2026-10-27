@@ -240,7 +240,7 @@ All forecast numbers above are **fabricated contract examples**. The `horizon_tr
 
 | Method & route | Action | Response | Milestone | Primary owner |
 |---|---|---|---|---|
-| `GET /health` | Liveness/readiness (DB and fixture ability) | 200 diagnostics | 0.0.1 | #22 |
+| `GET /health` | DB/migration/workspace/fixture readiness; `/livez` is process-only | 200 ready / 503 not_ready diagnostics | 0.0.1 | #22 |
 | `GET /workspace` | Singleton config | 200 workspace | 0.0.1 | #22 |
 | `GET /data/snapshots` | Local immutable datasets, freshness | 200 collection | 0.0.2 | #31 |
 | `POST /data/refresh` | Queue optional external ingest | 202 job; explicit fixture/live mode | 0.0.2 | #31 |
@@ -291,6 +291,8 @@ A completed result includes `decision_cutoff_utc`, mode/warnings, eligible candi
 ### 6.2 Staged operations
 
 [ADR-008](adr/0008-lifecycle-api-additions.md#deferred-lifecycle-contracts-and-handoffs) assigns dismiss, pending-order cancellation, idempotency recovery, Arena lifecycle, settings, backup and export contracts to owning issues. Each owner defines exact transport and tests before exposing an action. In 0.0.1, workspace/health expose labeled fixture metadata rather than fabricated later resources. Public job cancellation remains staged to 0.0.3 even though its internal queue service exists earlier.
+
+Foundation health returns `status`, `paper_only`, separate `database`, `migration`, `workspace` and `fixtures` checks (`status` ready/failed/unchecked plus nullable reason), and nullable `fixture_metadata`. Metadata contains the synthetic label, snapshot UUID/hash, coverage dates and asset count. It verifies the committed fixture artifacts; it does not register a research snapshot. Missing configuration, wrong migration, absent workspace or invalid/missing fixtures cannot report ready. `/workspace` returns UUID, locale, default benchmark, preferences and `paper_only`; unavailable database/migration/workspace returns `503 NOT_READY` in the typed error envelope, retryable. Workspace configuration remains readable when only fixtures fail. No public mutation/settings endpoint is activated by #22.
 
 ## 7. Lifecycle state machines
 

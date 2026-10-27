@@ -1,4 +1,38 @@
 export interface paths {
+  "/api/v1/health": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Health */
+    get: operations["health_api_v1_health_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/workspace": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Workspace */
+    get: operations["workspace_api_v1_workspace_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/livez": {
     parameters: {
       query?: never;
@@ -105,6 +139,7 @@ export interface components {
         | "NOT_FOUND"
         | "METHOD_NOT_ALLOWED"
         | "HTTP_ERROR"
+        | "NOT_READY"
         | "STATE_CONFLICT"
         | "IDEMPOTENCY_CONFLICT"
         | "STALE_DATA"
@@ -261,6 +296,33 @@ export interface components {
       /** Value */
       value: number | null;
     };
+    /** FixtureMetadata */
+    FixtureMetadata: {
+      /** Asset Count */
+      asset_count: number;
+      /**
+       * First Session
+       * Format: date
+       */
+      first_session: string;
+      /**
+       * Label
+       * @constant
+       */
+      label: "SYNTHETIC_DATA_ONLY";
+      /**
+       * Last Session
+       * Format: date
+       */
+      last_session: string;
+      /** Manifest Sha256 */
+      manifest_sha256: string;
+      /**
+       * Snapshot Id
+       * Format: uuid
+       */
+      snapshot_id: string;
+    };
     /** ForecastAllocation */
     ForecastAllocation: {
       /** Cash Weight */
@@ -377,6 +439,25 @@ export interface components {
       /** Weight */
       weight: string;
     };
+    /** HealthV1 */
+    HealthV1: {
+      database: components["schemas"]["ReadinessCheck"];
+      fixture_metadata: components["schemas"]["FixtureMetadata"] | null;
+      fixtures: components["schemas"]["ReadinessCheck"];
+      migration: components["schemas"]["ReadinessCheck"];
+      /**
+       * Paper Only
+       * @default true
+       * @constant
+       */
+      paper_only: true;
+      /**
+       * Status
+       * @enum {string}
+       */
+      status: "ready" | "not_ready";
+      workspace: components["schemas"]["ReadinessCheck"];
+    };
     /** JobResult */
     JobResult: {
       /**
@@ -428,6 +509,7 @@ export interface components {
        */
       updated_at: string;
     };
+    JsonValue: unknown;
     /** Liveness */
     Liveness: {
       /**
@@ -670,6 +752,16 @@ export interface components {
        * @constant
        */
       sampling_version: "noncircular_c_order_v1";
+    };
+    /** ReadinessCheck */
+    ReadinessCheck: {
+      /** Reason */
+      reason: string | null;
+      /**
+       * Status
+       * @enum {string}
+       */
+      status: "ready" | "failed" | "unchecked";
     };
     /** RebalanceConfig */
     RebalanceConfig: {
@@ -959,6 +1051,28 @@ export interface components {
       /** Min Price Usd */
       min_price_usd: string;
     };
+    /** WorkspaceV1 */
+    WorkspaceV1: {
+      /** Default Benchmark */
+      default_benchmark: string;
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /** Locale */
+      locale: string;
+      /**
+       * Paper Only
+       * @default true
+       * @constant
+       */
+      paper_only: true;
+      /** Preferences */
+      preferences: {
+        [key: string]: components["schemas"]["JsonValue"];
+      };
+    };
   };
   responses: never;
   parameters: never;
@@ -968,6 +1082,64 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+  health_api_v1_health_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HealthV1"];
+        };
+      };
+      /** @description Service Unavailable */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HealthV1"];
+        };
+      };
+    };
+  };
+  workspace_api_v1_workspace_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["WorkspaceV1"];
+        };
+      };
+      /** @description Service Unavailable */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+    };
+  };
   liveness_livez_get: {
     parameters: {
       query?: never;

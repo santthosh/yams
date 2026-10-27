@@ -12,7 +12,7 @@ def test_liveness_is_paper_only_without_database() -> None:
 
 def test_unimplemented_routes_do_not_claim_readiness_or_financial_results() -> None:
     with TestClient(create_app()) as client:
-        for path in ("/api/v1/health", "/api/v1/portfolios", "/missing"):
+        for path in ("/api/v1/portfolios", "/missing"):
             response = client.get(path)
             assert response.status_code == 404
             error = response.json()["error"]
