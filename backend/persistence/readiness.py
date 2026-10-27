@@ -1,6 +1,7 @@
 """Read-only readiness probes, with bounded DB I/O and sanitized diagnostics."""
 
 import hashlib
+import logging
 from pathlib import Path
 
 from sqlalchemy import Engine, select, text
@@ -10,6 +11,8 @@ from backend.domain.market import SnapshotManifestV1
 from backend.domain.workspace import FixtureMetadata, HealthV1, ReadinessCheck, WorkspaceV1
 from backend.persistence.bootstrap import expected_revision
 from backend.persistence.models.workspace import LocalWorkspace
+
+logger = logging.getLogger(__name__)
 
 
 def fixture_metadata(root: Path) -> FixtureMetadata:
@@ -52,15 +55,19 @@ def read_workspace(engine: Engine) -> WorkspaceV1:
         )
 
 
-def readiness(engine: Engine | None, root: Path) -> HealthV1:
-    database = ReadinessCheck(status="failed", reason="DATABASE_UNAVAILABLE")
-    migration = ReadinessCheck(status="unchecked", reason="DATABASE_UNAVAILABLE")
-    workspace = ReadinessCheck(status="unchecked", reason="DATABASE_UNAVAILABLE")
+def readiness(
+    engine: Engine | None, root: Path, database_reason: str = "DATABASE_UNAVAILABLE"
+) -> HealthV1:
+    database = ReadinessCheck(status="failed", reason=database_reason)
+    migration = ReadinessCheck(status="unchecked", reason=database_reason)
+    workspace = ReadinessCheck(status="unchecked", reason=database_reason)
     if engine is not None:
+        component = "database"
         try:
             with engine.connect() as connection:
                 connection.execute(text("SELECT 1"))
                 database = ReadinessCheck(status="ready", reason=None)
+                component = "migration"
                 migration = ReadinessCheck(status="failed", reason="MIGRATION_MISMATCH")
                 workspace = ReadinessCheck(status="unchecked", reason="MIGRATION_MISMATCH")
                 revisions = (
@@ -71,18 +78,24 @@ def readiness(engine: Engine | None, root: Path) -> HealthV1:
                 if list(revisions) == [expected_revision()]:
                     migration = ReadinessCheck(status="ready", reason=None)
             if migration.status == "ready":
+                component = "workspace"
                 workspace = ReadinessCheck(status="failed", reason="WORKSPACE_UNAVAILABLE")
                 read_workspace(engine)
                 workspace = ReadinessCheck(status="ready", reason=None)
-        except Exception:
-            pass  # Only predetermined diagnostic codes leave this boundary.
+        except Exception as error:
+            # Exception messages/tracebacks can contain URLs, SQL or submitted values.
+            logger.warning(
+                "Readiness probe failed component=%s error_type=%s", component, type(error).__name__
+            )
     fixtures = ReadinessCheck(status="failed", reason="FIXTURES_UNAVAILABLE")
     metadata = None
     try:
         metadata = fixture_metadata(root)
         fixtures = ReadinessCheck(status="ready", reason=None)
-    except (OSError, ValueError, AssertionError):
-        pass
+    except (OSError, ValueError, AssertionError) as error:
+        logger.warning(
+            "Readiness probe failed component=fixtures error_type=%s", type(error).__name__
+        )
     checks = (database, migration, workspace, fixtures)
     return HealthV1(
         status="ready" if all(check.status == "ready" for check in checks) else "not_ready",

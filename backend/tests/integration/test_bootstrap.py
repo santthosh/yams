@@ -86,7 +86,9 @@ def test_fresh_repeat_and_concurrent_bootstrap_preserves_identity_and_preference
     assert health.status == "ready"
 
 
-def test_api_workspace_and_readiness_failures(database: Engine, tmp_path: Path) -> None:
+def test_api_workspace_and_readiness_failures(
+    database: Engine, tmp_path: Path, caplog: pytest.LogCaptureFixture
+) -> None:
     identity = bootstrap(database)
     url = database.url.render_as_string(hide_password=False)
     with TestClient(create_app(Settings(url))) as client:
@@ -114,6 +116,8 @@ def test_api_workspace_and_readiness_failures(database: Engine, tmp_path: Path) 
         assert failed.status_code == 503
         assert failed.json()["database"]["status"] == "failed"
         assert "disposable_test_only" not in failed.text
+    assert "component=database error_type=OperationalError" in caplog.text
+    assert "disposable_test_only" not in caplog.text
 
 
 def test_failed_migration_rolls_back_and_does_not_reseed(database: Engine, tmp_path: Path) -> None:

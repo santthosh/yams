@@ -57,9 +57,10 @@ def main() -> None:
             raise ValueError("Missing database configuration")
         engine = database_engine(settings.database_url)
         identity = bootstrap(engine)
-    except Exception:
+    except Exception as error:
         raise SystemExit(
-            "Bootstrap failed; check database access and migration compatibility."
+            f"Bootstrap failed error_type={type(error).__name__}; "
+            "check database access and migration compatibility."
         ) from None
     finally:
         if engine is not None:

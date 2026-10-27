@@ -1,5 +1,6 @@
 """Database-independent API bootstrap; readiness belongs to the persistence layer."""
 
+import logging
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from typing import Literal
@@ -14,6 +15,8 @@ from backend.api.routes.workspace import workspace_router
 from backend.api.routing import ContractRoute
 from backend.persistence.database import Settings, database_engine
 
+logger = logging.getLogger(__name__)
+
 
 class Liveness(BaseModel):
     status: Literal["alive"] = "alive"
@@ -23,11 +26,13 @@ class Liveness(BaseModel):
 def create_app(settings: Settings | None = None) -> FastAPI:
     settings = settings or Settings.from_environment()
     engine = None
+    database_reason = "DATABASE_UNAVAILABLE"
     if settings.database_url:
         try:
             engine = database_engine(settings.database_url)
         except ValueError:
-            pass
+            database_reason = "DATABASE_MISCONFIGURED"
+            logger.warning("DATABASE_URL is set but invalid; database features disabled")
 
     @asynccontextmanager
     async def lifespan(app: FastAPI) -> AsyncIterator[None]:
@@ -40,8 +45,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app = ContractAPI(title="YAMS", version="0.0.1", lifespan=lifespan)
     app.router.route_class = ContractRoute
     register_error_handlers(app)
-    app.include_router(health_router(engine, settings.fixture_root))
-    app.include_router(workspace_router(engine, settings.fixture_root))
+    app.include_router(health_router(engine, settings.fixture_root, database_reason))
+    app.include_router(workspace_router(engine, settings.fixture_root, database_reason))
 
     @app.get("/livez", response_model=Liveness, tags=["operations"])
     def liveness() -> Liveness:
