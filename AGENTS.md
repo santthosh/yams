@@ -81,6 +81,12 @@ The API and worker share an importable Python package/quant engine. The Next.js 
 
 ## 4. Working from GitHub issues
 
+### Repository-specific user preferences
+
+The user has explicitly preapproved running `gh` commands for `santthosh/yams`. Run task-related GitHub CLI commands without asking again for permission to invoke `gh`. This standing approval persists across sessions; continue to respect the requested task scope and repository review gates. Ask for unresolved product decisions separately from command execution permission.
+
+For now, MergeWatch review is sufficient for the PR review requirement (user decision Q05, recorded in issues #27 and #72). A separate human approving review is not required by this interim policy. Address review findings and retain required CI and conversation-resolution gates. Verify the actual MergeWatch integration and its enforceable review/check signal before configuring protection; do not assume that an automated comment counts as a GitHub approving review. This decision supersedes earlier guidance requiring a separate human reviewer and does not itself authorize a merge or protection change.
+
 ### Definition of ready (`agent-ready` label)
 
 For issue-driven implementation, verify that the issue includes:
@@ -90,7 +96,7 @@ For issue-driven implementation, verify that the issue includes:
 - Inputs/outputs, expected states, linked versioned contracts and applicable ADRs.
 - Observable acceptance criteria, happy path **and negative/empty cases**.
 - Golden fixture IDs and testing expectations (unit/integration/E2E as appropriate).
-- Dependencies resolved or named and visibly blocked.
+- Every prerequisite artifact exists, is compatible and has verification evidence; required user decisions are recorded. Named but undelivered prerequisites mean `blocked`, not `agent-ready`.
 - PR boundary narrow enough to review without a repository-wide rewrite.
 
 Agents should not self-mark a blocked issue `agent-ready` to bypass dependencies. If incomplete, request the missing information from the user or, when authorized, on the GitHub issue **without implementing financial semantics from guesses**. Work on safe independent work or fixture scaffolding while awaiting resolution.
@@ -134,10 +140,35 @@ Branch/PR boundary, any migration or generated-client update.
 6. If an API or schema changes, regenerate TS types, update migrations and docs, and add backward-compatibility tests or an ADR.
 7. Open a PR linking the issue (`Closes #123`) with risk notes, proof of commands/tests, screenshots for UI, and precise unresolved limitations.
 8. Do **not** self-merge architecture/ledger/backtest/security changes without the required review and green CI.
+9. After an authorized merge, verify the delivered issue scope, reconcile its completion state and reassess downstream readiness using the procedure below.
 
 ### Shipping work
 
 Use the repository-local [ship skill](.agents/skills/ship/SKILL.md) when asked to ship an issue or scoped change: `$ship <issue URL, number, or scope>`. It maintains a checklist through implementation, verification, PR review, and merge when authorized. Honor narrower requests to stop at a draft or review-ready PR. The skill does not bypass the required reviews or CI gates in this document.
+
+Read the approved decisions in [#72](https://github.com/santthosh/yams/issues/72) and the owning issues before implementing their contracts. Explicit user decisions supersede earlier proposal wording; carry the decision into affected ADRs, specs and fixtures in the implementation PR. Ask one focused question for genuinely new ambiguity, record the answer, and continue independent work within the authorized scope.
+
+### Completion and downstream readiness
+
+Reassessing readiness is part of completing an issue. GitHub dependency links alone do not maintain `blocked` and `agent-ready` labels.
+
+1. Verify the merged artifact against every acceptance criterion and required test/review result. Close the issue only when its complete scope is delivered; if a PR auto-closes an incomplete issue, reopen it and record the remaining work.
+2. Inspect directly dependent issues through native blocking links and their bodies. For each, verify **all** prerequisite artifacts, approved decisions, contract compatibility and verification requirements. An issue being closed is evidence to inspect, not proof of delivery.
+3. If every condition is satisfied, remove `blocked` and apply `agent-ready`. Otherwise retain `blocked`, remove any stale `agent-ready`, and identify the exact missing artifact or unresolved decision. Remove `needs-user-decision` only after its choices are recorded. Preserve legitimate dependency links for traceability.
+4. Reconcile native dependencies with issue bodies, update parent epic checklists and refresh the readiness summary in #72. Parent membership is organizational and does not create an execution dependency by itself.
+5. Record the delivered commit/PR and verification evidence in the issue handoff. Report newly ready work and remaining blockers; continue only within the user's assigned scope.
+
+### Sequential milestone delivery
+
+When assigned a sequence of milestones, ship them in the requested semver order. Within each milestone, execute issues in dependency order; use parallel agents only when authorized and ownership is disjoint. Do not start implementation in the next milestone until the current milestone's release gate passes.
+
+- Verify the integrated milestone demonstration against its epic and the blueprint's exit criteria. Each milestone must ship its own documented increment without depending on features scheduled for later milestones. Stage unavailable UI honestly.
+- Require applicable tests, generated-client/contract checks, GitHub Actions checks, MergeWatch review and resolved findings before authorized merges. Include Docker/offline, fresh-install, migration and persistence-after-restart evidence as applicable.
+- For an authorized release, verify the exact release commit and candidate images on `linux/amd64` and `linux/arm64`. Publish public GHCR images with immutable digests, a digest-pinned Compose manifest, safe configuration, checksums/provenance and installation/upgrade guidance. Exclude credentials and licensed market datasets.
+- Publish the corresponding immutable semver tag and GitHub Release, marking prereleases explicitly. Close the milestone only after its required deliverables and packaged installation pass; closed tickets or committed workflow YAML alone do not establish a shipped release.
+- After each release, report the release link, delivered capabilities, verification evidence, known limitations and the next ready issues. Record this evidence in the milestone epic and refresh #72.
+
+These procedures describe how to complete assigned work; they do not independently authorize shipping all milestones, changing protections, merging or publishing releases. Honor authorization already given in the active task without repeatedly requesting it, and respect any requested stopping point.
 
 ## 5. Parallel-agent coordination
 
@@ -207,7 +238,7 @@ For bug fixes, reproduce the failure before verifying the correction where pract
 - [ ] For UI change: screenshot + mobile/keyboard/empty/error-state evidence.
 - [ ] PR description lists explicit tradeoffs, known limits and follow-up issue(s).
 
-**Milestone completion is different from PR completion.** 0.0.1–0.0.5 **core release** closes only when a fresh Docker clone can demonstrate a dynamic, data-derived $1,000 recommendation, audited historical backtest, risk-constrained portfolio, next-action orders, numerical forward scenario and durable paper fills. 0.0.6–0.0.9 are additive capabilities.
+**Milestone completion is different from PR completion.** Each milestone has its own independently verifiable release increment. `0.0.1` ships an installable foundation with an offline fixture shell, contracts, infrastructure and verified delivery pipeline. The cumulative **core release gate at `0.0.5`** additionally requires a fresh Docker clone to demonstrate a dynamic, data-derived $1,000 recommendation, audited historical backtest, risk-constrained portfolio, next-action orders, numerical forward scenario and durable paper fills. Do not impose that later product gate on earlier milestones. `0.0.6`–`0.0.9` add their documented capabilities.
 
 ## 8. Security, data terms and local environment
 
