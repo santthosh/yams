@@ -48,3 +48,8 @@ db-bootstrap:
 	uv run --locked python -m backend.persistence.bootstrap
 test-integration:
 	uv run --locked python scripts/test_integration.py
+
+.PHONY: test-e2e
+test-e2e:
+	pnpm --filter @yams/web build
+	pnpm --filter @yams/web exec playwright test
