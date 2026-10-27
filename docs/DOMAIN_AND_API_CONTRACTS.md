@@ -117,6 +117,8 @@ Other `signals.kind` values become supported only with documented operator contr
 
 ## 4. Market-data and experiment contracts
 
+[ADR-007](adr/0007-dataset-snapshots.md) defines manifest fields, canonical SHA-256/derived UUID identity, immutable artifact references, safe publication and recovery. Snapshot `published_at` is local registration/publication time; source availability remains in hashed row-level evidence and must not be inferred from this envelope timestamp.
+
 **Snapshot sample:**
 
 ```json
