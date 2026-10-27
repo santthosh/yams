@@ -74,6 +74,8 @@ Data refresh fetches → validates → normalizes → writes temp Parquet → co
 
 ## 5. Default strategy specification (ADR-003)
 
+[ADR-003](adr/0003-strategy-configuration.md) ratifies schema bounds, contiguous scheduled-session windows, canonical hashing and simultaneous capped allocation. Q02 excludes zero-VOL60 assets from inverse-volatility selection with `ZERO_VOLATILITY`, before top-N selection, without a volatility floor; zero cross-sectional dispersion still yields z=0.
+
 The first strategy is **Risk-Adjusted Momentum v1**, a transparent baseline, not a claim that momentum beats SPY. Other templates (mean reversion, low volatility) share the interface and are added in 0.0.3. A user may fork parameters to a new **immutable** strategy version.
 
 ### 5.1 Candidate eligibility
