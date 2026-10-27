@@ -75,6 +75,27 @@ Desktop's Linux VM; native macOS execution does not supply that enforcement.
 
 The [verification report](../verification/25-compose/README.md) records measured
 startup and diagnostic load, browser and failure/recovery evidence.
-Issue #25 is still in implementation. Native development,
-the complete operational handoff and review gates remain pending. Release images
+Issue #25 is still in implementation; review gates remain pending. Release images
 and installation artifacts are owned by #28, not by these local image tags.
+
+## Development with hot reload
+
+After `make install`, run `make dev`. Web and API run natively on loopback ports
+3000 and 8000, with Next Fast Refresh and Uvicorn source reload. PostgreSQL and the
+worker run in the separate `yams-dev` Compose project; the worker retains Linux
+cgroup/process enforcement. This is the Q14 workflow, including on macOS. Worker
+source is mounted read-only; use `docker compose -p yams-dev -f compose.dev.yaml restart worker`
+after handler changes. Dependency changes require rebuilding/restarting the launcher.
+
+The development database publishes an ephemeral loopback port which the launcher
+discovers. `YAMS_DEV_DB_PORT` selects a fixed port if needed. This is an explicit
+development exception: the default full-container application still publishes only
+web. `YAMS_DEV_API_PORT` and `YAMS_DEV_WEB_PORT` select native ports. The launcher
+rejects occupied ports and duplicate launchers and stops both native processes if
+either exits. Ctrl-C/SIGTERM stops the development containers while preserving
+their separate named volumes. It does not reset application or development data.
+
+`YAMS_DEV_PROJECT=yams-dev-<suffix>` creates a separate development namespace for
+verification. Avoid running multiple Next dev processes in the same checkout.
+The launcher does not load `.env` into native processes; export optional settings
+in the shell. Database/fixture/proxy addresses are supplied by the launcher.

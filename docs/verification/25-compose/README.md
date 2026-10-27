@@ -1,7 +1,7 @@
 # Issue #25 — integrated foundation verification
 
-Status: implementation evidence, not a completed issue or release. Native developer
-workflow remains pending its Linux-enforcement/macOS decision. No 0.0.2 work is
+Status: implementation evidence, not a completed issue or release. Q14 approves
+native web/API hot reload with a bounded Docker worker and PostgreSQL. No 0.0.2 work is
 included. Operational commands are in [local-compose](../../operations/local-compose.md).
 
 ## Reproduction and observed scope
@@ -77,5 +77,26 @@ Docker builds select standalone Next output; local builds keep standard output s
 `next start` works without the standalone warning.
 
 The reset cancellation path was exercised with a nonmatching response and made no
-resource changes. Destructive operator reset was not run. Final issue completion
-still requires developer workflow, final documentation and current-head PR review.
+resource changes. Destructive operator reset was not run. Developer verification is recorded below. Final issue completion
+still requires current-head PR review and merged-state verification.
+
+## Approved developer workflow
+
+Q14 was approved by the user. On macOS arm64, the actual launcher started native
+Uvicorn (8115) and Next development (3115) with project yams-dev-verify-q14.
+The native API/web proxy returned ready with persisted workspace
+`c5685340-60ee-4298-acf1-4ea95711e680`; the bounded container worker completed
+diagnostic job `c4b6a053-a428-442e-81ec-d233cab2c56e`, read through the native web proxy.
+Touching the API source triggered StatReload and replaced server PID 25197 with
+25279; readiness recovered. The browser hot-reload probe changed a temporary
+route from Reload before to Reload after without page.reload(), then removed
+only its own temporary route. SIGTERM to the launcher stopped native processes
+and its Compose project cleanly while retaining the development volumes.
+Starting that same disposable project again recovered the identical workspace ID
+and completed job from PostgreSQL. Both native ports were closed after shutdown.
+Only the verification project's volumes were removed after this retention check.
+
+`apps/web/tests/dev-reload.mjs <loopback-origin>` reproduces the web reload probe
+against a running dev server. It refuses an existing probe directory and cleans
+up its own source file. Next automatic agent-file generation is disabled to avoid
+rewriting repository instructions during normal development.

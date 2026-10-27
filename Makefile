@@ -61,3 +61,7 @@ smoke:
 .PHONY: reset
 reset:
 	uv run --locked python scripts/reset_local.py
+
+.PHONY: dev
+dev:
+	uv run --locked python scripts/dev.py

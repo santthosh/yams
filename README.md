@@ -4,13 +4,13 @@ Yet Another Market Simulator is a local, single-user paper research workspace. I
 
 ## Current state
 
-The `0.0.1` foundation provides an importable FastAPI package, an accessible Next.js Dashboard/Settings shell, versioned contracts, synthetic fixtures, PostgreSQL workspace/job migrations, a bounded diagnostic worker and working quality commands. `/livez` checks only that the API process responds; `/api/v1/health` checks database/migration/workspace/fixture readiness. Local Compose and isolated smoke checks are implemented; the native developer workflow, CI and release packaging remain tracked foundation work. No portfolio values or investment results are seeded by this foundation.
+The `0.0.1` foundation provides an importable FastAPI package, an accessible Next.js Dashboard/Settings shell, versioned contracts, synthetic fixtures, PostgreSQL workspace/job migrations, a bounded diagnostic worker and working quality commands. `/livez` checks only that the API process responds; `/api/v1/health` checks database/migration/workspace/fixture readiness. Local Compose and isolated smoke checks are implemented; CI and release packaging remain tracked foundation work. No portfolio values or investment results are seeded by this foundation.
 
 ## Local Docker startup
 
 With Docker Compose 2.38.2 or newer, run `docker compose up --build -d --wait`, then open `http://127.0.0.1:3000`. Initial builds download pinned images and locked dependencies; cached runtime needs no external provider. Migrations and workspace seeding run before the API and worker. Named database/artifact volumes survive restart and rebuild.
 
-See [local operations](docs/operations/local-compose.md) for offline startup, resource caps, diagnostics and the separate destructive `make reset` command. [Compose verification](docs/verification/25-compose/README.md) records browser, job, failure/recovery and resource evidence. `make smoke` requires the development dependencies and Playwright Chromium described below. Native macOS development remains pending Q14; full-container mode works on Docker Desktop.
+See [local operations](docs/operations/local-compose.md) for offline startup, resource caps, diagnostics and the separate destructive `make reset` command. [Compose verification](docs/verification/25-compose/README.md) records browser, job, failure/recovery and resource evidence. `make smoke` requires the development dependencies and Playwright Chromium described below. `make dev` runs native web/API with hot reload and a separate Docker PostgreSQL/worker project, as approved in Q14. Full-container mode remains authoritative.
 
 ## Development setup
 
@@ -46,7 +46,7 @@ make build
 
 `lint-backend` runs Ruff checks and formatting; `lint-web` runs ESLint and Prettier. `typecheck-backend` runs strict mypy separately from frontend `next typegen`/TypeScript. `test-backend` exercises liveness and unavailable routes without a DB; `test-web` verifies formatting, provenance/job/error states and proxy boundaries with Vitest. `build-backend` creates a wheel/sdist and `build-web` creates a production Next.js build. These targets propagate failures and contain no empty success stubs.
 
-Playwright is pinned. Install its Chromium once with `pnpm --filter @yams/web exec playwright install chromium`, then run `make test-e2e` for production-build browser checks at 360px and 1280px against a labeled synthetic transport. `make test-integration` verifies PostgreSQL in an isolated Docker project; `make smoke` verifies the full container application with isolated volumes; `make dev` remains pending Q14 in #72. Tailwind and locally owned shadcn-style primitives are implemented; charts remain with their feature owners.
+Playwright is pinned. Install its Chromium once with `pnpm --filter @yams/web exec playwright install chromium`, then run `make test-e2e` for production-build browser checks at 360px and 1280px against a labeled synthetic transport. `make test-integration` verifies PostgreSQL in an isolated Docker project; `make smoke` verifies the full container application with isolated volumes; `make dev` starts the approved native web/API plus Docker worker/database workflow. Tailwind and locally owned shadcn-style primitives are implemented; charts remain with their feature owners.
 
 Read [AGENTS.md](AGENTS.md), the [implementation blueprint](docs/IMPLEMENTATION_BLUEPRINT.md), and the scoped GitHub issue before changing financial semantics. Milestone `0.0.1` is not released merely because the scaffold builds.
 

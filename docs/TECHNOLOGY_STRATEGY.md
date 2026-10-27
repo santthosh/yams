@@ -93,7 +93,7 @@ In **0.0.1**, first boot presents a seeded **local workspace, labeled fixture me
 2. **Durability:** Postgres data and research artifacts use named Docker volumes. Container rebuilds do not destroy portfolios or past experiments.
 3. **Offline mode:** Fixtures, previously cached data, and saved results remain browsable and rerunnable without internet. New market refreshes fail with an actionable message.
 4. **Reset and backup:** Document export/backup and a separate, deliberately destructive `reset` command; never reset data during ordinary startup.
-5. **Developer mode:** `make dev` or equivalent launches only infrastructure in Docker while web/API/worker run natively with hot reload. Full-container mode remains authoritative.
+5. **Developer mode:** `make dev` launches web/API natively with hot reload while PostgreSQL and the bounded Linux worker run in Docker, including on macOS (approved Q14; ADR-009). Developer PostgreSQL is loopback-only and uses a separate project/volume namespace. Preserve worker enforcement; restart it after handler changes. Full-container mode remains authoritative.
 6. **No account setup:** Single local workspace, multiple strategies and multiple independent paper portfolios. No authentication UI.
 7. **Controlled resources:** Bound worker concurrency and experiment workload; configurable time, memory, ticker, and historical-range limits.
 8. **Networking:** Publish only the web port on `127.0.0.1` by default. API/Postgres are private to the Compose network. Document the risks of intentionally exposing the app beyond localhost.

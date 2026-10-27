@@ -1,0 +1,31 @@
+name: yams-dev
+
+services:
+  postgres:
+    extends:
+      file: compose.yaml
+      service: postgres
+    networks:
+      private: {}
+      ingress:
+        gw_priority: 1
+    ports:
+      - "127.0.0.1:${YAMS_DEV_DB_PORT:-0}:5432"
+  migrate:
+    extends:
+      file: compose.yaml
+      service: migrate
+  worker:
+    extends:
+      file: compose.yaml
+      service: worker
+    volumes:
+      - ./backend:/app/backend:ro
+
+networks:
+  private:
+    internal: true
+  ingress: {}
+volumes:
+  database:
+  artifacts:
