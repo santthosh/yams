@@ -324,6 +324,7 @@ Every approved batch records `approved_at`, original input snapshot, approval id
 5. Use optimistic portfolio revision or row locking when approving batches; competing approvals cannot overdraw cash.
 6. GET never mutates financial state. Only workers under the approved batch apply fills; restart repeats are safe.
 7. Snapshot IDs and strategy-version IDs remain stable across reboots. Backup includes both PostgreSQL metadata and Parquet manifests/artifacts.
+8. Under approved Q01 and [ADR-001](adr/0001-execution-semantics.md), executed/posted sale proceeds can fund subsequent buys immediately within a synthetic rebalance; no settlement delay is modeled. Pending sells/approval do not create available cash. Cancellation cannot reverse a posted fill.
 
 ## 9. Event and evidence model
 
