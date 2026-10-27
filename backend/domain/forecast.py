@@ -1,6 +1,7 @@
 """ADR-006 forecast outputs, including explicit unavailable comparisons."""
 
 from decimal import Decimal
+from math import isclose
 from typing import Annotated, Literal, Self
 from uuid import UUID
 
@@ -168,6 +169,7 @@ class ForecastV1(Contract):
         assert self.proposed is not None and self.hold_unchanged is not None
         assert self.median_return_delta_fraction is not None
         expected = self.proposed.median_return_fraction - self.hold_unchanged.median_return_fraction
-        if abs(self.median_return_delta_fraction - expected) > 1e-12:
+        # ADR-006: small scalar absolute tolerance, relative float64 tolerance.
+        if not isclose(self.median_return_delta_fraction, expected, rel_tol=1e-10, abs_tol=1e-12):
             raise ValueError("Comparison delta must equal the difference of scenario medians")
         return self

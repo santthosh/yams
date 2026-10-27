@@ -100,6 +100,21 @@ def test_forecast_requires_shared_asset_evidence_and_ordered_quantiles() -> None
     data["proposed"]["p10_return_fraction"] = 0.1
     with pytest.raises(ValidationError):
         ForecastV1.model_validate(data)
+
+
+def test_forecast_delta_uses_relative_float64_tolerance_without_hiding_wrong_delta() -> None:
+    data = example("forecast.json")
+    data["proposed"].update(
+        p10_return_fraction=999999,
+        median_return_fraction=1000000,
+        p90_return_fraction=1000001,
+        median_ending_value_usd="1000001000.00",
+    )
+    data["median_return_delta_fraction"] = 1000000.000001
+    assert ForecastV1.model_validate(data).status == "available"
+    data["median_return_delta_fraction"] = 1000000.01
+    with pytest.raises(ValidationError, match="delta"):
+        ForecastV1.model_validate(data)
     data = example("forecast.json")
     data["proposed_allocation"].update(
         weights=[{"asset_id": "DEMO:AAA", "weight": "0.2"}], cash_weight="0.8"

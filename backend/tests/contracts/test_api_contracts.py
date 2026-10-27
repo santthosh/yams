@@ -87,7 +87,7 @@ def test_internal_errors_never_expose_exception_payloads(caplog: pytest.LogCaptu
         (409, "STATE_CONFLICT"),
         (422, "VALIDATION_ERROR"),
         (429, "LIMIT_EXCEEDED"),
-        (503, "INTERNAL_ERROR"),
+        (503, "PROVIDER_UNAVAILABLE"),
     ],
 )
 def test_http_exception_keeps_status_without_detail_leak(status: int, code: str) -> None:
@@ -101,8 +101,8 @@ def test_http_exception_keeps_status_without_detail_leak(status: int, code: str)
     assert response.status_code == status
     assert response.json()["error"]["code"] == code
     assert "secret-provider-token" not in response.text
-    if status < 500:
-        assert response.headers["retry-after"] == "2"
+    assert response.headers["retry-after"] == "2"
+    assert response.json()["error"]["retryable"] is (status == 503)
 
 
 def test_export_is_deterministic_and_detects_changed_schema(tmp_path: Path) -> None:

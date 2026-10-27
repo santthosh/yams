@@ -75,8 +75,9 @@ def register_error_handlers(app: FastAPI) -> None:
             return error_response(
                 code, "Request could not be completed.", error.status_code, headers=error.headers
             )
+        code = "PROVIDER_UNAVAILABLE" if error.status_code == 503 else "INTERNAL_ERROR"
         return error_response(
-            "INTERNAL_ERROR", "Request could not be completed.", error.status_code
+            code, "Request could not be completed.", error.status_code, headers=error.headers
         )
 
     @app.exception_handler(Exception)
