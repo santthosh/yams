@@ -138,7 +138,12 @@ def test_resource_failure_never_seals_partial_output(
 ) -> None:
     bootstrap(database)
     queue = Queue(database)
-    identity = queue.enqueue("diagnostic", PAYLOAD, uuid4(), limits=JobLimits(wall_seconds=1))
+    # Spawn/import time counts toward the wall budget. Only the timeout case tests
+    # a one-second deadline; other failures must reach their handlers on hosted CI.
+    wall_seconds = 1 if expected == "TIME_LIMIT" else 10
+    identity = queue.enqueue(
+        "diagnostic", PAYLOAD, uuid4(), limits=JobLimits(wall_seconds=wall_seconds)
+    )
     started = time.monotonic()
     assert Worker(queue, handler).run_once()
     queue.recover()
@@ -146,7 +151,7 @@ def test_resource_failure_never_seals_partial_output(
     assert result is not None and result.status == "failed" and result.error is not None
     assert result.error.code == expected
     assert result.result is None and result.attempts == 1
-    assert time.monotonic() - started < 4
+    assert time.monotonic() - started < wall_seconds + 3
     with Session(database) as session:
         assert session.scalar(select(func.count()).select_from(DiagnosticEffect)) == 0
         attempt = session.get(JobAttempt, (identity, 1))
