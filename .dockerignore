@@ -16,3 +16,7 @@ data/downloads
 data/artifacts
 backups
 *.log
+test-results
+**/test-results
+**/playwright-report
+**/*.tsbuildinfo
