@@ -1,6 +1,6 @@
 # YAMS — Implementation Blueprint
 
-**Version:** 1.0 • **Status:** Implementation baseline (proposed defaults to ratify in M0 ADRs)  
+**Version:** 1.0 • **Status:** Implementation baseline (proposed defaults to ratify in 0.0.1 ADRs)  
 **Product:** YAMS — Yet Another Market Simulator  
 **Scope:** Single operator, local Docker Compose, US-listed equities/ETFs, USD, synthetic portfolios only  
 **Dependencies:** [Product Strategy](PRODUCT_STRATEGY.md) · [Technology Strategy](TECHNOLOGY_STRATEGY.md) · [Domain/API Contracts](DOMAIN_AND_API_CONTRACTS.md) · [UX Specification](UX_SPECIFICATION.md)
@@ -9,7 +9,7 @@
 
 This is the engineering decision record that prevents independent agents from inventing mutually incompatible investment rules. **Normative baseline choices are marked `MUST`**; recommended starting numeric defaults are marked `DEFAULT` and can only change through a strategy version or approved ADR. This is a specification, not a claim of proven trading profitability.
 
-**Core release demonstration (M0–M4):** fresh clone → `docker compose up --build` → seeded/offline lab → ingest/use real price and context data → provider-derived candidate universe → score and allocate to a feasible paper portfolio → show $1,000 current position and rationale → historical walk-forward backtest vs SPY → numerical 90-calendar-day proposed-vs-current scenario forecast → preview/apply synthetic BUY/SELL/HOLD decisions → persist holdings and cash across restart. **Every step MUST be traceable to immutable inputs.**
+**Core release demonstration (0.0.1–0.0.5):** fresh clone → `docker compose up --build` → seeded/offline lab → ingest/use real price and context data → provider-derived candidate universe → score and allocate to a feasible paper portfolio → show $1,000 current position and rationale → historical walk-forward backtest vs SPY → numerical 90-calendar-day proposed-vs-current scenario forecast → preview/apply synthetic BUY/SELL/HOLD decisions → persist holdings and cash across restart. **Every step MUST be traceable to immutable inputs.**
 
 **Architecture shape:** Next.js web (browser), FastAPI API (request/validation), Python worker (jobs/scheduler), PostgreSQL (transactions/metadata/jobs), local Parquet (market snapshots/artifacts), embedded DuckDB (read-only analytics). Exactly four long-running services, no cloud requirement.
 
@@ -36,7 +36,7 @@ This is the engineering decision record that prevents independent agents from in
 - **Offline fixture adapter (required):** bundled *labeled synthetic* multi-year OHLCV/sector/asset metadata with deliberate split/dividend, stale quote, duplicate-fill, holiday and missing-bar test cases. This is not presented as real historical return evidence.
 - **Research provider adapter (initial):** Yahoo Finance via `yfinance` as an optional network-backed feed, subject to current provider terms, rate limits and source reliability. The adapter is replaceable; downloaded data should not be redistributed without rights review.
 - **Universe strategy:** `liquid_us_equities` obtains a broad **provider- or published-rule-derived listing**, not five manually named favorites. Save membership snapshot IDs and selection rules with each run. The passive ETF benchmark (initially SPY) is a **benchmark**, not a hardcoded winner/automatic portfolio constituent.
-- **Historical membership honesty:** if the provider has only present-day membership, label runs `SURVIVORSHIP_BIAS_RISK`; do not describe them as point-in-time constituent-correct. More reliable membership-history support is M8.
+- **Historical membership honesty:** if the provider has only present-day membership, label runs `SURVIVORSHIP_BIAS_RISK`; do not describe them as point-in-time constituent-correct. More reliable membership-history support is 0.0.9.
 
 ### 3.3 Snapshot integrity
 
@@ -68,7 +68,7 @@ Data refresh fetches → validates → normalizes → writes temp Parquet → co
 
 ## 5. Default strategy specification (ADR-003)
 
-The first strategy is **Risk-Adjusted Momentum v1**, a transparent baseline, not a claim that momentum beats SPY. Other templates (mean reversion, low volatility) share the interface and are added in M2. A user may fork parameters to a new **immutable** strategy version.
+The first strategy is **Risk-Adjusted Momentum v1**, a transparent baseline, not a claim that momentum beats SPY. Other templates (mean reversion, low volatility) share the interface and are added in 0.0.3. A user may fork parameters to a new **immutable** strategy version.
 
 ### 5.1 Candidate eligibility
 
@@ -112,7 +112,7 @@ Skip candidates with missing/nonfinite inputs; record filters and quality flags.
 - Invariants after every posted event: `cash >= 0`, `shares >= 0`, no unapproved asset or order route, debits/credits reconcile within cent rounding, replay matches projected holdings; repeated fill returns same result.
 - Separate **recommendation** (may have many proposed actions) from **execution batch** (operator approval + pending/posted status) from **valuation** (mark to market). Ledger is the source of truth; position table is a derivable projection.
 
-## 7. Backtesting methodology (M2)
+## 7. Backtesting methodology (0.0.3)
 
 **Algorithm:** for each portfolio rebalance session T, compute candidates and targets using snapshot evidence available at T close; schedule and fill orders at eligible T+1 open; apply actions and value through time; rebalance monthly using exchange session calendar. Use same strategies, allocation, order planner, corporate-action policy, and fill simulator as ongoing paper accounts. For unavailable bars, record a skip/error according to a documented gap policy—never invent fills.
 
@@ -132,7 +132,7 @@ Skip candidates with missing/nonfinite inputs; record filters and quality flags.
 
 **Clock behavior:** scheduler runs only when Docker is running. On restart, scan for pending fills and due evaluations; replay missed eligible periods **in order**, honoring original timestamps, without retroactively recommending as though an earlier decision were fresh. Surface `paused while app stopped` and recovery results in diagnostics. An Arena entrant may not be retroactively credited with trades from before it was launched.
 
-## 10. Strategy Arena and Journal (M5–M6)
+## 10. Strategy Arena and Journal (0.0.6–0.0.7)
 
 **Arena:** freeze each entrant's strategy version, initial $1,000 default, join/start instant, universe assumptions, fee schedule, benchmark and evaluation calendar. Competitors have **independent** cash/holdings and no cross-funding. Champion selection requires explicit action; compare equal elapsed periods and reveal missing-data exclusions. A new entrant does not gain fake historical paper-trading history from a backtest.
 
@@ -183,30 +183,30 @@ Release instructions must explain backup and migration requirements and identify
 
 ### 11.4 Branch protection and required reviews
 
-Configure a GitHub ruleset or branch protection for the default branch during M0. Require pull requests, at least one approving review from a reviewer other than the author, resolution of review conversations, and a passing `CI / required` check for the current merge candidate. Dismiss stale approvals after code changes and require the branch to be current with its base, or use a verified merge queue.
+Configure a GitHub ruleset or branch protection for the default branch during 0.0.1. Require pull requests, at least one approving review from a reviewer other than the author, resolution of review conversations, and a passing `CI / required` check for the current merge candidate. Dismiss stale approvals after code changes and require the branch to be current with its base, or use a verified merge queue.
 
 Block force pushes and branch deletion. Apply the rules to administrators and automation where supported; the ship workflow must not bypass them. Add `.github/CODEOWNERS` with actual maintainers for financial-engine/ledger code, contracts/migrations, and CI/release workflows, and require their approval for affected paths. An automated review is additional evidence, not a substitute for required maintainer approval. If a reviewer or repository feature is unavailable, report the unmet gate instead of claiming protection is configured.
 
-M0 acceptance must include the workflow files, a successful PR run, a successful default-branch run, inspection of the active repository protection settings, and a verified prerelease installation. Committed YAML alone does not prove that checks, publishing permissions, or branch protections work.
+0.0.1 acceptance must include the workflow files, a successful PR run, a successful default-branch run, inspection of the active repository protection settings, and a verified prerelease installation. Committed YAML alone does not prove that checks, publishing permissions, or branch protections work.
 
 ## 12. Implementation gates and issue dependencies
 
 | Milestone | Must be demonstrable before milestone closes | Dependency boundary |
 |---|---|---|
-| M0 Foundation | `docker compose up --build`, offline seeded UI, migrations, lint/tests, typed contracts, ADRs 001–007; GitHub Actions PR/default-branch CI, protected reviews, verified Docker prerelease (§11.1–11.4) | None |
-| M1 Data & Quant | Snapshot → dynamic eligible securities → scores/explanations → feasible targets | M0 contracts |
-| M2 Strategy Lab | Versioned templates, jobs, walk-forward, benchmark, comparable curves/results | M1 quant + execution contract |
-| M3 Paper Portfolios | $1,000 virtual account, order preview, posting, persistence, reconciliation | M1 target; M0 ledger contract |
-| M4 Decision Center | Current vs proposed plan, next eligible fills, return scenarios and explanations | M2+M3; **core release gate** |
-| M5 Arena | Independent champion/challenger paper portfolios, valid prospective comparison | M4 |
-| M6 Journal | Immutable decision/outcome journal, no-change counterfactual | M4; Arena optional |
-| M7 Assisted Authoring | Validated visual/AI-to-config authoring, never direct LLM trades | M2 config schema |
-| M8 Reliability | Backups, provider diagnostics, more coverage and stronger calendar/action support | Existing contracts |
+| 0.0.1 — Foundation | `docker compose up --build`, offline seeded UI, migrations, lint/tests, typed contracts, ADRs 001–007; GitHub Actions PR/default-branch CI, protected reviews, verified Docker prerelease (§11.1–11.4) | None |
+| 0.0.2 — Market Data & Quant Core | Snapshot → dynamic eligible securities → scores/explanations → feasible targets | 0.0.1 contracts |
+| 0.0.3 — Strategy Lab & Backtesting | Versioned templates, jobs, walk-forward, benchmark, comparable curves/results | 0.0.2 quant + execution contract |
+| 0.0.4 — Paper Portfolios | $1,000 virtual account, order preview, posting, persistence, reconciliation | 0.0.2 target; 0.0.1 ledger contract |
+| 0.0.5 — Decision Center | Current vs proposed plan, next eligible fills, return scenarios and explanations | 0.0.3+0.0.4; **core release gate** |
+| 0.0.6 — Strategy Arena | Independent champion/challenger paper portfolios, valid prospective comparison | 0.0.5 |
+| 0.0.7 — Decision Journal | Immutable decision/outcome journal, no-change counterfactual | 0.0.5; Arena optional |
+| 0.0.8 — Assisted Authoring | Validated visual/AI-to-config authoring, never direct LLM trades | 0.0.3 config schema |
+| 0.0.9 — Reliability & Research Depth | Backups, provider diagnostics, more coverage and stronger calendar/action support | Existing contracts |
 
 **Do not begin dependent PRs until contracts and fixtures land**. Good early parallel tracks: independently authored golden fixtures, offline data adapter, frontend shell, and migration scaffolding following approved schema.
 
 ## 13. Decisions and change control
 
-Record ADRs in `docs/adr/` named `0001-execution-semantics.md` through `0007-dataset-snapshots.md`. The choices above are **working defaults** for initial grooming; M0 resolves provider limitations and ratifies them. Open questions that must not be silently chosen by agents: (a) Yahoo provider calendar/price availability, (b) historical symbol delistings and membership, (c) exact corporate-action raw-price convention, (d) whether partial open-session quotes are trustworthy, (e) downloaded market-data redistribution rights, and (f) nominal throughput/runtime budget on typical local hardware. If data quality prevents correctness, **reduce supported data scope or disclose limits**; never weaken the invariants.
+Record ADRs in `docs/adr/` named `0001-execution-semantics.md` through `0007-dataset-snapshots.md`. The choices above are **working defaults** for initial grooming; 0.0.1 resolves provider limitations and ratifies them. Open questions that must not be silently chosen by agents: (a) Yahoo provider calendar/price availability, (b) historical symbol delistings and membership, (c) exact corporate-action raw-price convention, (d) whether partial open-session quotes are trustworthy, (e) downloaded market-data redistribution rights, and (f) nominal throughput/runtime budget on typical local hardware. If data quality prevents correctness, **reduce supported data scope or disclose limits**; never weaken the invariants.
 
 **Normative references:** API schemas and state transitions are in `DOMAIN_AND_API_CONTRACTS.md`; UX treatment of pending fills, stale data and scenarios is in `UX_SPECIFICATION.md`; coding agent rules are in `../AGENTS.md`.

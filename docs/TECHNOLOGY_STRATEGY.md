@@ -368,17 +368,17 @@ Technology work should follow the product roadmap, with a usable vertical slice 
 
 | Milestone | Architecture deliverable | Engineering exit gate |
 |---|---|---|
-| **M0 — Foundation** | Monorepo, Compose, frontend/API/worker skeleton, schema/migrations, fixtures, CI, `AGENTS.md`. | Fresh clone launches local UI and passes tests. |
-| **M1 — Data & Quant Core** | Providers, provenance, Parquet snapshots, universe, features, scoring and allocation/risk interfaces. | Given as-of inputs, engine produces repeatable scored candidates and feasible targets. |
-| **M2 — Strategy Lab** | Immutable strategy versions, backtest runner, job status, benchmark and comparative UI. | Same inputs produce the same outcomes; temporal/leakage tests pass. |
-| **M3 — Paper Portfolio** | Durable paper ledger, order preview, execution model, valuations. | Portfolio remains correct after restart; cash/positions reconcile. |
-| **M4 — Decision Center** | Rebalance logic, evidence-grounded recommendations, 90-day scenario baseline. | Complete requirements: current position, next-action proposal, numerical forecast, history and explanations. |
-| **M5 — Strategy Arena** | Independent competitor portfolios, scheduled evaluations, fair comparisons. | Frozen entrants compete on aligned terms. |
-| **M6 — Decision Journal** | Immutable decision snapshots, outcome maturation, counterfactuals. | Prior predictions and outcomes are inspectable and independently reproducible. |
-| **M7 — Assisted Authoring** | Visual composer, optional AI-to-strategy proposal validated by schema. | AI proposes configurations; deterministic engine remains authority. |
-| **M8 — Reliability & Research Depth** | Provider hardening, richer context, exports/backups, local diagnostics and performance tuning. | Realistic datasets remain usable and failures remain observable/recoverable. |
+| **0.0.1 — Foundation** | Monorepo, Compose, frontend/API/worker skeleton, schema/migrations, fixtures, CI, `AGENTS.md`. | Fresh clone launches local UI and passes tests. |
+| **0.0.2 — Market Data & Quant Core** | Providers, provenance, Parquet snapshots, universe, features, scoring and allocation/risk interfaces. | Given as-of inputs, engine produces repeatable scored candidates and feasible targets. |
+| **0.0.3 — Strategy Lab & Backtesting** | Immutable strategy versions, backtest runner, job status, benchmark and comparative UI. | Same inputs produce the same outcomes; temporal/leakage tests pass. |
+| **0.0.4 — Paper Portfolios** | Durable paper ledger, order preview, execution model, valuations. | Portfolio remains correct after restart; cash/positions reconcile. |
+| **0.0.5 — Decision Center** | Rebalance logic, evidence-grounded recommendations, 90-day scenario baseline. | Complete requirements: current position, next-action proposal, numerical forecast, history and explanations. |
+| **0.0.6 — Strategy Arena** | Independent competitor portfolios, scheduled evaluations, fair comparisons. | Frozen entrants compete on aligned terms. |
+| **0.0.7 — Decision Journal** | Immutable decision snapshots, outcome maturation, counterfactuals. | Prior predictions and outcomes are inspectable and independently reproducible. |
+| **0.0.8 — Assisted Authoring** | Visual composer, optional AI-to-strategy proposal validated by schema. | AI proposes configurations; deterministic engine remains authority. |
+| **0.0.9 — Reliability & Research Depth** | Provider hardening, richer context, exports/backups, local diagnostics and performance tuning. | Realistic datasets remain usable and failures remain observable/recoverable. |
 
-**Core product release = M0–M4.** M5–M8 are additive, not prerequisites for an end-to-end first release. There is **no migration-to-SaaS milestone**.
+**Core product release = 0.0.1–0.0.5.** 0.0.6–0.0.9 are additive, not prerequisites for an end-to-end first release. There is **no migration-to-SaaS milestone**.
 
 ### GitHub and coding-agent conventions
 
@@ -410,7 +410,7 @@ Technology work should follow the product roadmap, with a usable vertical slice 
 6. **ADR-006: Forecast baseline** — 90-day scenario horizon, bootstrap convention, assumptions and comparability.
 7. **ADR-007: Dataset manifests** — canonical snapshot format, hashing, retention and backup/export behavior.
 
-The concrete starting policies for these seven decisions are in `IMPLEMENTATION_BLUEPRINT.md`; encode them as ADRs in M0 and do not re-decide them independently in coding-agent PRs. Changes require an ADR, updated tests, and synchronized contract changes.
+The concrete starting policies for these seven decisions are in `IMPLEMENTATION_BLUEPRINT.md`; encode them as ADRs in 0.0.1 and do not re-decide them independently in coding-agent PRs. Changes require an ADR, updated tests, and synchronized contract changes.
 
 ---
 

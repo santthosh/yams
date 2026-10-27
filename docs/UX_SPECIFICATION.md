@@ -22,20 +22,20 @@ Primary navigation and routes:
 
 | Route | Page | Core jobs to be done | Initial milestone |
 |---|---|---|---|
-| `/` | Dashboard | See overall virtual value, latest actions, data health and quick start | M0 scaffold, M4 final |
-| `/lab` | Strategy Lab | Browse templates, versions, experiments | M2 |
-| `/lab/strategies/new` | Strategy editor | Configure/fork declarative strategy rules | M2 basic, M7 advanced |
-| `/lab/strategies/[id]` | Strategy detail | See versions, explanation, launch experiment | M2 |
-| `/lab/experiments/[id]` | Experiment report | Explore equity curve, metrics, trade evidence and limitations | M2 |
-| `/lab/compare` | Strategy comparison | Compare same-period experiments; challenge/fork | M2 |
-| `/portfolios` | Paper Portfolios | Browse independent paper accounts, create portfolio | M3 |
-| `/portfolios/[id]` | Portfolio detail | Holdings, cash, valuation, status and history | M3 |
-| `/portfolios/[id]/decisions` | Decision Center | Review recommendation, scenarios, synthetic trade preview | M4 |
-| `/arena` | Strategy Arena | Compare independently running entrants | M5 |
-| `/arena/[id]` | Arena competition | Champion/challengers, fairness and promotion | M5 |
-| `/journal` | Decision Journal | Search prior evidence, forecasts and outcomes | M6 |
-| `/journal/[id]` | Decision details | Original evidence and later result | M6 |
-| `/settings` | Local Settings & Data | Data sources, freshness, experiment limits, backup, logs | M0 basics, M8 full |
+| `/` | Dashboard | See overall virtual value, latest actions, data health and quick start | 0.0.1 scaffold, 0.0.5 final |
+| `/lab` | Strategy Lab | Browse templates, versions, experiments | 0.0.3 |
+| `/lab/strategies/new` | Strategy editor | Configure/fork declarative strategy rules | 0.0.3 basic, 0.0.8 advanced |
+| `/lab/strategies/[id]` | Strategy detail | See versions, explanation, launch experiment | 0.0.3 |
+| `/lab/experiments/[id]` | Experiment report | Explore equity curve, metrics, trade evidence and limitations | 0.0.3 |
+| `/lab/compare` | Strategy comparison | Compare same-period experiments; challenge/fork | 0.0.3 |
+| `/portfolios` | Paper Portfolios | Browse independent paper accounts, create portfolio | 0.0.4 |
+| `/portfolios/[id]` | Portfolio detail | Holdings, cash, valuation, status and history | 0.0.4 |
+| `/portfolios/[id]/decisions` | Decision Center | Review recommendation, scenarios, synthetic trade preview | 0.0.5 |
+| `/arena` | Strategy Arena | Compare independently running entrants | 0.0.6 |
+| `/arena/[id]` | Arena competition | Champion/challengers, fairness and promotion | 0.0.6 |
+| `/journal` | Decision Journal | Search prior evidence, forecasts and outcomes | 0.0.7 |
+| `/journal/[id]` | Decision details | Original evidence and later result | 0.0.7 |
+| `/settings` | Local Settings & Data | Data sources, freshness, experiment limits, backup, logs | 0.0.1 basics, 0.0.9 full |
 
 Navigation order: **Dashboard / Lab / Portfolios / Arena / Journal / Settings**. Disabled/unimplemented routes are hidden or labeled `Coming later`; never present an inert button. Global top bar: YAMS wordmark, `Paper only` status, current data source/mode, data as-of session, accessible refresh/jobs status. On phone/tablet use collapsed responsive navigation; desktop has sidebar.
 
@@ -65,7 +65,7 @@ If live/provider access is unavailable, YAMS still starts and lets the operator 
 
 ## 4. Default happy path — core release
 
-### 4.1 First recommendation (M4)
+### 4.1 First recommendation (0.0.5)
 
 **Entry:** From Dashboard choose `See portfolio recommendation`. With a preconfigured default strategy, data snapshot and demo portfolio, show current holdings and **draft target immediately if previously computed**, otherwise show a cancellable job state. User sees:
 
@@ -78,11 +78,11 @@ If live/provider access is unavailable, YAMS still starts and lets the operator 
 
 A status banner must explain if the next valid fill is pending (e.g. `Queued for next eligible market open after approval`). The preview is **not** an executed trade; portfolio totals change only when an approved fill posts.
 
-### 4.2 New paper portfolio (M3)
+### 4.2 New paper portfolio (0.0.4)
 
 `Create paper portfolio` form: name, opening virtual cash (default $1,000), strategy version, source dataset/mode, benchmark and risk policy. Show validation inline (`capital > 0`, only supported instruments, no duplicate name within local workspace if disallowed). After creation, view starts with **100% cash**, not a falsely held portfolio; link to evaluate.
 
-### 4.3 Return visit (M4)
+### 4.3 Return visit (0.0.5)
 
 Dashboard shows current portfolio value, most recent settled fills, pending paper orders, last recommended changes, forecast-horizon countdown, next scheduled review and data freshness. If the application was shut down, show `Monitoring paused while YAMS was closed`; after restart, show what due work was safely caught up (if anything). Do not claim 24/7 monitoring.
 
@@ -201,15 +201,15 @@ Use explicit labels: `Estimated`, `Forecast scenario`, `Simulated fill`, `Histor
 
 | Gate | Acceptance scenario |
 |---|---|
-| M0 | Fresh Docker installation shows app, fixtures, global navigation and health; no signup |
-| M1 | Operator selects a snapshot, sees eligible/scored candidates and filter reasons |
-| M2 | Create/fork strategy, launch backtest, view comparison and inspect warnings |
-| M3 | Create $1,000 cash account, inspect ledger, restart Docker and see same state |
-| M4 | Get data-derived target, numerical 90-day scenarios, plain rationale, approve paper orders, see pending then posted fills, new holding state |
-| M5 | Start Champion vs Challenger competition; dates/policies aligned and independent |
-| M6 | Locate original recommendation, its forecast and matured result without overwriting history |
-| M7 | Compose or AI-propose a strategy as **reviewable validated rules**, never opaque generated picks |
-| M8 | Export/backup diagnostics, resolve data-provider failures, recover local job state safely |
+| 0.0.1 | Fresh Docker installation shows app, fixtures, global navigation and health; no signup |
+| 0.0.2 | Operator selects a snapshot, sees eligible/scored candidates and filter reasons |
+| 0.0.3 | Create/fork strategy, launch backtest, view comparison and inspect warnings |
+| 0.0.4 | Create $1,000 cash account, inspect ledger, restart Docker and see same state |
+| 0.0.5 | Get data-derived target, numerical 90-day scenarios, plain rationale, approve paper orders, see pending then posted fills, new holding state |
+| 0.0.6 | Start Champion vs Challenger competition; dates/policies aligned and independent |
+| 0.0.7 | Locate original recommendation, its forecast and matured result without overwriting history |
+| 0.0.8 | Compose or AI-propose a strategy as **reviewable validated rules**, never opaque generated picks |
+| 0.0.9 | Export/backup diagnostics, resolve data-provider failures, recover local job state safely |
 
 ### E2E flows for Playwright
 

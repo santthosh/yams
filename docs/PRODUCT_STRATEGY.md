@@ -279,27 +279,29 @@ Treat market ingestion, feature computation, strategy evaluation, portfolio cons
 
 ## 8. Milestone Roadmap
 
+Milestones `0.0.1`–`0.0.9` are planned release targets, not published releases. `0.0.5 — Decision Center` is the first complete core release; later versions add the documented capabilities. Document version metadata is separate from these product release targets.
+
 The roadmap prioritizes a **complete, trustworthy vertical slice** before advanced experimentation. Milestones are sequenced for GitHub planning; each produces a demonstrable result.
 
 | Milestone | Outcome | Key deliverables | Exit criteria |
 |---|---|---|---|
-| **M0 — Product & Engineering Foundation** | The project is ready for parallel development. | Repository standards, PRD, ADRs, domain model, data/strategy contracts, CI, local bootstrap, design system. | Fresh clone runs; tests/linters execute; example data contract validated. |
-| **M1 — Market Data & Quant Core** | Deterministic stock-selection engine. | Provider adapter, historical prices/context, candidate universe, feature pipeline, initial strategy, risk-aware allocation. | From data and an as-of date, engine returns scored candidates and a feasible target portfolio with explanations. |
-| **M2 — Strategy Lab & Backtesting** | Users can scientifically test investment ideas. | Template strategies, versioning, walk-forward backtester, benchmarks, costs, risk metrics, comparison UI, validation split. | Repeatable experiments generate correct metrics and reveal leakage/data limitations. |
-| **M3 — Paper Portfolio Management** | A virtual portfolio can be deployed and maintained. | $1,000 default, position/cash ledger, order preview, synthetic fills, holdings, valuation, portfolio dashboard. | Trades reconcile to cash and positions; restarting does not lose state. |
-| **M4 — Decision Center & Forecasting** | End-to-end investment decision workflow. | Scheduled/on-demand review, BUY/SELL/HOLD, current-vs-target deltas, numerical horizon forecast, uncertainty, grounded explanations. | New user can obtain a recommendation, deploy it, and later request an updated action with all required evidence. **First complete product release.** |
-| **M5 — Strategy Arena** | Strategies compete under fair forward conditions. | Champion/challengers, equal virtual starting capital, frozen versions, prospective runs, benchmark race, promotion workflow. | Parallel portfolios remain independent and comparisons use aligned periods and assumptions. |
-| **M6 — Decision Journal & Evaluation** | The system measures decision quality over time. | Immutable decision records, horizon maturity jobs, forecast-vs-outcome, hold/no-change counterfactual, attribution, calibration dashboard. | Users can audit a recommendation from original evidence through measured outcome. |
-| **M7 — Assisted Strategy Authoring** | Users can formulate hypotheses more easily. | Visual strategy composer, AI-to-config proposal, validation/approval, experiment critiques, plain-language insights. | AI outputs explicit reviewable rules; no arbitrary generated returns or unapproved execution. |
-| **M8 — Reliability & Research Depth** | Reliable ongoing operation and deeper research. | Multi-provider resilience, data usage review, local health diagnostics, job recovery, backup/export, more realistic market data and research coverage. | Data reliability, security, operational readiness, and research quality meet local reliability and research-quality release criteria. |
+| **0.0.1 — Foundation** | The project is ready for parallel development. | Repository standards, PRD, ADRs, domain model, data/strategy contracts, CI, local bootstrap, design system. | Fresh clone runs; tests/linters execute; example data contract validated. |
+| **0.0.2 — Market Data & Quant Core** | Deterministic stock-selection engine. | Provider adapter, historical prices/context, candidate universe, feature pipeline, initial strategy, risk-aware allocation. | From data and an as-of date, engine returns scored candidates and a feasible target portfolio with explanations. |
+| **0.0.3 — Strategy Lab & Backtesting** | Users can scientifically test investment ideas. | Template strategies, versioning, walk-forward backtester, benchmarks, costs, risk metrics, comparison UI, validation split. | Repeatable experiments generate correct metrics and reveal leakage/data limitations. |
+| **0.0.4 — Paper Portfolios** | A virtual portfolio can be deployed and maintained. | $1,000 default, position/cash ledger, order preview, synthetic fills, holdings, valuation, portfolio dashboard. | Trades reconcile to cash and positions; restarting does not lose state. |
+| **0.0.5 — Decision Center** | End-to-end investment decision workflow. | Scheduled/on-demand review, BUY/SELL/HOLD, current-vs-target deltas, numerical horizon forecast, uncertainty, grounded explanations. | New user can obtain a recommendation, deploy it, and later request an updated action with all required evidence. **First complete product release.** |
+| **0.0.6 — Strategy Arena** | Strategies compete under fair forward conditions. | Champion/challengers, equal virtual starting capital, frozen versions, prospective runs, benchmark race, promotion workflow. | Parallel portfolios remain independent and comparisons use aligned periods and assumptions. |
+| **0.0.7 — Decision Journal** | The system measures decision quality over time. | Immutable decision records, horizon maturity jobs, forecast-vs-outcome, hold/no-change counterfactual, attribution, calibration dashboard. | Users can audit a recommendation from original evidence through measured outcome. |
+| **0.0.8 — Assisted Authoring** | Users can formulate hypotheses more easily. | Visual strategy composer, AI-to-config proposal, validation/approval, experiment critiques, plain-language insights. | AI outputs explicit reviewable rules; no arbitrary generated returns or unapproved execution. |
+| **0.0.9 — Reliability & Research Depth** | Reliable ongoing operation and deeper research. | Multi-provider resilience, data usage review, local health diagnostics, job recovery, backup/export, more realistic market data and research coverage. | Data reliability, security, operational readiness, and research quality meet local reliability and research-quality release criteria. |
 
 ### Release gates
 
-**Core Release (M0–M4):** Real market-data ingestion and context; dynamically discovered/scored stocks; risk-constrained target portfolio; persistent synthetic holdings; explicit next-action recommendations; numerical forward forecast; historical profitability evaluation; position explanations; runnable web UI and concise startup/architecture README.
+**Core Release (0.0.1–0.0.5):** Real market-data ingestion and context; dynamically discovered/scored stocks; risk-constrained target portfolio; persistent synthetic holdings; explicit next-action recommendations; numerical forward forecast; historical profitability evaluation; position explanations; runnable web UI and concise startup/architecture README.
 
-**Research Release (M5–M6):** Prospective competing strategies and accountable forecast/outcome tracking.
+**Research Release (0.0.6–0.0.7):** Prospective competing strategies and accountable forecast/outcome tracking.
 
-**Creator Release (M7–M8):** Accessible authoring and research assistance, with quant execution remaining deterministic and auditable.
+**Creator Release (0.0.8–0.0.9):** Accessible authoring and research assistance, with quant execution remaining deterministic and auditable.
 
 Do not delay Core Release for a sophisticated AI assistant, arbitrary strategy DSL, advanced charting, or distributed/cloud infrastructure.
 

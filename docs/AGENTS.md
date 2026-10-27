@@ -6,9 +6,11 @@
 
 ## 1. Read before changing code
 
+Use planned release versions `0.0.1`–`0.0.9` for milestones, issue references and branch examples. `0.0.5` is the first complete core release. A milestone name does not mean a tag or release has been published.
+
 Read the relevant sections of the following source-of-truth documents **in this order**:
 
-1. [`docs/PRODUCT_STRATEGY.md`](docs/PRODUCT_STRATEGY.md) — capabilities FR-01–FR-15, product flows, M0–M8.
+1. [`docs/PRODUCT_STRATEGY.md`](docs/PRODUCT_STRATEGY.md) — capabilities FR-01–FR-15, product flows, 0.0.1–0.0.9.
 2. [`docs/TECHNOLOGY_STRATEGY.md`](docs/TECHNOLOGY_STRATEGY.md) — stack, local deployment, storage, workers and test boundaries.
 3. [`docs/IMPLEMENTATION_BLUEPRINT.md`](docs/IMPLEMENTATION_BLUEPRINT.md) — normative quant/data/clock/trading/forecast rules and baseline defaults.
 4. [`docs/DOMAIN_AND_API_CONTRACTS.md`](docs/DOMAIN_AND_API_CONTRACTS.md) — models, timestamps, REST contracts, errors and states.
@@ -85,7 +87,7 @@ Agents should not self-mark a blocked issue `agent-ready` to bypass dependencies
 
 ```markdown
 ## Outcome / requirement
-What user-visible behavior changes? FR-xx, Mx.
+What user-visible behavior changes? FR-xx, target release version.
 
 ## Scope
 In-scope modules, exact non-goals, proposed files.
@@ -112,7 +114,7 @@ Branch/PR boundary, any migration or generated-client update.
 
 1. **Read** issue, dependencies, contracts, relevant existing code and tests.
 2. **State a small plan** in the issue/PR: files to edit, interfaces, test criteria and risk.
-3. Work on one issue/PR with a branch name like `feat/m1-123-market-snapshot` or `fix/m3-204-ledger-idempotency`.
+3. Work on one issue/PR with a branch name like `feat/0.0.2-123-market-snapshot` or `fix/0.0.4-204-ledger-idempotency`.
 4. Implement the minimum complete behavior; avoid unrelated refactors or opportunistic library changes.
 5. Add tests and fixtures **before or alongside** financial logic; run lint/type checks and at least targeted tests.
 6. If an API or schema changes, regenerate TS types, update migrations and docs, and add backward-compatibility tests or an ADR.
@@ -124,20 +126,20 @@ Branch/PR boundary, any migration or generated-client update.
 The dependency order matters more than number of simultaneous agents:
 
 ```text
-M0 Contracts, ADRs, seeds and Compose
+0.0.1 Contracts, ADRs, seeds and Compose
             |
-M1 Data/Snapshots -> Strategy Features/Ranking -> Allocation
+0.0.2 Data/Snapshots -> Strategy Features/Ranking -> Allocation
             |                                   |
-            +-> M2 Backtest/Benchmarks          +-> M3 Ledger/Orders
+            +-> 0.0.3 Backtest/Benchmarks          +-> 0.0.4 Ledger/Orders
                         \                       /
-                         \----> M4 Decisions/Forecasts
+                         \----> 0.0.5 Decisions/Forecasts
                                        |
-                            M5 Arena; M6 Journal
+                            0.0.6 Arena; 0.0.7 Journal
                                        |
-                           M7 Assisted Authoring; M8 Hardening
+                           0.0.8 Assisted Authoring; 0.0.9 Hardening
 ```
 
-Safe early parallel tracks **after M0 contracts land:** provider adapter vs frontend shell vs independent golden test generator vs API schema migrations. Avoid parallel PRs that both redefine `StrategyConfigV1`, fill pricing semantics, or ledger entities. Preferred integration cadence: interface-only PR → focused implementation PRs → E2E wiring PR → milestone demo.
+Safe early parallel tracks **after 0.0.1 contracts land:** provider adapter vs frontend shell vs independent golden test generator vs API schema migrations. Avoid parallel PRs that both redefine `StrategyConfigV1`, fill pricing semantics, or ledger entities. Preferred integration cadence: interface-only PR → focused implementation PRs → E2E wiring PR → milestone demo.
 
 Recommended issue labels: `type:epic`, `type:feature`, `type:bug`, `type:chore`, `area:web`, `area:api`, `area:data`, `area:quant`, `area:backtest`, `area:portfolio`, `area:forecast`, `area:arena`, `area:journal`, `priority:p0`, `priority:p1`, `priority:p2`, `agent-ready`, `blocked`, `needs-adr`.
 
@@ -185,7 +187,7 @@ Use the `FIX-01`–`FIX-10` canonical fixture plan in `docs/IMPLEMENTATION_BLUEP
 - [ ] For UI change: screenshot + mobile/keyboard/empty/error-state evidence.
 - [ ] PR description lists explicit tradeoffs, known limits and follow-up issue(s).
 
-**Milestone completion is different from PR completion.** M0–M4 **core release** closes only when a fresh Docker clone can demonstrate a dynamic, data-derived $1,000 recommendation, audited historical backtest, risk-constrained portfolio, next-action orders, numerical forward scenario and durable paper fills. M5–M8 are additive capabilities.
+**Milestone completion is different from PR completion.** 0.0.1–0.0.5 **core release** closes only when a fresh Docker clone can demonstrate a dynamic, data-derived $1,000 recommendation, audited historical backtest, risk-constrained portfolio, next-action orders, numerical forward scenario and durable paper fills. 0.0.6–0.0.9 are additive capabilities.
 
 ## 8. Security, data terms and local environment
 
