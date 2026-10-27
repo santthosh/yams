@@ -74,6 +74,8 @@ Required foreign key and unique constraints: `strategy_version(strategy_id, vers
 
 ## 3. Strategy configuration contract
 
+[ADR-003](adr/0003-strategy-configuration.md) defines the closed field inventory, required fields, numeric ranges, strict validation, canonical bytes/hash, session indexing and deterministic operator semantics. The example below supplies template defaults; omitted fields are not silently defaulted during publication.
+
 `POST /strategies/{id}/versions` accepts a **validated declarative JSON configuration**. `schema_version=1` is closed to arbitrary executable expressions. For v1 the canonical structure is:
 
 ```json
