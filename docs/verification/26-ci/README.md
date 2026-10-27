@@ -1,7 +1,7 @@
 # CI verification
 
 Issue #26, PR #93. This record distinguishes controlled failures from successful
-delivery. The passing PR and actual main runs must be recorded before closure.
+delivery. Passing PR, merged-main and docs-only runs are recorded below.
 
 | Probe | Hosted evidence | Observation |
 |---|---|---|
@@ -51,8 +51,17 @@ separate type checks and contract/fixture drift checks. Runtime included all 37
 PostgreSQL/process/restart tests and the full isolated offline Docker journey.
 
 MergeWatch reviewed head `a2c0d9bf549632545dc85bc01eda72526ad83b43` with SUCCESS,
-5/5 and no findings. PR #93 merged as `b8a3119`; its main run is recorded in the
-issue tracker after completion. This follow-up changes only documentation so it
-also exercises the explicit docs-only hosted path. Issue closure still requires
-that path and the actual main run to pass; no runtime skip is described as a
-runtime test pass.
+5/5 and no findings. PR #93 merged as `b8a3119f2cdcebcb45351b46333db5c9b41d65c4`.
+[Main run 40603628997](https://github.com/santthosh/yams/actions/runs/40603628997)
+passed all five jobs against that exact merged SHA, including integration and
+Docker smoke. Its scope artifact records the previous main SHA and runtime=true.
+
+[Docs-only run 40603692241](https://github.com/santthosh/yams/actions/runs/40603692241)
+passed scope/docs/required on candidate `bcf61bd2548a0d52d9af3caf4467df505aff1b9c`.
+Its only changed file was this document and runtime=false; quality/runtime were
+explicitly skipped. MergeWatch reported its configured neutral “Only docs changed”
+skip, not a substantive code review. No runtime skip is described as a test pass.
+
+Superseded PR run 40601913859 was cancelled when the next source head arrived;
+the independent aggregate tests additionally reject unexpected skip and missing
+job results. Final documentation follow-up run links are retained in #26.
