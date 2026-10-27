@@ -53,3 +53,11 @@ test-integration:
 test-e2e:
 	pnpm --filter @yams/web build
 	pnpm --filter @yams/web exec playwright test
+
+.PHONY: smoke
+smoke:
+	uv run --locked python scripts/smoke.py
+
+.PHONY: reset
+reset:
+	uv run --locked python scripts/reset_local.py

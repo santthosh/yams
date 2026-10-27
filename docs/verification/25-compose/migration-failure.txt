@@ -1,0 +1,25 @@
+ Network yams-smoke-b3228f375c6b_private  Creating
+ Network yams-smoke-b3228f375c6b_private  Created
+ Network yams-smoke-b3228f375c6b_ingress  Creating
+ Network yams-smoke-b3228f375c6b_ingress  Created
+ Container yams-smoke-b3228f375c6b-postgres-1  Creating
+ Container yams-smoke-b3228f375c6b-postgres-1  Created
+ Container yams-smoke-b3228f375c6b-migrate-1  Creating
+ Container yams-smoke-b3228f375c6b-migrate-1  Created
+ Container yams-smoke-b3228f375c6b-worker-1  Creating
+ Container yams-smoke-b3228f375c6b-api-1  Creating
+ Container yams-smoke-b3228f375c6b-api-1  Created
+ Container yams-smoke-b3228f375c6b-web-1  Creating
+ Container yams-smoke-b3228f375c6b-worker-1  Created
+ Container yams-smoke-b3228f375c6b-web-1  Created
+ Container yams-smoke-b3228f375c6b-postgres-1  Starting
+ Container yams-smoke-b3228f375c6b-postgres-1  Started
+ Container yams-smoke-b3228f375c6b-postgres-1  Waiting
+ Container yams-smoke-b3228f375c6b-postgres-1  Healthy
+ Container yams-smoke-b3228f375c6b-migrate-1  Starting
+ Container yams-smoke-b3228f375c6b-migrate-1  Started
+ Container yams-smoke-b3228f375c6b-migrate-1  Waiting
+ Container yams-smoke-b3228f375c6b-migrate-1  Waiting
+ Container yams-smoke-b3228f375c6b-migrate-1  service "migrate" didn't complete successfully: exit 1
+ Container yams-smoke-b3228f375c6b-migrate-1  service "migrate" didn't complete successfully: exit 1
+service "migrate" didn't complete successfully: exit 1

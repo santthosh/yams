@@ -1,0 +1,120 @@
+name: yams
+
+x-backend: &backend
+  image: yams-backend:local
+  environment: &backend-env
+    DATABASE_URL: postgresql+psycopg://yams:yams_local_only@postgres:5432/yams
+    YAMS_FIXTURE_ROOT: /app/data/fixtures
+    YAMS_JOB_LIMITS: ${YAMS_JOB_LIMITS:-{}}
+  networks: [private]
+  read_only: true
+  tmpfs: ["/tmp:size=64m,mode=1777"]
+  security_opt: [no-new-privileges:true]
+  cap_drop: [ALL]
+  init: true
+  volumes:
+    - artifacts:/artifacts
+
+services:
+  postgres:
+    image: postgres:16@sha256:ca0bd484cb98bf4b24eb1010e73fb3fcbd6714d240fbc1a10eea5b7dbecb641d
+    environment:
+      POSTGRES_DB: yams
+      POSTGRES_USER: yams
+      POSTGRES_PASSWORD: yams_local_only
+    networks: [private]
+    volumes:
+      - database:/var/lib/postgresql/data
+    cpus: 0.5
+    mem_limit: 1g
+    memswap_limit: 1g
+    pids_limit: 128
+    healthcheck:
+      test: [CMD-SHELL, "pg_isready -U yams -d yams"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+    restart: unless-stopped
+  migrate:
+    <<: *backend
+    build:
+      context: .
+      dockerfile: infra/docker/backend.Dockerfile
+    command: [migrate]
+    cpus: 0.5
+    mem_limit: 512m
+    memswap_limit: 512m
+    pids_limit: 64
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: "no"
+  api:
+    <<: *backend
+    pull_policy: never
+    command: [api]
+    cpus: 0.5
+    mem_limit: 512m
+    memswap_limit: 512m
+    pids_limit: 64
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/v1/health', timeout=2)"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 10s
+    restart: unless-stopped
+  worker:
+    <<: *backend
+    pull_policy: never
+    command: [worker]
+    cpus: 2
+    mem_limit: 2g
+    memswap_limit: 2g
+    pids_limit: 64
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    restart: unless-stopped
+  web:
+    image: yams-web:local
+    build:
+      context: .
+      dockerfile: infra/docker/web.Dockerfile
+    environment:
+      API_INTERNAL_ORIGIN: http://api:8000
+    networks:
+      private: {}
+      ingress:
+        gw_priority: 1
+    ports:
+      - "127.0.0.1:${YAMS_WEB_PORT:-3000}:3000"
+    read_only: true
+    tmpfs: ["/tmp:size=64m,mode=1777"]
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
+    init: true
+    cpus: 1
+    mem_limit: 1g
+    memswap_limit: 1g
+    pids_limit: 128
+    depends_on:
+      api:
+        condition: service_healthy
+    healthcheck:
+      test: [CMD, node, -e, "fetch('http://127.0.0.1:3000/api/v1/health').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"]
+      interval: 5s
+      timeout: 4s
+      retries: 20
+    restart: unless-stopped
+
+networks:
+  ingress: {}
+  private:
+    internal: true
+volumes:
+  database:
+  artifacts:

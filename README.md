@@ -4,7 +4,13 @@ Yet Another Market Simulator is a local, single-user paper research workspace. I
 
 ## Current state
 
-The `0.0.1` foundation provides an importable FastAPI package, an accessible Next.js Dashboard/Settings shell, versioned contracts, synthetic fixtures, PostgreSQL workspace/job migrations, a bounded diagnostic worker and working quality commands. `/livez` checks only that the API process responds; `/api/v1/health` checks database/migration/workspace/fixture readiness. Application Compose, CI and release packaging remain tracked foundation work. No portfolio values or investment results are seeded by this foundation.
+The `0.0.1` foundation provides an importable FastAPI package, an accessible Next.js Dashboard/Settings shell, versioned contracts, synthetic fixtures, PostgreSQL workspace/job migrations, a bounded diagnostic worker and working quality commands. `/livez` checks only that the API process responds; `/api/v1/health` checks database/migration/workspace/fixture readiness. Local Compose and isolated smoke checks are implemented; the native developer workflow, CI and release packaging remain tracked foundation work. No portfolio values or investment results are seeded by this foundation.
+
+## Local Docker startup
+
+With Docker Compose 2.38.2 or newer, run `docker compose up --build -d --wait`, then open `http://127.0.0.1:3000`. Initial builds download pinned images and locked dependencies; cached runtime needs no external provider. Migrations and workspace seeding run before the API and worker. Named database/artifact volumes survive restart and rebuild.
+
+See [local operations](docs/operations/local-compose.md) for offline startup, resource caps, diagnostics and the separate destructive `make reset` command. [Compose verification](docs/verification/25-compose/README.md) records browser, job, failure/recovery and resource evidence. `make smoke` requires the development dependencies and Playwright Chromium described below. Native macOS development remains pending Q14; full-container mode works on Docker Desktop.
 
 ## Development setup
 
@@ -26,7 +32,7 @@ uv run --locked uvicorn backend.api.main:app --host 127.0.0.1 --port 8000
 API_INTERNAL_ORIGIN=http://127.0.0.1:8000 pnpm --filter @yams/web dev
 ```
 
-Open `http://127.0.0.1:3000`; inspect process liveness at `http://127.0.0.1:8000/livez`. Without a configured database, the shell shows unavailable workspace/readiness states; it does not invent balances. Provider credentials are not needed. Native development binds to loopback; final Compose networking is owned by #25. `.env.example` documents available settings; `.env` and downloaded/cached market data are ignored. The UI uses system fonts so builds do not fetch remote fonts.
+Open `http://127.0.0.1:3000`; inspect process liveness at `http://127.0.0.1:8000/livez`. Without a configured database, the shell shows unavailable workspace/readiness states; it does not invent balances. Provider credentials are not needed. Native development binds to loopback; Compose publishes only the web port. `.env.example` documents available settings; `.env` and downloaded/cached market data are ignored. The UI uses system fonts so builds do not fetch remote fonts.
 
 ## Verification
 
@@ -40,7 +46,7 @@ make build
 
 `lint-backend` runs Ruff checks and formatting; `lint-web` runs ESLint and Prettier. `typecheck-backend` runs strict mypy separately from frontend `next typegen`/TypeScript. `test-backend` exercises liveness and unavailable routes without a DB; `test-web` verifies formatting, provenance/job/error states and proxy boundaries with Vitest. `build-backend` creates a wheel/sdist and `build-web` creates a production Next.js build. These targets propagate failures and contain no empty success stubs.
 
-Playwright is pinned. Install its Chromium once with `pnpm --filter @yams/web exec playwright install chromium`, then run `make test-e2e` for production-build browser checks at 360px and 1280px against a labeled synthetic transport. `make test-integration` verifies PostgreSQL in an isolated Docker project; full application `make dev`/`make smoke` arrive with #25. Tailwind and locally owned shadcn-style primitives are implemented; charts remain with their feature owners.
+Playwright is pinned. Install its Chromium once with `pnpm --filter @yams/web exec playwright install chromium`, then run `make test-e2e` for production-build browser checks at 360px and 1280px against a labeled synthetic transport. `make test-integration` verifies PostgreSQL in an isolated Docker project; `make smoke` verifies the full container application with isolated volumes; `make dev` remains pending Q14 in #72. Tailwind and locally owned shadcn-style primitives are implemented; charts remain with their feature owners.
 
 Read [AGENTS.md](AGENTS.md), the [implementation blueprint](docs/IMPLEMENTATION_BLUEPRINT.md), and the scoped GitHub issue before changing financial semantics. Milestone `0.0.1` is not released merely because the scaffold builds.
 
@@ -56,7 +62,7 @@ Payload examples in `backend/tests/contracts/examples/` are **SYNTHETIC_DATA_ONL
 
 ## Offline synthetic fixtures
 
-`data/fixtures/` contains a complete four-year synthetic snapshot and FIX-01–FIX-10 independent input/oracle cases. `make fixtures` regenerates the committed artifacts; `make fixtures-check` detects byte drift. Fixture generation and tests use locked NumPy 2.5.4 for the pinned PCG64 sampling inputs. The snapshot is deliberately synthetic, including its versioned weekday calendar; it is not real exchange data or evidence of implemented financial engines. See the [fixture handoff](backend/tests/fixtures/README.md) for checksums, formulas, tolerances, limitations and later test owners. The current app does not yet load this snapshot; offline integration arrives with #25.
+`data/fixtures/` contains a complete four-year synthetic snapshot and FIX-01–FIX-10 independent input/oracle cases. `make fixtures` regenerates the committed artifacts; `make fixtures-check` detects byte drift. Fixture generation and tests use locked NumPy 2.5.4 for the pinned PCG64 sampling inputs. The snapshot is deliberately synthetic, including its versioned weekday calendar; it is not real exchange data or evidence of implemented financial engines. See the [fixture handoff](backend/tests/fixtures/README.md) for checksums, formulas, tolerances, limitations and later test owners. Compose readiness validates this snapshot and displays its labeled metadata; this does not execute financial simulations.
 
 ## PostgreSQL workspace
 
@@ -96,7 +102,7 @@ workspace preferences read-only and a job-ID lookup; it does not enqueue or canc
 work. Missing monetary values display `Unavailable`, never a substituted zero.
 
 Set `API_INTERNAL_ORIGIN` only in the web server environment. Its default is
-`http://api:8000` for the planned private Compose network; native development uses
+`http://api:8000` for the private Compose network; native development uses
 `http://127.0.0.1:8000`. It is not a `NEXT_PUBLIC_` setting and is not sent to the
 browser. The browser uses same-origin `/api/v1` routes. The proxy allows only GET
 health/workspace and GET jobs with UUIDs, rejects other paths/methods/query strings,
