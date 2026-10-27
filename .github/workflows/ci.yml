@@ -2,10 +2,12 @@ name: CI
 on:
   pull_request:
     branches: [main]
+    types: [opened, synchronize, reopened, ready_for_review]
   push:
     branches: [main]
 permissions:
   contents: read
+  checks: read
 concurrency:
   group: ci-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
@@ -171,6 +173,13 @@ jobs:
         env:
           CI_NEEDS: ${{ toJSON(needs) }}
         run: python3 scripts/ci.py required 2>&1 | tee test-results/ci/required.log
+      - name: Verify current-head MergeWatch review
+        if: github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REVIEW_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          CI_RUNTIME: ${{ needs.scope.outputs.runtime }}
+        run: python3 scripts/review_gate.py 2>&1 | tee test-results/ci/review.log
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         if: always()
         with:

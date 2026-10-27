@@ -1,0 +1,3 @@
+# Current repository maintainer. Routes all changes, including financial code,
+# contracts/migrations and CI/release workflows; Q05 does not require human approval.
+* @santthosh

@@ -39,6 +39,35 @@ passing PR and merged-main runs. Workflow presence alone does not establish CI
 delivery. Issue #27 owns enforcement of the actual emitted required-check names;
 issue #28 owns release publication and exact-source verification.
 
+## Merge governance
+
+The maintainer in `.github/CODEOWNERS` is the actual repository owner,
+`@santthosh`. It routes all changes, including financial modules, contracts,
+migrations and delivery workflows. Under approved Q05 a separate human or
+CODEOWNER approval is not required.
+
+The desired main protection is committed in
+[main-protection.json](../infra/github/main-protection.json). It requires a PR,
+current base, linear history, resolved review conversations, `CI / required`
+from GitHub Actions app 15368 and `MergeWatch Review` from app 3052814. Force
+pushes/deletion are disabled and administrators are included. Actual read-back
+and rejected/allowed merge evidence are recorded in issue #27; a JSON file alone
+does not establish active protection.
+
+GitHub accepts neutral required checks. MergeWatch can briefly report a neutral
+“Review in progress” result, so CI additionally queries its latest check on the
+exact PR source head. Code changes require completed SUCCESS from the verified
+app. A neutral result is accepted only for docs-only applicability and the exact
+configured “Only docs changed” summary. Missing/stale/wrong-app/in-progress,
+draft-skip and unsuccessful results fail closed after a bounded wait. Tokens
+remain read-only; no PR code receives repository-write credentials. Marking a
+draft ready triggers CI again. The post-merge main run does not request another
+PR review; it repeats all applicable validation on the actual merged SHA.
+
+Findings must still be addressed and conversations resolved. Do not use admin
+bypass, self-approval, or fabricated statuses. The release workflow must verify
+its exact source commit's passing main run before publishing.
+
 References: [GitHub workflow syntax](https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax),
 [artifact retention](https://github.com/actions/upload-artifact),
 [uv setup action](https://github.com/astral-sh/setup-uv).
