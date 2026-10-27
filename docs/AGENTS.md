@@ -10,11 +10,11 @@ Use planned release versions `0.0.1`–`0.0.9` for milestones, issue references 
 
 Read the relevant sections of the following source-of-truth documents **in this order**:
 
-1. [`docs/PRODUCT_STRATEGY.md`](docs/PRODUCT_STRATEGY.md) — capabilities FR-01–FR-15, product flows, 0.0.1–0.0.9.
-2. [`docs/TECHNOLOGY_STRATEGY.md`](docs/TECHNOLOGY_STRATEGY.md) — stack, local deployment, storage, workers and test boundaries.
-3. [`docs/IMPLEMENTATION_BLUEPRINT.md`](docs/IMPLEMENTATION_BLUEPRINT.md) — normative quant/data/clock/trading/forecast rules and baseline defaults.
-4. [`docs/DOMAIN_AND_API_CONTRACTS.md`](docs/DOMAIN_AND_API_CONTRACTS.md) — models, timestamps, REST contracts, errors and states.
-5. [`docs/UX_SPECIFICATION.md`](docs/UX_SPECIFICATION.md) — flows, accessibility, financial labels, pending/error states.
+1. [`docs/PRODUCT_STRATEGY.md`](PRODUCT_STRATEGY.md) — capabilities FR-01–FR-15, product flows, 0.0.1–0.0.9.
+2. [`docs/TECHNOLOGY_STRATEGY.md`](TECHNOLOGY_STRATEGY.md) — stack, local deployment, storage, workers and test boundaries.
+3. [`docs/IMPLEMENTATION_BLUEPRINT.md`](IMPLEMENTATION_BLUEPRINT.md) — normative quant/data/clock/trading/forecast rules and baseline defaults.
+4. [`docs/DOMAIN_AND_API_CONTRACTS.md`](DOMAIN_AND_API_CONTRACTS.md) — models, timestamps, REST contracts, errors and states.
+5. [`docs/UX_SPECIFICATION.md`](UX_SPECIFICATION.md) — flows, accessibility, financial labels, pending/error states.
 6. This `AGENTS.md` — contribution and verification policy.
 
 When rules conflict, **stop implementation of the conflicting part**, describe the conflict in the GitHub issue/PR and propose an ADR. Do not silently choose the easiest interpretation. Contract changes require coordinating the engine, API, frontend, docs, tests, and data fixtures.
