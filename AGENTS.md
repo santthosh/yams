@@ -83,7 +83,7 @@ The API and worker share an importable Python package/quant engine. The Next.js 
 
 ### Repository-specific user preferences
 
-The user has explicitly preapproved running `gh` commands for `santthosh/yams`. Run task-related GitHub CLI commands without asking again for permission to invoke `gh`. This standing approval persists across sessions; continue to respect the requested task scope and repository review gates. Ask for unresolved product decisions separately from command execution permission.
+The user has explicitly preapproved all `git` and `gh` commands for `santthosh/yams`. Run task-related Git and GitHub CLI commands without asking again for command permission. This standing approval persists across sessions; continue to respect the requested task scope, preserve unrelated work, and honor repository review gates. Environment-enforced sandbox approvals may still be required and cannot be disabled by this document. Ask for unresolved product decisions separately from command execution permission.
 
 For now, MergeWatch review is sufficient for the PR review requirement (user decision Q05, recorded in issues #27 and #72). A separate human approving review is not required by this interim policy. Address review findings and retain required CI and conversation-resolution gates. Verify the actual MergeWatch integration and its enforceable review/check signal before configuring protection; do not assume that an automated comment counts as a GitHub approving review. This decision supersedes earlier guidance requiring a separate human reviewer and does not itself authorize a merge or protection change.
 
