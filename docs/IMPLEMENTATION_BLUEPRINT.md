@@ -59,10 +59,12 @@ Data refresh fetches → validates → normalizes → writes temp Parquet → co
 | Price series | Adjusted-close for continuous return/feature computation; raw/unadjusted opening price for synthetic executions |
 | Shares | Long-only; fractional units at most **6 decimal places**, truncate buys conservatively |
 | Friction | DEFAULT: **10 bps adverse slippage per side**, $0 commission; configurable and recorded |
-| Cash | USD, no margin/borrowing; cash remaining after sizing and rounding |
+| Cash | USD, no margin/borrowing; Q01 permits immediate reuse of executed/posted sale proceeds in the same synthetic rebalance; no settlement delay |
 | Minimum trade | DEFAULT $5 notional; skip smaller trades with recorded explanation |
 | Rebalance tolerance | DEFAULT absolute weight deviation 2 percentage points, unless mandatory risk breach |
 | Portfolio orders | Apply feasible sells before buys; reject duplicates and prevent negative cash |
+
+[ADR-001](adr/0001-execution-semantics.md) defines the pinned calendar, strict approval/open comparison, Decimal rounding, affordable sizing, missing-open handling, cancellation and independent fixture traces.
 
 **Important UX distinction:** pressing **Apply paper recommendation** commits an authorized synthetic order set. If tomorrow's open has not occurred/been ingested, orders are pending and holdings do not change. After the next eligible opening bar becomes available, an idempotent worker posts fills. Backtests and fixture replay can complete this lifecycle using only eligible bars in the replay chronology. Never backdate a real-time order to an opening price already in the past.
 
