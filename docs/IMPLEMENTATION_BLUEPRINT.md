@@ -25,6 +25,8 @@ This is the engineering decision record that prevents independent agents from in
 
 ## 3. Market-data and universe policy (ADR-002, ADR-007)
 
+[ADR-002](adr/0002-data-normalization.md) ratifies identity, normalization, action dates, availability and failure handling. The [provider evidence](data-provider-evidence.md) records verified documentation and unsupported capabilities. Synthetic fixtures are the supported baseline; optional external data must establish rights, raw-price/action basis and chronology before enabling affected execution or historical claims.
+
 ### 3.1 Asset identity and required data
 
 **MUST:** canonical identifier `{venue}:{symbol}` with explicit currency and effective-dated symbol aliases when available (e.g., `XNYS:ABC`); symbol alone is not a guaranteed permanent identity. Maintain provider-native IDs and preserve lineage. V1 may support a practical `asset_id` surrogate and source mappings, but must not merge assets on ticker alone across venues/dates.
