@@ -69,11 +69,11 @@ def export(root: Path, check: bool) -> None:
     from backend.api.main import create_app
 
     outputs = {root / "contracts/openapi.json": json_bytes(create_app().openapi())}
+    goldens = {}
     for model in MODELS:
         for mode in ("validation", "serialization"):
-            outputs[root / f"contracts/schemas/{model.__name__}.{mode}.json"] = json_bytes(
-                model.model_json_schema(mode=mode)
-            )
+            goldens[f"{model.__name__}.{mode}"] = model.model_json_schema(mode=mode)
+    outputs[root / "contracts/schemas.json"] = json_bytes(goldens)
     drift = []
     for path, content in outputs.items():
         if check:

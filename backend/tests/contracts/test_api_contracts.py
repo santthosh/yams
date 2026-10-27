@@ -79,10 +79,10 @@ def test_internal_errors_never_expose_exception_payloads() -> None:
 def test_export_is_deterministic_and_detects_changed_schema(tmp_path: Path) -> None:
     export(tmp_path, check=False)
     export(tmp_path, check=True)
-    schema = tmp_path / "contracts/schemas/StrategyConfigV1.validation.json"
+    schema = tmp_path / "contracts/schemas.json"
     original = schema.read_bytes()
     modified = json.loads(original)
-    modified["properties"]["schema_version"]["const"] = 99
+    modified["StrategyConfigV1.validation"]["properties"]["schema_version"]["const"] = 99
     schema.write_text(json.dumps(modified))
     with pytest.raises(SystemExit, match="Contract drift"):
         export(tmp_path, check=True)
