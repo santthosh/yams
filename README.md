@@ -4,7 +4,7 @@ Yet Another Market Simulator is a local, single-user paper research workspace. I
 
 ## Current state
 
-The `0.0.1` foundation provides an importable FastAPI package, a labeled Next.js shell, versioned contracts, synthetic fixtures, PostgreSQL workspace/job migrations, a bounded diagnostic worker and working quality commands. `/livez` checks only that the API process responds; `/api/v1/health` checks database/migration/workspace/fixture readiness. Application Compose, CI and release packaging remain tracked foundation work. No portfolio values or investment results are seeded by this foundation.
+The `0.0.1` foundation provides an importable FastAPI package, an accessible Next.js Dashboard/Settings shell, versioned contracts, synthetic fixtures, PostgreSQL workspace/job migrations, a bounded diagnostic worker and working quality commands. `/livez` checks only that the API process responds; `/api/v1/health` checks database/migration/workspace/fixture readiness. Application Compose, CI and release packaging remain tracked foundation work. No portfolio values or investment results are seeded by this foundation.
 
 ## Development setup
 
@@ -23,10 +23,10 @@ In separate terminals:
 
 ```sh
 uv run --locked uvicorn backend.api.main:app --host 127.0.0.1 --port 8000
-pnpm --filter @yams/web dev
+API_INTERNAL_ORIGIN=http://127.0.0.1:8000 pnpm --filter @yams/web dev
 ```
 
-Open `http://127.0.0.1:3000`; inspect process liveness at `http://127.0.0.1:8000/livez`. No database or provider credentials are needed. Native development binds to loopback; final Compose networking is owned by #25. `.env.example` documents available settings; `.env` and downloaded/cached market data are ignored. The UI uses system fonts so builds do not fetch remote fonts.
+Open `http://127.0.0.1:3000`; inspect process liveness at `http://127.0.0.1:8000/livez`. Without a configured database, the shell shows unavailable workspace/readiness states; it does not invent balances. Provider credentials are not needed. Native development binds to loopback; final Compose networking is owned by #25. `.env.example` documents available settings; `.env` and downloaded/cached market data are ignored. The UI uses system fonts so builds do not fetch remote fonts.
 
 ## Verification
 
@@ -38,9 +38,9 @@ make contracts-check
 make build
 ```
 
-`lint-backend` runs Ruff checks and formatting; `lint-web` runs ESLint and Prettier. `typecheck-backend` runs strict mypy separately from frontend `next typegen`/TypeScript. `test-backend` exercises liveness and unavailable routes without a DB; `test-web` renders the paper-only/empty shell with Vitest. `build-backend` creates a wheel/sdist and `build-web` creates a production Next.js build. These targets propagate failures and contain no empty success stubs.
+`lint-backend` runs Ruff checks and formatting; `lint-web` runs ESLint and Prettier. `typecheck-backend` runs strict mypy separately from frontend `next typegen`/TypeScript. `test-backend` exercises liveness and unavailable routes without a DB; `test-web` verifies formatting, provenance/job/error states and proxy boundaries with Vitest. `build-backend` creates a wheel/sdist and `build-web` creates a production Next.js build. These targets propagate failures and contain no empty success stubs.
 
-Playwright is pinned and its CLI is available through `pnpm --filter @yams/web playwright`; browser journeys and `make test-e2e` arrive with #24. `make test-integration` verifies the PostgreSQL foundation in an isolated Docker project; `make dev`/`make smoke` arrive with #25. Do not interpret these planned commands as existing checks. Tailwind/shadcn components and chart dependencies arrive with their UI owners when used.
+Playwright is pinned. Install its Chromium once with `pnpm --filter @yams/web exec playwright install chromium`, then run `make test-e2e` for production-build browser checks at 360px and 1280px against a labeled synthetic transport. `make test-integration` verifies PostgreSQL in an isolated Docker project; full application `make dev`/`make smoke` arrive with #25. Tailwind and locally owned shadcn-style primitives are implemented; charts remain with their feature owners.
 
 Read [AGENTS.md](AGENTS.md), the [implementation blueprint](docs/IMPLEMENTATION_BLUEPRINT.md), and the scoped GitHub issue before changing financial semantics. Milestone `0.0.1` is not released merely because the scaffold builds.
 
@@ -86,3 +86,23 @@ retries, scheduler catch-up, actual process crashes and resource failures. It
 retains measurements in ignored `test-results/integration/<project>/worker.json`.
 The [verification report](docs/verification/23-durable-jobs/README.md) records the
 measured environment and committed evidence; these are not financial benchmarks.
+
+## Web shell and same-origin transport
+
+Dashboard and Settings are implemented in `apps/web/src/app`. Unavailable Lab,
+Portfolios, Arena and Journal routes are hidden. Global paper scope, source/as-of
+metadata and last-checked job status stay visible. Settings exposes persisted
+workspace preferences read-only and a job-ID lookup; it does not enqueue or cancel
+work. Missing monetary values display `Unavailable`, never a substituted zero.
+
+Set `API_INTERNAL_ORIGIN` only in the web server environment. Its default is
+`http://api:8000` for the planned private Compose network; native development uses
+`http://127.0.0.1:8000`. It is not a `NEXT_PUBLIC_` setting and is not sent to the
+browser. The browser uses same-origin `/api/v1` routes. The proxy allows only GET
+health/workspace and GET jobs with UUIDs, rejects other paths/methods/query strings,
+does not forward cookies/authorization, rejects redirects, and bounds upstream
+requests at three seconds. Failures carry safe correlation IDs.
+
+[Web-shell handoff and verification](docs/verification/24-web-shell/README.md)
+describes components, fixtures, browser evidence and the boundary between these
+transport tests and #25's integrated Docker/persistence journey.
