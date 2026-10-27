@@ -85,7 +85,7 @@ docker compose up --build
 # Open http://localhost:3000
 ```
 
-A new user should encounter a seeded **demo workspace and sample experiment** on first boot, with sample data clearly labeled. They can then ingest fresh market data, create or fork strategies, run experiments, create a $1,000 paper portfolio, and evaluate ongoing recommendations.
+In **0.0.1**, first boot presents a seeded **local workspace, labeled fixture metadata and healthy shell**, not a fake computed experiment or account. Experiments arrive in 0.0.3, paper accounts in 0.0.4 and recommendations in 0.0.5. [ADR-008](adr/0008-lifecycle-api-additions.md#first-run-increments) governs these increments; the complete core journey includes ingestion, strategy forks, experiments and paper decisions.
 
 ### Operational requirements
 
@@ -170,7 +170,7 @@ Use exchange-local session calendars (U.S. equity market initially), while stori
 
 ### Declarative, immutable strategies
 
-Strategy definitions are **validated configuration**, not runtime-evaluated Python snippets or untrusted executable code. Once referenced by an experiment, recommendation, or Arena entrant, a version is immutable; editing creates a new version.
+Strategy definitions are **validated configuration**, not runtime-evaluated Python snippets or untrusted executable code. Versions are immutable from creation, whether referenced yet or not; editing creates a new published version. V1 has no editable draft backend.
 
 Illustrative configuration (contract will be versioned):
 

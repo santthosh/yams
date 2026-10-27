@@ -41,7 +41,9 @@ Navigation order: **Dashboard / Lab / Portfolios / Arena / Journal / Settings**.
 
 ## 3. First-run and local startup
 
-**Zero login steps.** First boot after `docker compose up --build` opens the Dashboard with an idempotently seeded local workspace and a sample strategy, dataset, experiment and $1,000 demo paper account. If sample holdings are seeded, label them **synthetic example state**. Do not present fabricated historical outcomes as real returns.
+**Zero login steps.** In **0.0.1**, first boot after `docker compose up --build` opens an idempotently seeded local workspace with labeled fixture metadata, navigation, health and basic settings. Contract examples and expected-value tables are fixture material, not persisted experiments or accounts. Hide unavailable financial actions. [ADR-008](adr/0008-lifecycle-api-additions.md) defines progressive first-run behavior.
+
+By **0.0.5**, first run supports a default strategy, dataset, historical experiment and $1,000 paper account. New accounts are cash-only; any test-only held state is labeled **synthetic example state**. Computed fixture results are distinguished from market returns. The onboarding panel below describes that core-release flow, not the foundation shell.
 
 A compact onboarding panel:
 
@@ -61,7 +63,7 @@ Data: Synthetic demo data | Last sample session: YYYY-MM-DD
 - `Synthetic demo` — generated fixtures for offline exploration and testing. Forecasts and charts are illustrative outcomes of those fixtures, not results from securities markets.
 - `Market research data` — downloadable real history with provider, as-of, quality flags and legal limitations. No brokerage connections, no live-money execution.
 
-If live/provider access is unavailable, YAMS still starts and lets the operator replay fixture experiments; it shows offline status and doesn't silently switch a real portfolio into fixture values.
+If provider access is unavailable, YAMS still starts in fixture mode. Foundation metadata and health remain available; implemented fixture experiments can be replayed from 0.0.3. Show offline status and never silently switch a research portfolio into fixture values.
 
 ## 4. Default happy path — core release
 
@@ -213,7 +215,8 @@ Use explicit labels: `Estimated`, `Forecast scenario`, `Simulated fill`, `Histor
 
 ### E2E flows for Playwright
 
-- **Offline first-run:** clean volumes → initialize fixture → dashboard sample warning → one-click recommendation → no external credentials.
+- **Foundation first-run (0.0.1):** clean test volumes → workspace seed → labeled fixture metadata/health → basic settings → restart → same workspace; no credentials or financial action buttons.
+- **Core first-run (0.0.5):** clean test volumes → initialize fixture → dashboard sample warning → computed recommendation → no external credentials.
 - **Experiment:** fork a template → run fixed backtest → view curve/metrics/holdout → compare with SPY and another template.
 - **Trade state:** create cash portfolio → recommendation → preview → approve → see pending → provide eligible next opening bar → see fill and reconciliation → restart → verify durability.
 - **Safety:** stale data and duplicate approval cannot silently fill; unavailable forecast has no invented value; error states remain accessible.

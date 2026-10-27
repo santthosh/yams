@@ -81,7 +81,7 @@ The operator starts within one local workspace (no account registration) with:
 - Risk preference and basic constraints: maximum position and sector exposure, eligible securities, rebalancing frequency, and optional cash reserve.
 - A benchmark, initially a broad-market index proxy such as SPY with adjusted-price assumptions disclosed.
 
-**First-use fast path:** YAMS proposes a starter strategy, evaluates the latest eligible market data, and immediately displays a draft target portfolio, recommended virtual trades, rationale, and 90-day forecast. Users can inspect or change the assumptions before deploying.
+**First-use fast path (complete core release, 0.0.5):** YAMS proposes a starter strategy, evaluates the latest eligible market data, and immediately displays a draft target portfolio, recommended virtual trades, rationale, and 90-day forecast. Users can inspect or change the assumptions before deploying. The 0.0.1 foundation instead ships the seeded workspace, labeled fixture metadata and healthy shell; [ADR-008](adr/0008-lifecycle-api-additions.md) defines the intermediate journeys without reducing the full core scope.
 
 ### 4.2 Discover or design a strategy
 
