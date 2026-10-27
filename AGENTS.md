@@ -19,7 +19,7 @@ Read the relevant sections of the following source-of-truth documents **in this 
 
 Each document owns the area described above. Normative contracts take precedence over illustrative examples. When authoritative rules conflict, **stop implementation of the conflicting part**, describe the conflict to the user (and in the GitHub issue/PR when publishing is authorized), and propose an ADR. Do not silently choose the easiest interpretation. Contract changes require coordinating the engine, API, frontend, docs, tests, and data fixtures.
 
-The repository currently contains planning documents and the local `ship` skill, not an application scaffold. The layout and commands below are implementation targets; verify what exists before using them. Update this note and document confirmed commands when the foundation lands.
+The repository contains planning documents, the local `ship` skill and a minimal FastAPI/Next.js scaffold. `make install`, `make lint`, `make typecheck`, `make test` and `make build` are implemented; see README for pinned runtimes and separate backend/frontend targets. Persistence, worker execution, Compose and integration/E2E commands remain foundation implementation targets until their owning issues land. Verify what exists before using other commands below.
 
 ### Working approach
 
