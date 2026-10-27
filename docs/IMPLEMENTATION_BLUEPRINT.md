@@ -130,6 +130,8 @@ Skip candidates with missing/nonfinite inputs; record filters and quality flags.
 
 ## 8. Forward forecasts (ADR-006)
 
+[ADR-006](adr/0006-forecast-baseline.md) ratifies this baseline, including zero cash return (Q03), aligned 253-close/252-return history, common non-circular blocks, cost treatment, numerical reproducibility and explicit unavailable outcomes.
+
 **DEFAULT horizon:** **90 calendar days** from decision timestamp; use the exchange calendar to determine the corresponding eligible future sessions (do not simply call this '90 trading days'). **DEFAULT baseline:** 5-trading-day multivariate block bootstrap over the most recent 252 completed daily asset-return observations; 5,000 deterministic paths; seed stored with forecast. Resample **cross-asset return vectors together** to preserve historical cross-sectional co-movement; use common sampled vectors when comparing proposed targets against current holdings. Apply a documented rebalancing/constant-weight assumption (DEFAULT constant weight for scenario paths without additional trades) and apply forecast-upfront costs to the change case.
 
 **Display:** P50 terminal return (called *scenario median*, NOT guaranteed expected return), projected P50 ending portfolio value, P10/P90 scenario range, probability of a negative return, a current-vs-proposed delta under shared assumptions, as-of timestamp and source snapshot. Caution: bootstrap percentiles are **model-generated scenario quantiles, not calibrated prediction intervals**. If return history is inadequate, return `FORECAST_UNAVAILABLE` with reason rather than manufactured values. Never use future bars in a forecast.
