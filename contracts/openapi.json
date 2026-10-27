@@ -2624,7 +2624,7 @@
   },
   "info": {
     "description": "Only paths listed here are implemented. Components include versioned contracts for later feature owners; their presence does not activate endpoints.",
-    "title": "YAMS CI deliberate drift",
+    "title": "YAMS",
     "version": "0.0.1"
   },
   "openapi": "3.1.0",

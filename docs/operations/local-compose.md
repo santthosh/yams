@@ -75,7 +75,7 @@ Desktop's Linux VM; native macOS execution does not supply that enforcement.
 
 The [verification report](../verification/25-compose/README.md) records measured
 startup and diagnostic load, browser and failure/recovery evidence.
-Issue #25 is still in implementation; review gates remain pending. Release images
+Issue #25 is delivered in PR #92. Release images
 and installation artifacts are owned by #28, not by these local image tags.
 
 ## Development with hot reload
