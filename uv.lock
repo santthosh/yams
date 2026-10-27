@@ -443,6 +443,7 @@ benchmark = [
 dev = [
     { name = "httpx" },
     { name = "mypy" },
+    { name = "numpy" },
     { name = "pytest" },
     { name = "ruff" },
 ]
@@ -459,6 +460,7 @@ benchmark = [{ name = "numpy", specifier = "==2.5.4" }]
 dev = [
     { name = "httpx", specifier = "==0.28.1" },
     { name = "mypy", specifier = "==2.4.0" },
+    { name = "numpy", specifier = "==2.5.4" },
     { name = "pytest", specifier = "==9.1.1" },
     { name = "ruff", specifier = "==0.17.3" },
 ]
