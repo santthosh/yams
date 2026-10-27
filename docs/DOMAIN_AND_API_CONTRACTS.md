@@ -290,6 +290,8 @@ A completed result includes `decision_cutoff_utc`, mode/warnings, eligible candi
 
 ### 7.1 Experiment / job
 
+[ADR-005](adr/0005-worker-queue.md) owns durable attempts, lease-token fencing, cancellation races, bounded retries, resource admission and chronological catch-up. Over-budget requests return `422 WORKLOAD_LIMIT`; runtime `RESOURCE_EXHAUSTED` or `TIME_LIMIT` fails without publishing partial results. Foundation registers only a harmless diagnostic handler; later job kinds are unavailable until implemented.
+
 ```text
 queued -> running -> completed
    |        |   \\-> failed (possibly retry via new queued attempt)
