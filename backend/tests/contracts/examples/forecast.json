@@ -1,0 +1,68 @@
+{
+  "id": "00000000-0000-4000-8000-000000000001",
+  "status": "available",
+  "unavailable_reason": null,
+  "as_of_session": "2030-01-01",
+  "decision_cutoff_utc": "2030-01-01T21:00:00Z",
+  "data_status": "synthetic_fixture",
+  "snapshot_id": "00000000-0000-4000-8000-000000000001",
+  "snapshot_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "calendar_version": "0000000000000000000000000000000000000000000000000000000000000000",
+  "horizon_calendar_days": 90,
+  "horizon_trading_sessions": 2,
+  "horizon_end_at": "2030-04-01T20:00:00Z",
+  "future_sessions": [
+    "2030-01-02",
+    "2030-01-03"
+  ],
+  "method": "multivariate_block_bootstrap_v1",
+  "seed": 42,
+  "simulation_count": 5000,
+  "lookback_sessions": 252,
+  "block_length_sessions": 5,
+  "cash_return_fraction": 0,
+  "initial_value_usd": "1000.00",
+  "current_allocation": {
+    "weights": [],
+    "cash_weight": "1",
+    "upfront_cost_usd": "0.00"
+  },
+  "proposed_allocation": {
+    "weights": [],
+    "cash_weight": "1",
+    "upfront_cost_usd": "0.00"
+  },
+  "rng": {
+    "generator": "PCG64",
+    "numpy_version": "2.5.4",
+    "sampling_version": "noncircular_c_order_v1",
+    "initial_state": null
+  },
+  "input_array_sha256": null,
+  "sampled_indices": null,
+  "fingerprint": "0000000000000000000000000000000000000000000000000000000000000000",
+  "fingerprint_schema_version": 1,
+  "engine_version": "contract-fixture",
+  "proposed": {
+    "median_return_fraction": 0,
+    "p10_return_fraction": 0,
+    "p90_return_fraction": 0,
+    "probability_of_loss": 0,
+    "median_ending_value_usd": "1000.00"
+  },
+  "hold_unchanged": {
+    "median_return_fraction": 0,
+    "p10_return_fraction": 0,
+    "p90_return_fraction": 0,
+    "probability_of_loss": 0,
+    "median_ending_value_usd": "1000.00"
+  },
+  "median_return_delta_fraction": 0,
+  "comparability": "common_shock_paths",
+  "limitations": [
+    "SCENARIO_NOT_CALIBRATED_PREDICTION",
+    "ZERO_CASH_YIELD",
+    "CONSTANT_WEIGHT_APPROXIMATION",
+    "ESTIMATED_UPFRONT_COST"
+  ]
+}

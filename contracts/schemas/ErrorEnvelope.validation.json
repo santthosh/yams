@@ -1,0 +1,86 @@
+{
+  "$defs": {
+    "ErrorDetail": {
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "enum": [
+            "VALIDATION_ERROR",
+            "NOT_FOUND",
+            "METHOD_NOT_ALLOWED",
+            "STATE_CONFLICT",
+            "IDEMPOTENCY_CONFLICT",
+            "STALE_DATA",
+            "INSUFFICIENT_MARKET_DATA",
+            "LIMIT_EXCEEDED",
+            "PROVIDER_UNAVAILABLE",
+            "FORECAST_UNAVAILABLE",
+            "JOB_FAILED",
+            "INTERNAL_ERROR",
+            "WORKLOAD_LIMIT",
+            "RESOURCE_EXHAUSTED",
+            "TIME_LIMIT"
+          ],
+          "title": "Code",
+          "type": "string"
+        },
+        "correlation_id": {
+          "format": "uuid",
+          "title": "Correlation Id",
+          "type": "string"
+        },
+        "details": {
+          "additionalProperties": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              }
+            ]
+          },
+          "title": "Details",
+          "type": "object"
+        },
+        "message": {
+          "title": "Message",
+          "type": "string"
+        },
+        "retryable": {
+          "title": "Retryable",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "code",
+        "message",
+        "details",
+        "retryable",
+        "correlation_id"
+      ],
+      "title": "ErrorDetail",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "error": {
+      "$ref": "#/$defs/ErrorDetail"
+    }
+  },
+  "required": [
+    "error"
+  ],
+  "title": "ErrorEnvelope",
+  "type": "object"
+}

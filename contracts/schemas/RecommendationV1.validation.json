@@ -1,0 +1,377 @@
+{
+  "$defs": {
+    "ActionEvidence": {
+      "additionalProperties": false,
+      "properties": {
+        "current_weight": {
+          "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$",
+          "title": "Current Weight",
+          "type": "string"
+        },
+        "position_cap": {
+          "anyOf": [
+            {
+              "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Position Cap"
+        }
+      },
+      "required": [
+        "position_cap",
+        "current_weight"
+      ],
+      "title": "ActionEvidence",
+      "type": "object"
+    },
+    "CandidateEvidence": {
+      "additionalProperties": false,
+      "properties": {
+        "asset_id": {
+          "maxLength": 160,
+          "minLength": 1,
+          "title": "Asset Id",
+          "type": "string"
+        },
+        "contributions": {
+          "items": {
+            "$ref": "#/$defs/FeatureValue"
+          },
+          "title": "Contributions",
+          "type": "array"
+        },
+        "exclusion_reasons": {
+          "items": {
+            "pattern": "^[A-Z][A-Z0-9_]*$",
+            "type": "string"
+          },
+          "title": "Exclusion Reasons",
+          "type": "array"
+        },
+        "features": {
+          "items": {
+            "$ref": "#/$defs/FeatureValue"
+          },
+          "title": "Features",
+          "type": "array"
+        },
+        "score": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Score"
+        }
+      },
+      "required": [
+        "asset_id",
+        "features",
+        "score",
+        "exclusion_reasons",
+        "contributions"
+      ],
+      "title": "CandidateEvidence",
+      "type": "object"
+    },
+    "FeatureValue": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "unavailable_reason": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Z][A-Z0-9_]*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Unavailable Reason"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Value"
+        }
+      },
+      "required": [
+        "name",
+        "value",
+        "unavailable_reason"
+      ],
+      "title": "FeatureValue",
+      "type": "object"
+    },
+    "RecommendedAction": {
+      "additionalProperties": false,
+      "properties": {
+        "asset_id": {
+          "maxLength": 160,
+          "minLength": 1,
+          "title": "Asset Id",
+          "type": "string"
+        },
+        "current_weight": {
+          "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$",
+          "title": "Current Weight",
+          "type": "string"
+        },
+        "estimated_notional_usd": {
+          "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+          "title": "Estimated Notional Usd",
+          "type": "string"
+        },
+        "estimated_quantity": {
+          "pattern": "^(0|[1-9][0-9]{0,23})(\\.[0-9]{1,6})?$",
+          "title": "Estimated Quantity",
+          "type": "string"
+        },
+        "evidence": {
+          "$ref": "#/$defs/ActionEvidence"
+        },
+        "explanation": {
+          "title": "Explanation",
+          "type": "string"
+        },
+        "label": {
+          "enum": [
+            "INCREASE",
+            "REDUCE",
+            "HOLD"
+          ],
+          "title": "Label",
+          "type": "string"
+        },
+        "reason_codes": {
+          "items": {
+            "pattern": "^[A-Z][A-Z0-9_]*$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Reason Codes",
+          "type": "array"
+        },
+        "side": {
+          "enum": [
+            "BUY",
+            "SELL",
+            "HOLD"
+          ],
+          "title": "Side",
+          "type": "string"
+        },
+        "target_weight": {
+          "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$",
+          "title": "Target Weight",
+          "type": "string"
+        }
+      },
+      "required": [
+        "asset_id",
+        "side",
+        "label",
+        "current_weight",
+        "target_weight",
+        "estimated_notional_usd",
+        "estimated_quantity",
+        "reason_codes",
+        "evidence",
+        "explanation"
+      ],
+      "title": "RecommendedAction",
+      "type": "object"
+    },
+    "TargetWeight": {
+      "additionalProperties": false,
+      "properties": {
+        "asset_id": {
+          "maxLength": 160,
+          "minLength": 1,
+          "title": "Asset Id",
+          "type": "string"
+        },
+        "reason_codes": {
+          "items": {
+            "pattern": "^[A-Z][A-Z0-9_]*$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Reason Codes",
+          "type": "array"
+        },
+        "weight": {
+          "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$",
+          "title": "Weight",
+          "type": "string"
+        }
+      },
+      "required": [
+        "asset_id",
+        "weight",
+        "reason_codes"
+      ],
+      "title": "TargetWeight",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "actions": {
+      "items": {
+        "$ref": "#/$defs/RecommendedAction"
+      },
+      "title": "Actions",
+      "type": "array"
+    },
+    "as_of_session": {
+      "format": "date",
+      "title": "As Of Session",
+      "type": "string"
+    },
+    "candidates": {
+      "items": {
+        "$ref": "#/$defs/CandidateEvidence"
+      },
+      "title": "Candidates",
+      "type": "array"
+    },
+    "cash_target_weight": {
+      "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$",
+      "title": "Cash Target Weight",
+      "type": "string"
+    },
+    "created_at": {
+      "format": "date-time",
+      "pattern": "Z$",
+      "title": "Created At",
+      "type": "string"
+    },
+    "data_status": {
+      "enum": [
+        "synthetic_fixture",
+        "research_market_data"
+      ],
+      "title": "Data Status",
+      "type": "string"
+    },
+    "decision_cutoff_utc": {
+      "format": "date-time",
+      "pattern": "Z$",
+      "title": "Decision Cutoff Utc",
+      "type": "string"
+    },
+    "engine_version": {
+      "title": "Engine Version",
+      "type": "string"
+    },
+    "estimated_total_trade_cost_usd": {
+      "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+      "title": "Estimated Total Trade Cost Usd",
+      "type": "string"
+    },
+    "forecast_id": {
+      "format": "uuid",
+      "title": "Forecast Id",
+      "type": "string"
+    },
+    "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+    },
+    "portfolio_id": {
+      "format": "uuid",
+      "title": "Portfolio Id",
+      "type": "string"
+    },
+    "portfolio_revision": {
+      "minimum": 0,
+      "title": "Portfolio Revision",
+      "type": "integer"
+    },
+    "snapshot_id": {
+      "format": "uuid",
+      "title": "Snapshot Id",
+      "type": "string"
+    },
+    "snapshot_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Snapshot Sha256",
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "ready",
+        "applied",
+        "dismissed",
+        "expired"
+      ],
+      "title": "Status",
+      "type": "string"
+    },
+    "strategy_version_id": {
+      "format": "uuid",
+      "title": "Strategy Version Id",
+      "type": "string"
+    },
+    "summary_action": {
+      "enum": [
+        "BUY",
+        "SELL",
+        "HOLD",
+        "REBALANCE",
+        "ALLOCATE_TO_CASH"
+      ],
+      "title": "Summary Action",
+      "type": "string"
+    },
+    "target_weights": {
+      "items": {
+        "$ref": "#/$defs/TargetWeight"
+      },
+      "title": "Target Weights",
+      "type": "array"
+    }
+  },
+  "required": [
+    "id",
+    "portfolio_id",
+    "portfolio_revision",
+    "strategy_version_id",
+    "snapshot_id",
+    "snapshot_sha256",
+    "as_of_session",
+    "decision_cutoff_utc",
+    "data_status",
+    "summary_action",
+    "target_weights",
+    "cash_target_weight",
+    "actions",
+    "candidates",
+    "estimated_total_trade_cost_usd",
+    "forecast_id",
+    "engine_version",
+    "created_at",
+    "status"
+  ],
+  "title": "RecommendationV1",
+  "type": "object"
+}

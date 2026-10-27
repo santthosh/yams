@@ -34,6 +34,7 @@ Open `http://127.0.0.1:3000`; inspect process liveness at `http://127.0.0.1:8000
 make lint
 make typecheck
 make test
+make contracts-check
 make build
 ```
 
@@ -42,3 +43,13 @@ make build
 Playwright is pinned and its CLI is available through `pnpm --filter @yams/web playwright`; browser journeys and `make test-e2e` arrive with #24. PostgreSQL integration checks arrive with #22, and `make dev`/`make smoke` with #25. Do not interpret these planned commands as existing checks. Tailwind/shadcn components and chart dependencies arrive with their UI owners when used.
 
 Read [AGENTS.md](AGENTS.md), the [implementation blueprint](docs/IMPLEMENTATION_BLUEPRINT.md), and the scoped GitHub issue before changing financial semantics. Milestone `0.0.1` is not released merely because the scaffold builds.
+
+## Versioned contracts
+
+`backend/domain` implements closed Pydantic contracts for strategies, market bars and snapshot manifests, recommendations, forecasts, paper orders, experiments, jobs, errors and pagination. Money, quantities, prices and allocation weights remain decimal strings; statistical numbers must be finite. Cross-field validators enforce complete allocations and lifecycle-dependent results. These validators do not implement financial calculations, storage, calendar verification or artifact-byte verification.
+
+Run `make contracts` after changing a model or route. It regenerates `contracts/openapi.json`, input/output JSON schema goldens and `apps/web/src/api/generated/` using pinned tools. Commit these artifacts together. `make contracts-check` compares them byte-for-byte without rewriting; Python and frontend tests deliberately introduce isolated schema drift and require failure before regeneration. The generated `createApiClient` accepts a base URL and optional fetch implementation. Only `/livez` is an implemented typed path; future domain components do not activate financial endpoints.
+
+New API routers must use `APIRouter(route_class=ContractRoute)` from `backend.api.routing` to preserve exact JSON score numbers and reject duplicate keys/NaN before Pydantic validation. Direct routes on `create_app()` already use this class. For raw offline strategy documents, use `StrategyConfigV1.from_json`; parsing with ordinary float-based `json.loads` first loses precision. Serialize validated models with `model_dump(mode="json")` or FastAPI response models. Use the shared typed error envelope and `error_response` for documented feature failures; validation errors expose field paths without submitted values.
+
+Payload examples in `backend/tests/contracts/examples/` are **SYNTHETIC_DATA_ONLY**, illustrative contract shapes, not market evidence or engine outputs. IDs and hashes are placeholders; the forecast uses an abbreviated synthetic calendar and a zero-return all-cash case. Actual snapshot bytes, exchange calendars, forecast arithmetic, transactions and durable job behavior remain with their owning feature issues. The schema and client checks require no database, Docker or provider network.

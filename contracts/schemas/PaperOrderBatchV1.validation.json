@@ -1,0 +1,210 @@
+{
+  "$defs": {
+    "PaperOrderV1": {
+      "additionalProperties": false,
+      "properties": {
+        "asset_id": {
+          "maxLength": 160,
+          "minLength": 1,
+          "title": "Asset Id",
+          "type": "string"
+        },
+        "cancelled_or_skipped_quantity": {
+          "pattern": "^(0|[1-9][0-9]{0,23})(\\.[0-9]{1,6})?$",
+          "title": "Cancelled Or Skipped Quantity",
+          "type": "string"
+        },
+        "earliest_fill_session": {
+          "format": "date",
+          "title": "Earliest Fill Session",
+          "type": "string"
+        },
+        "filled_quantity": {
+          "pattern": "^(0|[1-9][0-9]{0,23})(\\.[0-9]{1,6})?$",
+          "title": "Filled Quantity",
+          "type": "string"
+        },
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "pending_quantity": {
+          "pattern": "^(0|[1-9][0-9]{0,23})(\\.[0-9]{1,6})?$",
+          "title": "Pending Quantity",
+          "type": "string"
+        },
+        "reason": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Z][A-Z0-9_]*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Reason"
+        },
+        "requested_quantity": {
+          "pattern": "^(0|[1-9][0-9]{0,23})(\\.[0-9]{1,6})?$",
+          "title": "Requested Quantity",
+          "type": "string"
+        },
+        "side": {
+          "enum": [
+            "BUY",
+            "SELL"
+          ],
+          "title": "Side",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "pending",
+            "partially_filled",
+            "filled",
+            "cancelled",
+            "rejected"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "terminal": {
+          "title": "Terminal",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "asset_id",
+        "side",
+        "requested_quantity",
+        "filled_quantity",
+        "pending_quantity",
+        "cancelled_or_skipped_quantity",
+        "earliest_fill_session",
+        "status",
+        "terminal",
+        "reason"
+      ],
+      "title": "PaperOrderV1",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "approval_idempotency_key": {
+      "format": "uuid",
+      "title": "Approval Idempotency Key",
+      "type": "string"
+    },
+    "approved_at": {
+      "format": "date-time",
+      "pattern": "Z$",
+      "title": "Approved At",
+      "type": "string"
+    },
+    "approved_revision": {
+      "minimum": 0,
+      "title": "Approved Revision",
+      "type": "integer"
+    },
+    "calendar_version": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Calendar Version",
+      "type": "string"
+    },
+    "decision_cutoff_utc": {
+      "format": "date-time",
+      "pattern": "Z$",
+      "title": "Decision Cutoff Utc",
+      "type": "string"
+    },
+    "eligible_open_at": {
+      "format": "date-time",
+      "pattern": "Z$",
+      "title": "Eligible Open At",
+      "type": "string"
+    },
+    "execution_policy_id": {
+      "const": "us_eod_next_open_v1",
+      "title": "Execution Policy Id",
+      "type": "string"
+    },
+    "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+    },
+    "orders": {
+      "items": {
+        "$ref": "#/$defs/PaperOrderV1"
+      },
+      "minItems": 1,
+      "title": "Orders",
+      "type": "array"
+    },
+    "portfolio_id": {
+      "format": "uuid",
+      "title": "Portfolio Id",
+      "type": "string"
+    },
+    "reason": {
+      "anyOf": [
+        {
+          "pattern": "^[A-Z][A-Z0-9_]*$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Reason"
+    },
+    "recommendation_id": {
+      "format": "uuid",
+      "title": "Recommendation Id",
+      "type": "string"
+    },
+    "snapshot_id": {
+      "format": "uuid",
+      "title": "Snapshot Id",
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "pending",
+        "partially_filled",
+        "filled",
+        "cancelled",
+        "rejected"
+      ],
+      "title": "Status",
+      "type": "string"
+    },
+    "terminal": {
+      "title": "Terminal",
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "id",
+    "portfolio_id",
+    "recommendation_id",
+    "approval_idempotency_key",
+    "approved_revision",
+    "approved_at",
+    "decision_cutoff_utc",
+    "snapshot_id",
+    "calendar_version",
+    "execution_policy_id",
+    "eligible_open_at",
+    "status",
+    "terminal",
+    "orders",
+    "reason"
+  ],
+  "title": "PaperOrderBatchV1",
+  "type": "object"
+}

@@ -1,0 +1,136 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "adjusted_close": {
+      "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$",
+      "title": "Adjusted Close",
+      "type": "string"
+    },
+    "asset_id": {
+      "maxLength": 160,
+      "minLength": 1,
+      "title": "Asset Id",
+      "type": "string"
+    },
+    "availability_basis": {
+      "enum": [
+        "published",
+        "observed",
+        "synthetic"
+      ],
+      "title": "Availability Basis",
+      "type": "string"
+    },
+    "available_at": {
+      "format": "date-time",
+      "pattern": "Z$",
+      "title": "Available At",
+      "type": "string"
+    },
+    "close": {
+      "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$",
+      "title": "Close",
+      "type": "string"
+    },
+    "currency": {
+      "const": "USD",
+      "title": "Currency",
+      "type": "string"
+    },
+    "high": {
+      "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$",
+      "title": "High",
+      "type": "string"
+    },
+    "ingested_at": {
+      "format": "date-time",
+      "pattern": "Z$",
+      "title": "Ingested At",
+      "type": "string"
+    },
+    "low": {
+      "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$",
+      "title": "Low",
+      "type": "string"
+    },
+    "open": {
+      "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$",
+      "title": "Open",
+      "type": "string"
+    },
+    "price_basis": {
+      "enum": [
+        "raw_as_traded",
+        "provider_unverified"
+      ],
+      "title": "Price Basis",
+      "type": "string"
+    },
+    "provider": {
+      "title": "Provider",
+      "type": "string"
+    },
+    "published_at": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "pattern": "Z$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Published At"
+    },
+    "quality_flags": {
+      "items": {
+        "pattern": "^[A-Z][A-Z0-9_]*$",
+        "type": "string"
+      },
+      "title": "Quality Flags",
+      "type": "array"
+    },
+    "schema_version": {
+      "const": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "session_date": {
+      "format": "date",
+      "title": "Session Date",
+      "type": "string"
+    },
+    "volume": {
+      "minimum": 0,
+      "title": "Volume",
+      "type": "integer"
+    },
+    "volume_basis": {
+      "title": "Volume Basis",
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "asset_id",
+    "session_date",
+    "open",
+    "high",
+    "low",
+    "close",
+    "adjusted_close",
+    "volume",
+    "currency",
+    "provider",
+    "published_at",
+    "available_at",
+    "ingested_at",
+    "availability_basis",
+    "price_basis",
+    "volume_basis",
+    "quality_flags"
+  ],
+  "title": "MarketBarV1",
+  "type": "object"
+}

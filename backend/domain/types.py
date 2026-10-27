@@ -73,6 +73,7 @@ Weight = Annotated[
     AfterValidator(_weight),
 ]
 PositiveWeight = Annotated[Weight, AfterValidator(_positive)]
+FractionString = Annotated[DecimalString, AfterValidator(_weight)]
 Hash256 = Annotated[str, StringConstraints(strict=True, pattern=r"^[0-9a-f]{64}$")]
 AssetId = Annotated[str, StringConstraints(strict=True, min_length=1, max_length=160)]
 Reason = Annotated[str, StringConstraints(strict=True, pattern=r"^[A-Z][A-Z0-9_]*$")]

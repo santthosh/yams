@@ -28,3 +28,11 @@ build-backend:
 	uv build
 build-web:
 	NEXT_TELEMETRY_DISABLED=1 pnpm build
+
+.PHONY: contracts contracts-check
+contracts:
+	uv run --locked python -m backend.api.openapi
+	pnpm --filter @yams/web exec node scripts/contracts.mjs
+contracts-check:
+	uv run --locked python -m backend.api.openapi --check
+	pnpm --filter @yams/web exec node scripts/contracts.mjs --check

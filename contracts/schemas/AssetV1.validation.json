@@ -1,0 +1,60 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "asset_id": {
+      "maxLength": 160,
+      "minLength": 1,
+      "title": "Asset Id",
+      "type": "string"
+    },
+    "currency": {
+      "const": "USD",
+      "title": "Currency",
+      "type": "string"
+    },
+    "instrument": {
+      "enum": [
+        "ordinary_equity",
+        "etf"
+      ],
+      "title": "Instrument",
+      "type": "string"
+    },
+    "provider": {
+      "title": "Provider",
+      "type": "string"
+    },
+    "provider_id": {
+      "title": "Provider Id",
+      "type": "string"
+    },
+    "sector": {
+      "minLength": 1,
+      "title": "Sector",
+      "type": "string"
+    },
+    "symbol": {
+      "maxLength": 32,
+      "minLength": 1,
+      "title": "Symbol",
+      "type": "string"
+    },
+    "venue": {
+      "pattern": "^[A-Z0-9]{4}$",
+      "title": "Venue",
+      "type": "string"
+    }
+  },
+  "required": [
+    "asset_id",
+    "venue",
+    "symbol",
+    "currency",
+    "instrument",
+    "sector",
+    "provider",
+    "provider_id"
+  ],
+  "title": "AssetV1",
+  "type": "object"
+}

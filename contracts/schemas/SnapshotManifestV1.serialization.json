@@ -1,0 +1,359 @@
+{
+  "$defs": {
+    "CalendarReference": {
+      "additionalProperties": false,
+      "properties": {
+        "artifact_path": {
+          "title": "Artifact Path",
+          "type": "string"
+        },
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "timezone": {
+          "const": "America/New_York",
+          "title": "Timezone",
+          "type": "string"
+        },
+        "version": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "timezone",
+        "version",
+        "artifact_path"
+      ],
+      "title": "CalendarReference",
+      "type": "object"
+    },
+    "MissingSession": {
+      "additionalProperties": false,
+      "properties": {
+        "asset_id": {
+          "maxLength": 160,
+          "minLength": 1,
+          "title": "Asset Id",
+          "type": "string"
+        },
+        "session_date": {
+          "format": "date",
+          "title": "Session Date",
+          "type": "string"
+        }
+      },
+      "required": [
+        "asset_id",
+        "session_date"
+      ],
+      "title": "MissingSession",
+      "type": "object"
+    },
+    "SnapshotArtifact": {
+      "additionalProperties": false,
+      "properties": {
+        "format": {
+          "enum": [
+            "parquet",
+            "json"
+          ],
+          "title": "Format",
+          "type": "string"
+        },
+        "path": {
+          "pattern": "^[A-Za-z0-9_./-]+$",
+          "title": "Path",
+          "type": "string"
+        },
+        "role": {
+          "enum": [
+            "bars",
+            "assets",
+            "actions",
+            "universe",
+            "calendar",
+            "provenance",
+            "coverage"
+          ],
+          "title": "Role",
+          "type": "string"
+        },
+        "row_count": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Row Count"
+        },
+        "schema_version": {
+          "minimum": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Sha256",
+          "type": "string"
+        },
+        "size_bytes": {
+          "minimum": 0,
+          "title": "Size Bytes",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "path",
+        "role",
+        "format",
+        "schema_version",
+        "sha256",
+        "size_bytes",
+        "row_count"
+      ],
+      "title": "SnapshotArtifact",
+      "type": "object"
+    },
+    "SnapshotCoverage": {
+      "additionalProperties": false,
+      "properties": {
+        "asset_ids": {
+          "items": {
+            "maxLength": 160,
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Asset Ids",
+          "type": "array"
+        },
+        "first_session": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "First Session"
+        },
+        "last_session": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Last Session"
+        },
+        "latest_completed_session": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Latest Completed Session"
+        },
+        "membership_basis": {
+          "enum": [
+            "point_in_time",
+            "current_only",
+            "synthetic"
+          ],
+          "title": "Membership Basis",
+          "type": "string"
+        },
+        "missing_sessions": {
+          "items": {
+            "$ref": "#/$defs/MissingSession"
+          },
+          "title": "Missing Sessions",
+          "type": "array"
+        }
+      },
+      "required": [
+        "asset_ids",
+        "first_session",
+        "last_session",
+        "latest_completed_session",
+        "missing_sessions",
+        "membership_basis"
+      ],
+      "title": "SnapshotCoverage",
+      "type": "object"
+    },
+    "SnapshotPriceBasis": {
+      "additionalProperties": false,
+      "properties": {
+        "adjusted_close": {
+          "title": "Adjusted Close",
+          "type": "string"
+        },
+        "corporate_action_policy": {
+          "title": "Corporate Action Policy",
+          "type": "string"
+        },
+        "currency": {
+          "const": "USD",
+          "title": "Currency",
+          "type": "string"
+        },
+        "ohlc": {
+          "enum": [
+            "raw_as_traded",
+            "provider_unverified"
+          ],
+          "title": "Ohlc",
+          "type": "string"
+        },
+        "volume": {
+          "title": "Volume",
+          "type": "string"
+        }
+      },
+      "required": [
+        "ohlc",
+        "adjusted_close",
+        "volume",
+        "currency",
+        "corporate_action_policy"
+      ],
+      "title": "SnapshotPriceBasis",
+      "type": "object"
+    },
+    "SnapshotSource": {
+      "additionalProperties": false,
+      "properties": {
+        "adapter_version": {
+          "title": "Adapter Version",
+          "type": "string"
+        },
+        "capabilities_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Capabilities Sha256",
+          "type": "string"
+        },
+        "normalization_version": {
+          "title": "Normalization Version",
+          "type": "string"
+        },
+        "provider": {
+          "title": "Provider",
+          "type": "string"
+        },
+        "rights_reference": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Rights Reference"
+        },
+        "rights_status": {
+          "enum": [
+            "synthetic_owned",
+            "verified_local_use",
+            "unverified"
+          ],
+          "title": "Rights Status",
+          "type": "string"
+        }
+      },
+      "required": [
+        "provider",
+        "adapter_version",
+        "normalization_version",
+        "rights_reference",
+        "rights_status",
+        "capabilities_sha256"
+      ],
+      "title": "SnapshotSource",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "artifacts": {
+      "items": {
+        "$ref": "#/$defs/SnapshotArtifact"
+      },
+      "minItems": 1,
+      "title": "Artifacts",
+      "type": "array"
+    },
+    "calendar": {
+      "$ref": "#/$defs/CalendarReference"
+    },
+    "coverage": {
+      "$ref": "#/$defs/SnapshotCoverage"
+    },
+    "mode": {
+      "enum": [
+        "synthetic_fixture",
+        "research_market_data"
+      ],
+      "title": "Mode",
+      "type": "string"
+    },
+    "price_basis": {
+      "$ref": "#/$defs/SnapshotPriceBasis"
+    },
+    "quality": {
+      "enum": [
+        "usable",
+        "usable_with_warnings",
+        "blocked"
+      ],
+      "title": "Quality",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "source": {
+      "$ref": "#/$defs/SnapshotSource"
+    },
+    "warnings": {
+      "items": {
+        "pattern": "^[A-Z][A-Z0-9_]*$",
+        "type": "string"
+      },
+      "title": "Warnings",
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema_version",
+    "mode",
+    "source",
+    "price_basis",
+    "calendar",
+    "coverage",
+    "quality",
+    "warnings",
+    "artifacts"
+  ],
+  "title": "SnapshotManifestV1",
+  "type": "object"
+}
