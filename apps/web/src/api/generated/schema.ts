@@ -104,6 +104,7 @@ export interface components {
         | "VALIDATION_ERROR"
         | "NOT_FOUND"
         | "METHOD_NOT_ALLOWED"
+        | "HTTP_ERROR"
         | "STATE_CONFLICT"
         | "IDEMPOTENCY_CONFLICT"
         | "STALE_DATA"

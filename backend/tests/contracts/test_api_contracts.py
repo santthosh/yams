@@ -5,6 +5,7 @@ from uuid import UUID
 import pytest
 from fastapi.testclient import TestClient
 from pydantic import ValidationError
+from starlette.exceptions import HTTPException
 
 from backend.api.main import create_app
 from backend.api.openapi import export
@@ -63,7 +64,7 @@ def test_method_error_preserves_status_and_allow_header() -> None:
     assert response.headers["allow"] == "GET"
 
 
-def test_internal_errors_never_expose_exception_payloads() -> None:
+def test_internal_errors_never_expose_exception_payloads(caplog: pytest.LogCaptureFixture) -> None:
     app = create_app()
 
     @app.get("/broken-probe")
@@ -74,6 +75,34 @@ def test_internal_errors_never_expose_exception_payloads() -> None:
     assert response.status_code == 500
     assert response.json()["error"]["code"] == "INTERNAL_ERROR"
     assert "secret-provider-token" not in response.text
+    assert response.json()["error"]["correlation_id"] in caplog.text
+    assert "secret-provider-token" not in caplog.text
+
+
+@pytest.mark.parametrize(
+    ("status", "code"),
+    [
+        (400, "VALIDATION_ERROR"),
+        (401, "HTTP_ERROR"),
+        (409, "STATE_CONFLICT"),
+        (422, "VALIDATION_ERROR"),
+        (429, "LIMIT_EXCEEDED"),
+        (503, "INTERNAL_ERROR"),
+    ],
+)
+def test_http_exception_keeps_status_without_detail_leak(status: int, code: str) -> None:
+    app = create_app()
+
+    @app.get("/http-probe")
+    def broken() -> None:
+        raise HTTPException(status, "secret-provider-token", headers={"Retry-After": "2"})
+
+    response = TestClient(app).get("/http-probe")
+    assert response.status_code == status
+    assert response.json()["error"]["code"] == code
+    assert "secret-provider-token" not in response.text
+    if status < 500:
+        assert response.headers["retry-after"] == "2"
 
 
 def test_export_is_deterministic_and_detects_changed_schema(tmp_path: Path) -> None:

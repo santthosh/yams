@@ -1,5 +1,6 @@
 """Consistent safe error responses; request payloads are never echoed."""
 
+import logging
 from collections.abc import Mapping
 from uuid import uuid4
 
@@ -9,6 +10,8 @@ from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException
 
 from backend.domain.common import ERROR_HTTP_STATUS, ErrorCode, ErrorDetail, ErrorEnvelope
+
+logger = logging.getLogger(__name__)
 
 
 def error_response(
@@ -27,9 +30,17 @@ def error_response(
             correlation_id=uuid4(),
         )
     )
+    response_status = status or ERROR_HTTP_STATUS[code]
+    if response_status >= 500:
+        logger.error(
+            "API failure code=%s status=%s correlation_id=%s",
+            code,
+            response_status,
+            envelope.error.correlation_id,
+        )
     return JSONResponse(
         envelope.model_dump(mode="json"),
-        status_code=status or ERROR_HTTP_STATUS[code],
+        status_code=response_status,
         headers=headers,
     )
 
@@ -51,8 +62,22 @@ def register_error_handlers(app: FastAPI) -> None:
                 "METHOD_NOT_ALLOWED", "Method not allowed.", headers=error.headers
             )
         if error.status_code == 429:
-            return error_response("LIMIT_EXCEEDED", "Request limit exceeded.", 429)
-        return error_response("INTERNAL_ERROR", "Request could not be completed.")
+            return error_response(
+                "LIMIT_EXCEEDED", "Request limit exceeded.", 429, headers=error.headers
+            )
+        if 400 <= error.status_code < 500:
+            client_codes: dict[int, ErrorCode] = {
+                400: "VALIDATION_ERROR",
+                409: "STATE_CONFLICT",
+                422: "VALIDATION_ERROR",
+            }
+            code = client_codes.get(error.status_code, "HTTP_ERROR")
+            return error_response(
+                code, "Request could not be completed.", error.status_code, headers=error.headers
+            )
+        return error_response(
+            "INTERNAL_ERROR", "Request could not be completed.", error.status_code
+        )
 
     @app.exception_handler(Exception)
     async def internal_error(request: Request, error: Exception) -> JSONResponse:
