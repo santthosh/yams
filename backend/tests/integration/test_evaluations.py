@@ -2,7 +2,7 @@
 
 import json
 import shutil
-from datetime import date, timedelta
+from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 from uuid import UUID, uuid4
 
@@ -18,6 +18,7 @@ from backend.jobs.worker import Worker
 from backend.market_data.snapshots import PublicationFenceError, publish_snapshot
 from backend.persistence.bootstrap import bootstrap
 from backend.persistence.database import Settings, database_engine
+from backend.strategies import evaluations as evaluation_service
 from backend.strategies.evaluations import admit_evaluation, read_evaluation, seal_evaluation
 from backend.strategies.registry import DEFAULT_VERSION_ID
 from backend.tests.integration.test_bootstrap import database as database
@@ -82,6 +83,10 @@ def test_admission_completion_replay_and_immutable_evidence(
         assert client.post("/api/v1/strategy-evaluations", json=unknown).status_code == 404
         weekend = request.model_dump(mode="json") | {"as_of_session": "2028-07-16"}
         assert client.post("/api/v1/strategy-evaluations", json=weekend).status_code == 422
+        no_lookahead = request.model_dump(mode="json") | {"as_of_session": "2030-12-31"}
+        response = client.post("/api/v1/strategy-evaluations", json=no_lookahead)
+        assert response.status_code == 422
+        assert response.json()["error"]["code"] == "INSUFFICIENT_MARKET_DATA"
     for table in ("strategy_evaluation", "strategy_evaluation_result"):
         for verb in (
             f"UPDATE {table} SET "
@@ -175,11 +180,47 @@ def test_real_supervised_evaluation_handler_and_rerun(database: Engine, tmp_path
         actual = read_evaluation(database, accepted.evaluation_id)
         assert actual is not None and actual.status == "completed", actual
         assert actual.result is not None
-        assert actual.result.decision_cutoff_utc.isoformat() == "2028-07-17T20:15:00+00:00"
+        assert actual.result.decision_cutoff_utc.isoformat() == "2028-07-18T12:30:00+00:00"
         assert actual.result.selected_ids == ("SYN:AAA", "SYN:BBB", "SYN:CCC")
         assert actual.result.cash_target_weight == "0.4"
         results.append(actual.result_sha256)
     assert results[0] == results[1]
+
+
+def test_prior_cutoff_evidence_stays_readable_but_old_queued_build_cannot_run(
+    database: Engine, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    request = prepare(database, tmp_path)
+    old_cutoff = datetime(2028, 7, 17, 20, 15, tzinfo=UTC)
+    old_build = "f8447f32d2067ef0def6ad5a35705189f1bd442407d70ab61c82be0d2dcbafcd"
+    queue = Queue(database)
+    _, current = explicit_fixture_result(tmp_path / "explicit")
+    historical = current.model_copy(
+        update={
+            "decision_cutoff_utc": old_cutoff,
+            "reproducibility": current.reproducibility.model_copy(
+                update={"engine_version": old_build}
+            ),
+        }
+    )
+    # Model a completed persisted Q15 run and an unexecuted old-build job.
+    # No financial output is synthesized: the fixture has identical as-of inputs
+    # at these two cutoffs; only the pinned timing/build metadata changes.
+    with monkeypatch.context() as previous:
+        previous.setattr(evaluation_service, "decision_cutoff", lambda calendar, day: old_cutoff)
+        previous.setattr(evaluation_service, "engine_fingerprint", lambda: old_build)
+        completed = admit_evaluation(database, tmp_path, request)
+        lease = queue.claim("prior-policy-test")
+        assert lease is not None
+        seal_evaluation(queue, lease, historical.model_dump_json())
+        queued = admit_evaluation(database, tmp_path, request)
+    saved = read_evaluation(database, completed.evaluation_id)
+    assert saved is not None and saved.result == historical
+    assert saved.result_sha256 == historical.result_hash()
+    assert Worker(queue, artifact_root=tmp_path).run_once()
+    failed = read_evaluation(database, queued.evaluation_id)
+    assert failed is not None and failed.status == "failed" and failed.result is None
+    assert failed.error is not None and failed.error.code == "VALIDATION_ERROR"
 
 
 def test_prepare_evaluation_restart() -> None:

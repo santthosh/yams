@@ -4,7 +4,21 @@ Yet Another Market Simulator is a local, single-user paper research workspace. I
 
 ## Current state
 
-The `0.0.1` foundation provides an importable FastAPI package, an accessible Next.js Dashboard/Settings shell, versioned contracts, synthetic fixtures, PostgreSQL workspace/job migrations, a bounded diagnostic worker and working quality commands. `/livez` checks only that the API process responds; `/api/v1/health` checks database/migration/workspace/fixture readiness. Local Compose, isolated smoke checks and protected GitHub Actions CI are implemented. The release workflow builds and verifies native amd64/arm64 candidates before publication; see [release installation and recovery](docs/releases.md). [v0.0.1 is published as a foundation prerelease](https://github.com/santthosh/yams/releases/tag/v0.0.1), verified natively on linux/amd64 and linux/arm64. See [release evidence](docs/verification/28-release/README.md). For this first release, follow the release-note filename-copy step before verifying downloaded checksums. No portfolio values or investment results are seeded by this foundation.
+The source checkout includes the0.0.2 market repository, immutable snapshots and
+strategy registry, shared momentum/allocation engine, and asynchronous candidate
+inspection backed by PostgreSQL and a supervised worker. The synthetic Docker
+journey produces measured candidates, exclusions and feasible targets, with
+reproducible results retained through restart. Portfolio approval, backtesting and
+forecasts remain with their later milestone owners; the shared execution kernel
+is available but does not itself post durable trades.
+
+[v0.0.1](https://github.com/santthosh/yams/releases/tag/v0.0.1) remains the published
+foundation prerelease, verified on native linux/amd64 and linux/arm64. The0.0.2
+release gate still requires a verified real provider-derived universe and native
+packaged-install evidence; source implementation does not establish publication.
+See [release evidence](docs/verification/28-release/README.md) and
+[installation/upgrade guidance](docs/releases.md). For the first release, follow
+its release-note filename-copy step before verifying downloaded checksums.
 
 ## Local Docker startup
 
@@ -48,7 +62,7 @@ make build
 
 Playwright is pinned. Install its Chromium once with `pnpm --filter @yams/web exec playwright install chromium`, then run `make test-e2e` for production-build browser checks at 360px and 1280px against a labeled synthetic transport. `make test-integration` verifies PostgreSQL in an isolated Docker project; `make smoke` verifies the full container application with isolated volumes; `make dev` starts the approved native web/API plus Docker worker/database workflow. Tailwind and locally owned shadcn-style primitives are implemented; charts remain with their feature owners.
 
-Read [AGENTS.md](AGENTS.md), the [implementation blueprint](docs/IMPLEMENTATION_BLUEPRINT.md), and the scoped GitHub issue before changing financial semantics. Milestone `0.0.1` is not released merely because the scaffold builds.
+Read [AGENTS.md](AGENTS.md), the [implementation blueprint](docs/IMPLEMENTATION_BLUEPRINT.md), and the scoped GitHub issue before changing financial semantics. Milestone completion requires integrated release evidence beyond a successful scaffold build.
 
 ## Versioned contracts
 
@@ -104,8 +118,8 @@ work. Missing monetary values display `Unavailable`, never a substituted zero.
 Set `API_INTERNAL_ORIGIN` only in the web server environment. Its default is
 `http://api:8000` for the private Compose network; native development uses
 `http://127.0.0.1:8000`. It is not a `NEXT_PUBLIC_` setting and is not sent to the
-browser. The browser uses same-origin `/api/v1` routes. The proxy allows only GET
-health/workspace and GET jobs with UUIDs, rejects other paths/methods/query strings,
+browser. The browser uses same-origin `/api/v1` routes. The proxy allows the owned health/workspace/job, data/asset/default-strategy and
+diagnostic evaluation routes, with closed methods, paths and query parameters,
 does not forward cookies/authorization, rejects redirects, and bounds upstream
 requests at three seconds. Failures carry safe correlation IDs.
 
@@ -126,7 +140,32 @@ The [candidate inspection diagnostic](docs/operations/strategy-evaluations.md) c
 registered snapshots and immutable strategy versions to the supervised shared engine.
 Prepare a synthetic snapshot in Settings & data, open Candidate inspection and select
 as-of session `2028-07-17` for the authored populated fixture, or `2027-01-04` for
-cash-only insufficient history. The cutoff is the pinned scheduled close plus15
-minutes. Targets are diagnostic evidence; this flow cannot approve orders or change
-holdings. The published0.0.1 prerelease remains the foundation release until the
-0.0.2 integration/release gate passes.
+cash-only insufficient history. The cutoff is one hour before the next pinned
+session's open. Calendar lookahead is required; missing coverage produces an
+explicit error. Targets are diagnostic evidence; this flow cannot approve orders
+or change holdings.
+
+## Optional real-data credentials
+
+Offline startup and the synthetic demonstration need no provider account. For
+Tiingo capability verification, use your own free personal-use API token from the
+[Tiingo account](https://www.tiingo.com/). Create or edit the repository-root `.env`
+without replacing existing configuration:
+
+```dotenv
+TIINGO_API_TOKEN=your_personal_token
+```
+
+Keep the file local (`.env` is ignored by Git) and restrict it with `chmod 600 .env`.
+Do not put the token in browser code, a `NEXT_PUBLIC_` variable, issues, screenshots
+or release files. Provider responses belong in ignored `data/downloads/` or local
+artifact storage; public images and fixtures contain authored synthetic data only.
+
+Tiingo integration is being completed under
+[#109](https://github.com/santthosh/yams/issues/109). Configuring a token alone does
+not enable Tiingo inside the current application refresh flow. Authenticated
+metadata/history access has been checked locally; complete universe selection,
+normalization and the actual research UI/worker journey remain required before
+claiming supported real-data diagnostics. The [dated provider review](docs/data-provider-evidence.md)
+records source rights/capabilities and remaining limits. User-owned credentials do
+not authorize redistribution or establish historical publication/action coverage.

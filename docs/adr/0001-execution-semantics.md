@@ -14,18 +14,27 @@ Store event timestamps as timezone-aware RFC3339 UTC `Z`; session dates are exch
 
 A close-derived decision is made only after the session's closing bar is complete, validated and available. Record `decision_cutoff_utc` and require every input's `available_at <= decision_cutoff_utc`; this cutoff is at or after that session's scheduled close. Data downloaded later is not automatically evidence that it was historically available (ADR-002 owns availability proxies and disclosures).
 
-Approved Q15 (#34, 2026-10-28): end-of-day strategy diagnostics use a fixed
-`decision_cutoff_utc = scheduled_close_utc + 15 minutes` from the pinned calendar,
-including early-close and DST sessions. The cutoff is independent of bar arrival
-order, snapshot download time and evaluation wall clock. Use only complete,
-validated evidence available at or before the cutoff; live-like use additionally
-requires ingestion by the cutoff. Late/missing bars are excluded with reasons,
-never repaired or backdated. No eligible candidates yields a completed cash-only
-target with exclusion evidence. Fifteen minutes is an initial policy default,
-not a provider completeness guarantee; store it with reproducibility evidence.
-A real-market evaluation cannot run before this cutoff has elapsed. Synthetic
-replay uses its explicitly authored calendar and availability without pretending
-that fictional dates are real future market evidence.
+Approved Q17 (2026-10-28), superseding Q15's close-plus15-minute default:
+end-of-day strategy diagnostics use
+`decision_cutoff_utc = next_pinned_session.open_at - 1 hour`. The next session
+comes from the immutable calendar, including weekends, holidays, early closes
+and DST. Require a following session and a cutoff at or after the as-of close;
+missing or invalid lookahead is an explicit insufficient-data error. Never invent
+a weekday/open or move the cutoff to fit an input's arrival. Verified free daily
+feeds can publish after the previous15-minute default; this overnight policy
+provides a fixed validation window before the next open, without promising data
+completeness. See the dated provider evidence for the publication limitations.
+
+Use only complete, validated evidence available at or before the cutoff; live-like
+use additionally requires ingestion by the cutoff. Late/missing bars are excluded
+with reasons, never repaired or backdated. No eligible candidates yields a
+completed cash-only target with exclusion evidence. Pin the cutoff and runtime
+identity for reproducibility. Real-market evaluation cannot run before its cutoff
+has elapsed. Synthetic replay uses its explicitly authored calendar/availability,
+not fictional evidence of real future prices. Completed earlier evaluations retain
+their original cutoff, calendar, config, result hash and build; never rewrite their
+evidence to the newer default. New jobs require their pinned build/policy to match
+the supervised worker, rather than silently executing under different timing.
 
 Given `decision_cutoff_utc`, `approved_at` and the pinned schedule, choose the first session whose opening instant is **strictly greater than both timestamps**. Equality is too late for that open. For a deterministic historical backtest, the simulated approval instant is the decision cutoff; it is not the wall-clock time when the backtest ran. A live-like approval always uses the actual recorded approval time and cannot fill at a past opening. Preserve these timestamps through restart.
 

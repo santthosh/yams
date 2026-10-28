@@ -107,7 +107,13 @@ def admit_evaluation(
             raise EvaluationAdmissionError(
                 "INSUFFICIENT_MARKET_DATA", "Session is not covered by this snapshot."
             )
-        cutoff = decision_cutoff(calendar, request.as_of_session)
+        try:
+            cutoff = decision_cutoff(calendar, request.as_of_session)
+        except ValueError:
+            raise EvaluationAdmissionError(
+                "INSUFFICIENT_MARKET_DATA",
+                "The pinned calendar lacks a usable next session for the decision cutoff.",
+            ) from None
         if manifest.mode == "research_market_data" and cutoff > datetime.now(UTC):
             raise EvaluationAdmissionError(
                 "VALIDATION_ERROR", "The market session decision cutoff has not elapsed."
