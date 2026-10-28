@@ -67,6 +67,14 @@ def portfolio() -> dict:
     return service.portfolio_view(md(), ledger(), data.live_quotes([*holdings, STRATEGY.benchmark]))
 
 
+def with_status(rec: dict) -> dict:
+    """A 'ready' recommendation becomes 'stale' once the portfolio or market data changed; it can no longer be applied."""
+    if rec["status"] == "ready" and (rec["trade_count"] != ledger().trade_count()
+                                     or rec["data_fetched_at"] != md().fetched_at):
+        rec["status"] = "stale"
+    return rec
+
+
 def render(request: Request, name: str, **ctx):
     ctx.update(status=md().status(), msg=request.query_params.get("msg"), err=request.query_params.get("err"))
     return templates.TemplateResponse(request, name, ctx)
@@ -120,8 +128,9 @@ def do_apply(rec_id: str):
 
 @app.get("/")
 def dashboard(request: Request):
-    return render(request, "dashboard.html", p=portfolio(),
-                  trades=ledger().trades(25), recs=ledger().list_recommendations(10))
+    recs = [with_status(r) for r in ledger().list_recommendations(10)]
+    pending = recs[0] if recs and recs[0]["status"] == "ready" and recs[0]["summary_action"] != "HOLD" else None
+    return render(request, "dashboard.html", p=portfolio(), trades=ledger().trades(25), recs=recs, pending=pending)
 
 
 @app.get("/recommendations/{rec_id}")
@@ -129,9 +138,9 @@ def recommendation_page(request: Request, rec_id: str):
     rec = ledger().get_recommendation(rec_id)
     if rec is None:
         return RedirectResponse("/?err=" + quote("Recommendation not found."), status_code=303)
-    stale = rec["status"] == "ready" and (
-        rec["trade_count"] != ledger().trade_count() or rec["data_fetched_at"] != md().fetched_at)
-    return render(request, "recommendation.html", rec=rec, stale=stale, caption=service.FORECAST_CAPTION)
+    rec = with_status(rec)
+    return render(request, "recommendation.html", rec=rec, stale=rec["status"] == "stale",
+                  caption=service.FORECAST_CAPTION)
 
 
 @app.get("/backtest")
@@ -204,7 +213,7 @@ def api_recommend():
 
 @app.get("/api/recommendations")
 def api_recommendations():
-    return ledger().list_recommendations(50)
+    return [with_status(r) for r in ledger().list_recommendations(50)]
 
 
 @app.get("/api/recommendations/{rec_id}")
@@ -212,7 +221,7 @@ def api_recommendation(rec_id: str):
     rec = ledger().get_recommendation(rec_id)
     if rec is None:
         raise AppError("NOT_FOUND", "Recommendation not found.", 404)
-    return rec
+    return with_status(rec)
 
 
 @app.post("/api/recommendations/{rec_id}/apply")

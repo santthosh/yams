@@ -61,13 +61,17 @@ def test_stale_recommendation_rejected_after_other_apply(client):
     b = client.post("/api/recommendations").json()
     assert client.post(f"/api/recommendations/{a['id']}/apply").status_code == 200
     assert client.post(f"/api/recommendations/{b['id']}/apply").status_code == 409
+    statuses = {r["id"]: r["status"] for r in client.get("/api/recommendations").json()}
+    assert statuses == {a["id"]: "applied", b["id"]: "stale"}
+    assert "Apply paper trades</button>" not in client.get(f"/recommendations/{b['id']}").text
 
 
 def test_pages_render(client):
     assert client.get("/").status_code == 200
     rec = client.post("/api/recommendations").json()
     page = client.get(f"/recommendations/{rec['id']}")
-    assert page.status_code == 200 and "Apply paper trades" in page.text
+    assert page.status_code == 200 and page.text.count("Apply paper trades</button>") == 2  # top + section 6
+    assert "not applied yet" in client.get("/").text
     assert client.get("/backtest").status_code == 200
 
 

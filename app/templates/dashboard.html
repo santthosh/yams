@@ -2,6 +2,8 @@
 {% block title %}Dashboard{% endblock %}
 {% block content %}
 <h1>Your paper portfolio</h1>
+{% if pending %}<div class="warn">Recommendation from {{ pending.created_at[11:16] }} UTC not applied yet: {{ pending.summary }}
+  <a href="/recommendations/{{ pending.id }}"><strong>Review and apply →</strong></a></div>{% endif %}
 {% set live = p.live if p.live.status == 'live' else none %}
 {% set v = live or p %}
 <div class="cards">
@@ -66,7 +68,7 @@
       <thead><tr><th>Created (UTC)</th><th>Data as of</th><th>Summary</th><th>Status</th></tr></thead>
       <tbody>{% for r in recs %}
         <tr><td class="small"><a href="/recommendations/{{ r.id }}">{{ r.created_at[:16]|replace('T', ' ') }}</a></td>
-          <td class="small">{{ r.data_as_of }}</td><td class="small">{{ r.summary }}</td><td><span class="tag">{{ r.status }}</span></td></tr>
+          <td class="small">{{ r.data_as_of }}</td><td class="small">{{ r.summary }}</td><td><span class="tag {{ r.status }}">{{ r.status }}</span></td></tr>
       {% endfor %}</tbody></table></div>
     {% else %}<p class="muted">None yet.</p>{% endif %}
   </div>

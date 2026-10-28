@@ -2,6 +2,19 @@
 {% block title %}Recommendation{% endblock %}
 {% block content %}
 {% set f = rec.forecast %}
+{% macro apply_form() %}
+  {% if rec.status == 'applied' %}
+    <p>These trades were applied to the paper portfolio. <a href="/">See holdings →</a></p>
+  {% elif not stale %}
+  <form method="post" action="/ui/recommendations/{{ rec.id }}/apply"
+        onsubmit="this.querySelector('button').disabled=true">
+    <p class="small">Simulated fills at the {{ rec.data_as_of }} close, ±{{ strategy.slippage_bps|int }} bps slippage. Sells execute first; buys are trimmed if cash runs short. No real money or broker is involved.</p>
+    <label><input type="checkbox" name="confirm" value="yes" required> I understand these are simulated paper trades.</label><br><br>
+    <button type="submit" {{ 'disabled' if rec.summary_action == 'HOLD' }}>Apply paper trades</button>
+    {% if rec.summary_action == 'HOLD' %}<span class="small muted">Nothing to trade.</span>{% endif %}
+  </form>
+  {% endif %}
+{% endmacro %}
 <h1>Recommendation <span class="tag">{{ rec.status }}</span></h1>
 <p class="muted small">Created {{ rec.created_at[:19]|replace('T', ' ') }} UTC · data as of {{ rec.data_as_of }} ({{ rec.data_source }}) · portfolio value {{ rec.portfolio_value|money }}</p>
 {% if stale %}<div class="warn">This recommendation is out of date: the portfolio or market data changed since it was made. <form class="inline" method="post" action="/ui/recommend"><button class="secondary" type="submit">Get a new one</button></form></div>{% endif %}
@@ -10,6 +23,8 @@
   <div style="font-size:19px;font-weight:700">{{ rec.summary }}</div>
   <p>{{ rec.regime_text }}</p>
   <p class="small muted">{{ rec.n_eligible }} of {{ rec.n_universe }} S&amp;P 500 stocks passed the filters. Estimated trading cost: {{ rec.est_total_cost|money }} ({{ strategy.slippage_bps|int }} bps slippage per trade).</p>
+  {% if rec.status == 'ready' and rec.summary_action != 'HOLD' %}<hr>{{ apply_form() }}
+  <p class="small muted">The details below explain each pick, the trades, a 90-day forecast and the backtest.</p>{% endif %}
 </div>
 
 <h2><span class="step">1</span>Proposed portfolio</h2>
@@ -82,19 +97,7 @@
   {% for code, n in rec.excluded.items() %}{{ n }} {{ code|replace('_', ' ')|lower }}{% if not loop.last %} · {% endif %}{% endfor %}</p>
 
 <h2><span class="step">6</span>Apply paper trades</h2>
-<div class="panel">
-  {% if rec.status == 'applied' %}
-    <p>These trades were applied to the paper portfolio. <a href="/">See holdings →</a></p>
-  {% else %}
-  <form method="post" action="/ui/recommendations/{{ rec.id }}/apply"
-        onsubmit="this.querySelector('button').disabled=true">
-    <p class="small">Simulated fills at the {{ rec.data_as_of }} close, ±{{ strategy.slippage_bps|int }} bps slippage. Sells execute first; buys are trimmed if cash runs short. No real money or broker is involved.</p>
-    <label><input type="checkbox" name="confirm" value="yes" required {{ 'disabled' if stale }}> I understand these are simulated paper trades.</label><br><br>
-    <button type="submit" {{ 'disabled' if stale or rec.summary_action == 'HOLD' }}>Apply paper trades</button>
-    {% if rec.summary_action == 'HOLD' %}<span class="small muted">Nothing to trade.</span>{% endif %}
-  </form>
-  {% endif %}
-</div>
+<div class="panel">{{ apply_form() }}</div>
 
 <script>
 new Chart(document.getElementById('mini'), {
