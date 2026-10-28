@@ -346,7 +346,7 @@ core runtime identity; numerical results retain their original fingerprint.
 the implemented verification scope and approved Q17 overnight cutoff policy. This transport
 inventory does not settle that financial timing question or claim handler delivery.
 
-### 6.2 Implemented default strategy registry (0.0.2, #71)
+### 6.2 Strategy registry and immutable publication (#71, #36)
 
 `GET /strategies` accepts `limit` (default25, 1–100) and an optional existing
 strategy UUID `cursor`. It returns `Page[StrategyV1]` ordered by ascending strategy
@@ -355,8 +355,34 @@ contains `id`, `name`, `is_template`, nullable `template_key`, `created_at` and 
 latest immutable `published_version` (`id`, `strategy_id`, positive `version`,
 `status="published"`, complete `config`, canonical `config_sha256`, `published_at`).
 Reads validate stored config/hash and return503 NOT_READY on unavailable or corrupt
-storage. Empty pages are valid and do not seed data. Mutation APIs remain staged to
-0.0.3. [Registry operations](operations/strategy-registry.md) records seed identity,
+storage. Empty pages are valid and do not seed data. The default read registry
+shipped in 0.0.2; the following publication APIs are added by #36 for 0.0.3.
+
+`POST /strategies` accepts closed `StrategyCreateRequest` with `name` and the
+complete `config: StrategyConfigV1`. It atomically creates a non-template strategy
+and published version1, returning201 `StrategyV1`. Names follow §3/ADR-008;
+workspace Unicode-casefold collisions return409 STATE_CONFLICT, including races.
+`GET /strategies/{id}` returns200 `StrategyV1` with the latest published version.
+
+`POST /strategies/{id}/versions` accepts the **raw complete StrategyConfigV1**,
+without a config wrapper. Each successful call appends a distinct UUID and next
+positive ordinal, returning201 `StrategyVersionV1`, even for identical config.
+An existing strategy-row lock serializes concurrent publications. No Idempotency-Key
+is required; a retry after response loss may append another version. Inspect version
+history before retrying if that distinction matters. Old IDs/configs/hashes and
+consumers' pinned references remain unchanged. There is no update/delete endpoint.
+
+`GET /strategies/{id}/versions` returns `Page[StrategyVersionV1]` ordered by ascending
+ordinal, with `limit` default25/max100 and final version UUID as `cursor`.
+Unknown or other-strategy cursors return422; unknown strategy IDs return404.
+A new identity fork copies the chosen complete config into `POST /strategies`;
+appending under an existing identity retains that root's ID and version lineage.
+No parent-version field, mutable draft, template operator or experiment service
+is introduced. Config validation is independent of market-data availability;
+evaluation checks pinned data separately. Publication never computes returns or
+writes accounts/orders/jobs. The browser proxy permits only these exact paths,
+same-origin JSON writes (1 MiB input cap), and list pagination queries.
+[Registry operations](operations/strategy-registry.md) records examples, identity,
 schema ownership and verification.
 
 ### 6.3 Staged operations

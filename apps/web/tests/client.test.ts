@@ -81,3 +81,35 @@ describe("generated transport", () => {
     expect(typeof invalid).toBe("number");
   });
 });
+
+it("uses generated publication types with a named creation wrapper and raw version config", async () => {
+  const config: components["schemas"]["StrategyConfigV1"] = JSON.parse(
+    readFileSync(
+      new URL(
+        "../../../data/fixtures/fix-01/strategy.canonical.json",
+        import.meta.url,
+      ),
+      "utf8",
+    ),
+  );
+  const id = "22222222-2222-4222-8222-222222222222";
+  const seen: unknown[] = [];
+  const client = createApiClient("http://yams.test", async (input) => {
+    const request = input as Request;
+    expect(request.method).toBe("POST");
+    seen.push(await request.json());
+    return Response.json(
+      { error: { code: "STATE_CONFLICT" } },
+      { status: 409 },
+    );
+  });
+  await client.POST("/api/v1/strategies", {
+    body: { name: "My fork", config },
+  });
+  await client.POST("/api/v1/strategies/{strategy_id}/versions", {
+    params: { path: { strategy_id: id } },
+    body: config,
+  });
+  expect(seen).toEqual([{ name: "My fork", config }, config]);
+  expect((seen[1] as typeof config).portfolio.max_position_weight).toBe("0.2");
+});

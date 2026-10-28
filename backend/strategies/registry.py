@@ -1,18 +1,25 @@
-"""Validated default parameters and read-only registry; never computes returns."""
+"""Validated defaults and immutable strategy publication; never computes returns."""
 
 import json
 from datetime import UTC, datetime
 from importlib.resources import files
-from uuid import NAMESPACE_URL, UUID, uuid5
+from uuid import NAMESPACE_URL, UUID, uuid4, uuid5
 
 from sqlalchemy import Connection, Engine, select, text
 from sqlalchemy.dialects.postgresql import insert
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from backend.domain.common import Page
-from backend.domain.registry import StrategyV1, StrategyVersionV1, strategy_name
+from backend.domain.registry import (
+    StrategyCreateRequest,
+    StrategyV1,
+    StrategyVersionV1,
+    strategy_name,
+)
 from backend.domain.strategy import StrategyConfigV1
 from backend.persistence.models.strategy import Strategy, StrategyVersion
+from backend.persistence.models.workspace import LocalWorkspace
 
 DEFAULT_TEMPLATE_KEY = "risk_adjusted_momentum_v1"
 DEFAULT_STRATEGY_ID = uuid5(NAMESPACE_URL, "https://yams.local/strategies/risk-adjusted-momentum")
@@ -108,24 +115,124 @@ def list_strategies(
         rows = session.scalars(statement.order_by(Strategy.id).limit(limit + 1)).all()
         items = []
         for row in rows[:limit]:
-            version = session.scalar(
-                select(StrategyVersion)
-                .where(StrategyVersion.strategy_id == row.id)
-                .order_by(StrategyVersion.version.desc())
-                .limit(1)
-            )
-            if version is None:
-                raise ValueError("Strategy has no published version")
-            items.append(
-                StrategyV1(
-                    id=row.id,
-                    name=row.name,
-                    is_template=row.template_key is not None,
-                    template_key=row.template_key,
-                    created_at=row.created_at,
-                    published_version=version_view(version),
-                )
-            )
+            items.append(strategy_view(session, row))
         return Page[StrategyV1](
             items=tuple(items), next_cursor=str(rows[limit - 1].id) if len(rows) > limit else None
         )
+
+
+class StrategyNotFound(LookupError):
+    pass
+
+
+class StrategyNameConflict(ValueError):
+    pass
+
+
+def strategy_view(session: Session, row: Strategy) -> StrategyV1:
+    version = session.scalar(
+        select(StrategyVersion)
+        .where(StrategyVersion.strategy_id == row.id)
+        .order_by(StrategyVersion.version.desc())
+        .limit(1)
+    )
+    if version is None:
+        raise ValueError("Strategy has no published version")
+    return StrategyV1(
+        id=row.id,
+        name=row.name,
+        is_template=row.template_key is not None,
+        template_key=row.template_key,
+        created_at=row.created_at,
+        published_version=version_view(version),
+    )
+
+
+def new_version(strategy_id: UUID, ordinal: int, config: StrategyConfigV1) -> StrategyVersion:
+    # Round-trip validation also guards callers outside the HTTP boundary.
+    config = StrategyConfigV1.from_json(config.canonical_bytes())
+    return StrategyVersion(
+        id=uuid4(),
+        strategy_id=strategy_id,
+        version=ordinal,
+        status="published",
+        config=json.loads(config.canonical_bytes()),
+        config_sha256=config.config_hash(),
+        published_at=datetime.now(UTC),
+    )
+
+
+def create_strategy(engine: Engine, request: StrategyCreateRequest) -> StrategyV1:
+    request = StrategyCreateRequest.model_validate(request.model_dump())
+    try:
+        with Session(engine) as session, session.begin():
+            workspace = session.scalar(select(LocalWorkspace))
+            if workspace is None:
+                raise ValueError("Workspace is not initialized")
+            row = Strategy(
+                id=uuid4(),
+                workspace_id=workspace.id,
+                name=request.name,
+                name_key=request.name.casefold(),
+                template_key=None,
+                created_at=datetime.now(UTC),
+            )
+            session.add(row)
+            session.flush()
+            session.add(new_version(row.id, 1, request.config))
+            session.flush()
+            result = strategy_view(session, row)
+        return result
+    except IntegrityError as error:
+        if (
+            getattr(getattr(error.orig, "diag", None), "constraint_name", None)
+            == "uq_strategy_name"
+        ):
+            raise StrategyNameConflict("Strategy name already exists") from error
+        raise
+
+
+def get_strategy(engine: Engine, strategy_id: UUID) -> StrategyV1:
+    with Session(engine) as session:
+        row = session.get(Strategy, strategy_id)
+        if row is None:
+            raise StrategyNotFound("Unknown strategy")
+        return strategy_view(session, row)
+
+
+def list_versions(
+    engine: Engine, strategy_id: UUID, limit: int = 25, cursor: UUID | None = None
+) -> Page[StrategyVersionV1]:
+    if type(limit) is not int or not 1 <= limit <= 100:
+        raise ValueError("Page limit must be between 1 and 100")
+    with Session(engine) as session:
+        if session.get(Strategy, strategy_id) is None:
+            raise StrategyNotFound("Unknown strategy")
+        statement = select(StrategyVersion).where(StrategyVersion.strategy_id == strategy_id)
+        if cursor is not None:
+            preceding = session.get(StrategyVersion, cursor)
+            if preceding is None or preceding.strategy_id != strategy_id:
+                raise LookupError("Unknown version cursor")
+            statement = statement.where(StrategyVersion.version > preceding.version)
+        rows = session.scalars(statement.order_by(StrategyVersion.version).limit(limit + 1)).all()
+        return Page[StrategyVersionV1](
+            items=tuple(version_view(row) for row in rows[:limit]),
+            next_cursor=str(rows[limit - 1].id) if len(rows) > limit else None,
+        )
+
+
+def publish_version(
+    engine: Engine, strategy_id: UUID, config: StrategyConfigV1
+) -> StrategyVersionV1:
+    with Session(engine) as session, session.begin():
+        # Lock the stable identity, not the latest version: concurrent appends must
+        # serialize even when they began with the same latest-version observation.
+        row = session.scalar(select(Strategy).where(Strategy.id == strategy_id).with_for_update())
+        if row is None:
+            raise StrategyNotFound("Unknown strategy")
+        previous = strategy_view(session, row).published_version
+        version = new_version(strategy_id, previous.version + 1, config)
+        session.add(version)
+        session.flush()
+        result = version_view(version)
+    return result

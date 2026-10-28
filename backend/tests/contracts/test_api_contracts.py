@@ -132,6 +132,8 @@ def test_openapi_does_not_activate_future_handlers() -> None:
         "/api/v1/data/assets",
         "/api/v1/data/health",
         "/api/v1/strategies",
+        "/api/v1/strategies/{strategy_id}",
+        "/api/v1/strategies/{strategy_id}/versions",
         "/api/v1/strategy-evaluations",
         "/api/v1/strategy-evaluations/{evaluation_id}",
     }

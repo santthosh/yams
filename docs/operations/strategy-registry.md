@@ -1,8 +1,8 @@
-# Default strategy registry
+# Strategy registry and immutable versions
 
 Issue #71 adds the initial `strategy` and append-only `strategy_version` tables in
-migration `0004_strategies`. #36 extends them with publication/fork APIs in 0.0.3;
-this increment provides only read-only discovery. No scores, forecasts, orders or
+migration `0004_strategies`. #36 extends them with publication/fork APIs for 0.0.3,
+using the existing schema and immutable triggers. No scores, forecasts, orders or
 ledger entries are seeded or computed by the registry.
 
 ## Startup and immutable publication
@@ -47,9 +47,42 @@ stored config/hash; missing storage or integrity failures return sanitized
 `503 NOT_READY`, never fabricated defaults. An empty registry returns an empty
 page; it does not trigger seed or trading from a read request.
 
-The same-origin web proxy allows only this read and its `limit`/`cursor` query
-fields. Mutation methods remain unavailable. OpenAPI, Pydantic schema goldens and
-the generated TypeScript client include the implemented route and models.
+## Create, inspect and publish (#36)
+
+The same-origin `/api/v1/strategies` proxy supports creation, detail and immutable
+version browsing/publication. Send `Content-Type: application/json` and an `Origin`
+matching the browser's authority for writes; no request key is required. Requests
+are capped at 1 MiB. It forwards no cookies, user authorization or provider tokens.
+
+1. Read the complete `published_version.config` from the chosen strategy or its
+   version history. The initial default is a documented hypothesis, not evidence
+   of profitability.
+2. To create a separately named fork, POST `{ "name": "My momentum fork", "config":
+   <complete config> }` to `/api/v1/strategies`. The response201 includes the new
+   strategy and immutable version1. This is JSON notation: substitute the entire
+   config object, never the `<complete config>` placeholder.
+3. To change parameters under an existing identity, POST the complete config
+   **without a wrapper** to `/api/v1/strategies/<strategy-id>/versions`. A successful
+   response201 allocates a fresh UUID and next ordinal. Identical input also appends;
+   a lost-response retry may create another version. Review history before retrying.
+4. GET `/api/v1/strategies/<strategy-id>` for metadata/latest version; GET its
+   `/versions?limit=25` for ascending ordinal history. Follow `next_cursor` as the
+   final version UUID; cursors must belong to that strategy. Limits are1–100.
+
+Use the generated `StrategyCreateRequest` and `StrategyConfigV1` types rather than
+hand-maintained browser models. Every config field is required. Syntax validation
+runs independently of current market-data availability; execution is separate.
+Unknown/unsupported keys/operators, invalid caps/names and invalid/cross-strategy
+cursors return422 VALIDATION_ERROR. Unicode-casefold duplicate names return409
+STATE_CONFLICT, unknown strategies404 NOT_FOUND, storage/integrity faults503 NOT_READY.
+No partial root/version survives failure. Row-level locking serializes publication;
+DB uniqueness protects name conflicts. Completed writes return only after commit.
+
+Original version IDs/config/hashes remain inspectable after changes. Evaluations
+and future experiments/accounts must pin a version ID, never resolve “latest” for
+an existing run. New identity forks record their own root/version lineage; v1 has
+no parent-version field. No update/delete API, editable backend draft, metadata
+rename, new template formulas or Lab authoring UI is included in #36.
 
 ## Verification and handoff
 
@@ -61,7 +94,11 @@ atomic rollback on a failed default and an actual PostgreSQL container restart.
 The Compose smoke checks the real same-origin registry at fresh boot, restart and
 rebuild/recreation. Generated-client tests preserve decimal config strings.
 
-#34 consumes immutable version IDs/config hashes for snapshot diagnostics. #36
-must append versions and preserve these identities; #44 may reference version
-IDs when its portfolio tables arrive. None of these later workflows is activated
-by this registry.
+#34 consumes immutable version IDs/config hashes for snapshot diagnostics. Tests
+prove a persisted diagnostic remains pinned after appending to its source strategy;
+existing immutable triggers and FK restrictions prevent referenced deletion. Public
+experiment persistence belongs to #39/#41 and is not fabricated here. Publication
+races, Unicode conflicts, failure rollback and actual PostgreSQL restart are tested.
+The offline Compose smoke exercises the real proxy and retains all versions across
+restart/rebuild. #73 owns the version-authoring UI; #44 later consumes version IDs
+for portfolios. OpenAPI/schema goldens and generated TypeScript are synchronized.

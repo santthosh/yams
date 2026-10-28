@@ -6,7 +6,7 @@ import shutil
 from collections.abc import Iterator
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
-from uuid import uuid4
+from uuid import UUID, uuid4
 
 import pytest
 from fastapi.testclient import TestClient
@@ -15,10 +15,17 @@ from sqlalchemy.engine import make_url
 from sqlalchemy.exc import IntegrityError
 
 from backend.api.main import create_app
+from backend.domain.registry import StrategyCreateRequest
 from backend.persistence.bootstrap import MIGRATIONS, bootstrap, expected_revision
 from backend.persistence.database import Settings, database_engine
 from backend.persistence.readiness import read_workspace, readiness
-from backend.strategies.registry import list_strategies
+from backend.strategies.registry import (
+    create_strategy,
+    default_config,
+    list_strategies,
+    list_versions,
+    publish_version,
+)
 
 pytestmark = pytest.mark.integration
 
@@ -173,6 +180,14 @@ def test_prepare_real_container_restart() -> None:
                 {"prefs": json.dumps({"restart_marker": "retained"})},
             )
         Path("/evidence/workspace.json").write_text(json.dumps({"id": str(identity)}))
+        fork = create_strategy(
+            engine, StrategyCreateRequest(name="Restart fork", config=default_config())
+        )
+        publish_version(engine, fork.id, default_config())
+        Path("/evidence/strategy-versions.json").write_text(
+            list_versions(engine, fork.id).model_dump_json()
+        )
+        Path("/evidence/strategy-id").write_text(str(fork.id))
         Path("/evidence/strategies.json").write_text(list_strategies(engine).model_dump_json())
     finally:
         engine.dispose()
@@ -186,6 +201,10 @@ def test_workspace_survives_actual_postgres_container_restart() -> None:
         assert str(bootstrap(engine)) == expected["id"]
         assert read_workspace(engine).preferences == {"restart_marker": "retained"}
         assert readiness(engine, Settings.fixture_root).status == "ready"
+        assert (
+            list_versions(engine, UUID(Path("/evidence/strategy-id").read_text())).model_dump_json()
+            == Path("/evidence/strategy-versions.json").read_text()
+        )
         assert json.loads(list_strategies(engine).model_dump_json()) == json.loads(
             Path("/evidence/strategies.json").read_text()
         )

@@ -7073,6 +7073,528 @@
     "title": "StrategyConfigV1",
     "type": "object"
   },
+  "StrategyCreateRequest.serialization": {
+    "$defs": {
+      "ExecutionPolicy": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "const": "us_eod_next_open_v1",
+            "title": "Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "title": "ExecutionPolicy",
+        "type": "object"
+      },
+      "PortfolioConfig": {
+        "additionalProperties": false,
+        "properties": {
+          "max_position_weight": {
+            "pattern": "^(0|1)(\\.[0-9]{1,6})?$",
+            "title": "Max Position Weight",
+            "type": "string"
+          },
+          "max_positions": {
+            "maximum": 100,
+            "minimum": 1,
+            "title": "Max Positions",
+            "type": "integer"
+          },
+          "max_sector_weight": {
+            "pattern": "^(0|1)(\\.[0-9]{1,6})?$",
+            "title": "Max Sector Weight",
+            "type": "string"
+          },
+          "min_cash_weight": {
+            "pattern": "^(0|1)(\\.[0-9]{1,6})?$",
+            "title": "Min Cash Weight",
+            "type": "string"
+          },
+          "min_trade_usd": {
+            "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Min Trade Usd",
+            "type": "string"
+          },
+          "rebalance_band_absolute_weight": {
+            "pattern": "^(0|1)(\\.[0-9]{1,6})?$",
+            "title": "Rebalance Band Absolute Weight",
+            "type": "string"
+          },
+          "weighting": {
+            "const": "inverse_volatility",
+            "title": "Weighting",
+            "type": "string"
+          }
+        },
+        "required": [
+          "max_positions",
+          "weighting",
+          "max_position_weight",
+          "max_sector_weight",
+          "min_cash_weight",
+          "min_trade_usd",
+          "rebalance_band_absolute_weight"
+        ],
+        "title": "PortfolioConfig",
+        "type": "object"
+      },
+      "RebalanceConfig": {
+        "additionalProperties": false,
+        "properties": {
+          "frequency": {
+            "const": "monthly",
+            "title": "Frequency",
+            "type": "string"
+          }
+        },
+        "required": [
+          "frequency"
+        ],
+        "title": "RebalanceConfig",
+        "type": "object"
+      },
+      "ScoreWeights": {
+        "additionalProperties": false,
+        "properties": {
+          "momentum_long": {
+            "maximum": 1,
+            "minimum": -1,
+            "multipleOf": 1e-06,
+            "title": "Momentum Long",
+            "type": "number"
+          },
+          "momentum_short": {
+            "maximum": 1,
+            "minimum": -1,
+            "multipleOf": 1e-06,
+            "title": "Momentum Short",
+            "type": "number"
+          },
+          "volatility_penalty": {
+            "maximum": 1,
+            "minimum": -1,
+            "multipleOf": 1e-06,
+            "title": "Volatility Penalty",
+            "type": "number"
+          }
+        },
+        "required": [
+          "momentum_long",
+          "momentum_short",
+          "volatility_penalty"
+        ],
+        "title": "ScoreWeights",
+        "type": "object"
+      },
+      "SignalConfig": {
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "const": "risk_adjusted_momentum",
+            "title": "Kind",
+            "type": "string"
+          },
+          "momentum_long_sessions": {
+            "maximum": 2519,
+            "minimum": 1,
+            "title": "Momentum Long Sessions",
+            "type": "integer"
+          },
+          "momentum_short_sessions": {
+            "maximum": 2519,
+            "minimum": 1,
+            "title": "Momentum Short Sessions",
+            "type": "integer"
+          },
+          "require_positive_trend": {
+            "title": "Require Positive Trend",
+            "type": "boolean"
+          },
+          "trend_sma_sessions": {
+            "maximum": 2520,
+            "minimum": 1,
+            "title": "Trend Sma Sessions",
+            "type": "integer"
+          },
+          "volatility_sessions": {
+            "maximum": 2519,
+            "minimum": 2,
+            "title": "Volatility Sessions",
+            "type": "integer"
+          },
+          "z_score_weights": {
+            "$ref": "#/$defs/ScoreWeights"
+          }
+        },
+        "required": [
+          "kind",
+          "momentum_long_sessions",
+          "momentum_short_sessions",
+          "volatility_sessions",
+          "trend_sma_sessions",
+          "require_positive_trend",
+          "z_score_weights"
+        ],
+        "title": "SignalConfig",
+        "type": "object"
+      },
+      "StrategyConfigV1": {
+        "additionalProperties": false,
+        "properties": {
+          "display_name": {
+            "title": "Display Name",
+            "type": "string"
+          },
+          "execution_policy": {
+            "$ref": "#/$defs/ExecutionPolicy"
+          },
+          "portfolio": {
+            "$ref": "#/$defs/PortfolioConfig"
+          },
+          "rebalance": {
+            "$ref": "#/$defs/RebalanceConfig"
+          },
+          "schema_version": {
+            "const": 1,
+            "title": "Schema Version",
+            "type": "integer"
+          },
+          "signals": {
+            "$ref": "#/$defs/SignalConfig"
+          },
+          "universe": {
+            "$ref": "#/$defs/UniverseConfig"
+          }
+        },
+        "required": [
+          "schema_version",
+          "display_name",
+          "universe",
+          "signals",
+          "portfolio",
+          "rebalance",
+          "execution_policy"
+        ],
+        "title": "StrategyConfigV1",
+        "type": "object"
+      },
+      "UniverseConfig": {
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "const": "liquid_us_equities",
+            "title": "Kind",
+            "type": "string"
+          },
+          "min_history_sessions": {
+            "maximum": 2520,
+            "minimum": 252,
+            "title": "Min History Sessions",
+            "type": "integer"
+          },
+          "min_median_dollar_volume_usd": {
+            "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Min Median Dollar Volume Usd",
+            "type": "string"
+          },
+          "min_price_usd": {
+            "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Min Price Usd",
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "min_price_usd",
+          "min_median_dollar_volume_usd",
+          "min_history_sessions"
+        ],
+        "title": "UniverseConfig",
+        "type": "object"
+      }
+    },
+    "additionalProperties": false,
+    "properties": {
+      "config": {
+        "$ref": "#/$defs/StrategyConfigV1"
+      },
+      "name": {
+        "title": "Name",
+        "type": "string"
+      }
+    },
+    "required": [
+      "name",
+      "config"
+    ],
+    "title": "StrategyCreateRequest",
+    "type": "object"
+  },
+  "StrategyCreateRequest.validation": {
+    "$defs": {
+      "ExecutionPolicy": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "const": "us_eod_next_open_v1",
+            "title": "Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "title": "ExecutionPolicy",
+        "type": "object"
+      },
+      "PortfolioConfig": {
+        "additionalProperties": false,
+        "properties": {
+          "max_position_weight": {
+            "pattern": "^(0|1)(\\.[0-9]{1,6})?$",
+            "title": "Max Position Weight",
+            "type": "string"
+          },
+          "max_positions": {
+            "maximum": 100,
+            "minimum": 1,
+            "title": "Max Positions",
+            "type": "integer"
+          },
+          "max_sector_weight": {
+            "pattern": "^(0|1)(\\.[0-9]{1,6})?$",
+            "title": "Max Sector Weight",
+            "type": "string"
+          },
+          "min_cash_weight": {
+            "pattern": "^(0|1)(\\.[0-9]{1,6})?$",
+            "title": "Min Cash Weight",
+            "type": "string"
+          },
+          "min_trade_usd": {
+            "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Min Trade Usd",
+            "type": "string"
+          },
+          "rebalance_band_absolute_weight": {
+            "pattern": "^(0|1)(\\.[0-9]{1,6})?$",
+            "title": "Rebalance Band Absolute Weight",
+            "type": "string"
+          },
+          "weighting": {
+            "const": "inverse_volatility",
+            "title": "Weighting",
+            "type": "string"
+          }
+        },
+        "required": [
+          "max_positions",
+          "weighting",
+          "max_position_weight",
+          "max_sector_weight",
+          "min_cash_weight",
+          "min_trade_usd",
+          "rebalance_band_absolute_weight"
+        ],
+        "title": "PortfolioConfig",
+        "type": "object"
+      },
+      "RebalanceConfig": {
+        "additionalProperties": false,
+        "properties": {
+          "frequency": {
+            "const": "monthly",
+            "title": "Frequency",
+            "type": "string"
+          }
+        },
+        "required": [
+          "frequency"
+        ],
+        "title": "RebalanceConfig",
+        "type": "object"
+      },
+      "ScoreWeights": {
+        "additionalProperties": false,
+        "properties": {
+          "momentum_long": {
+            "maximum": 1,
+            "minimum": -1,
+            "multipleOf": 1e-06,
+            "title": "Momentum Long",
+            "type": "number"
+          },
+          "momentum_short": {
+            "maximum": 1,
+            "minimum": -1,
+            "multipleOf": 1e-06,
+            "title": "Momentum Short",
+            "type": "number"
+          },
+          "volatility_penalty": {
+            "maximum": 1,
+            "minimum": -1,
+            "multipleOf": 1e-06,
+            "title": "Volatility Penalty",
+            "type": "number"
+          }
+        },
+        "required": [
+          "momentum_long",
+          "momentum_short",
+          "volatility_penalty"
+        ],
+        "title": "ScoreWeights",
+        "type": "object"
+      },
+      "SignalConfig": {
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "const": "risk_adjusted_momentum",
+            "title": "Kind",
+            "type": "string"
+          },
+          "momentum_long_sessions": {
+            "maximum": 2519,
+            "minimum": 1,
+            "title": "Momentum Long Sessions",
+            "type": "integer"
+          },
+          "momentum_short_sessions": {
+            "maximum": 2519,
+            "minimum": 1,
+            "title": "Momentum Short Sessions",
+            "type": "integer"
+          },
+          "require_positive_trend": {
+            "title": "Require Positive Trend",
+            "type": "boolean"
+          },
+          "trend_sma_sessions": {
+            "maximum": 2520,
+            "minimum": 1,
+            "title": "Trend Sma Sessions",
+            "type": "integer"
+          },
+          "volatility_sessions": {
+            "maximum": 2519,
+            "minimum": 2,
+            "title": "Volatility Sessions",
+            "type": "integer"
+          },
+          "z_score_weights": {
+            "$ref": "#/$defs/ScoreWeights"
+          }
+        },
+        "required": [
+          "kind",
+          "momentum_long_sessions",
+          "momentum_short_sessions",
+          "volatility_sessions",
+          "trend_sma_sessions",
+          "require_positive_trend",
+          "z_score_weights"
+        ],
+        "title": "SignalConfig",
+        "type": "object"
+      },
+      "StrategyConfigV1": {
+        "additionalProperties": false,
+        "properties": {
+          "display_name": {
+            "title": "Display Name",
+            "type": "string"
+          },
+          "execution_policy": {
+            "$ref": "#/$defs/ExecutionPolicy"
+          },
+          "portfolio": {
+            "$ref": "#/$defs/PortfolioConfig"
+          },
+          "rebalance": {
+            "$ref": "#/$defs/RebalanceConfig"
+          },
+          "schema_version": {
+            "const": 1,
+            "title": "Schema Version",
+            "type": "integer"
+          },
+          "signals": {
+            "$ref": "#/$defs/SignalConfig"
+          },
+          "universe": {
+            "$ref": "#/$defs/UniverseConfig"
+          }
+        },
+        "required": [
+          "schema_version",
+          "display_name",
+          "universe",
+          "signals",
+          "portfolio",
+          "rebalance",
+          "execution_policy"
+        ],
+        "title": "StrategyConfigV1",
+        "type": "object"
+      },
+      "UniverseConfig": {
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "const": "liquid_us_equities",
+            "title": "Kind",
+            "type": "string"
+          },
+          "min_history_sessions": {
+            "maximum": 2520,
+            "minimum": 252,
+            "title": "Min History Sessions",
+            "type": "integer"
+          },
+          "min_median_dollar_volume_usd": {
+            "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Min Median Dollar Volume Usd",
+            "type": "string"
+          },
+          "min_price_usd": {
+            "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Min Price Usd",
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "min_price_usd",
+          "min_median_dollar_volume_usd",
+          "min_history_sessions"
+        ],
+        "title": "UniverseConfig",
+        "type": "object"
+      }
+    },
+    "additionalProperties": false,
+    "properties": {
+      "config": {
+        "$ref": "#/$defs/StrategyConfigV1"
+      },
+      "name": {
+        "title": "Name",
+        "type": "string"
+      }
+    },
+    "required": [
+      "name",
+      "config"
+    ],
+    "title": "StrategyCreateRequest",
+    "type": "object"
+  },
   "StrategyEvaluationAccepted.serialization": {
     "additionalProperties": false,
     "properties": {
