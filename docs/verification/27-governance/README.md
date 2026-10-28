@@ -41,7 +41,7 @@ Conversation resolution remains a separate server-enforced requirement.
 MergeWatch reviewed implementation head `0e11924ace9a7a29e1e324207a61fc3c984eae1b`
 with SUCCESS, 5/5 and no findings. Local lint, strict typing and 154 Python tests
 passed. Hosted current-head and merged-main runs, the allowed normal merge path,
-and final read-back are recorded in #27 before closure. No destructive force-push
+and final read-back are recorded below and in #27. No destructive force-push
 or deletion probe was attempted; those restrictions were inspected in settings.
 
 Reference: [GitHub required-check semantics](https://docs.github.com/en/pull-requests/how-tos/merge-and-close-pull-requests/troubleshooting-required-status-checks).
@@ -56,3 +56,15 @@ succeeded with exact-head matching and no bypass, delivering commit `46590da`.
 This contrasts with the two rejected calls above; protection was not disabled
 between tests. The evidence branch was updated to that main commit before its
 final checks, honoring strict current-base enforcement.
+
+[Main run 40605506474](https://github.com/santthosh/yams/actions/runs/40605506474)
+passed every gate on actual merged SHA `46590dac8325a44c97afaf0737a92db5f0209e94`,
+including PostgreSQL integration and Docker smoke. Documentation-only run
+[40605536324](https://github.com/santthosh/yams/actions/runs/40605536324) passed
+both the required aggregate and the new current-head review guard, accepting only
+the explicit MergeWatch docs skip on its verified docs-only change.
+
+A fresh main protection read-back after implementation matched the intended
+policy, and GitHub's CODEOWNERS errors endpoint returned an empty list. The final
+evidence-only PR/main run links are retained in #27. No review gate was disabled
+or protection bypassed to obtain the allowed merge.
