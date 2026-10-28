@@ -1,0 +1,20 @@
+{
+  "label": "SYNTHETIC_DATA_ONLY",
+  "basis": "Independently derived from the committed synthetic price formulas; not produced by run_backtest.",
+  "start_session": "2028-07-18",
+  "end_session_exclusive": "2028-07-24",
+  "capital_usd": "1000.00",
+  "initial_decision_index": 401,
+  "fill_index": 402,
+  "decision_closes": {"SYN:AAA": "70.05", "SYN:BBB": "70.05", "SYN:CCC": "65.04"},
+  "target_usd_per_asset": "200.00",
+  "shares_floor_6dp": {"SYN:AAA": "2.855103", "SYN:BBB": "2.855103", "SYN:CCC": "3.075030"},
+  "next_opens": {"SYN:AAA": "70.10", "SYN:BBB": "70.10", "SYN:CCC": "67.08"},
+  "slippage_fraction": "0.001",
+  "debits_half_even_cents": {"SYN:AAA": "200.34", "SYN:BBB": "200.34", "SYN:CCC": "206.48"},
+  "cash_after_fills_usd": "392.84",
+  "daily_nav_usd": ["1000.00", "999.40", "993.66", "1000.22"],
+  "holdout_start_session": "2028-07-21",
+  "dividend_probe": {"ex_session": "2028-07-20", "payable_session": "2028-07-21", "asset_id": "SYN:AAA", "per_share": "1.25", "credit_usd": "3.57"},
+  "split_probe": {"session": "2028-07-20", "asset_id": "SYN:AAA", "ratio": "2/1", "quantity_after": "5.710206", "total_basis_usd": "200.34"}
+}

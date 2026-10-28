@@ -19,10 +19,9 @@ from backend.portfolio.execution import (
     money,
     quantity,
     quote_order,
-    usable_bar,
-    verify_context,
 )
 from backend.portfolio.risk import AllocationTarget, assess_targets
+from backend.portfolio.valuation import value_close
 
 
 class PlannedAction(Contract):
@@ -69,28 +68,15 @@ def plan_orders(
     policy: ExecutionPolicy = DEFAULT_EXECUTION_POLICY,
 ) -> OrderPlan:
     """Use one coherent decision close; actual opening affordability is checked later."""
-    verify_context(context, calendar, marks)
     report = assess_targets(targets, cash_target_weight, config)
     if not report.compliant:
         raise ValueError("Cannot plan an invalid target allocation")
     positions = {row.asset_id: row for row in state.positions if Decimal(row.quantity) > 0}
     target_map = {row.asset_id: row for row in targets}
     ids = sorted(positions.keys() | target_map.keys())
-    bars = {row.asset_id: row for row in marks.bars if row.session_date == context.decision_session}
-    decision_close = next(
-        s.close_at for s in calendar.sessions if s.session_date == context.decision_session
-    )
-    valid = {
-        identity: bar
-        for identity, bar in bars.items()
-        if usable_bar(bar, context.decision_cutoff, context) and bar.available_at >= decision_close
-    }
-    missing = tuple(identity for identity in ids if identity not in valid)
-    if (
-        missing
-        or marks.freshness == "blocked"
-        or (context.execution_mode == "current_paper" and marks.freshness == "stale")
-    ):
+    valuation = value_close(state, context, calendar, marks, required_assets=tuple(target_map))
+    valid, missing = valuation.marks, valuation.missing_assets
+    if valuation.nav is None:
         return OrderPlan(
             context=context,
             policy=policy,
@@ -106,11 +92,7 @@ def plan_orders(
             raise ValueError(
                 "Position/target sector evidence must use the same as-of classification"
             )
-    values = {
-        identity: Fraction(row.quantity) * Fraction(valid[identity].close)
-        for identity, row in positions.items()
-    }
-    nav = Fraction(state.cash_usd) + sum(values.values(), Fraction(0))
+    values, nav = valuation.values, valuation.nav
     if nav == 0:
         return OrderPlan(
             context=context,
