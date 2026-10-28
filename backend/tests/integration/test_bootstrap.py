@@ -18,6 +18,7 @@ from backend.api.main import create_app
 from backend.persistence.bootstrap import MIGRATIONS, bootstrap, expected_revision
 from backend.persistence.database import Settings, database_engine
 from backend.persistence.readiness import read_workspace, readiness
+from backend.strategies.registry import list_strategies
 
 pytestmark = pytest.mark.integration
 
@@ -81,6 +82,8 @@ def test_fresh_repeat_and_concurrent_bootstrap_preserves_identity_and_preference
         "snapshot_artifact",
         "snapshot_publication",
         "current_snapshot",
+        "strategy",
+        "strategy_version",
     }
     with database.connect() as connection:
         assert connection.execute(text("SELECT count(*) FROM local_workspace")).scalar_one() == 1
@@ -168,6 +171,7 @@ def test_prepare_real_container_restart() -> None:
                 {"prefs": json.dumps({"restart_marker": "retained"})},
             )
         Path("/evidence/workspace.json").write_text(json.dumps({"id": str(identity)}))
+        Path("/evidence/strategies.json").write_text(list_strategies(engine).model_dump_json())
     finally:
         engine.dispose()
 
@@ -180,5 +184,8 @@ def test_workspace_survives_actual_postgres_container_restart() -> None:
         assert str(bootstrap(engine)) == expected["id"]
         assert read_workspace(engine).preferences == {"restart_marker": "retained"}
         assert readiness(engine, Settings.fixture_root).status == "ready"
+        assert json.loads(list_strategies(engine).model_dump_json()) == json.loads(
+            Path("/evidence/strategies.json").read_text()
+        )
     finally:
         engine.dispose()

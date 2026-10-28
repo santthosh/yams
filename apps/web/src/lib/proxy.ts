@@ -33,6 +33,7 @@ export async function proxyApi(
   const readData =
     dataPath && ["snapshots", "assets", "health"].includes(segments[1]);
   const refresh = dataPath && segments[1] === "refresh";
+  const readStrategies = segments.length === 1 && segments[0] === "strategies";
   if (request.method !== "GET" && !(request.method === "POST" && refresh))
     return safeError(
       "METHOD_NOT_ALLOWED",
@@ -43,6 +44,7 @@ export async function proxyApi(
     request.method === "POST"
       ? refresh
       : readData ||
+        readStrategies ||
         (segments.length === 1 &&
           ["health", "workspace"].includes(segments[0])) ||
         (segments.length === 2 &&
@@ -54,7 +56,9 @@ export async function proxyApi(
       : segments[1] === "snapshots"
         ? ["mode", "limit", "cursor"]
         : ["mode"]
-    : [];
+    : readStrategies
+      ? ["limit", "cursor"]
+      : [];
   if (
     !allowed ||
     [...url.searchParams.keys()].some((key) => !queryKeys.includes(key))

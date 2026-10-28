@@ -1864,6 +1864,38 @@
         "title": "Page[SnapshotV1]",
         "type": "object"
       },
+      "Page_StrategyV1_": {
+        "additionalProperties": false,
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/StrategyV1"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "maxLength": 2048,
+                "minLength": 1,
+                "pattern": "^[A-Za-z0-9_-]+$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          }
+        },
+        "required": [
+          "items",
+          "next_cursor"
+        ],
+        "title": "Page[StrategyV1]",
+        "type": "object"
+      },
       "PaperOrderBatchV1": {
         "additionalProperties": false,
         "properties": {
@@ -3172,6 +3204,104 @@
         "title": "StrategyConfigV1",
         "type": "object"
       },
+      "StrategyV1": {
+        "additionalProperties": false,
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "pattern": "Z$",
+            "title": "Created At",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "is_template": {
+            "title": "Is Template",
+            "type": "boolean"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "published_version": {
+            "$ref": "#/components/schemas/StrategyVersionV1"
+          },
+          "template_key": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Template Key"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "is_template",
+          "template_key",
+          "created_at",
+          "published_version"
+        ],
+        "title": "StrategyV1",
+        "type": "object"
+      },
+      "StrategyVersionV1": {
+        "additionalProperties": false,
+        "properties": {
+          "config": {
+            "$ref": "#/components/schemas/StrategyConfigV1"
+          },
+          "config_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Config Sha256",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "published_at": {
+            "format": "date-time",
+            "pattern": "Z$",
+            "title": "Published At",
+            "type": "string"
+          },
+          "status": {
+            "const": "published",
+            "title": "Status",
+            "type": "string"
+          },
+          "strategy_id": {
+            "format": "uuid",
+            "title": "Strategy Id",
+            "type": "string"
+          },
+          "version": {
+            "minimum": 1,
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "strategy_id",
+          "version",
+          "status",
+          "config",
+          "config_sha256",
+          "published_at"
+        ],
+        "title": "StrategyVersionV1",
+        "type": "object"
+      },
       "TargetWeight": {
         "additionalProperties": false,
         "properties": {
@@ -3792,6 +3922,75 @@
           }
         },
         "summary": "Get Job"
+      }
+    },
+    "/api/v1/strategies": {
+      "get": {
+        "operationId": "strategies_api_v1_strategies_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 25,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Cursor"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_StrategyV1_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "summary": "Strategies"
       }
     },
     "/api/v1/workspace": {
