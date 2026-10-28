@@ -40,6 +40,8 @@ GLOSSARY = {
     "p10": "Bad case: 1 in 10 simulated futures end below this.",
     "p90": "Good case: 1 in 10 simulated futures end above this.",
     "prob_loss": "Share of simulated futures that end below today's value.",
+    "fan": "Each shaded band shows where the simulated futures fall on each day. The wide, light band holds 8 in 10 "
+           "of them (P10 to P90); the darker band holds the middle half. Wider means less certain.",
     "median_ending": "Portfolio value in the middle (median) simulated future after 90 days.",
     # backtest
     "ending_value": "What the starting cash would have grown (or shrunk) to by the end of the test.",

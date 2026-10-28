@@ -71,13 +71,15 @@ def run_forecast(
     rows = (starts[:, :, None] + np.arange(cfg.block_sessions)).reshape(cfg.paths, -1)[:, : cfg.horizon_sessions]
     paths = R[rows]  # (paths, sessions, assets) — same paths for both portfolios
 
-    def terminal(weights: dict[str, float]) -> np.ndarray:
+    def growth(weights: dict[str, float]) -> np.ndarray:
+        """(paths, sessions) growth factor of $1; constant weights, cash at 0%."""
         w = np.array([weights.get(t, 0.0) for t in tickers])
         daily = paths @ w if len(w) else np.zeros(paths.shape[:2])
-        return np.prod(1 + daily, axis=1) - 1  # constant weights, cash at 0%
+        return np.cumprod(1 + daily, axis=1)
 
-    hold = terminal(current)
-    prop = (1 + terminal(proposed)) * (1 - trade_cost / portfolio_value) - 1
+    g_hold = growth(current)
+    g_prop = growth(proposed) * (1 - trade_cost / portfolio_value)
+    hold, prop = g_hold[:, -1] - 1, g_prop[:, -1] - 1
     s_hold, s_prop = _summary(hold, portfolio_value), _summary(prop, portfolio_value)
     return {
         **base,
@@ -86,4 +88,22 @@ def run_forecast(
         "hold": s_hold,
         "delta_median_return": s_prop["median_return"] - s_hold["median_return"],
         "delta_median_value": round(s_prop["median_ending_value"] - s_hold["median_ending_value"], 2),
+        "fan": _fan(close.index[-1], g_prop, g_hold, portfolio_value),
     }
+
+
+FAN_PCTS = (10, 25, 50, 75, 90)
+
+
+def _fan(as_of: pd.Timestamp, g_prop: np.ndarray, g_hold: np.ndarray, value: float) -> dict:
+    """Portfolio-value percentiles for each future session (index 0 = today), for the fan chart.
+
+    Dates are weekdays after `as_of` (exchange holidays ignored), so they are approximate.
+    """
+    dates = [as_of] + list(pd.bdate_range(as_of + pd.Timedelta(days=1), periods=g_prop.shape[1]))
+
+    def bands(g: np.ndarray) -> dict:
+        q = np.percentile(g, FAN_PCTS, axis=0) * value
+        return {f"p{p}": [round(value, 2)] + [round(float(v), 2) for v in row] for p, row in zip(FAN_PCTS, q)}
+
+    return {"dates": [d.strftime("%Y-%m-%d") for d in dates], "proposed": bands(g_prop), "hold": bands(g_hold)}

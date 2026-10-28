@@ -13,6 +13,12 @@ def test_seeded_forecast_is_reproducible_and_ordered(market):
         assert s["p10_return"] <= s["median_return"] <= s["p90_return"]
         assert 0 <= s["prob_loss"] <= 1
     assert a["horizon_sessions"] == 62
+    fan = a["fan"]
+    assert len(fan["dates"]) == 63 and all(len(v) == 63 for v in fan["proposed"].values())
+    assert fan["hold"]["p10"][0] == fan["hold"]["p90"][0] == 1000.0  # every path starts at today's value
+    assert all(lo <= hi for lo, hi in zip(fan["proposed"]["p10"], fan["proposed"]["p90"]))
+    # the fan's last point is the same distribution as the summary numbers
+    assert abs(fan["hold"]["p50"][-1] - a["hold"]["median_ending_value"]) < 0.02
 
 
 def test_all_cash_is_flat(market):

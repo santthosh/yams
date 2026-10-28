@@ -37,7 +37,7 @@ flowchart LR
    While the market is open, holdings are valued at live Yahoo prices with today's change (for display only).
    Every metric has a **?** that explains it in plain English.
 2. **Recommendation:** the summary and the **Apply paper trades** box are at the top. Below them: the proposed
-   portfolio with a reason for each stock, the trades, the 90-day forecast (bad, middle and good case; apply vs keep),
+   portfolio with a reason for each stock, the trades, the 90-day forecast (bad, middle and good case; apply vs keep; a day-by-day fan chart),
    the 3-year track record, and close calls that just missed.
 3. **Refresh data** after the close (~1 min, needs internet), then check again. It proposes *changes* to what you
    hold and leaves small drifts alone.

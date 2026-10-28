@@ -50,5 +50,34 @@
     });
   };
 
+  const alpha = (hex, a) => {
+    const n = parseInt(hex.replace('#', ''), 16);
+    return `rgba(${n >> 16}, ${(n >> 8) & 255}, ${n & 255}, ${a})`;
+  };
+
+  // Forecast fan: shaded P10–P90 and P25–P75 bands + median for "apply", dashed median for "keep".
+  window.yamsFan = function (canvasId, fan) {
+    const p = fan.proposed, h = fan.hold, c1 = css('--series-1'), c0 = css('--axis');
+    const band = (data, fillTo, a, label) => ({ label, data, fill: fillTo, backgroundColor: alpha(c1, a),
+      borderWidth: 0, pointRadius: 0, pointHoverRadius: 0 });
+    const chart = yamsLine(canvasId, fan.dates, [], 'money');
+    chart.data.datasets = [
+      band(p.p90, 3, 0.13, 'Apply · good case (P90)'),  // filled down to P10 (dataset 3)
+      band(p.p75, 2, 0.22, null),                         // filled down to P25 (dataset 2)
+      band(p.p25, false, 0, null),
+      band(p.p10, false, 0, 'Apply · bad case (P10)'),
+      { label: 'Apply · middle (median)', data: p.p50, borderColor: c1, backgroundColor: c1, borderWidth: 2,
+        pointRadius: 0, pointHoverRadius: 4, tension: 0 },
+      { label: 'Keep · middle (median)', data: h.p50, borderColor: c0, backgroundColor: c0, borderWidth: 2,
+        borderDash: [6, 4], pointRadius: 0, pointHoverRadius: 4, tension: 0 },
+    ];
+    const o = chart.options.plugins;
+    o.filler = { propagate: false };
+    o.tooltip.filter = i => i.dataset.label !== null;
+    o.tooltip.itemSort = (a, b) => b.parsed.y - a.parsed.y;
+    chart.update();
+    return chart;
+  };
+
   window.yamsDrawdown = a => { let m = -Infinity; return a.map(v => { m = Math.max(m, v); return +(100 * (v / m - 1)).toFixed(2); }); };
 })();

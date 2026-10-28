@@ -128,6 +128,12 @@
       </div>
       {% endfor %}
     </div>
+    {% if f.fan %}
+    <h3 style="margin:22px 0 4px">Day by day{{ tip('fan') }}</h3>
+    <p class="small ink2" style="margin:0 0 10px">Portfolio value across the {{ f.paths }} simulated futures if you apply these trades. The band widens because the further ahead, the less certain.</p>
+    <div class="legend"><span><i class="band wide"></i>8 in 10 futures (P10–P90)</span><span><i class="band"></i>Middle half</span><span><i class="s1"></i>Apply: median</span><span><i class="s0"></i>Keep what you hold: median</span></div>
+    <div class="chart-box"><canvas id="fan" aria-label="Forecast fan chart: range of simulated portfolio values over the next {{ f.horizon_calendar_days }} days"></canvas></div>
+    {% endif %}
     <div class="table-wrap" style="margin-top:18px"><table>
       <thead><tr><th></th><th class="num">Median{{ tip('median_90', 'right') }}</th><th class="num">Bad case (P10){{ tip('p10', 'right') }}</th><th class="num">Good case (P90){{ tip('p90', 'right') }}</th><th class="num">Chance of a loss{{ tip('prob_loss', 'right') }}</th><th class="num">Median ending value{{ tip('median_ending', 'right') }}</th></tr></thead>
       <tbody>
@@ -181,5 +187,6 @@ yamsLine('mini', {{ rec.backtest.dates|tojson }}, [
   { label: 'Strategy', data: {{ rec.backtest.equity|tojson }}, color: '--series-1' },
   { label: 'SPY buy & hold', data: {{ rec.backtest.benchmark|tojson }}, color: '--series-2', dashed: true },
 ], 'money');
+{% if f.status == 'available' and f.fan %}yamsFan('fan', {{ f.fan|tojson }});{% endif %}
 </script>
 {% endblock %}

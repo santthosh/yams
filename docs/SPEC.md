@@ -316,7 +316,8 @@ A persistent header shows **YAMS · Paper only · Data as of 2026-10-27 (live)**
    2. *Proposed portfolio*: target weights including cash, sector breakdown, and an expandable
       per-position explanation with the numbers (M126, M63, VOL60, rank, score).
    3. *Trades*: action, shares, $, cost, reason.
-   4. *Forecast*: proposed vs hold P10/P50/P90, probability of loss, $ ending value, delta, caveat.
+   4. *Forecast*: proposed vs hold P10/P50/P90, probability of loss, $ ending value, delta, caveat, and a
+      day-by-day fan chart (P10–P90 and P25–P75 bands of portfolio value; hold median dashed).
    5. *Track record*: the backtest verdict line and a mini chart, linking to `/backtest`.
    6. *Runners-up and exclusions*: the next 5 names with why they missed, and counts by exclusion reason.
    7. **Apply paper trades** button, with a confirm dialog. It is disabled once the recommendation is applied or stale.
