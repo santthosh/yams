@@ -1,0 +1,95 @@
+{
+  "project": "yams-smoke-f3be17d9e523",
+  "passed": true,
+  "checks": [
+    "clean boot and real same-origin API readiness",
+    "real persisted diagnostic job completed by bounded worker",
+    "warm-up plus three diagnostic batches with concurrent API/DB reads",
+    "real Docker browser Dashboard/Settings/job at both widths",
+    "real browser candidate/target reruns and cash-only cases via supervised worker",
+    "API and worker external routing blocked",
+    "restart preserves workspace, job, fixtures and artifact hash",
+    "rebuild/recreate preserves named-volume state",
+    "actual private ports and aggregate 4 CPU/4.5 GiB caps",
+    "failed migration blocks application startup; repair preserves workspace"
+  ],
+  "approved_decision": "Q17: next pinned session opening minus1 hour",
+  "engine_version": "dba6f003eb17b50a3f690512c25d34361e30e2a02d508c4e3c7fb495ac9d2728",
+  "postgresql": "56 integration tests plus2 actual restart checks; project yams-it-8c16ef587218",
+  "runs": [
+    {
+      "id": "ccb3762a-46f1-48e8-a0fc-5070d75b93d0",
+      "job_id": "8eb983ed-b7c1-4fea-90b8-5306fca08497",
+      "as_of_session": "2028-07-17",
+      "cutoff": "2028-07-18T12:30:00Z",
+      "result_sha256": "6b839876bd311c42dcd1aa66cff210d778edc0d279574cd702645e272e6c054d",
+      "selected_ids": [
+        "SYN:AAA",
+        "SYN:BBB",
+        "SYN:CCC"
+      ],
+      "cash_target_weight": "0.4"
+    },
+    {
+      "id": "e1355c17-ef94-49d5-b30b-ce62b572cda8",
+      "job_id": "31161968-4736-4799-8365-053b21f25531",
+      "as_of_session": "2028-07-17",
+      "cutoff": "2028-07-18T12:30:00Z",
+      "result_sha256": "6b839876bd311c42dcd1aa66cff210d778edc0d279574cd702645e272e6c054d",
+      "selected_ids": [
+        "SYN:AAA",
+        "SYN:BBB",
+        "SYN:CCC"
+      ],
+      "cash_target_weight": "0.4"
+    },
+    {
+      "id": "d458777c-5370-4e62-83ea-b188b60963a1",
+      "job_id": "43cbd4a0-18b8-4326-be37-2c310f8b4624",
+      "as_of_session": "2027-01-04",
+      "cutoff": "2027-01-05T13:30:00Z",
+      "result_sha256": "82c8febe6765d325e204f5ff23d33fcaf0a1591b41d13062d5db961c4b04455b",
+      "selected_ids": [],
+      "cash_target_weight": "1"
+    },
+    {
+      "id": "eab67e71-12a0-47f5-97fb-30daaa3a6570",
+      "job_id": "42957ede-a7d8-42da-8cc1-c1115595480b",
+      "as_of_session": "2028-07-17",
+      "cutoff": "2028-07-18T12:30:00Z",
+      "result_sha256": "6b839876bd311c42dcd1aa66cff210d778edc0d279574cd702645e272e6c054d",
+      "selected_ids": [
+        "SYN:AAA",
+        "SYN:BBB",
+        "SYN:CCC"
+      ],
+      "cash_target_weight": "0.4"
+    },
+    {
+      "id": "77484307-78a2-48a3-9ea1-10d0c13ad1c0",
+      "job_id": "a4751065-adf5-4272-8481-67901ff524f3",
+      "as_of_session": "2028-07-17",
+      "cutoff": "2028-07-18T12:30:00Z",
+      "result_sha256": "6b839876bd311c42dcd1aa66cff210d778edc0d279574cd702645e272e6c054d",
+      "selected_ids": [
+        "SYN:AAA",
+        "SYN:BBB",
+        "SYN:CCC"
+      ],
+      "cash_target_weight": "0.4"
+    },
+    {
+      "id": "515df589-b002-4783-ab30-69e24dc2a2ec",
+      "job_id": "e0d98574-77a0-4d41-89cd-86023d41780f",
+      "as_of_session": "2027-01-04",
+      "cutoff": "2027-01-05T13:30:00Z",
+      "result_sha256": "82c8febe6765d325e204f5ff23d33fcaf0a1591b41d13062d5db961c4b04455b",
+      "selected_ids": [],
+      "cash_target_weight": "1"
+    }
+  ],
+  "screenshots": {
+    "candidates-1280.png": "ecb9b7809f814597e7e62e88258739d537a5d4d2f8597b7cbcad810bb4a816e5",
+    "candidates-360.png": "071b14f6a75111c1526db9647459aa81a3e43533556f992ed1253e75ec10a4aa"
+  }
+}

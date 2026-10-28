@@ -1,5 +1,9 @@
 # Candidate inspection verification (#34)
 
+Historical Q15 evidence: these captured runs retain their original close-plus15-
+minute cutoff. Approved Q17 supersedes that default for new runs; the original
+screenshots, timestamps and hashes below remain unchanged.
+
 Captured2026-10-28 from the actual local Compose API, supervised worker,
 PostgreSQL and browser. All prices/universe data are authored synthetic fixtures,
 visibly labeled `SYNTHETIC_DATA_ONLY`; these are not real investment results.

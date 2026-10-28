@@ -107,7 +107,7 @@ try {
       assert.equal(sealed.mode, "synthetic_fixture");
       assert.match(sealed.result_sha256, /^[0-9a-f]{64}$/);
       if (session === "2028-07-17") {
-        assert.equal(sealed.result.decision_cutoff_utc, "2028-07-17T20:15:00Z");
+        assert.equal(sealed.result.decision_cutoff_utc, "2028-07-18T12:30:00Z");
         assert.deepEqual(sealed.result.selected_ids, [
           "SYN:AAA",
           "SYN:BBB",
@@ -119,7 +119,7 @@ try {
           ["0.2", "0.2", "0.2"],
         );
       } else {
-        assert.equal(sealed.result.decision_cutoff_utc, "2027-01-04T21:15:00Z");
+        assert.equal(sealed.result.decision_cutoff_utc, "2027-01-05T13:30:00Z");
         assert.equal(sealed.result.cash_target_weight, "1");
         assert.deepEqual(sealed.result.target_weights, []);
         await page.getByRole("heading", { name: "Cash-only target" }).waitFor();
