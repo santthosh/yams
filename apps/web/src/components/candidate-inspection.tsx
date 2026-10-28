@@ -490,7 +490,7 @@ export function CandidateInspection() {
           code === "STALE_DATA"
             ? "The selected snapshot is blocked or lacks a completed session at that date."
             : code === "INSUFFICIENT_MARKET_DATA"
-              ? "Choose a covered exchange session from the selected snapshot."
+              ? "Choose a session with data and a scheduled next trading session in this snapshot."
               : code === "WORKLOAD_LIMIT"
                 ? "This snapshot exceeds supported diagnostic workload limits."
                 : "Evaluation could not be queued. Check the inputs and local service, then try again.",

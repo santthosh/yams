@@ -35,8 +35,8 @@ def explicit_fixture_result(
     digest = json.loads((ROOT / "manifest.json").read_text())["snapshot_sha256"]
     pinned = PinnedSnapshot.open(tmp_path / "snapshot", digest)
     config = StrategyConfigV1.from_json((ROOT / "fix-01/strategy.canonical.json").read_bytes())
-    # Approved Q15: FIX-01 session400 closes20:00Z; decision is20:15Z.
-    cutoff = datetime(2028, 7, 17, 20, 15, tzinfo=UTC)
+    # Approved Q17: next pinned opening is July18 at13:30Z; decision is12:30Z.
+    cutoff = datetime(2028, 7, 18, 12, 30, tzinfo=UTC)
     measured = allocate_momentum(
         evaluate_snapshot(
             pinned, config, cutoff, date(2028, 7, 17), engine_version=engine_fingerprint()

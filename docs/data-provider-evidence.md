@@ -20,3 +20,29 @@ The foundation selects the synthetic adapter. For later network research, prefer
 Persist a source capability record with source URL, retrieval date, adapter version, rights assessment/reference, coverage period, price/volume basis, action-date semantics, publication-time evidence, membership history and explicit unsupported fields. Preserve source errors and quality flags. Network availability or successful parsing does not upgrade a capability.
 
 Sector history, historical alias intervals, complete delistings, dividend entitlement/payable dates, raw-price reconstruction and point-in-time revisions are **not verified** for the external candidates in this review. Use the restrictions and synthetic acceptance traces in ADR-002. No implicit paid-source fallback is permitted.
+
+
+## Overnight timing review (Q17,2026-10-28)
+
+Approved Q16 retains verified real-data evidence as a0.0.2 release requirement.
+Approved Q17 replaces close-plus15 minutes with one hour before the next pinned
+session opens. These are documentation findings, not successful live API checks.
+No external data or credentials are committed. The user configured a free Tiingo token locally. Bounded authenticated metadata
+and291 ordered daily bars passed response-shape checks on2026-10-28; raw responses
+remain in ignored local downloads. Full universe/account capabilities, publication
+chronology and application integration remain to be verified under #109.
+
+| Candidate | Primary evidence | Consequence |
+|---|---|---|
+| Tiingo EOD | [EOD documentation](https://www.tiingo.com/documentation/end-of-day) describes raw/adjusted OHLC and share volume; most US bars arrive17:30 ET with possible later corrections. `divCash` identifies an ex-date, not a verified payable date. [General documentation](https://www.tiingo.com/documentation/) permits software where users supply their own token without redistributing its data. [Pricing](https://app.tiingo.com/pricing/) lists a free personal tier with account limits. | Suitable candidate for overnight diagnostic verification; no retrospective availability, complete action-accounting or live entitlement claim yet. Query current metadata rather than treating reserved directory entries as supported assets. |
+| Twelve Data | [US coverage guide](https://support.twelvedata.com/en/articles/9935903-us-equities-market-data) says consolidated daily history arrives after midnight on the next trading day. Its default real-time venues cover only a fraction of US volume. [API docs](https://twelvedata.com/docs) list adjustment modes; separate action endpoints require higher plans. [Terms](https://twelvedata.com/terms) restrict use, caching and redistribution by tier. | The earlier15-minute deadline cannot be justified using the consolidated daily feed. Personal-use/free-plan documentation is not proof that a specific account, price basis or action contract is enabled. |
+| Alpha Vantage | [API docs](https://www.alphavantage.co/documentation/) distinguish free compact daily history100 points from premium full/adjusted history. | The free compact response cannot satisfy the default252-session strategy history. No paid fallback is authorized. |
+| EODHD | [EOD docs](https://eodhd.com/financial-apis/api-for-historical-data-and-volumes) describe raw OHLC, split/dividend-adjusted close, split-adjusted volume, US updates within15 minutes and free-plan history/request limits. | Update timing is not proof of local ingestion by the cutoff. Split-adjusted volume cannot be relabeled raw shares; a supported conversion would require its own evidenced method. No acquisition or permission claim is made. |
+
+A new adapter must prove bounded source-derived universe selection, venue/type
+identity, price/volume basis, explicit sector evidence, complete declared coverage,
+pinned calendar lookahead, provenance and safe errors. Historical downloads use
+observed availability and cannot populate an earlier cutoff by assumption. Keep
+unsupported execution/action capabilities blocked and never substitute fixtures
+for absent research data. Live integration and its ADR belong to the0.0.2 release
+integration work; this timing correction does not enable an unverified provider.

@@ -309,7 +309,7 @@ A route listed here is a planned contract, not a claim that 0.0.1 implements it.
 
 ### 6.1 Candidate diagnostics (0.0.2, owner #34)
 
-`POST /strategy-evaluations` accepts exactly `strategy_version_id` (UUID), `snapshot_id` (UUID) and `as_of_session` (exchange-local date). Return `202` with UUID `job_id` and `evaluation_id`. Inputs are immutable. The worker derives and records `decision_cutoff_utc = scheduled_close_utc + 15 minutes` from the pinned calendar under approved Q15/ADR-001, including early closes and DST. Only validated evidence available by the cutoff is usable; live-like inputs must also be ingested by it. Later/missing bars are excluded with reasons, never backdated. Real-market evaluation requires the cutoff to have elapsed; the fixed delay is not a provider completeness guarantee. Unknown references return `404 NOT_FOUND`; invalid/future/uncovered sessions return `422 VALIDATION_ERROR` or `INSUFFICIENT_MARKET_DATA`; data blocked/stale for the requested evaluation returns `409 STALE_DATA`. Historical evaluation reads only evidence available at its cutoff, even if the snapshot contains later rows.
+`POST /strategy-evaluations` accepts exactly `strategy_version_id` (UUID), `snapshot_id` (UUID) and `as_of_session` (exchange-local date). Return `202` with UUID `job_id` and `evaluation_id`. Inputs are immutable. The worker derives and records `decision_cutoff_utc = next_pinned_session.open_at - 1 hour` under approved Q17/ADR-001, using the immediate next session in the immutable calendar, including holidays, weekends, early closes and DST. Missing/invalid next-session lookahead returns `422 INSUFFICIENT_MARKET_DATA`; never invent a weekday or opening time. Only validated evidence available by the cutoff is usable; live-like inputs must also be ingested by it. Later/missing bars are excluded with reasons, never backdated. Real-market evaluation requires the cutoff to have elapsed; the overnight validation window is not a provider completeness guarantee. Completed earlier results keep their original pinned cutoff/build. Unknown references return `404 NOT_FOUND`; invalid/future/uncovered sessions return `422 VALIDATION_ERROR` or `INSUFFICIENT_MARKET_DATA`; data blocked/stale for the requested evaluation returns `409 STALE_DATA`. Historical evaluation reads only evidence available at its cutoff, even if the snapshot contains later rows.
 
 `GET /strategy-evaluations/{id}` returns `200` with `id`, `job_id`, job `status`, immutable inputs and `result`/`error`. Result is null until successful completion; failed/cancelled output cannot appear completed. Error details follow §1. Unknown IDs return `404 NOT_FOUND`.
 
@@ -325,7 +325,7 @@ their constraints `constraint_evidence`, with `allocation_reasons`,
 candidate/target fields above. The engine fingerprint is a SHA-256 of source and
 core runtime identity; numerical results retain their original fingerprint.
 [Diagnostic implementation handoff](operations/strategy-evaluations.md) records
-the draft verification scope and unresolved Q15 cutoff policy. This transport
+the implemented verification scope and approved Q17 overnight cutoff policy. This transport
 inventory does not settle that financial timing question or claim handler delivery.
 
 ### 6.2 Implemented default strategy registry (0.0.2, #71)

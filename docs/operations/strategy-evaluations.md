@@ -1,8 +1,9 @@
 # Snapshot-to-target diagnostics
 
 The diagnostic slice combines immutable transport/persistence, the supervised
-shared quant engine and a responsive inspection UI. Approved Q15 fixes the cutoff
-at scheduled close plus15 minutes, including early-close days. Only validated
+shared quant engine and a responsive inspection UI. Approved Q17 fixes the cutoff
+at one hour before the next pinned session opens, including holidays, weekends,
+early-close days and DST. Only validated
 evidence available by that instant is usable; late bars retain exclusion reasons.
 This is a paper-only research diagnostic, not an approval or order operation.
 
@@ -73,7 +74,7 @@ dependencies and architecture. Different architecture/runtime fingerprints remai
 distinguishable. Stored results retain their original fingerprint across updates.
 
 The supervised worker compares pinned build/config/snapshot/calendar identities
-before evaluating and enforces Q15's scheduled-close-plus15-minute cutoff. Admission
+before evaluating and enforces Q17's next-pinned-open-minus1-hour cutoff. Admission
 pins this instant in the immutable job payload; the child independently derives it
 from the verified calendar, and publication/reads reject a different result cutoff.
 Bar arrival order cannot change it. Real-market admission and execution of the
@@ -101,9 +102,10 @@ approval action in this diagnostic slice. Public cancellation is staged to #41.
 ## Verification and limitations
 
 FIX-01 momentum values are checked against independently authored expectations at
-the approved cutoff `2028-07-17T20:15:00Z`; authored target weights are20% each for
+the approved cutoff `2028-07-18T12:30:00Z`; authored target weights are20% each for
 SYN:AAA/BBB/CCC and40% cash. The insufficient-history session2027-01-04 completes
-with100% cash and exclusions. Boundary tests cover availability exactly at the
+with100% cash and exclusions at cutoff2027-01-05T13:30:00Z. Missing next-session
+calendar lookahead produces a typed insufficient-data error, never a guessed date. Boundary tests cover availability exactly at the
 cutoff and ±1 microsecond, separate late ingestion, DST and early closes.
 
 PostgreSQL tests cover admission/reads, fenced sealing, repeat-result hashes,

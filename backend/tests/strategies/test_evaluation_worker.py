@@ -27,22 +27,58 @@ from scripts.generate_fixtures import parquet_bars
 
 
 @pytest.mark.parametrize(
-    ("day", "close", "expected"),
+    ("day", "close", "next_day", "next_open", "expected"),
     [
-        ("2026-03-06", "2026-03-06T21:00:00Z", "2026-03-06T21:15:00Z"),
-        ("2026-03-09", "2026-03-09T20:00:00Z", "2026-03-09T20:15:00Z"),
-        ("2026-11-27", "2026-11-27T18:00:00Z", "2026-11-27T18:15:00Z"),
+        (
+            "2026-03-06",
+            "2026-03-06T21:00:00Z",
+            "2026-03-09",
+            "2026-03-09T13:30:00Z",
+            "2026-03-09T12:30:00Z",
+        ),
+        (
+            "2026-03-09",
+            "2026-03-09T20:00:00Z",
+            "2026-03-10",
+            "2026-03-10T13:30:00Z",
+            "2026-03-10T12:30:00Z",
+        ),
+        (
+            "2026-11-27",
+            "2026-11-27T18:00:00Z",
+            "2026-11-30",
+            "2026-11-30T14:30:00Z",
+            "2026-11-30T13:30:00Z",
+        ),
+        (
+            "2026-05-22",
+            "2026-05-22T20:00:00Z",
+            "2026-05-26",
+            "2026-05-26T13:30:00Z",
+            "2026-05-26T12:30:00Z",
+        ),
     ],
 )
-def test_pinned_close_controls_cutoff_including_dst_and_early_close(
-    day: str, close: str, expected: str
+def test_pinned_next_open_controls_cutoff_across_dst_early_close_and_holiday(
+    day: str, close: str, next_day: str, next_open: str, expected: str
 ) -> None:
     data = json.loads((ROOT / "snapshot/calendar.json").read_text())
-    data["sessions"] = [{"session_date": day, "open_at": day + "T14:30:00Z", "close_at": close}]
+    data["sessions"] = [
+        {"session_date": day, "open_at": day + "T14:30:00Z", "close_at": close},
+        {"session_date": next_day, "open_at": next_open, "close_at": next_day + "T21:00:00Z"},
+    ]
     calendar = Calendar.model_validate(data)
     assert decision_cutoff(calendar, date.fromisoformat(day)) == datetime.fromisoformat(expected)
     with pytest.raises(ValueError, match="absent"):
         decision_cutoff(calendar, date(2026, 1, 1))
+    with pytest.raises(ValueError, match="next pinned"):
+        decision_cutoff(calendar, date.fromisoformat(next_day))
+    # A malformed adjacent session must not be silently skipped or repaired.
+    data["sessions"][1]["open_at"] = (
+        (datetime.fromisoformat(close) + timedelta(minutes=30)).isoformat().replace("+00:00", "Z")
+    )
+    with pytest.raises(ValueError, match="overnight"):
+        decision_cutoff(Calendar.model_validate(data), date.fromisoformat(day))
 
 
 @pytest.mark.parametrize("offset", [-1, 0, 1])
@@ -55,7 +91,7 @@ def test_available_at_boundary_and_late_ingestion_are_distinct(offset: int) -> N
         for row in source
         if row["asset_id"] == "SYN:AAA" and row["session_date"] in {"2027-01-04", "2027-01-05"}
     ]
-    cutoff = datetime(2027, 1, 5, 21, 15, tzinfo=UTC)
+    cutoff = datetime(2027, 1, 6, 13, 30, tzinfo=UTC)
     rows[1]["available_at"] = (
         (cutoff + timedelta(microseconds=offset)).isoformat().replace("+00:00", "Z")
     )
@@ -89,7 +125,7 @@ def test_handler_pins_policy_build_and_reruns_independent_fixture(tmp_path: Path
         evaluate_strategy(second_payload.model_dump(mode="json"), cancel, root=tmp_path)
     )
     assert first == second == expected
-    assert first.decision_cutoff_utc == datetime(2028, 7, 17, 20, 15, tzinfo=UTC)
+    assert first.decision_cutoff_utc == datetime(2028, 7, 18, 12, 30, tzinfo=UTC)
     assert first.selected_ids == ("SYN:AAA", "SYN:BBB", "SYN:CCC")
     assert first.cash_target_weight == "0.4"
     for field, value in (
@@ -123,7 +159,7 @@ def test_late_price_mutation_cannot_change_past_candidate_or_target() -> None:
             if row["asset_id"] == "SYN:AAA" and row["session_date"] == "2028-07-17"
         )
         late.update(
-            available_at="2028-07-17T20:15:00.000001Z", ingested_at="2028-07-17T20:15:00.000001Z"
+            available_at="2028-07-18T12:30:00.000001Z", ingested_at="2028-07-18T12:30:00.000001Z"
         )
         for field in ("open", "high", "low", "close", "adjusted_close"):
             late[field] = price
