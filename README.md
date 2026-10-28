@@ -30,6 +30,12 @@ exact tables, cancel work or rerun without changing the original.
 at `/lab/compare` inspect 2–4 completed reports, flag incompatible assumptions,
 create explicit fair reruns and preserve one-rule forks with their original evidence.
 
+[v0.0.3 Strategy Lab](https://github.com/santthosh/yams/releases/tag/v0.0.3) is now
+published with verified native linux/amd64 and linux/arm64 installations. See the
+[release evidence](docs/verification/0.0.3-release/README.md) for exact source,
+image digests, checksums, experiment/challenge/comparison and restart proof.
+Historical accounting uses labeled synthetic fixtures; real feeds remain diagnostic-only.
+
 Download published bundles and platform evidence from [GitHub Releases](https://github.com/santthosh/yams/releases).
 Source implementation alone does not establish publication: use each release's
 exact tag, immutable image digests, checksums and supported-capability notes.
@@ -236,5 +242,5 @@ backend metrics and exact canonical rerun inputs. The comparison UI checks store
 alignment fingerprints and keeps original configurations/results inspectable.
 Internal core calculations
 remain distinct from completed public experiments.
-The published0.0.2 installation remains unchanged. Tiingo data stays diagnostic-only
+Earlier published installations retain their original capabilities. Tiingo data stays diagnostic-only
 until historical raw execution/action/publication/membership capabilities are verified.
