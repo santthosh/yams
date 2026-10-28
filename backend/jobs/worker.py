@@ -9,6 +9,7 @@ import signal
 import sys
 import time
 from collections.abc import Callable
+from functools import partial
 from multiprocessing.connection import Connection as PipeConnection
 from multiprocessing.process import BaseProcess
 from multiprocessing.synchronize import Event
@@ -20,12 +21,15 @@ from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
 
 from backend.domain.common import ErrorCode
+from backend.jobs.handlers.refresh_market_data import refresh_market_data
 from backend.jobs.queue import Lease, Queue
-from backend.jobs.registry import AttemptMetrics, JobLimits, validate_payload
+from backend.jobs.registry import AttemptMetrics, DiagnosticPayload, JobLimits
+from backend.market_data.providers.yahoo import ProviderFailure
+from backend.market_data.snapshots import PublicationFenceError, publish_snapshot
 from backend.persistence.database import Settings, database_engine
 
 logger = logging.getLogger(__name__)
-Handler = Callable[[dict[str, Any], Event], int]
+Handler = Callable[[dict[str, Any], Event], int | str]
 
 
 class Cancelled(Exception):
@@ -33,7 +37,7 @@ class Cancelled(Exception):
 
 
 def diagnostic(payload: dict[str, Any], cancelled: Event) -> int:
-    config = validate_payload("diagnostic", payload)
+    config = DiagnosticPayload.model_validate(payload)
     result = 0
     for number in range(config.work_units):
         if number % 1024 == 0 and cancelled.is_set():
@@ -97,6 +101,8 @@ def child_entry(
         pipe.send(("ok", value, usage.ru_maxrss, usage.ru_utime + usage.ru_stime))
     except Cancelled:
         pipe.send(("cancelled",))
+    except ProviderFailure as error:
+        pipe.send(("provider_error", error.reason))
     except MemoryError:
         pipe.send(("error", "RESOURCE_EXHAUSTED"))
     except Exception:
@@ -124,9 +130,16 @@ def stop_child(process: BaseProcess, grace: float) -> None:
 
 
 class Worker:
-    def __init__(self, queue: Queue, handler: Handler = diagnostic):
+    def __init__(
+        self,
+        queue: Queue,
+        handler: Handler = diagnostic,
+        *,
+        artifact_root: Path = Path("/artifacts"),
+    ):
         self.queue = queue
         self.handler = handler
+        self.artifact_root = artifact_root
         self.owner = "worker-" + uuid4().hex
         self.next_schedule_tick = 0.0
 
@@ -154,13 +167,22 @@ class Worker:
             self.next_schedule_tick = time.monotonic() + self.queue.limits.scheduler_tick_seconds
 
     def execute(self, lease: Lease) -> None:
+        handler = self.handler
+        stage: Path | None = None
+        store = self.artifact_root / "snapshots"
+        if lease.kind == "refresh_market_data":
+            staging = self.artifact_root / "snapshot-staging"
+            staging.mkdir(mode=0o700, parents=True, exist_ok=True)
+            store.mkdir(mode=0o700, parents=True, exist_ok=True)
+            stage = staging / f"{lease.job_id}-{lease.token}"
+            handler = partial(refresh_market_data, stage=stage)
         context = mp.get_context("spawn")
         cancelled = context.Event()
         reader, writer = context.Pipe(duplex=False)
         process = context.Process(
             target=child_entry,
             args=(
-                self.handler,
+                handler,
                 lease,
                 cancelled,
                 writer,
@@ -256,9 +278,16 @@ class Worker:
                 self.queue.fail(lease, failure)
             elif process.exitcode == 0 and message and message[0] == "ok":
                 try:
-                    if not self.queue.complete_diagnostic(lease, message[1]):
+                    if lease.kind == "refresh_market_data":
+                        assert stage is not None
+                        if not isinstance(message[1], str):
+                            raise ValueError("Invalid refresh completion")
+                        publish_snapshot(self.queue, lease, stage, store, message[1])
+                    elif not self.queue.complete_diagnostic(lease, message[1]):
                         self.queue.acknowledge_cancel(lease)
-                except ValueError:
+                except PublicationFenceError:
+                    self.queue.acknowledge_cancel(lease)
+                except (ValueError, OSError):
                     self.queue.fail(lease, "VALIDATION_ERROR")
             else:
                 code: ErrorCode = "JOB_FAILED"
@@ -266,7 +295,16 @@ class Worker:
                     code = "TIME_LIMIT"
                 if message and message[:2] == ("error", "RESOURCE_EXHAUSTED"):
                     code = "RESOURCE_EXHAUSTED"
-                self.queue.fail(lease, code)
+                if message and message[0] == "provider_error":
+                    provider = ProviderFailure(message[1])
+                    self.queue.fail(
+                        lease,
+                        "PROVIDER_UNAVAILABLE",
+                        retryable=provider.retryable,
+                        reason=provider.reason,
+                    )
+                else:
+                    self.queue.fail(lease, code)
             logger.info(
                 "job_attempt job_id=%s attempt=%s elapsed_seconds=%.6f max_heartbeat_gap=%.6f",
                 lease.job_id,

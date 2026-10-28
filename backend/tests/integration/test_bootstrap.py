@@ -77,6 +77,10 @@ def test_fresh_repeat_and_concurrent_bootstrap_preserves_identity_and_preference
         "job_attempt",
         "schedule",
         "job_diagnostic_effect",
+        "dataset_snapshot",
+        "snapshot_artifact",
+        "snapshot_publication",
+        "current_snapshot",
     }
     with database.connect() as connection:
         assert connection.execute(text("SELECT count(*) FROM local_workspace")).scalar_one() == 1

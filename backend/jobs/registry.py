@@ -5,7 +5,8 @@ from typing import Annotated, Literal, Self
 
 from pydantic import Field, field_validator, model_validator
 
-from backend.domain.types import Contract
+from backend.domain.types import Contract, Hash256, SourceMode
+from backend.market_data.research_config import ResearchConfig
 
 
 class JobLimits(Contract):
@@ -54,10 +55,28 @@ class DiagnosticPayload(Contract):
     work_units: Annotated[int, Field(strict=True, ge=0, le=1000000)]
 
 
-def validate_payload(kind: str, payload: object) -> DiagnosticPayload:
-    if kind != "diagnostic":
-        raise ValueError("Unregistered job kind")
-    return DiagnosticPayload.model_validate(payload)
+class RefreshPayload(Contract):
+    schema_version: Literal[1]
+    source_mode: SourceMode
+    expected_manifest_hash: Hash256 | None = None
+    research_config: ResearchConfig | None = None
+
+    @model_validator(mode="after")
+    def mode_inputs(self) -> Self:
+        if self.source_mode == "synthetic_fixture":
+            if self.expected_manifest_hash is None or self.research_config is not None:
+                raise ValueError("Fixture refresh requires only its pinned manifest hash")
+        elif self.research_config is None or self.expected_manifest_hash is not None:
+            raise ValueError("Research refresh requires pinned configuration, not an output hash")
+        return self
+
+
+def validate_payload(kind: str, payload: object) -> DiagnosticPayload | RefreshPayload:
+    if kind == "diagnostic":
+        return DiagnosticPayload.model_validate(payload)
+    if kind == "refresh_market_data":
+        return RefreshPayload.model_validate(payload)
+    raise ValueError("Unregistered job kind")
 
 
 def validate_workload(

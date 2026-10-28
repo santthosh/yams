@@ -322,3 +322,30 @@ def test_child_wall_deadline_survives_slow_supervisor_status_read(
         assert result.error.code == "TIME_LIMIT" and result.result is None
     finally:
         CRASH_CHILD_PID.unlink(missing_ok=True)
+
+
+def provider_timeout_handler(payload: dict[str, Any], cancelled: Event) -> int:
+    from backend.market_data.providers.yahoo import ProviderFailure
+
+    raise ProviderFailure("PROVIDER_TIMEOUT")
+
+
+def test_provider_retry_exhaustion_has_safe_actionable_reason(database: Engine) -> None:
+    from datetime import timedelta
+
+    from backend.persistence.models.job import Job
+
+    bootstrap(database)
+    queue = Queue(database, limits=JobLimits(max_attempts=2))
+    identity = queue.enqueue("diagnostic", PAYLOAD, uuid4())
+    assert Worker(queue, provider_timeout_handler).run_once()
+    result = queue.get(identity)
+    assert result is not None and result.status == "queued" and result.attempts == 1
+    with Session(database) as session, session.begin():
+        row = session.get(Job, identity)
+        assert row is not None
+        row.available_at = queue.clock(session) - timedelta(seconds=1)
+    assert Worker(queue, provider_timeout_handler).run_once()
+    result = queue.get(identity)
+    assert result is not None and result.status == "failed" and result.attempts == 2
+    assert result.error is not None and result.error.details == {"reason": "PROVIDER_TIMEOUT"}
