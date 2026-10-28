@@ -141,10 +141,22 @@ def main() -> None:
             evidence["checks"].append(
                 "native image/source/fixture identity and offline browser/API/worker journey"
             )
+            evaluations = [
+                row
+                for path in sorted(destination.glob("candidate-runs-*.json"))
+                for row in json.loads(path.read_text())
+            ]
+            assert len(evaluations) == 6
+            evidence["strategy_evaluations"] = evaluations
+            evidence["checks"].append(
+                "native real-worker candidate rerun hashes and explicit cash-only results"
+            )
             run("down")
             run("up", "-d", "--wait", "--wait-timeout", "120", "--pull", "never")
             assert get("workspace")["id"] == workspace["id"]
             assert get(f"jobs/{job}")["status"] == "completed"
+            for saved in evaluations:
+                assert get(f"strategy-evaluations/{saved['id']}") == saved
             assert (
                 python(
                     "from pathlib import Path; "

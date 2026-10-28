@@ -1,0 +1,470 @@
+{
+  "label": "SYNTHETIC_DATA_ONLY",
+  "purpose": "TEST_ONLY_TRANSPORT_FROM_EXPLICIT_FIXTURE_CUTOFF; financial oracles remain FIX-01/02, not this engine-produced transport sample.",
+  "snapshot": {
+    "id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+    "provider": "yams_synthetic_v1",
+    "mode": "synthetic_fixture",
+    "latest_completed_session": "2030-12-31",
+    "published_at": "2026-10-27T00:00:00Z",
+    "quality": "usable_with_warnings",
+    "warnings": ["SYNTHETIC_DATA_ONLY"],
+    "asset_count": 5,
+    "manifest_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+    "coverage": {
+      "asset_ids": ["SYN:AAA", "SYN:BBB", "SYN:CCC", "SYN:SPY", "SYN:ZERO"],
+      "first_session": "2027-01-04",
+      "last_session": "2030-12-31",
+      "latest_completed_session": "2030-12-31",
+      "missing_sessions": [],
+      "membership_basis": "synthetic"
+    }
+  },
+  "strategy": {
+    "id": "b7c45d31-03d3-5584-89b4-0e25b4cd46ba",
+    "name": "Risk-Adjusted Momentum",
+    "is_template": true,
+    "template_key": "risk_adjusted_momentum_v1",
+    "created_at": "2026-10-27T00:00:00Z",
+    "published_version": {
+      "id": "184f4ef7-c542-5387-a5aa-9bd4d162efde",
+      "strategy_id": "b7c45d31-03d3-5584-89b4-0e25b4cd46ba",
+      "version": 1,
+      "status": "published",
+      "config": {
+        "schema_version": 1,
+        "display_name": "Risk-Adjusted Momentum",
+        "universe": {
+          "kind": "liquid_us_equities",
+          "min_price_usd": "5",
+          "min_median_dollar_volume_usd": "1000000",
+          "min_history_sessions": 252
+        },
+        "signals": {
+          "kind": "risk_adjusted_momentum",
+          "momentum_long_sessions": 126,
+          "momentum_short_sessions": 63,
+          "volatility_sessions": 60,
+          "trend_sma_sessions": 200,
+          "require_positive_trend": true,
+          "z_score_weights": {
+            "momentum_long": 0.6,
+            "momentum_short": 0.25,
+            "volatility_penalty": -0.15
+          }
+        },
+        "portfolio": {
+          "max_positions": 8,
+          "weighting": "inverse_volatility",
+          "max_position_weight": "0.2",
+          "max_sector_weight": "0.4",
+          "min_cash_weight": "0.05",
+          "min_trade_usd": "5",
+          "rebalance_band_absolute_weight": "0.02"
+        },
+        "rebalance": {
+          "frequency": "monthly"
+        },
+        "execution_policy": {
+          "id": "us_eod_next_open_v1"
+        }
+      },
+      "config_sha256": "2093c63d190815eba052508d6d42d8ae0c93400cf777602d2c5f759627f43f21",
+      "published_at": "2026-10-27T00:00:00Z"
+    }
+  },
+  "completed": {
+    "id": "55555555-5555-4555-8555-555555555555",
+    "job_id": "44444444-4444-4444-8444-444444444444",
+    "status": "completed",
+    "inputs": {
+      "strategy_version_id": "184f4ef7-c542-5387-a5aa-9bd4d162efde",
+      "snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+      "as_of_session": "2028-07-17"
+    },
+    "mode": "synthetic_fixture",
+    "config_sha256": "2093c63d190815eba052508d6d42d8ae0c93400cf777602d2c5f759627f43f21",
+    "snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+    "engine_version": "9197e4810cdd263e09524fd9dbbc5a7e417053635ad8e2551a77a40b982317d1",
+    "created_at": "2026-10-27T00:00:00Z",
+    "strategy_config": {
+      "schema_version": 1,
+      "display_name": "Risk-Adjusted Momentum",
+      "universe": {
+        "kind": "liquid_us_equities",
+        "min_price_usd": "5",
+        "min_median_dollar_volume_usd": "1000000",
+        "min_history_sessions": 252
+      },
+      "signals": {
+        "kind": "risk_adjusted_momentum",
+        "momentum_long_sessions": 126,
+        "momentum_short_sessions": 63,
+        "volatility_sessions": 60,
+        "trend_sma_sessions": 200,
+        "require_positive_trend": true,
+        "z_score_weights": {
+          "momentum_long": 0.6,
+          "momentum_short": 0.25,
+          "volatility_penalty": -0.15
+        }
+      },
+      "portfolio": {
+        "max_positions": 8,
+        "weighting": "inverse_volatility",
+        "max_position_weight": "0.2",
+        "max_sector_weight": "0.4",
+        "min_cash_weight": "0.05",
+        "min_trade_usd": "5",
+        "rebalance_band_absolute_weight": "0.02"
+      },
+      "rebalance": {
+        "frequency": "monthly"
+      },
+      "execution_policy": {
+        "id": "us_eod_next_open_v1"
+      }
+    },
+    "result": {
+      "schema_version": 1,
+      "as_of_session": "2028-07-17",
+      "decision_cutoff_utc": "2028-07-17T20:00:01Z",
+      "mode": "synthetic_fixture",
+      "warnings": ["SYNTHETIC_DATA_ONLY"],
+      "candidates": [
+        {
+          "asset_id": "SYN:AAA",
+          "sector": "Technology",
+          "eligible": true,
+          "allocation_eligible": true,
+          "reasons": [],
+          "raw_close": "70.000",
+          "median_dollar_volume": "69525000.000",
+          "trend_sma": "65.025",
+          "input_sha256": "3764a4d80c0941deae6fc157600413b6999244894b8fae68a9ab0a7233f5f41a",
+          "features": {
+            "momentum_long": 0.0989010989010989,
+            "momentum_short": 0.04712041884816754,
+            "volatility": 0.00014776165676800922
+          },
+          "scoring": {
+            "momentum_long_z": 0.7071067811865471,
+            "momentum_short_z": -0.7071067811865476,
+            "volatility_z": -0.7071067811865476,
+            "momentum_long_contribution": 0.4242640687119283,
+            "momentum_short_contribution": -0.1767766952966369,
+            "volatility_contribution": 0.10606601717798213,
+            "score": 0.3535533905932735
+          },
+          "rank": 1
+        },
+        {
+          "asset_id": "SYN:BBB",
+          "sector": "Technology",
+          "eligible": true,
+          "allocation_eligible": true,
+          "reasons": [],
+          "raw_close": "70.000",
+          "median_dollar_volume": "69525000.000",
+          "trend_sma": "65.025",
+          "input_sha256": "f4a84b0d93a34ac5869ea498b90d7dbbff4fcc9e1657dedc9f3adf82f79c9ea4",
+          "features": {
+            "momentum_long": 0.0989010989010989,
+            "momentum_short": 0.04712041884816754,
+            "volatility": 0.00014776165676800922
+          },
+          "scoring": {
+            "momentum_long_z": 0.7071067811865471,
+            "momentum_short_z": -0.7071067811865476,
+            "volatility_z": -0.7071067811865476,
+            "momentum_long_contribution": 0.4242640687119283,
+            "momentum_short_contribution": -0.1767766952966369,
+            "volatility_contribution": 0.10606601717798213,
+            "score": 0.3535533905932735
+          },
+          "rank": 2
+        },
+        {
+          "asset_id": "SYN:CCC",
+          "sector": "Unknown",
+          "eligible": true,
+          "allocation_eligible": true,
+          "reasons": [],
+          "raw_close": "67.000",
+          "median_dollar_volume": "65620000.000",
+          "trend_sma": "62.020",
+          "input_sha256": "de3f461382e43db02df96f99f55b22463dee5c8d5120eb998dd1af5336d412a4",
+          "features": {
+            "momentum_long": 0.08134280180761781,
+            "momentum_short": 0.07234314980793854,
+            "volatility": 0.49420961736983665
+          },
+          "scoring": {
+            "momentum_long_z": -1.4142135623730956,
+            "momentum_short_z": 1.4142135623730951,
+            "volatility_z": 1.4142135623730951,
+            "momentum_long_contribution": -0.8485281374238574,
+            "momentum_short_contribution": 0.3535533905932738,
+            "volatility_contribution": -0.21213203435596426,
+            "score": -0.7071067811865478
+          },
+          "rank": 3
+        },
+        {
+          "asset_id": "SYN:SPY",
+          "sector": "Unknown",
+          "eligible": false,
+          "allocation_eligible": false,
+          "reasons": ["UNSUPPORTED_INSTRUMENT"],
+          "raw_close": "110.000",
+          "median_dollar_volume": "109762500.000",
+          "trend_sma": "107.5125",
+          "input_sha256": "bcd03efb58d1cb03ddc94347d5db9d898f13c2499be9d9b22816bcba98725f67",
+          "features": null,
+          "scoring": null,
+          "rank": null
+        },
+        {
+          "asset_id": "SYN:ZERO",
+          "sector": "Unknown",
+          "eligible": false,
+          "allocation_eligible": false,
+          "reasons": ["NONPOSITIVE_TREND"],
+          "raw_close": "50.000",
+          "median_dollar_volume": "50000000.000",
+          "trend_sma": "50.000",
+          "input_sha256": "99c1d7a4bc732ff3b1d1c8cb0dbb9d81ac7772685be7c8c1ec736ccdbafb9175",
+          "features": null,
+          "scoring": null,
+          "rank": null
+        }
+      ],
+      "selected_ids": ["SYN:AAA", "SYN:BBB", "SYN:CCC"],
+      "target_weights": [
+        {
+          "asset_id": "SYN:AAA",
+          "sector": "Technology",
+          "weight": "0.2"
+        },
+        {
+          "asset_id": "SYN:BBB",
+          "sector": "Technology",
+          "weight": "0.2"
+        },
+        {
+          "asset_id": "SYN:CCC",
+          "sector": "Unknown",
+          "weight": "0.2"
+        }
+      ],
+      "cash_target_weight": "0.4",
+      "constraint_evidence": {
+        "compliant": true,
+        "violations": [],
+        "position_count": 3,
+        "max_position_weight": "0.2",
+        "max_sector_weight": "0.4",
+        "invested_weight": "0.6",
+        "cash_weight": "0.4",
+        "unmet_investable_weight": "0.35",
+        "position_limit": "0.2",
+        "sector_limit": "0.4",
+        "cash_floor": "0.05",
+        "capped_positions": ["SYN:AAA", "SYN:BBB", "SYN:CCC"],
+        "sectors": [
+          {
+            "sector": "Technology",
+            "weight": "0.4",
+            "at_cap": true
+          },
+          {
+            "sector": "Unknown",
+            "weight": "0.2",
+            "at_cap": false
+          }
+        ]
+      },
+      "allocation_reasons": ["UNALLOCATABLE_CAPACITY"],
+      "allocation_exclusions": [],
+      "data_diagnostics": [],
+      "reproducibility": {
+        "strategy_version_id": "184f4ef7-c542-5387-a5aa-9bd4d162efde",
+        "snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+        "config_sha256": "2093c63d190815eba052508d6d42d8ae0c93400cf777602d2c5f759627f43f21",
+        "snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+        "calendar_sha256": "e3d2312d54e172d7aada8239f296eecf38c6038d66b5a203c5c5690ede82d660",
+        "engine_version": "9197e4810cdd263e09524fd9dbbc5a7e417053635ad8e2551a77a40b982317d1"
+      }
+    },
+    "result_sha256": "6276e91bc9bcbda7f5e82e58b6fa52079fe2910428f06a198b1b8c8ac0d234d7",
+    "error": null,
+    "provider": "yams_synthetic_v1"
+  },
+  "empty": {
+    "id": "66666666-6666-4666-8666-666666666666",
+    "job_id": "44444444-4444-4444-8444-444444444444",
+    "status": "completed",
+    "inputs": {
+      "strategy_version_id": "184f4ef7-c542-5387-a5aa-9bd4d162efde",
+      "snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+      "as_of_session": "2027-01-04"
+    },
+    "mode": "synthetic_fixture",
+    "config_sha256": "2093c63d190815eba052508d6d42d8ae0c93400cf777602d2c5f759627f43f21",
+    "snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+    "engine_version": "9197e4810cdd263e09524fd9dbbc5a7e417053635ad8e2551a77a40b982317d1",
+    "created_at": "2026-10-27T00:00:00Z",
+    "strategy_config": {
+      "schema_version": 1,
+      "display_name": "Risk-Adjusted Momentum",
+      "universe": {
+        "kind": "liquid_us_equities",
+        "min_price_usd": "5",
+        "min_median_dollar_volume_usd": "1000000",
+        "min_history_sessions": 252
+      },
+      "signals": {
+        "kind": "risk_adjusted_momentum",
+        "momentum_long_sessions": 126,
+        "momentum_short_sessions": 63,
+        "volatility_sessions": 60,
+        "trend_sma_sessions": 200,
+        "require_positive_trend": true,
+        "z_score_weights": {
+          "momentum_long": 0.6,
+          "momentum_short": 0.25,
+          "volatility_penalty": -0.15
+        }
+      },
+      "portfolio": {
+        "max_positions": 8,
+        "weighting": "inverse_volatility",
+        "max_position_weight": "0.2",
+        "max_sector_weight": "0.4",
+        "min_cash_weight": "0.05",
+        "min_trade_usd": "5",
+        "rebalance_band_absolute_weight": "0.02"
+      },
+      "rebalance": {
+        "frequency": "monthly"
+      },
+      "execution_policy": {
+        "id": "us_eod_next_open_v1"
+      }
+    },
+    "result": {
+      "schema_version": 1,
+      "as_of_session": "2027-01-04",
+      "decision_cutoff_utc": "2027-01-04T21:00:01Z",
+      "mode": "synthetic_fixture",
+      "warnings": ["SYNTHETIC_DATA_ONLY"],
+      "candidates": [
+        {
+          "asset_id": "SYN:AAA",
+          "sector": "Technology",
+          "eligible": false,
+          "allocation_eligible": false,
+          "reasons": ["MISSING_HISTORY"],
+          "raw_close": null,
+          "median_dollar_volume": null,
+          "trend_sma": null,
+          "input_sha256": "036d0dd7a1212642260627818ff8393088c0ed05336751ab622eafc97ba2ad99",
+          "features": null,
+          "scoring": null,
+          "rank": null
+        },
+        {
+          "asset_id": "SYN:BBB",
+          "sector": "Technology",
+          "eligible": false,
+          "allocation_eligible": false,
+          "reasons": ["MISSING_HISTORY"],
+          "raw_close": null,
+          "median_dollar_volume": null,
+          "trend_sma": null,
+          "input_sha256": "dbf69e639dff1e231e29be24a7c65c2dcc162c076a12899a8241225de49ad037",
+          "features": null,
+          "scoring": null,
+          "rank": null
+        },
+        {
+          "asset_id": "SYN:CCC",
+          "sector": "Unknown",
+          "eligible": false,
+          "allocation_eligible": false,
+          "reasons": ["MISSING_HISTORY"],
+          "raw_close": null,
+          "median_dollar_volume": null,
+          "trend_sma": null,
+          "input_sha256": "bcd95898152789c94a63e5f19229e791d4957919691dd4f979e0939e3078ccce",
+          "features": null,
+          "scoring": null,
+          "rank": null
+        },
+        {
+          "asset_id": "SYN:SPY",
+          "sector": "Unknown",
+          "eligible": false,
+          "allocation_eligible": false,
+          "reasons": ["MISSING_HISTORY", "UNSUPPORTED_INSTRUMENT"],
+          "raw_close": null,
+          "median_dollar_volume": null,
+          "trend_sma": null,
+          "input_sha256": "dd742116b868ed7a8f420d3bd2f06e48860a0630b088b182ae6ed99f0eaa2a00",
+          "features": null,
+          "scoring": null,
+          "rank": null
+        },
+        {
+          "asset_id": "SYN:ZERO",
+          "sector": "Unknown",
+          "eligible": false,
+          "allocation_eligible": false,
+          "reasons": ["MISSING_HISTORY"],
+          "raw_close": null,
+          "median_dollar_volume": null,
+          "trend_sma": null,
+          "input_sha256": "5df5e5731ed488c23e84bf452e4cd8ceddb3a54026c128b411f4bc513e805d59",
+          "features": null,
+          "scoring": null,
+          "rank": null
+        }
+      ],
+      "selected_ids": [],
+      "target_weights": [],
+      "cash_target_weight": "1",
+      "constraint_evidence": {
+        "compliant": true,
+        "violations": [],
+        "position_count": 0,
+        "max_position_weight": "0",
+        "max_sector_weight": "0",
+        "invested_weight": "0",
+        "cash_weight": "1",
+        "unmet_investable_weight": "0.95",
+        "position_limit": "0.2",
+        "sector_limit": "0.4",
+        "cash_floor": "0.05",
+        "capped_positions": [],
+        "sectors": []
+      },
+      "allocation_reasons": [
+        "EMPTY_ELIGIBLE_UNIVERSE",
+        "UNALLOCATABLE_CAPACITY"
+      ],
+      "allocation_exclusions": [],
+      "data_diagnostics": [],
+      "reproducibility": {
+        "strategy_version_id": "184f4ef7-c542-5387-a5aa-9bd4d162efde",
+        "snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+        "config_sha256": "2093c63d190815eba052508d6d42d8ae0c93400cf777602d2c5f759627f43f21",
+        "snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+        "calendar_sha256": "e3d2312d54e172d7aada8239f296eecf38c6038d66b5a203c5c5690ede82d660",
+        "engine_version": "9197e4810cdd263e09524fd9dbbc5a7e417053635ad8e2551a77a40b982317d1"
+      }
+    },
+    "result_sha256": "67c53591d2c0214fdbeede78b71e78858a782ac171d3082764adac44c59af84b",
+    "error": null,
+    "provider": "yams_synthetic_v1"
+  }
+}

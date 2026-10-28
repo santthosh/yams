@@ -309,11 +309,24 @@ A route listed here is a planned contract, not a claim that 0.0.1 implements it.
 
 ### 6.1 Candidate diagnostics (0.0.2, owner #34)
 
-`POST /strategy-evaluations` accepts exactly `strategy_version_id` (UUID), `snapshot_id` (UUID) and `as_of_session` (exchange-local date). Return `202` with UUID `job_id` and `evaluation_id`. Inputs are immutable. The worker derives and records `decision_cutoff_utc` under ADR-001 from the pinned calendar and validated closing-bar availability, at or after session close; calendar close alone is not proof that the bar was available. Unknown references return `404 NOT_FOUND`; invalid/future/uncovered sessions return `422 VALIDATION_ERROR` or `INSUFFICIENT_MARKET_DATA`; data blocked/stale for the requested evaluation returns `409 STALE_DATA`. Historical evaluation reads only evidence available at its cutoff, even if the snapshot contains later rows.
+`POST /strategy-evaluations` accepts exactly `strategy_version_id` (UUID), `snapshot_id` (UUID) and `as_of_session` (exchange-local date). Return `202` with UUID `job_id` and `evaluation_id`. Inputs are immutable. The worker derives and records `decision_cutoff_utc = scheduled_close_utc + 15 minutes` from the pinned calendar under approved Q15/ADR-001, including early closes and DST. Only validated evidence available by the cutoff is usable; live-like inputs must also be ingested by it. Later/missing bars are excluded with reasons, never backdated. Real-market evaluation requires the cutoff to have elapsed; the fixed delay is not a provider completeness guarantee. Unknown references return `404 NOT_FOUND`; invalid/future/uncovered sessions return `422 VALIDATION_ERROR` or `INSUFFICIENT_MARKET_DATA`; data blocked/stale for the requested evaluation returns `409 STALE_DATA`. Historical evaluation reads only evidence available at its cutoff, even if the snapshot contains later rows.
 
 `GET /strategy-evaluations/{id}` returns `200` with `id`, `job_id`, job `status`, immutable inputs and `result`/`error`. Result is null until successful completion; failed/cancelled output cannot appear completed. Error details follow §1. Unknown IDs return `404 NOT_FOUND`.
 
 A completed result includes `decision_cutoff_utc`, mode/warnings, eligible candidates with feature values/contributions and deterministic ranks, rejected candidates with reasons, complete `target_weights`, `cash_target_weight`, constraint evidence and a reproducibility manifest (config/snapshot hashes and engine build). Serialization follows §1; weights plus cash sum to one within `1e-8`. Empty eligible universe is a completed result with `target_weights=[]`, `cash_target_weight="1.00"` and exclusion evidence. Repeated requests may have different IDs, but identical pinned inputs and engine version reproduce financial results. The flow performs no portfolio, recommendation, forecast, order, cash or holdings writes.
+
+The #34 transport models name these resources `StrategyEvaluationRequest`,
+`StrategyEvaluationAccepted`, `StrategyEvaluationV1` and
+`StrategyEvaluationResultV1`. The envelope additionally exposes pinned canonical
+`strategy_config`, `mode`, `provider`, `config_sha256`, `snapshot_sha256`,
+`engine_version`, `created_at` and nullable `result_sha256`. Completed results name
+their constraints `constraint_evidence`, with `allocation_reasons`,
+`allocation_exclusions`, `data_diagnostics` and `reproducibility` alongside the
+candidate/target fields above. The engine fingerprint is a SHA-256 of source and
+core runtime identity; numerical results retain their original fingerprint.
+[Diagnostic implementation handoff](operations/strategy-evaluations.md) records
+the draft verification scope and unresolved Q15 cutoff policy. This transport
+inventory does not settle that financial timing question or claim handler delivery.
 
 ### 6.2 Implemented default strategy registry (0.0.2, #71)
 

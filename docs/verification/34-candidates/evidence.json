@@ -1,0 +1,191 @@
+{
+  "project": "yams-smoke-8b4f19710cd3",
+  "passed": true,
+  "checks": [
+    "clean boot and real same-origin API readiness",
+    "real persisted diagnostic job completed by bounded worker",
+    "warm-up plus three diagnostic batches with concurrent API/DB reads",
+    "real Docker browser Dashboard/Settings/job at both widths",
+    "real browser candidate/target reruns and cash-only cases via supervised worker",
+    "API and worker external routing blocked",
+    "restart preserves workspace, job, fixtures and artifact hash",
+    "rebuild/recreate preserves named-volume state",
+    "actual private ports and aggregate 4 CPU/4.5 GiB caps",
+    "failed migration blocks application startup; repair preserves workspace"
+  ],
+  "engine_version": "f8447f32d2067ef0def6ad5a35705189f1bd442407d70ab61c82be0d2dcbafcd",
+  "integration_project": "yams-it-533dba67cbfc",
+  "integration_checks": "55 PostgreSQL tests plus2 actual restart checks passed",
+  "runs": [
+    {
+      "id": "dbb29f1f-fc3f-4702-9f17-bb75d37374dc",
+      "job_id": "0ef44685-bbb6-4ce8-8591-0b6df02f6317",
+      "inputs": {
+        "strategy_version_id": "184f4ef7-c542-5387-a5aa-9bd4d162efde",
+        "snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+        "as_of_session": "2028-07-17"
+      },
+      "result_sha256": "387f89e3a97ace876565e5fb64784f1314a1adc4473545acedd7268533a196bc",
+      "cutoff": "2028-07-17T20:15:00Z",
+      "selected_ids": [
+        "SYN:AAA",
+        "SYN:BBB",
+        "SYN:CCC"
+      ],
+      "target_weights": [
+        {
+          "asset_id": "SYN:AAA",
+          "sector": "Technology",
+          "weight": "0.2"
+        },
+        {
+          "asset_id": "SYN:BBB",
+          "sector": "Technology",
+          "weight": "0.2"
+        },
+        {
+          "asset_id": "SYN:CCC",
+          "sector": "Unknown",
+          "weight": "0.2"
+        }
+      ],
+      "cash_target_weight": "0.4"
+    },
+    {
+      "id": "6968939e-6be1-4490-a6a4-a8949c435b18",
+      "job_id": "7ed06f7d-e4de-4894-86d6-a7419933c09b",
+      "inputs": {
+        "strategy_version_id": "184f4ef7-c542-5387-a5aa-9bd4d162efde",
+        "snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+        "as_of_session": "2028-07-17"
+      },
+      "result_sha256": "387f89e3a97ace876565e5fb64784f1314a1adc4473545acedd7268533a196bc",
+      "cutoff": "2028-07-17T20:15:00Z",
+      "selected_ids": [
+        "SYN:AAA",
+        "SYN:BBB",
+        "SYN:CCC"
+      ],
+      "target_weights": [
+        {
+          "asset_id": "SYN:AAA",
+          "sector": "Technology",
+          "weight": "0.2"
+        },
+        {
+          "asset_id": "SYN:BBB",
+          "sector": "Technology",
+          "weight": "0.2"
+        },
+        {
+          "asset_id": "SYN:CCC",
+          "sector": "Unknown",
+          "weight": "0.2"
+        }
+      ],
+      "cash_target_weight": "0.4"
+    },
+    {
+      "id": "4f5d8180-2dff-4611-ae58-6910bcef09a8",
+      "job_id": "a06c3dac-e4ae-4a93-bd7e-ef6c72ea5263",
+      "inputs": {
+        "strategy_version_id": "184f4ef7-c542-5387-a5aa-9bd4d162efde",
+        "snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+        "as_of_session": "2027-01-04"
+      },
+      "result_sha256": "d1cba3d16a2efa088994ef86d94c0589a289e9255746a07df02366ae9cb049e8",
+      "cutoff": "2027-01-04T21:15:00Z",
+      "selected_ids": [],
+      "target_weights": [],
+      "cash_target_weight": "1"
+    },
+    {
+      "id": "acd0d46e-1705-4a9a-80ec-5c569b1f8752",
+      "job_id": "d287f924-ce2b-4043-a84a-04df8d9305f2",
+      "inputs": {
+        "strategy_version_id": "184f4ef7-c542-5387-a5aa-9bd4d162efde",
+        "snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+        "as_of_session": "2028-07-17"
+      },
+      "result_sha256": "387f89e3a97ace876565e5fb64784f1314a1adc4473545acedd7268533a196bc",
+      "cutoff": "2028-07-17T20:15:00Z",
+      "selected_ids": [
+        "SYN:AAA",
+        "SYN:BBB",
+        "SYN:CCC"
+      ],
+      "target_weights": [
+        {
+          "asset_id": "SYN:AAA",
+          "sector": "Technology",
+          "weight": "0.2"
+        },
+        {
+          "asset_id": "SYN:BBB",
+          "sector": "Technology",
+          "weight": "0.2"
+        },
+        {
+          "asset_id": "SYN:CCC",
+          "sector": "Unknown",
+          "weight": "0.2"
+        }
+      ],
+      "cash_target_weight": "0.4"
+    },
+    {
+      "id": "e3a578b3-226b-4ffd-b684-0a184eb6db05",
+      "job_id": "813b1706-db45-4eb3-aa07-7d336f6ddf0a",
+      "inputs": {
+        "strategy_version_id": "184f4ef7-c542-5387-a5aa-9bd4d162efde",
+        "snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+        "as_of_session": "2028-07-17"
+      },
+      "result_sha256": "387f89e3a97ace876565e5fb64784f1314a1adc4473545acedd7268533a196bc",
+      "cutoff": "2028-07-17T20:15:00Z",
+      "selected_ids": [
+        "SYN:AAA",
+        "SYN:BBB",
+        "SYN:CCC"
+      ],
+      "target_weights": [
+        {
+          "asset_id": "SYN:AAA",
+          "sector": "Technology",
+          "weight": "0.2"
+        },
+        {
+          "asset_id": "SYN:BBB",
+          "sector": "Technology",
+          "weight": "0.2"
+        },
+        {
+          "asset_id": "SYN:CCC",
+          "sector": "Unknown",
+          "weight": "0.2"
+        }
+      ],
+      "cash_target_weight": "0.4"
+    },
+    {
+      "id": "d9928839-f666-44a5-afbc-97f7836f8f75",
+      "job_id": "1b5f4b48-29df-48f2-be8c-8c793f216f7e",
+      "inputs": {
+        "strategy_version_id": "184f4ef7-c542-5387-a5aa-9bd4d162efde",
+        "snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+        "as_of_session": "2027-01-04"
+      },
+      "result_sha256": "d1cba3d16a2efa088994ef86d94c0589a289e9255746a07df02366ae9cb049e8",
+      "cutoff": "2027-01-04T21:15:00Z",
+      "selected_ids": [],
+      "target_weights": [],
+      "cash_target_weight": "1"
+    }
+  ],
+  "screenshots": {
+    "candidates-1280.png": "3fd02018b7fdbb74d34ef6772d6c02b661204fbbe954daabbe7f5cea2c171c3b",
+    "candidates-empty-360.png": "0d2aac3c1d3fe63399b21784cdd69b5aa9026b399ce9160717a0755836a9c2c8",
+    "candidates-empty-1280.png": "cda84e8873a506b55d1d829abc9f94a84cd84d619e71c657d824c491b4c82dea",
+    "candidates-360.png": "dc0798170243d0733c73a4688a2f9a08995a4a4ce15ba0d293a4de9732768fad"
+  }
+}

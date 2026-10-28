@@ -3,6 +3,42 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { proxyApi } from "../src/lib/proxy";
 import fixtures from "./transport-fixtures.json";
 afterEach(() => vi.unstubAllEnvs());
+
+it("forwards same-origin diagnostics without a paper-command key and preserves safe stale errors", async () => {
+  const make = (origin: string) =>
+    new Request("http://web.test/api/v1/strategy-evaluations", {
+      method: "POST",
+      headers: { origin, "Content-Type": "application/json" },
+      body: "{}",
+    });
+  const fetcher = vi.fn(async (_input, init) => {
+    expect(init.headers).toEqual({
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    });
+    return Response.json(
+      { error: { code: "STALE_DATA", message: "private raw explanation" } },
+      { status: 409 },
+    );
+  });
+  expect(
+    (
+      await proxyApi(
+        make("http://outside.test"),
+        ["strategy-evaluations"],
+        fetcher,
+      )
+    ).status,
+  ).toBe(422);
+  expect(fetcher).not.toHaveBeenCalled();
+  const result = await proxyApi(
+    make("http://web.test"),
+    ["strategy-evaluations"],
+    fetcher,
+  );
+  expect(result.status).toBe(409);
+  expect((await result.json()).error.code).toBe("STALE_DATA");
+});
 const request = (path: string, method = "GET") =>
   new Request(`http://web.test/api/v1/${path}`, {
     method,

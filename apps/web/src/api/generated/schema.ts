@@ -118,6 +118,40 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/strategy-evaluations": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Create */
+    post: operations["create_api_v1_strategy_evaluations_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/strategy-evaluations/{evaluation_id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Read */
+    get: operations["read_api_v1_strategy_evaluations__evaluation_id__get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/v1/workspace": {
     parameters: {
       query?: never;
@@ -195,6 +229,22 @@ export interface components {
       symbol: string;
       /** Venue */
       venue: string;
+    };
+    /** AllocationExclusion */
+    AllocationExclusion: {
+      /** Asset Id */
+      asset_id: string;
+      /** Reason */
+      reason: string;
+    };
+    /** AllocationTarget */
+    AllocationTarget: {
+      /** Asset Id */
+      asset_id: string;
+      /** Sector */
+      sector: string;
+      /** Weight */
+      weight: string;
     };
     /** ArtifactReference */
     ArtifactReference: {
@@ -316,6 +366,17 @@ export interface components {
       /** Score */
       score: number | null;
     };
+    /** DataDiagnosticEvidence */
+    DataDiagnosticEvidence: {
+      /** Asset Id */
+      asset_id: string | null;
+      /** Count */
+      count: number;
+      /** Reason */
+      reason: string;
+      /** Session Date */
+      session_date: string | null;
+    };
     /** DataHealthV1 */
     DataHealthV1: {
       /**
@@ -384,6 +445,55 @@ export interface components {
     /** ErrorEnvelope */
     ErrorEnvelope: {
       error: components["schemas"]["ErrorDetail"];
+    };
+    /**
+     * EvaluationCandidateV1
+     * @description Shared engine fields, uniquely named in the generated public schema.
+     */
+    EvaluationCandidateV1: {
+      /** Allocation Eligible */
+      allocation_eligible: boolean;
+      /** Asset Id */
+      asset_id: string;
+      /** Eligible */
+      eligible: boolean;
+      features: components["schemas"]["FeatureValues"] | null;
+      /** Input Sha256 */
+      input_sha256: string;
+      /** Median Dollar Volume */
+      median_dollar_volume: string | null;
+      /** Rank */
+      rank: number | null;
+      /** Raw Close */
+      raw_close: string | null;
+      /** Reasons */
+      reasons: string[];
+      scoring: components["schemas"]["ScoreEvidence"] | null;
+      /** Sector */
+      sector: string | null;
+      /** Trend Sma */
+      trend_sma: string | null;
+    };
+    /** EvaluationReproducibilityV1 */
+    EvaluationReproducibilityV1: {
+      /** Calendar Sha256 */
+      calendar_sha256: string;
+      /** Config Sha256 */
+      config_sha256: string;
+      /** Engine Version */
+      engine_version: string;
+      /**
+       * Snapshot Id
+       * Format: uuid
+       */
+      snapshot_id: string;
+      /** Snapshot Sha256 */
+      snapshot_sha256: string;
+      /**
+       * Strategy Version Id
+       * Format: uuid
+       */
+      strategy_version_id: string;
     };
     /** EvaluationSplit */
     EvaluationSplit: {
@@ -510,6 +620,15 @@ export interface components {
       unavailable_reason: string | null;
       /** Value */
       value: number | null;
+    };
+    /** FeatureValues */
+    FeatureValues: {
+      /** Momentum Long */
+      momentum_long: number;
+      /** Momentum Short */
+      momentum_short: number;
+      /** Volatility */
+      volatility: number;
     };
     /** FixtureMetadata */
     FixtureMetadata: {
@@ -1192,6 +1311,52 @@ export interface components {
       /** Selection Rule Reference */
       selection_rule_reference: string;
     };
+    /** RiskReport */
+    RiskReport: {
+      /** Capped Positions */
+      capped_positions: string[];
+      /** Cash Floor */
+      cash_floor: string;
+      /** Cash Weight */
+      cash_weight: string;
+      /** Compliant */
+      compliant: boolean;
+      /** Invested Weight */
+      invested_weight: string;
+      /** Max Position Weight */
+      max_position_weight: string;
+      /** Max Sector Weight */
+      max_sector_weight: string;
+      /** Position Count */
+      position_count: number;
+      /** Position Limit */
+      position_limit: string;
+      /** Sector Limit */
+      sector_limit: string;
+      /** Sectors */
+      sectors: components["schemas"]["SectorRisk"][];
+      /** Unmet Investable Weight */
+      unmet_investable_weight: string;
+      /** Violations */
+      violations: string[];
+    };
+    /** ScoreEvidence */
+    ScoreEvidence: {
+      /** Momentum Long Contribution */
+      momentum_long_contribution: number;
+      /** Momentum Long Z */
+      momentum_long_z: number;
+      /** Momentum Short Contribution */
+      momentum_short_contribution: number;
+      /** Momentum Short Z */
+      momentum_short_z: number;
+      /** Score */
+      score: number;
+      /** Volatility Contribution */
+      volatility_contribution: number;
+      /** Volatility Z */
+      volatility_z: number;
+    };
     /** ScoreWeights */
     ScoreWeights: {
       /** Momentum Long */
@@ -1226,6 +1391,15 @@ export interface components {
       provider: string;
       /** Sector */
       sector: string;
+    };
+    /** SectorRisk */
+    SectorRisk: {
+      /** At Cap */
+      at_cap: boolean;
+      /** Sector */
+      sector: string;
+      /** Weight */
+      weight: string;
     };
     /** Session */
     Session: {
@@ -1423,6 +1597,127 @@ export interface components {
       schema_version: 1;
       signals: components["schemas"]["SignalConfig"];
       universe: components["schemas"]["UniverseConfig"];
+    };
+    /** StrategyEvaluationAccepted */
+    StrategyEvaluationAccepted: {
+      /**
+       * Evaluation Id
+       * Format: uuid
+       */
+      evaluation_id: string;
+      /**
+       * Job Id
+       * Format: uuid
+       */
+      job_id: string;
+    };
+    /** StrategyEvaluationRequest */
+    StrategyEvaluationRequest: {
+      /**
+       * As Of Session
+       * Format: date
+       */
+      as_of_session: string;
+      /**
+       * Snapshot Id
+       * Format: uuid
+       */
+      snapshot_id: string;
+      /**
+       * Strategy Version Id
+       * Format: uuid
+       */
+      strategy_version_id: string;
+    };
+    /** StrategyEvaluationResultV1 */
+    StrategyEvaluationResultV1: {
+      /** Allocation Exclusions */
+      allocation_exclusions: components["schemas"]["AllocationExclusion"][];
+      /** Allocation Reasons */
+      allocation_reasons: string[];
+      /**
+       * As Of Session
+       * Format: date
+       */
+      as_of_session: string;
+      /** Candidates */
+      candidates: components["schemas"]["EvaluationCandidateV1"][];
+      /** Cash Target Weight */
+      cash_target_weight: string;
+      constraint_evidence: components["schemas"]["RiskReport"];
+      /** Data Diagnostics */
+      data_diagnostics: components["schemas"]["DataDiagnosticEvidence"][];
+      /**
+       * Decision Cutoff Utc
+       * Format: date-time
+       */
+      decision_cutoff_utc: string;
+      /**
+       * Mode
+       * @enum {string}
+       */
+      mode: "synthetic_fixture" | "research_market_data";
+      reproducibility: components["schemas"]["EvaluationReproducibilityV1"];
+      /**
+       * Schema Version
+       * @default 1
+       * @constant
+       */
+      schema_version: 1;
+      /** Selected Ids */
+      selected_ids: string[];
+      /** Target Weights */
+      target_weights: components["schemas"]["AllocationTarget"][];
+      /** Warnings */
+      warnings: string[];
+    };
+    /** StrategyEvaluationV1 */
+    StrategyEvaluationV1: {
+      /** Config Sha256 */
+      config_sha256: string;
+      /**
+       * Created At
+       * Format: date-time
+       */
+      created_at: string;
+      /** Engine Version */
+      engine_version: string;
+      error: components["schemas"]["ErrorDetail"] | null;
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      inputs: components["schemas"]["StrategyEvaluationRequest"];
+      /**
+       * Job Id
+       * Format: uuid
+       */
+      job_id: string;
+      /**
+       * Mode
+       * @enum {string}
+       */
+      mode: "synthetic_fixture" | "research_market_data";
+      /** Provider */
+      provider: string;
+      result: components["schemas"]["StrategyEvaluationResultV1"] | null;
+      /** Result Sha256 */
+      result_sha256: string | null;
+      /** Snapshot Sha256 */
+      snapshot_sha256: string;
+      /**
+       * Status
+       * @enum {string}
+       */
+      status:
+        | "queued"
+        | "running"
+        | "cancel_requested"
+        | "completed"
+        | "failed"
+        | "cancelled";
+      strategy_config: components["schemas"]["StrategyConfigV1"];
     };
     /** StrategyV1 */
     StrategyV1: {
@@ -1878,6 +2173,124 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["Page_StrategyV1_"];
+        };
+      };
+      /** @description Unprocessable Content */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Service Unavailable */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+    };
+  };
+  create_api_v1_strategy_evaluations_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["StrategyEvaluationRequest"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      202: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["StrategyEvaluationAccepted"];
+        };
+      };
+      /** @description Not Found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Conflict */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Unprocessable Content */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Service Unavailable */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+    };
+  };
+  read_api_v1_strategy_evaluations__evaluation_id__get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        evaluation_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["StrategyEvaluationV1"];
+        };
+      };
+      /** @description Not Found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Conflict */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
         };
       };
       /** @description Unprocessable Content */

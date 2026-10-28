@@ -121,3 +121,12 @@ The [shared momentum engine](docs/operations/momentum-engine.md) documents deter
 The [shared allocation engine](docs/operations/allocation-engine.md) documents capped inverse-volatility targets, exact cash conservation and risk evidence.
 The [default strategy registry](docs/operations/strategy-registry.md) documents stable immutable versions, bootstrap seeding and paginated discovery.
 The [shared paper execution kernel](docs/operations/paper-execution-kernel.md) documents target planning, conditional previews, eligible raw-open effects and split/dividend arithmetic.
+
+The [candidate inspection diagnostic](docs/operations/strategy-evaluations.md) connects
+registered snapshots and immutable strategy versions to the supervised shared engine.
+Prepare a synthetic snapshot in Settings & data, open Candidate inspection and select
+as-of session `2028-07-17` for the authored populated fixture, or `2027-01-04` for
+cash-only insufficient history. The cutoff is the pinned scheduled close plus15
+minutes. Targets are diagnostic evidence; this flow cannot approve orders or change
+holdings. The published0.0.1 prerelease remains the foundation release until the
+0.0.2 integration/release gate passes.

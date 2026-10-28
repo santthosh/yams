@@ -13,7 +13,8 @@ function Navigation() {
     <nav aria-label="Main navigation">
       {[
         { path: "/", name: "Dashboard", mark: "01" },
-        { path: "/settings", name: "Settings & data", mark: "02" },
+        { path: "/lab/candidates", name: "Candidate inspection", mark: "02" },
+        { path: "/settings", name: "Settings & data", mark: "03" },
       ].map((item) => (
         <Link
           key={item.path}
@@ -63,7 +64,7 @@ export function Shell({ children }: { children: ReactNode }) {
           <div className="mobile-brand">yams.</div>
           <div className="topbar-label">
             Your local workspace{" "}
-            <span className="version-badge">0.0.1 · Foundation</span>
+            <span className="version-badge">Quant diagnostics</span>
           </div>
           <span className="paper-badge">Paper only</span>
         </header>
@@ -72,7 +73,7 @@ export function Shell({ children }: { children: ReactNode }) {
           <Navigation />
         </details>
         <div className="context-bar">
-          {pathname === "/settings/data" ? (
+          {pathname === "/settings/data" || pathname === "/lab/candidates" ? (
             <span>Dataset coverage · Selected source below</span>
           ) : (
             <DataProvenanceBadge

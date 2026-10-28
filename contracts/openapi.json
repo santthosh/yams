@@ -102,6 +102,56 @@
         "title": "Alias",
         "type": "object"
       },
+      "AllocationExclusion": {
+        "additionalProperties": false,
+        "properties": {
+          "asset_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "title": "Asset Id",
+            "type": "string"
+          },
+          "reason": {
+            "pattern": "^[A-Z][A-Z0-9_]*$",
+            "title": "Reason",
+            "type": "string"
+          }
+        },
+        "required": [
+          "asset_id",
+          "reason"
+        ],
+        "title": "AllocationExclusion",
+        "type": "object"
+      },
+      "AllocationTarget": {
+        "additionalProperties": false,
+        "properties": {
+          "asset_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "title": "Asset Id",
+            "type": "string"
+          },
+          "sector": {
+            "minLength": 1,
+            "title": "Sector",
+            "type": "string"
+          },
+          "weight": {
+            "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$",
+            "title": "Weight",
+            "type": "string"
+          }
+        },
+        "required": [
+          "asset_id",
+          "sector",
+          "weight"
+        ],
+        "title": "AllocationTarget",
+        "type": "object"
+      },
       "ArtifactReference": {
         "additionalProperties": false,
         "properties": {
@@ -421,6 +471,50 @@
         "title": "CandidateEvidence",
         "type": "object"
       },
+      "DataDiagnosticEvidence": {
+        "additionalProperties": false,
+        "properties": {
+          "asset_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Asset Id"
+          },
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          },
+          "reason": {
+            "title": "Reason",
+            "type": "string"
+          },
+          "session_date": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Session Date"
+          }
+        },
+        "required": [
+          "reason",
+          "asset_id",
+          "session_date",
+          "count"
+        ],
+        "title": "DataDiagnosticEvidence",
+        "type": "object"
+      },
       "DataHealthV1": {
         "additionalProperties": false,
         "properties": {
@@ -582,6 +676,172 @@
           "error"
         ],
         "title": "ErrorEnvelope",
+        "type": "object"
+      },
+      "EvaluationCandidateV1": {
+        "additionalProperties": false,
+        "description": "Shared engine fields, uniquely named in the generated public schema.",
+        "properties": {
+          "allocation_eligible": {
+            "title": "Allocation Eligible",
+            "type": "boolean"
+          },
+          "asset_id": {
+            "title": "Asset Id",
+            "type": "string"
+          },
+          "eligible": {
+            "title": "Eligible",
+            "type": "boolean"
+          },
+          "features": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/FeatureValues"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "input_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Input Sha256",
+            "type": "string"
+          },
+          "median_dollar_volume": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Median Dollar Volume"
+          },
+          "rank": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rank"
+          },
+          "raw_close": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Raw Close"
+          },
+          "reasons": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Reasons",
+            "type": "array"
+          },
+          "scoring": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ScoreEvidence"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "sector": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sector"
+          },
+          "trend_sma": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Trend Sma"
+          }
+        },
+        "required": [
+          "asset_id",
+          "sector",
+          "eligible",
+          "allocation_eligible",
+          "reasons",
+          "raw_close",
+          "median_dollar_volume",
+          "trend_sma",
+          "input_sha256",
+          "features",
+          "scoring",
+          "rank"
+        ],
+        "title": "EvaluationCandidateV1",
+        "type": "object"
+      },
+      "EvaluationReproducibilityV1": {
+        "additionalProperties": false,
+        "properties": {
+          "calendar_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Calendar Sha256",
+            "type": "string"
+          },
+          "config_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Config Sha256",
+            "type": "string"
+          },
+          "engine_version": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Engine Version",
+            "type": "string"
+          },
+          "snapshot_id": {
+            "format": "uuid",
+            "title": "Snapshot Id",
+            "type": "string"
+          },
+          "snapshot_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Snapshot Sha256",
+            "type": "string"
+          },
+          "strategy_version_id": {
+            "format": "uuid",
+            "title": "Strategy Version Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "strategy_version_id",
+          "snapshot_id",
+          "config_sha256",
+          "snapshot_sha256",
+          "calendar_sha256",
+          "engine_version"
+        ],
+        "title": "EvaluationReproducibilityV1",
         "type": "object"
       },
       "EvaluationSplit": {
@@ -907,6 +1167,31 @@
           "unavailable_reason"
         ],
         "title": "FeatureValue",
+        "type": "object"
+      },
+      "FeatureValues": {
+        "additionalProperties": false,
+        "properties": {
+          "momentum_long": {
+            "title": "Momentum Long",
+            "type": "number"
+          },
+          "momentum_short": {
+            "title": "Momentum Short",
+            "type": "number"
+          },
+          "volatility": {
+            "ge": 0,
+            "title": "Volatility",
+            "type": "number"
+          }
+        },
+        "required": [
+          "momentum_long",
+          "momentum_short",
+          "volatility"
+        ],
+        "title": "FeatureValues",
         "type": "object"
       },
       "FixtureMetadata": {
@@ -2601,6 +2886,144 @@
         "title": "ResearchConfig",
         "type": "object"
       },
+      "RiskReport": {
+        "additionalProperties": false,
+        "properties": {
+          "capped_positions": {
+            "items": {
+              "maxLength": 160,
+              "minLength": 1,
+              "type": "string"
+            },
+            "title": "Capped Positions",
+            "type": "array"
+          },
+          "cash_floor": {
+            "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$",
+            "title": "Cash Floor",
+            "type": "string"
+          },
+          "cash_weight": {
+            "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$",
+            "title": "Cash Weight",
+            "type": "string"
+          },
+          "compliant": {
+            "title": "Compliant",
+            "type": "boolean"
+          },
+          "invested_weight": {
+            "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$",
+            "title": "Invested Weight",
+            "type": "string"
+          },
+          "max_position_weight": {
+            "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$",
+            "title": "Max Position Weight",
+            "type": "string"
+          },
+          "max_sector_weight": {
+            "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$",
+            "title": "Max Sector Weight",
+            "type": "string"
+          },
+          "position_count": {
+            "title": "Position Count",
+            "type": "integer"
+          },
+          "position_limit": {
+            "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$",
+            "title": "Position Limit",
+            "type": "string"
+          },
+          "sector_limit": {
+            "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$",
+            "title": "Sector Limit",
+            "type": "string"
+          },
+          "sectors": {
+            "items": {
+              "$ref": "#/components/schemas/SectorRisk"
+            },
+            "title": "Sectors",
+            "type": "array"
+          },
+          "unmet_investable_weight": {
+            "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$",
+            "title": "Unmet Investable Weight",
+            "type": "string"
+          },
+          "violations": {
+            "items": {
+              "pattern": "^[A-Z][A-Z0-9_]*$",
+              "type": "string"
+            },
+            "title": "Violations",
+            "type": "array"
+          }
+        },
+        "required": [
+          "compliant",
+          "violations",
+          "position_count",
+          "max_position_weight",
+          "max_sector_weight",
+          "invested_weight",
+          "cash_weight",
+          "unmet_investable_weight",
+          "position_limit",
+          "sector_limit",
+          "cash_floor",
+          "capped_positions",
+          "sectors"
+        ],
+        "title": "RiskReport",
+        "type": "object"
+      },
+      "ScoreEvidence": {
+        "additionalProperties": false,
+        "properties": {
+          "momentum_long_contribution": {
+            "title": "Momentum Long Contribution",
+            "type": "number"
+          },
+          "momentum_long_z": {
+            "title": "Momentum Long Z",
+            "type": "number"
+          },
+          "momentum_short_contribution": {
+            "title": "Momentum Short Contribution",
+            "type": "number"
+          },
+          "momentum_short_z": {
+            "title": "Momentum Short Z",
+            "type": "number"
+          },
+          "score": {
+            "title": "Score",
+            "type": "number"
+          },
+          "volatility_contribution": {
+            "title": "Volatility Contribution",
+            "type": "number"
+          },
+          "volatility_z": {
+            "title": "Volatility Z",
+            "type": "number"
+          }
+        },
+        "required": [
+          "momentum_long_z",
+          "momentum_short_z",
+          "volatility_z",
+          "momentum_long_contribution",
+          "momentum_short_contribution",
+          "volatility_contribution",
+          "score"
+        ],
+        "title": "ScoreEvidence",
+        "type": "object"
+      },
       "ScoreWeights": {
         "additionalProperties": false,
         "properties": {
@@ -2693,6 +3116,31 @@
           "provider"
         ],
         "title": "Sector",
+        "type": "object"
+      },
+      "SectorRisk": {
+        "additionalProperties": false,
+        "properties": {
+          "at_cap": {
+            "title": "At Cap",
+            "type": "boolean"
+          },
+          "sector": {
+            "title": "Sector",
+            "type": "string"
+          },
+          "weight": {
+            "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$",
+            "title": "Weight",
+            "type": "string"
+          }
+        },
+        "required": [
+          "sector",
+          "weight",
+          "at_cap"
+        ],
+        "title": "SectorRisk",
         "type": "object"
       },
       "Session": {
@@ -3202,6 +3650,282 @@
           "execution_policy"
         ],
         "title": "StrategyConfigV1",
+        "type": "object"
+      },
+      "StrategyEvaluationAccepted": {
+        "additionalProperties": false,
+        "properties": {
+          "evaluation_id": {
+            "format": "uuid",
+            "title": "Evaluation Id",
+            "type": "string"
+          },
+          "job_id": {
+            "format": "uuid",
+            "title": "Job Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "job_id",
+          "evaluation_id"
+        ],
+        "title": "StrategyEvaluationAccepted",
+        "type": "object"
+      },
+      "StrategyEvaluationRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "as_of_session": {
+            "format": "date",
+            "title": "As Of Session",
+            "type": "string"
+          },
+          "snapshot_id": {
+            "format": "uuid",
+            "title": "Snapshot Id",
+            "type": "string"
+          },
+          "strategy_version_id": {
+            "format": "uuid",
+            "title": "Strategy Version Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "strategy_version_id",
+          "snapshot_id",
+          "as_of_session"
+        ],
+        "title": "StrategyEvaluationRequest",
+        "type": "object"
+      },
+      "StrategyEvaluationResultV1": {
+        "additionalProperties": false,
+        "properties": {
+          "allocation_exclusions": {
+            "items": {
+              "$ref": "#/components/schemas/AllocationExclusion"
+            },
+            "title": "Allocation Exclusions",
+            "type": "array"
+          },
+          "allocation_reasons": {
+            "items": {
+              "pattern": "^[A-Z][A-Z0-9_]*$",
+              "type": "string"
+            },
+            "title": "Allocation Reasons",
+            "type": "array"
+          },
+          "as_of_session": {
+            "format": "date",
+            "title": "As Of Session",
+            "type": "string"
+          },
+          "candidates": {
+            "items": {
+              "$ref": "#/components/schemas/EvaluationCandidateV1"
+            },
+            "title": "Candidates",
+            "type": "array"
+          },
+          "cash_target_weight": {
+            "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$",
+            "title": "Cash Target Weight",
+            "type": "string"
+          },
+          "constraint_evidence": {
+            "$ref": "#/components/schemas/RiskReport"
+          },
+          "data_diagnostics": {
+            "items": {
+              "$ref": "#/components/schemas/DataDiagnosticEvidence"
+            },
+            "title": "Data Diagnostics",
+            "type": "array"
+          },
+          "decision_cutoff_utc": {
+            "format": "date-time",
+            "pattern": "Z$",
+            "title": "Decision Cutoff Utc",
+            "type": "string"
+          },
+          "mode": {
+            "enum": [
+              "synthetic_fixture",
+              "research_market_data"
+            ],
+            "title": "Mode",
+            "type": "string"
+          },
+          "reproducibility": {
+            "$ref": "#/components/schemas/EvaluationReproducibilityV1"
+          },
+          "schema_version": {
+            "const": 1,
+            "default": 1,
+            "title": "Schema Version",
+            "type": "integer"
+          },
+          "selected_ids": {
+            "items": {
+              "maxLength": 160,
+              "minLength": 1,
+              "type": "string"
+            },
+            "title": "Selected Ids",
+            "type": "array"
+          },
+          "target_weights": {
+            "items": {
+              "$ref": "#/components/schemas/AllocationTarget"
+            },
+            "title": "Target Weights",
+            "type": "array"
+          },
+          "warnings": {
+            "items": {
+              "pattern": "^[A-Z][A-Z0-9_]*$",
+              "type": "string"
+            },
+            "title": "Warnings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "as_of_session",
+          "decision_cutoff_utc",
+          "mode",
+          "warnings",
+          "candidates",
+          "selected_ids",
+          "target_weights",
+          "cash_target_weight",
+          "constraint_evidence",
+          "allocation_reasons",
+          "allocation_exclusions",
+          "data_diagnostics",
+          "reproducibility"
+        ],
+        "title": "StrategyEvaluationResultV1",
+        "type": "object"
+      },
+      "StrategyEvaluationV1": {
+        "additionalProperties": false,
+        "properties": {
+          "config_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Config Sha256",
+            "type": "string"
+          },
+          "created_at": {
+            "format": "date-time",
+            "pattern": "Z$",
+            "title": "Created At",
+            "type": "string"
+          },
+          "engine_version": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Engine Version",
+            "type": "string"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ErrorDetail"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "inputs": {
+            "$ref": "#/components/schemas/StrategyEvaluationRequest"
+          },
+          "job_id": {
+            "format": "uuid",
+            "title": "Job Id",
+            "type": "string"
+          },
+          "mode": {
+            "enum": [
+              "synthetic_fixture",
+              "research_market_data"
+            ],
+            "title": "Mode",
+            "type": "string"
+          },
+          "provider": {
+            "minLength": 1,
+            "title": "Provider",
+            "type": "string"
+          },
+          "result": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/StrategyEvaluationResultV1"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "result_sha256": {
+            "anyOf": [
+              {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Result Sha256"
+          },
+          "snapshot_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Snapshot Sha256",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "queued",
+              "running",
+              "cancel_requested",
+              "completed",
+              "failed",
+              "cancelled"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "strategy_config": {
+            "$ref": "#/components/schemas/StrategyConfigV1"
+          }
+        },
+        "required": [
+          "id",
+          "job_id",
+          "status",
+          "inputs",
+          "mode",
+          "provider",
+          "config_sha256",
+          "snapshot_sha256",
+          "engine_version",
+          "created_at",
+          "strategy_config",
+          "result",
+          "result_sha256",
+          "error"
+        ],
+        "title": "StrategyEvaluationV1",
         "type": "object"
       },
       "StrategyV1": {
@@ -3991,6 +4715,144 @@
           }
         },
         "summary": "Strategies"
+      }
+    },
+    "/api/v1/strategy-evaluations": {
+      "post": {
+        "operationId": "create_api_v1_strategy_evaluations_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StrategyEvaluationRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StrategyEvaluationAccepted"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "summary": "Create"
+      }
+    },
+    "/api/v1/strategy-evaluations/{evaluation_id}": {
+      "get": {
+        "operationId": "read_api_v1_strategy_evaluations__evaluation_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "evaluation_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Evaluation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StrategyEvaluationV1"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "summary": "Read"
       }
     },
     "/api/v1/workspace": {

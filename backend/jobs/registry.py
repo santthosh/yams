@@ -5,6 +5,7 @@ from typing import Annotated, Literal, Self
 
 from pydantic import Field, field_validator, model_validator
 
+from backend.domain.evaluation import StrategyEvaluationPayload
 from backend.domain.types import Contract, Hash256, SourceMode
 from backend.market_data.research_config import ResearchConfig
 
@@ -71,11 +72,15 @@ class RefreshPayload(Contract):
         return self
 
 
-def validate_payload(kind: str, payload: object) -> DiagnosticPayload | RefreshPayload:
+def validate_payload(
+    kind: str, payload: object
+) -> DiagnosticPayload | RefreshPayload | StrategyEvaluationPayload:
     if kind == "diagnostic":
         return DiagnosticPayload.model_validate(payload)
     if kind == "refresh_market_data":
         return RefreshPayload.model_validate(payload)
+    if kind == "evaluate_strategy":
+        return StrategyEvaluationPayload.model_validate(payload)
     raise ValueError("Unregistered job kind")
 
 
