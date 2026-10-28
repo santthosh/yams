@@ -1,4 +1,222 @@
 {
+  "AssetPageV1.serialization": {
+    "$defs": {
+      "AssetV1": {
+        "additionalProperties": false,
+        "properties": {
+          "asset_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "title": "Asset Id",
+            "type": "string"
+          },
+          "currency": {
+            "const": "USD",
+            "title": "Currency",
+            "type": "string"
+          },
+          "instrument": {
+            "enum": [
+              "ordinary_equity",
+              "etf"
+            ],
+            "title": "Instrument",
+            "type": "string"
+          },
+          "provider": {
+            "title": "Provider",
+            "type": "string"
+          },
+          "provider_id": {
+            "title": "Provider Id",
+            "type": "string"
+          },
+          "sector": {
+            "minLength": 1,
+            "title": "Sector",
+            "type": "string"
+          },
+          "symbol": {
+            "maxLength": 32,
+            "minLength": 1,
+            "title": "Symbol",
+            "type": "string"
+          },
+          "venue": {
+            "pattern": "^[A-Z0-9]{4}$",
+            "title": "Venue",
+            "type": "string"
+          }
+        },
+        "required": [
+          "asset_id",
+          "venue",
+          "symbol",
+          "currency",
+          "instrument",
+          "sector",
+          "provider",
+          "provider_id"
+        ],
+        "title": "AssetV1",
+        "type": "object"
+      }
+    },
+    "additionalProperties": false,
+    "properties": {
+      "items": {
+        "items": {
+          "$ref": "#/$defs/AssetV1"
+        },
+        "title": "Items",
+        "type": "array"
+      },
+      "mode": {
+        "enum": [
+          "synthetic_fixture",
+          "research_market_data"
+        ],
+        "title": "Mode",
+        "type": "string"
+      },
+      "next_cursor": {
+        "anyOf": [
+          {
+            "maxLength": 2048,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9_-]+$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Next Cursor"
+      },
+      "snapshot_id": {
+        "format": "uuid",
+        "title": "Snapshot Id",
+        "type": "string"
+      }
+    },
+    "required": [
+      "items",
+      "next_cursor",
+      "snapshot_id",
+      "mode"
+    ],
+    "title": "AssetPageV1",
+    "type": "object"
+  },
+  "AssetPageV1.validation": {
+    "$defs": {
+      "AssetV1": {
+        "additionalProperties": false,
+        "properties": {
+          "asset_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "title": "Asset Id",
+            "type": "string"
+          },
+          "currency": {
+            "const": "USD",
+            "title": "Currency",
+            "type": "string"
+          },
+          "instrument": {
+            "enum": [
+              "ordinary_equity",
+              "etf"
+            ],
+            "title": "Instrument",
+            "type": "string"
+          },
+          "provider": {
+            "title": "Provider",
+            "type": "string"
+          },
+          "provider_id": {
+            "title": "Provider Id",
+            "type": "string"
+          },
+          "sector": {
+            "minLength": 1,
+            "title": "Sector",
+            "type": "string"
+          },
+          "symbol": {
+            "maxLength": 32,
+            "minLength": 1,
+            "title": "Symbol",
+            "type": "string"
+          },
+          "venue": {
+            "pattern": "^[A-Z0-9]{4}$",
+            "title": "Venue",
+            "type": "string"
+          }
+        },
+        "required": [
+          "asset_id",
+          "venue",
+          "symbol",
+          "currency",
+          "instrument",
+          "sector",
+          "provider",
+          "provider_id"
+        ],
+        "title": "AssetV1",
+        "type": "object"
+      }
+    },
+    "additionalProperties": false,
+    "properties": {
+      "items": {
+        "items": {
+          "$ref": "#/$defs/AssetV1"
+        },
+        "title": "Items",
+        "type": "array"
+      },
+      "mode": {
+        "enum": [
+          "synthetic_fixture",
+          "research_market_data"
+        ],
+        "title": "Mode",
+        "type": "string"
+      },
+      "next_cursor": {
+        "anyOf": [
+          {
+            "maxLength": 2048,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9_-]+$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Next Cursor"
+      },
+      "snapshot_id": {
+        "format": "uuid",
+        "title": "Snapshot Id",
+        "type": "string"
+      }
+    },
+    "required": [
+      "items",
+      "next_cursor",
+      "snapshot_id",
+      "mode"
+    ],
+    "title": "AssetPageV1",
+    "type": "object"
+  },
   "AssetV1.serialization": {
     "additionalProperties": false,
     "properties": {
@@ -117,6 +335,922 @@
       "provider_id"
     ],
     "title": "AssetV1",
+    "type": "object"
+  },
+  "DataHealthV1.serialization": {
+    "$defs": {
+      "ErrorDetail": {
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "enum": [
+              "VALIDATION_ERROR",
+              "NOT_FOUND",
+              "METHOD_NOT_ALLOWED",
+              "HTTP_ERROR",
+              "NOT_READY",
+              "STATE_CONFLICT",
+              "IDEMPOTENCY_CONFLICT",
+              "STALE_DATA",
+              "INSUFFICIENT_MARKET_DATA",
+              "LIMIT_EXCEEDED",
+              "PROVIDER_UNAVAILABLE",
+              "FORECAST_UNAVAILABLE",
+              "JOB_FAILED",
+              "INTERNAL_ERROR",
+              "WORKLOAD_LIMIT",
+              "RESOURCE_EXHAUSTED",
+              "TIME_LIMIT"
+            ],
+            "title": "Code",
+            "type": "string"
+          },
+          "correlation_id": {
+            "format": "uuid",
+            "title": "Correlation Id",
+            "type": "string"
+          },
+          "details": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "boolean"
+                },
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                }
+              ]
+            },
+            "title": "Details",
+            "type": "object"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "retryable": {
+            "title": "Retryable",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "code",
+          "message",
+          "details",
+          "retryable",
+          "correlation_id"
+        ],
+        "title": "ErrorDetail",
+        "type": "object"
+      },
+      "JobResult": {
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "enum": [
+              "diagnostic",
+              "resource"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "resource_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resource Id"
+          }
+        },
+        "required": [
+          "kind",
+          "resource_id",
+          "message"
+        ],
+        "title": "JobResult",
+        "type": "object"
+      },
+      "JobV1": {
+        "additionalProperties": false,
+        "properties": {
+          "attempts": {
+            "minimum": 0,
+            "title": "Attempts",
+            "type": "integer"
+          },
+          "created_at": {
+            "format": "date-time",
+            "pattern": "Z$",
+            "title": "Created At",
+            "type": "string"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/ErrorDetail"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "max_attempts": {
+            "minimum": 1,
+            "title": "Max Attempts",
+            "type": "integer"
+          },
+          "progress": {
+            "ge": 0,
+            "le": 100,
+            "title": "Progress",
+            "type": "number"
+          },
+          "result": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/JobResult"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "status": {
+            "enum": [
+              "queued",
+              "running",
+              "cancel_requested",
+              "completed",
+              "failed",
+              "cancelled"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "pattern": "Z$",
+            "title": "Updated At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "status",
+          "attempts",
+          "max_attempts",
+          "progress",
+          "created_at",
+          "updated_at",
+          "result",
+          "error"
+        ],
+        "title": "JobV1",
+        "type": "object"
+      },
+      "MissingSession": {
+        "additionalProperties": false,
+        "properties": {
+          "asset_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "title": "Asset Id",
+            "type": "string"
+          },
+          "session_date": {
+            "format": "date",
+            "title": "Session Date",
+            "type": "string"
+          }
+        },
+        "required": [
+          "asset_id",
+          "session_date"
+        ],
+        "title": "MissingSession",
+        "type": "object"
+      },
+      "SnapshotCoverage": {
+        "additionalProperties": false,
+        "properties": {
+          "asset_ids": {
+            "items": {
+              "maxLength": 160,
+              "minLength": 1,
+              "type": "string"
+            },
+            "title": "Asset Ids",
+            "type": "array"
+          },
+          "first_session": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "First Session"
+          },
+          "last_session": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Session"
+          },
+          "latest_completed_session": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latest Completed Session"
+          },
+          "membership_basis": {
+            "enum": [
+              "point_in_time",
+              "current_only",
+              "synthetic"
+            ],
+            "title": "Membership Basis",
+            "type": "string"
+          },
+          "missing_sessions": {
+            "items": {
+              "$ref": "#/$defs/MissingSession"
+            },
+            "title": "Missing Sessions",
+            "type": "array"
+          }
+        },
+        "required": [
+          "asset_ids",
+          "first_session",
+          "last_session",
+          "latest_completed_session",
+          "missing_sessions",
+          "membership_basis"
+        ],
+        "title": "SnapshotCoverage",
+        "type": "object"
+      },
+      "SnapshotV1": {
+        "additionalProperties": false,
+        "properties": {
+          "asset_count": {
+            "minimum": 0,
+            "title": "Asset Count",
+            "type": "integer"
+          },
+          "coverage": {
+            "$ref": "#/$defs/SnapshotCoverage"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "latest_completed_session": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latest Completed Session"
+          },
+          "manifest_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Manifest Sha256",
+            "type": "string"
+          },
+          "mode": {
+            "enum": [
+              "synthetic_fixture",
+              "research_market_data"
+            ],
+            "title": "Mode",
+            "type": "string"
+          },
+          "provider": {
+            "title": "Provider",
+            "type": "string"
+          },
+          "published_at": {
+            "format": "date-time",
+            "pattern": "Z$",
+            "title": "Published At",
+            "type": "string"
+          },
+          "quality": {
+            "enum": [
+              "usable",
+              "usable_with_warnings",
+              "blocked"
+            ],
+            "title": "Quality",
+            "type": "string"
+          },
+          "warnings": {
+            "items": {
+              "pattern": "^[A-Z][A-Z0-9_]*$",
+              "type": "string"
+            },
+            "title": "Warnings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "provider",
+          "mode",
+          "latest_completed_session",
+          "published_at",
+          "quality",
+          "warnings",
+          "asset_count",
+          "manifest_sha256",
+          "coverage"
+        ],
+        "title": "SnapshotV1",
+        "type": "object"
+      }
+    },
+    "additionalProperties": false,
+    "properties": {
+      "checked_at": {
+        "format": "date-time",
+        "pattern": "Z$",
+        "title": "Checked At",
+        "type": "string"
+      },
+      "current_snapshot": {
+        "anyOf": [
+          {
+            "$ref": "#/$defs/SnapshotV1"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "freshness": {
+        "enum": [
+          "synthetic",
+          "unknown",
+          "refresh_failed"
+        ],
+        "title": "Freshness",
+        "type": "string"
+      },
+      "latest_job": {
+        "anyOf": [
+          {
+            "$ref": "#/$defs/JobV1"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "mode": {
+        "enum": [
+          "synthetic_fixture",
+          "research_market_data"
+        ],
+        "title": "Mode",
+        "type": "string"
+      },
+      "status": {
+        "enum": [
+          "empty",
+          "ready",
+          "refreshing",
+          "failed"
+        ],
+        "title": "Status",
+        "type": "string"
+      },
+      "warnings": {
+        "items": {
+          "pattern": "^[A-Z][A-Z0-9_]*$",
+          "type": "string"
+        },
+        "title": "Warnings",
+        "type": "array"
+      }
+    },
+    "required": [
+      "mode",
+      "checked_at",
+      "status",
+      "current_snapshot",
+      "latest_job",
+      "warnings",
+      "freshness"
+    ],
+    "title": "DataHealthV1",
+    "type": "object"
+  },
+  "DataHealthV1.validation": {
+    "$defs": {
+      "ErrorDetail": {
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "enum": [
+              "VALIDATION_ERROR",
+              "NOT_FOUND",
+              "METHOD_NOT_ALLOWED",
+              "HTTP_ERROR",
+              "NOT_READY",
+              "STATE_CONFLICT",
+              "IDEMPOTENCY_CONFLICT",
+              "STALE_DATA",
+              "INSUFFICIENT_MARKET_DATA",
+              "LIMIT_EXCEEDED",
+              "PROVIDER_UNAVAILABLE",
+              "FORECAST_UNAVAILABLE",
+              "JOB_FAILED",
+              "INTERNAL_ERROR",
+              "WORKLOAD_LIMIT",
+              "RESOURCE_EXHAUSTED",
+              "TIME_LIMIT"
+            ],
+            "title": "Code",
+            "type": "string"
+          },
+          "correlation_id": {
+            "format": "uuid",
+            "title": "Correlation Id",
+            "type": "string"
+          },
+          "details": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "boolean"
+                },
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                }
+              ]
+            },
+            "title": "Details",
+            "type": "object"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "retryable": {
+            "title": "Retryable",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "code",
+          "message",
+          "details",
+          "retryable",
+          "correlation_id"
+        ],
+        "title": "ErrorDetail",
+        "type": "object"
+      },
+      "JobResult": {
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "enum": [
+              "diagnostic",
+              "resource"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "resource_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resource Id"
+          }
+        },
+        "required": [
+          "kind",
+          "resource_id",
+          "message"
+        ],
+        "title": "JobResult",
+        "type": "object"
+      },
+      "JobV1": {
+        "additionalProperties": false,
+        "properties": {
+          "attempts": {
+            "minimum": 0,
+            "title": "Attempts",
+            "type": "integer"
+          },
+          "created_at": {
+            "format": "date-time",
+            "pattern": "Z$",
+            "title": "Created At",
+            "type": "string"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/ErrorDetail"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "max_attempts": {
+            "minimum": 1,
+            "title": "Max Attempts",
+            "type": "integer"
+          },
+          "progress": {
+            "ge": 0,
+            "le": 100,
+            "title": "Progress",
+            "type": "number"
+          },
+          "result": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/JobResult"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "status": {
+            "enum": [
+              "queued",
+              "running",
+              "cancel_requested",
+              "completed",
+              "failed",
+              "cancelled"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "pattern": "Z$",
+            "title": "Updated At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "status",
+          "attempts",
+          "max_attempts",
+          "progress",
+          "created_at",
+          "updated_at",
+          "result",
+          "error"
+        ],
+        "title": "JobV1",
+        "type": "object"
+      },
+      "MissingSession": {
+        "additionalProperties": false,
+        "properties": {
+          "asset_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "title": "Asset Id",
+            "type": "string"
+          },
+          "session_date": {
+            "format": "date",
+            "title": "Session Date",
+            "type": "string"
+          }
+        },
+        "required": [
+          "asset_id",
+          "session_date"
+        ],
+        "title": "MissingSession",
+        "type": "object"
+      },
+      "SnapshotCoverage": {
+        "additionalProperties": false,
+        "properties": {
+          "asset_ids": {
+            "items": {
+              "maxLength": 160,
+              "minLength": 1,
+              "type": "string"
+            },
+            "title": "Asset Ids",
+            "type": "array"
+          },
+          "first_session": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "First Session"
+          },
+          "last_session": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Session"
+          },
+          "latest_completed_session": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latest Completed Session"
+          },
+          "membership_basis": {
+            "enum": [
+              "point_in_time",
+              "current_only",
+              "synthetic"
+            ],
+            "title": "Membership Basis",
+            "type": "string"
+          },
+          "missing_sessions": {
+            "items": {
+              "$ref": "#/$defs/MissingSession"
+            },
+            "title": "Missing Sessions",
+            "type": "array"
+          }
+        },
+        "required": [
+          "asset_ids",
+          "first_session",
+          "last_session",
+          "latest_completed_session",
+          "missing_sessions",
+          "membership_basis"
+        ],
+        "title": "SnapshotCoverage",
+        "type": "object"
+      },
+      "SnapshotV1": {
+        "additionalProperties": false,
+        "properties": {
+          "asset_count": {
+            "minimum": 0,
+            "title": "Asset Count",
+            "type": "integer"
+          },
+          "coverage": {
+            "$ref": "#/$defs/SnapshotCoverage"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "latest_completed_session": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latest Completed Session"
+          },
+          "manifest_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Manifest Sha256",
+            "type": "string"
+          },
+          "mode": {
+            "enum": [
+              "synthetic_fixture",
+              "research_market_data"
+            ],
+            "title": "Mode",
+            "type": "string"
+          },
+          "provider": {
+            "title": "Provider",
+            "type": "string"
+          },
+          "published_at": {
+            "format": "date-time",
+            "pattern": "Z$",
+            "title": "Published At",
+            "type": "string"
+          },
+          "quality": {
+            "enum": [
+              "usable",
+              "usable_with_warnings",
+              "blocked"
+            ],
+            "title": "Quality",
+            "type": "string"
+          },
+          "warnings": {
+            "items": {
+              "pattern": "^[A-Z][A-Z0-9_]*$",
+              "type": "string"
+            },
+            "title": "Warnings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "provider",
+          "mode",
+          "latest_completed_session",
+          "published_at",
+          "quality",
+          "warnings",
+          "asset_count",
+          "manifest_sha256",
+          "coverage"
+        ],
+        "title": "SnapshotV1",
+        "type": "object"
+      }
+    },
+    "additionalProperties": false,
+    "properties": {
+      "checked_at": {
+        "format": "date-time",
+        "pattern": "Z$",
+        "title": "Checked At",
+        "type": "string"
+      },
+      "current_snapshot": {
+        "anyOf": [
+          {
+            "$ref": "#/$defs/SnapshotV1"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "freshness": {
+        "enum": [
+          "synthetic",
+          "unknown",
+          "refresh_failed"
+        ],
+        "title": "Freshness",
+        "type": "string"
+      },
+      "latest_job": {
+        "anyOf": [
+          {
+            "$ref": "#/$defs/JobV1"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "mode": {
+        "enum": [
+          "synthetic_fixture",
+          "research_market_data"
+        ],
+        "title": "Mode",
+        "type": "string"
+      },
+      "status": {
+        "enum": [
+          "empty",
+          "ready",
+          "refreshing",
+          "failed"
+        ],
+        "title": "Status",
+        "type": "string"
+      },
+      "warnings": {
+        "items": {
+          "pattern": "^[A-Z][A-Z0-9_]*$",
+          "type": "string"
+        },
+        "title": "Warnings",
+        "type": "array"
+      }
+    },
+    "required": [
+      "mode",
+      "checked_at",
+      "status",
+      "current_snapshot",
+      "latest_job",
+      "warnings",
+      "freshness"
+    ],
+    "title": "DataHealthV1",
     "type": "object"
   },
   "ErrorEnvelope.serialization": {
@@ -5083,6 +6217,374 @@
       "artifacts"
     ],
     "title": "SnapshotManifestV1",
+    "type": "object"
+  },
+  "SnapshotV1.serialization": {
+    "$defs": {
+      "MissingSession": {
+        "additionalProperties": false,
+        "properties": {
+          "asset_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "title": "Asset Id",
+            "type": "string"
+          },
+          "session_date": {
+            "format": "date",
+            "title": "Session Date",
+            "type": "string"
+          }
+        },
+        "required": [
+          "asset_id",
+          "session_date"
+        ],
+        "title": "MissingSession",
+        "type": "object"
+      },
+      "SnapshotCoverage": {
+        "additionalProperties": false,
+        "properties": {
+          "asset_ids": {
+            "items": {
+              "maxLength": 160,
+              "minLength": 1,
+              "type": "string"
+            },
+            "title": "Asset Ids",
+            "type": "array"
+          },
+          "first_session": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "First Session"
+          },
+          "last_session": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Session"
+          },
+          "latest_completed_session": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latest Completed Session"
+          },
+          "membership_basis": {
+            "enum": [
+              "point_in_time",
+              "current_only",
+              "synthetic"
+            ],
+            "title": "Membership Basis",
+            "type": "string"
+          },
+          "missing_sessions": {
+            "items": {
+              "$ref": "#/$defs/MissingSession"
+            },
+            "title": "Missing Sessions",
+            "type": "array"
+          }
+        },
+        "required": [
+          "asset_ids",
+          "first_session",
+          "last_session",
+          "latest_completed_session",
+          "missing_sessions",
+          "membership_basis"
+        ],
+        "title": "SnapshotCoverage",
+        "type": "object"
+      }
+    },
+    "additionalProperties": false,
+    "properties": {
+      "asset_count": {
+        "minimum": 0,
+        "title": "Asset Count",
+        "type": "integer"
+      },
+      "coverage": {
+        "$ref": "#/$defs/SnapshotCoverage"
+      },
+      "id": {
+        "format": "uuid",
+        "title": "Id",
+        "type": "string"
+      },
+      "latest_completed_session": {
+        "anyOf": [
+          {
+            "format": "date",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Latest Completed Session"
+      },
+      "manifest_sha256": {
+        "pattern": "^[0-9a-f]{64}$",
+        "title": "Manifest Sha256",
+        "type": "string"
+      },
+      "mode": {
+        "enum": [
+          "synthetic_fixture",
+          "research_market_data"
+        ],
+        "title": "Mode",
+        "type": "string"
+      },
+      "provider": {
+        "title": "Provider",
+        "type": "string"
+      },
+      "published_at": {
+        "format": "date-time",
+        "pattern": "Z$",
+        "title": "Published At",
+        "type": "string"
+      },
+      "quality": {
+        "enum": [
+          "usable",
+          "usable_with_warnings",
+          "blocked"
+        ],
+        "title": "Quality",
+        "type": "string"
+      },
+      "warnings": {
+        "items": {
+          "pattern": "^[A-Z][A-Z0-9_]*$",
+          "type": "string"
+        },
+        "title": "Warnings",
+        "type": "array"
+      }
+    },
+    "required": [
+      "id",
+      "provider",
+      "mode",
+      "latest_completed_session",
+      "published_at",
+      "quality",
+      "warnings",
+      "asset_count",
+      "manifest_sha256",
+      "coverage"
+    ],
+    "title": "SnapshotV1",
+    "type": "object"
+  },
+  "SnapshotV1.validation": {
+    "$defs": {
+      "MissingSession": {
+        "additionalProperties": false,
+        "properties": {
+          "asset_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "title": "Asset Id",
+            "type": "string"
+          },
+          "session_date": {
+            "format": "date",
+            "title": "Session Date",
+            "type": "string"
+          }
+        },
+        "required": [
+          "asset_id",
+          "session_date"
+        ],
+        "title": "MissingSession",
+        "type": "object"
+      },
+      "SnapshotCoverage": {
+        "additionalProperties": false,
+        "properties": {
+          "asset_ids": {
+            "items": {
+              "maxLength": 160,
+              "minLength": 1,
+              "type": "string"
+            },
+            "title": "Asset Ids",
+            "type": "array"
+          },
+          "first_session": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "First Session"
+          },
+          "last_session": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Session"
+          },
+          "latest_completed_session": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latest Completed Session"
+          },
+          "membership_basis": {
+            "enum": [
+              "point_in_time",
+              "current_only",
+              "synthetic"
+            ],
+            "title": "Membership Basis",
+            "type": "string"
+          },
+          "missing_sessions": {
+            "items": {
+              "$ref": "#/$defs/MissingSession"
+            },
+            "title": "Missing Sessions",
+            "type": "array"
+          }
+        },
+        "required": [
+          "asset_ids",
+          "first_session",
+          "last_session",
+          "latest_completed_session",
+          "missing_sessions",
+          "membership_basis"
+        ],
+        "title": "SnapshotCoverage",
+        "type": "object"
+      }
+    },
+    "additionalProperties": false,
+    "properties": {
+      "asset_count": {
+        "minimum": 0,
+        "title": "Asset Count",
+        "type": "integer"
+      },
+      "coverage": {
+        "$ref": "#/$defs/SnapshotCoverage"
+      },
+      "id": {
+        "format": "uuid",
+        "title": "Id",
+        "type": "string"
+      },
+      "latest_completed_session": {
+        "anyOf": [
+          {
+            "format": "date",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Latest Completed Session"
+      },
+      "manifest_sha256": {
+        "pattern": "^[0-9a-f]{64}$",
+        "title": "Manifest Sha256",
+        "type": "string"
+      },
+      "mode": {
+        "enum": [
+          "synthetic_fixture",
+          "research_market_data"
+        ],
+        "title": "Mode",
+        "type": "string"
+      },
+      "provider": {
+        "title": "Provider",
+        "type": "string"
+      },
+      "published_at": {
+        "format": "date-time",
+        "pattern": "Z$",
+        "title": "Published At",
+        "type": "string"
+      },
+      "quality": {
+        "enum": [
+          "usable",
+          "usable_with_warnings",
+          "blocked"
+        ],
+        "title": "Quality",
+        "type": "string"
+      },
+      "warnings": {
+        "items": {
+          "pattern": "^[A-Z][A-Z0-9_]*$",
+          "type": "string"
+        },
+        "title": "Warnings",
+        "type": "array"
+      }
+    },
+    "required": [
+      "id",
+      "provider",
+      "mode",
+      "latest_completed_session",
+      "published_at",
+      "quality",
+      "warnings",
+      "asset_count",
+      "manifest_sha256",
+      "coverage"
+    ],
+    "title": "SnapshotV1",
     "type": "object"
   },
   "StrategyConfigV1.serialization": {

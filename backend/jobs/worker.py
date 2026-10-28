@@ -334,7 +334,7 @@ def main() -> None:
         raise SystemExit("Worker requires DATABASE_URL")
     verify_container_budget()
     engine = database_engine(settings.database_url)
-    worker = Worker(Queue(engine, limits=limits))
+    worker = Worker(Queue(engine, limits=limits), artifact_root=settings.artifact_root)
     try:
         while True:
             try:

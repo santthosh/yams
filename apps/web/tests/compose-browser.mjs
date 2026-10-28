@@ -48,6 +48,29 @@ try {
       path: path.join(destination, `settings-${width}.png`),
       fullPage: true,
     });
+    await page.goto(`${origin}/settings/data`);
+    await page
+      .getByRole("heading", { name: "Market data", exact: true })
+      .waitFor();
+    await page.getByRole("button", { name: "Refresh selected source" }).click();
+    await page
+      .getByRole("heading", { name: "Completed", exact: true })
+      .waitFor({ timeout: 60000 });
+    await page.getByLabel("Symbol or asset ID").fill("AAA");
+    await page.getByRole("button", { name: "Search assets" }).click();
+    await page.getByText("AAA · XNYS", { exact: false }).waitFor();
+    await page.screenshot({
+      path: path.join(destination, `data-${width}.png`),
+      fullPage: true,
+    });
+    await page.getByLabel("Source mode").selectOption("research_market_data");
+    await page
+      .getByRole("heading", { name: "No registered snapshot" })
+      .waitFor();
+    await page.screenshot({
+      path: path.join(destination, `data-research-${width}.png`),
+      fullPage: true,
+    });
     assert.deepEqual(errors, []);
     assert.deepEqual(external, []);
     await page.close();
