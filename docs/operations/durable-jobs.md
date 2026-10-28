@@ -1,25 +1,35 @@
 # Durable job operations
 
-Foundation registers only `diagnostic`: a labeled synthetic integer sum, not a
-financial calculation. Unknown kinds and payload fields fail before enqueue.
+The foundation `diagnostic` handler remains a labeled synthetic integer sum, not
+a financial calculation. Unknown kinds and payload fields fail before enqueue.
 The typed payload is `{"schema_version":1,"work_units":10}`; work units must be
 an integer from zero through one million. Ten units produce the independent
 integer sum 45. The sealed result has kind `diagnostic`, no financial resource ID,
 and a fixed synthetic message; its durable effect lives in `job_diagnostic_effect`.
 
+The current 0.0.2 application also registers `refresh_market_data` and
+`evaluate_strategy`. Use the source-aware refresh API and strategy-evaluation
+admission API; they pin validated source/config/calendar/build inputs and own
+atomic publication. The diagnostic service example below is not a way to enqueue
+arbitrary financial work. See [market refresh](market-refresh.md),
+[candidate inspection](strategy-evaluations.md) and the optional
+[Tiingo workflow](tiingo-research.md). Backtest, forecast and durable trade-posting
+handlers remain unavailable. Public cancellation is owned by #41.
+
 ## Startup and configuration
 
 Apply `make db-bootstrap` before starting API or worker. Migration `0002_jobs`
 adds `job`, `job_attempt`, `schedule` and `job_diagnostic_effect`; it preserves the
-workspace. Startup does not implicitly migrate. `DATABASE_URL` must use the
+workspace. Standalone worker startup does not migrate; application Compose runs
+its migration service before API/worker readiness. `DATABASE_URL` must use the
 private `postgresql+psycopg://` service described in README. Never publish its port.
 
 Run `python -m backend.jobs.worker` in the installed Linux worker environment.
 The worker refuses unbounded cgroup-v2 CPU/memory/PID settings or nonzero swap:
 maximum 2 CPUs, 2 GiB memory and 64 PIDs. It is intentionally not a native macOS
-worker. Application image/Compose wiring belongs to #25; this command does not
-claim that the packaged application already exists. The isolated integration
-harness provides the currently executable, resource-enforced verification path.
+worker. Application image/Compose wiring is delivered by #25; `make dev` uses
+the approved native web/API plus Docker worker/database workflow. The isolated
+integration harness remains the resource-enforced test path.
 
 `YAMS_JOB_LIMITS` is an optional JSON object of lower defaults, for example
 `{"wall_seconds":60,"memory_mib":1024}`. Missing fields retain ADR-005 defaults;
@@ -79,7 +89,7 @@ interval_seconds=60)`. The worker calls `catch_up` while active, preserving each
 original due time and atomically advancing the cursor. Batches defer remaining
 backlog. Schedule definitions are immutable; changes require a new schedule ID,
 with the old schedule disabled through an authorized administrative transaction.
-Existing occurrence identities and job inputs remain unchanged. This foundation
+Existing occurrence identities and job inputs remain unchanged. The current application
 has no schedule UI or financial/calendar scheduler. No monitoring occurs while
 Docker is stopped. Inspect `schedule.next_due_at` and queued job timestamps for
 backlog; no public schedule-status endpoint is claimed.

@@ -1,8 +1,8 @@
 # Immutable market refresh
 
-Issue #30 adds internal `refresh_market_data` jobs to the existing supervised worker.
-Enqueue through `Queue.enqueue` with a UUID idempotency key. Public snapshot routes
-and UI controls belong to #31; this internal service does not claim those are delivered.
+The supervised worker handles `refresh_market_data` jobs; the source-aware API and
+Settings UI are delivered by #31. Use `POST /api/v1/data/refresh` with a UUID
+idempotency key. Trusted internal callers can also use `Queue.enqueue`.
 
 For offline fixture acquisition, payload is:
 
@@ -10,7 +10,15 @@ For offline fixture acquisition, payload is:
 {"schema_version":1,"source_mode":"synthetic_fixture","expected_manifest_hash":"<trusted fixture manifest SHA-256>"}
 ```
 
-For optional research acquisition, use `source_mode: research_market_data` and a
+Research mode accepts a closed provider-specific configuration. The personal-use
+Tiingo path uses `TiingoResearchConfigV1`, a pinned real calendar and a declared
+budget-sampled universe; see the [local Tiingo workflow](tiingo-research.md) for the
+worker-only token/egress override, quotas and diagnostic-only capabilities. It is
+included in the default backend image but requires explicit operator opt-in.
+
+## Conditional Yahoo inspection path
+
+For optional Yahoo acquisition, use `source_mode: research_market_data` and a
 `research_config` validated by `backend.market_data.research_config.ResearchConfig`.
 Do not supply an output manifest hash: the immutable configuration is pinned in the
 job and its canonical hash is recorded in the resulting provenance. Configuration
@@ -21,7 +29,7 @@ Every non-test directory listing selected by that rule must match the configured
 inventory exactly. No silent first-N truncation, missing-name omission or ticker-only
 identity assignment is allowed. Unsupported venue mappings fail explicitly.
 
-The network path is inactive during normal fixture startup. To install its pinned
+This Yahoo network path is inactive during normal fixture startup. To install its pinned
 library in a development environment run `uv sync --locked --extra research` and run
 commands with `uv run --locked --extra research ...`. Default Docker images exclude
 the extra; a research-enabled operator image must export/install the same locked extra
@@ -41,6 +49,8 @@ than silently narrow the universe. Historical downloads retain actual observatio
 current membership carries survivorship limitations. Unverified raw-price and action
 capabilities produce blocked inspection snapshots, never an execution-usable current
 pointer. Ex-dates do not invent dividend payable dates. No holdings or cash are mutated.
+
+## Shared publication and recovery
 
 The child stages files beneath `/artifacts/snapshot-staging/<job>-<attempt-token>`.
 Only the supervisor may publish: validate hashes and payload, acquire digest lock,
@@ -66,13 +76,14 @@ Verification commands: `make lint`, `make typecheck`, `make test`, `make build`,
 `make contracts-check`, `make fixtures-check`, `make test-integration`, `make smoke`.
 Offline tests cover the actual bounded worker, database restart, immutable rows,
 lease expiry, digest contention, no-clobber publication, valid/corrupt orphans and blocked
-snapshot pointer preservation. A live provider diagnostic is optional and not an offline CI gate.
+snapshot pointer preservation. Live provider acquisition stays outside offline CI;
+the0.0.2 release epic separately requires actual verified real-source evidence.
 
 ## Settings / Data and discovery API
 
 Open Settings → Manage market data and snapshots (`/settings/data`). Choose the source
 explicitly. The sample refresh pins the committed fixture hash; advanced research refresh
-accepts the closed configuration above. Queue admission requires a UUID idempotency key;
+accepts the selected provider's closed configuration above. Queue admission requires a UUID idempotency key;
 the browser retains it after an uncertain network result. The page polls persisted job
 status, retains prior same-mode coverage on failure and never offers public cancellation.
 Research coverage is not labeled fresh. A blocked inspection snapshot can appear in the
