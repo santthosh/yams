@@ -14,13 +14,16 @@ from multiprocessing.connection import Connection as PipeConnection
 from multiprocessing.process import BaseProcess
 from multiprocessing.synchronize import Event
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 from uuid import uuid4
 
 from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
 
+from backend.backtesting.errors import SAFE_BACKTEST_REASONS, BacktestFailure
+from backend.backtesting.service import seal_core
 from backend.domain.common import ErrorCode
+from backend.jobs.handlers.backtest import backtest_core
 from backend.jobs.handlers.evaluate_strategy import EvaluationFailure, evaluate_strategy
 from backend.jobs.handlers.refresh_market_data import refresh_market_data
 from backend.jobs.queue import Lease, Queue
@@ -32,6 +35,7 @@ from backend.strategies.evaluations import seal_evaluation
 
 logger = logging.getLogger(__name__)
 Handler = Callable[[dict[str, Any], Event], int | str]
+CoreHandler = Callable[[dict[str, Any], Event, Callable[[int, int], None]], str]
 
 
 class Cancelled(Exception):
@@ -98,13 +102,32 @@ def child_entry(
             raise RuntimeError("Worker requires Linux resource enforcement")
         for name in ("OPENBLAS_NUM_THREADS", "OMP_NUM_THREADS", "MKL_NUM_THREADS"):
             os.environ[name] = "1"
-        value = handler(lease.payload, cancelled)
+        last_progress = -1
+
+        def report_progress(completed: int, total: int) -> None:
+            nonlocal last_progress
+            if not 0 <= completed <= total or not 1 <= total <= 2520:
+                raise ValueError("Invalid core progress")
+            percent = min(99, completed * 100 // total)
+            if percent != last_progress:
+                pipe.send(("progress", percent))
+                last_progress = percent
+
+        value: int | str
+        if lease.kind == "backtest_core":
+            value = cast(CoreHandler, handler)(lease.payload, cancelled, report_progress)
+        else:
+            value = handler(lease.payload, cancelled)
         usage = resource.getrusage(resource.RUSAGE_SELF)
         pipe.send(("ok", value, usage.ru_maxrss, usage.ru_utime + usage.ru_stime))
     except Cancelled:
         pipe.send(("cancelled",))
     except ProviderFailure as error:
         pipe.send(("provider_error", error.reason))
+    except BacktestFailure as error:
+        pipe.send(
+            ("cancelled",) if error.reason == "CANCELLED" else ("backtest_error", error.reason)
+        )
     except EvaluationFailure as error:
         pipe.send(("evaluation_error", error.code))
     except MemoryError:
@@ -182,6 +205,11 @@ class Worker:
             handler = partial(refresh_market_data, stage=stage)
         elif lease.kind == "evaluate_strategy":
             handler = partial(evaluate_strategy, root=self.artifact_root)
+        elif lease.kind == "backtest_core":
+            staging = self.artifact_root / "experiment-staging"
+            staging.mkdir(mode=0o700, parents=True, exist_ok=True)
+            stage = staging / f"{lease.job_id}-{lease.token}"
+            handler = partial(backtest_core, root=self.artifact_root, stage=stage)
         context = mp.get_context("spawn")
         cancelled = context.Event()
         reader, writer = context.Pipe(duplex=False)
@@ -204,6 +232,26 @@ class Worker:
         failure: ErrorCode | None = None
         usage_before = resource.getrusage(resource.RUSAGE_CHILDREN)
         peak_rss: int | None = None
+        progress = 0
+
+        def receive() -> None:
+            nonlocal message, progress
+            while reader.poll():
+                try:
+                    incoming = reader.recv()
+                except EOFError:
+                    return
+                if incoming[0] == "progress":
+                    if (
+                        lease.kind != "backtest_core"
+                        or type(incoming[1]) is not int
+                        or not progress <= incoming[1] <= 99
+                    ):
+                        raise ValueError("Invalid child progress")
+                    progress = incoming[1]
+                else:
+                    message = incoming
+
         try:
             try:
                 process.start()
@@ -239,7 +287,7 @@ class Worker:
                     stop_child(process, 0)
                     break
                 if now - last_heartbeat >= lease.limits.heartbeat_seconds:
-                    authority = self.queue.heartbeat(lease)
+                    authority = self.queue.heartbeat(lease, progress)
                     if authority is None:
                         cancelled.set()
                         stop_child(process, 0)
@@ -248,18 +296,10 @@ class Worker:
                     max_gap = max(max_gap, heartbeat_done - last_heartbeat)
                     last_heartbeat = heartbeat_done
                 self.schedule_if_due()
-                if reader.poll():
-                    try:
-                        message = reader.recv()
-                    except EOFError:
-                        pass
+                receive()
                 process.join(timeout=lease.limits.poll_milliseconds / 1000)
             process.join(timeout=1)
-            if message is None and reader.poll():
-                try:
-                    message = reader.recv()
-                except EOFError:
-                    pass
+            receive()
             usage_after = resource.getrusage(resource.RUSAGE_CHILDREN)
             if message and message[0] == "ok":
                 peak_rss = max(peak_rss or 0, int(message[2]))
@@ -293,6 +333,10 @@ class Worker:
                         if not isinstance(message[1], str):
                             raise ValueError("Invalid diagnostic completion")
                         seal_evaluation(self.queue, lease, message[1])
+                    elif lease.kind == "backtest_core":
+                        if stage is None or not isinstance(message[1], str):
+                            raise ValueError("Invalid core completion")
+                        seal_core(self.queue, lease, self.artifact_root, stage, message[1])
                     elif not self.queue.complete_diagnostic(lease, message[1]):
                         self.queue.acknowledge_cancel(lease)
                 except PublicationFenceError:
@@ -308,7 +352,12 @@ class Worker:
                 if message and message[0] == "evaluation_error":
                     if message[1] in {"VALIDATION_ERROR", "STALE_DATA"}:
                         code = message[1]
-                if message and message[0] == "provider_error":
+                if message and message[0] == "backtest_error":
+                    reason = message[1]
+                    if reason not in SAFE_BACKTEST_REASONS:
+                        raise ValueError("Invalid backtest failure")
+                    self.queue.fail(lease, "VALIDATION_ERROR", reason=reason)
+                elif message and message[0] == "provider_error":
                     provider = ProviderFailure(message[1])
                     self.queue.fail(
                         lease,

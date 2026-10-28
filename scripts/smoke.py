@@ -40,8 +40,8 @@ def main() -> None:
     def compose(*args: str) -> str:
         return subprocess.check_output([*command, *args], cwd=ROOT, env=env, text=True)
 
-    def python(code: str) -> str:
-        return compose("exec", "-T", "api", "python", "-c", code).strip()
+    def python(code: str, *arguments: str) -> str:
+        return compose("exec", "-T", "api", "python", "-c", code, *arguments).strip()
 
     def web_address() -> str:
         value = compose("port", "web", "3000").strip()
@@ -244,6 +244,70 @@ def main() -> None:
         evidence["checks"].append(
             "real browser candidate/target reruns and cash-only cases via supervised worker"
         )
+        # Internal service integration only: #41 owns public report submission.
+        core = json.loads(
+            python(
+                "import json\n"
+                "from uuid import uuid5\n"
+                "from sqlalchemy.orm import Session\n"
+                "from backend.backtesting.service import admit_core\n"
+                "from backend.domain.experiment import ExperimentRequest\n"
+                "from backend.persistence.database import Settings, database_engine\n"
+                "from backend.persistence.models.snapshot import CurrentSnapshot\n"
+                "from backend.strategies.registry import template_strategy_id\n"
+                "settings=Settings.from_environment()\n"
+                "engine=database_engine(settings.database_url)\n"
+                "with Session(engine) as session:\n"
+                "    snapshot=session.get(CurrentSnapshot, 'synthetic_fixture').snapshot_id\n"
+                "request=ExperimentRequest.model_validate(dict(\n"
+                "    strategy_version_id=uuid5(template_strategy_id('mean_reversion'),'1'),\n"
+                "    snapshot_id=snapshot,start_session='2028-07-18',\n"
+                "    end_session_exclusive='2028-07-24',initial_capital_usd='1000.00',\n"
+                "    benchmark_asset_id='SYN:SPY',execution_policy_id='us_eod_next_open_v1',\n"
+                "    random_seed=42,evaluation_split=dict(kind='chronological',"
+                "holdout_fraction=0.25)))\n"
+                "accepted=admit_core(engine,settings.artifact_root,request)\n"
+                "print(json.dumps(dict(experiment_id=str(accepted.experiment_id),job_id=str(accepted.job_id))))\n"
+                "engine.dispose()"
+            )
+        )
+        deadline = time.monotonic() + 60
+        while time.monotonic() < deadline:
+            core_job = get(f"jobs/{core['job_id']}")
+            if core_job["status"] in {"completed", "failed", "cancelled"}:
+                break
+            time.sleep(0.1)
+        assert core_job["status"] == "completed", core_job
+
+        def core_state() -> Any:
+            return json.loads(
+                python(
+                    "import json,sys\n"
+                    "from uuid import UUID\n"
+                    "from backend.backtesting.service import read_core_run\n"
+                    "from backend.persistence.database import Settings,database_engine\n"
+                    "settings=Settings.from_environment()\n"
+                    "engine=database_engine(settings.database_url)\n"
+                    "saved=read_core_run(engine,settings.artifact_root,UUID(sys.argv[1]))\n"
+                    "assert saved is not None and saved.result is not None\n"
+                    "print(json.dumps(dict(id=str(saved.id),manifest_sha256=saved.manifest_sha256,"
+                    "result=saved.result.model_dump(mode='json'))))\n"
+                    "engine.dispose()",
+                    core["experiment_id"],
+                )
+            )
+
+        core_result = core_state()
+        oracle = json.loads((ROOT / "data/fixtures/backtesting/core-case.json").read_text())
+        assert [row["nav_usd"] for row in core_result["result"]["points"]] == oracle[
+            "daily_nav_usd"
+        ]
+        assert core_result["result"]["points"][1]["state"]["cash_usd"] == "392.84"
+        evidence["backtest_core"] = core_result
+        (destination / "backtest-core.json").write_text(json.dumps(core_result, indent=2))
+        evidence["checks"].append(
+            "internal core admission, actual supervised next-open replay and sealed artifact"
+        )
         for service in ("api", "worker"):
             blocked = compose(
                 "exec",
@@ -268,6 +332,7 @@ def main() -> None:
         compose("up", "-d", "--wait", "--wait-timeout", "120", "--pull", "never", "--no-build")
         address = web_address()
         assert get("workspace") == workspace
+        assert core_state() == core_result
         assert get("strategies") == strategies
         assert get(f"strategies/{strategy_id}/versions") == versions
         for editor_id, history in editor_versions.items():
@@ -286,6 +351,7 @@ def main() -> None:
         compose("up", "--build", "--force-recreate", "-d", "--wait", "--wait-timeout", "120")
         address = web_address()
         assert get("workspace") == workspace
+        assert core_state() == core_result
         assert get("strategies") == strategies
         assert get(f"strategies/{strategy_id}/versions") == versions
         for editor_id, history in editor_versions.items():
@@ -382,6 +448,7 @@ def main() -> None:
         compose("up", "-d", "--wait", "--wait-timeout", "120")
         address = web_address()
         assert get("workspace") == workspace
+        assert core_state() == core_result
         evidence["checks"].append(
             "failed migration blocks application startup; repair preserves workspace"
         )

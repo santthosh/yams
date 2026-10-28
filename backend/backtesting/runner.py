@@ -6,11 +6,14 @@ from datetime import date, timedelta
 from decimal import Decimal
 from typing import Literal
 
+from backend.backtesting.errors import BacktestFailure as BacktestFailure
 from backend.backtesting.schedule import ExperimentSchedule, build_schedule
 from backend.domain.experiment import ExperimentRequest
 from backend.domain.strategy import StrategyConfigV1
 from backend.domain.types import Contract, Hash256, Money, Reason, SourceMode, load_json
 from backend.jobs.registry import validate_workload
+from backend.market_data.files import PinnedSnapshot
+from backend.market_data.models import Calendar
 from backend.market_data.repository import MarketRepository, MarketView
 from backend.portfolio.allocation import AllocatedMomentum, allocate_momentum
 from backend.portfolio.corporate_actions import ActionResult, action_key, apply_action
@@ -27,14 +30,6 @@ from backend.portfolio.planner import OrderPlan, plan_orders
 from backend.portfolio.valuation import value_close
 from backend.strategies.clock import decision_cutoff
 from backend.strategies.momentum import evaluate_strategy
-
-
-class BacktestFailure(ValueError):
-    """Safe inspectable reason; no partially completed financial result."""
-
-    def __init__(self, reason: str):
-        self.reason = reason
-        super().__init__(reason)
 
 
 class EquityPoint(Contract):
@@ -69,7 +64,11 @@ class BacktestCoreResult(Contract):
 
 
 def validate_source(repository: MarketRepository) -> None:
-    manifest = repository.snapshot.manifest
+    validate_source_snapshot(repository.snapshot)
+
+
+def validate_source_snapshot(snapshot: PinnedSnapshot) -> None:
+    manifest = snapshot.manifest
     if manifest.quality == "blocked" or manifest.price_basis.ohlc != "raw_as_traded":
         raise BacktestFailure("UNSUPPORTED_ACCOUNTING_SOURCE")
     if manifest.mode == "synthetic_fixture":
@@ -84,7 +83,7 @@ def validate_source(repository: MarketRepository) -> None:
         for row in manifest.artifacts
         if row.role == "provenance" and row.sha256 == manifest.source.capabilities_sha256
     )
-    capabilities = load_json(repository.snapshot.artifacts[evidence.path])
+    capabilities = load_json(snapshot.artifacts[evidence.path])
     if not isinstance(capabilities, dict) or any(
         capabilities.get(key) is not True
         for key in (
@@ -113,22 +112,13 @@ def _warnings(
     return result
 
 
-def run_backtest(
-    repository: MarketRepository,
-    request: ExperimentRequest,
-    config: StrategyConfigV1,
-    *,
-    engine_version: str,
-    cancelled: Callable[[], bool] = lambda: False,
-) -> BacktestCoreResult:
-    """No DB/network writes. A missing required mark/open fails the whole core.
-
-    Daily bars may arrive after the originally eligible open but must be known by
-    that session's overnight cutoff. Later evidence never revises a sealed NAV.
-    No raw/action capability is inferred from diagnostic support.
-    """
-    validate_source(repository)
-    manifest, calendar = repository.snapshot.manifest, repository.calendar
+def prepare_backtest(
+    snapshot: PinnedSnapshot, request: ExperimentRequest
+) -> tuple[Calendar, ExperimentSchedule]:
+    """Bounded metadata-only admission; no prices are queried in the API process."""
+    validate_source_snapshot(snapshot)
+    manifest = snapshot.manifest
+    calendar = Calendar.model_validate_json(snapshot.artifacts[manifest.calendar.artifact_path])
     if request.snapshot_id != manifest.snapshot_id():
         raise BacktestFailure("SNAPSHOT_IDENTITY_MISMATCH")
     validate_workload(assets=len(manifest.coverage.asset_ids), sessions=len(calendar.sessions))
@@ -151,6 +141,28 @@ def run_backtest(
         raise BacktestFailure("UNCOVERED_EXPERIMENT_INTERVAL")
     if request.execution_policy_id != DEFAULT_EXECUTION_POLICY.id:
         raise BacktestFailure("UNSUPPORTED_EXECUTION_POLICY")
+    if any(row.role == "bars" and (row.row_count or 0) > 2520000 for row in manifest.artifacts):
+        raise ValueError("WORKLOAD_LIMIT")
+    return calendar, schedule
+
+
+def run_backtest(
+    repository: MarketRepository,
+    request: ExperimentRequest,
+    config: StrategyConfigV1,
+    *,
+    engine_version: str,
+    cancelled: Callable[[], bool] = lambda: False,
+    progress: Callable[[int, int], None] = lambda completed, total: None,
+) -> BacktestCoreResult:
+    """No DB/network writes. A missing required mark/open fails the whole core.
+
+    Daily bars may arrive after the originally eligible open but must be known by
+    that session's overnight cutoff. Later evidence never revises a sealed NAV.
+    No raw/action capability is inferred from diagnostic support.
+    """
+    calendar, schedule = prepare_backtest(repository.snapshot, request)
+    manifest = repository.snapshot.manifest
     warnings = _warnings(schedule, config, repository)
     state = PortfolioState(cash_usd=request.initial_capital_usd, positions=())
     points: list[EquityPoint] = []
@@ -282,6 +294,7 @@ def run_backtest(
             decisions.append(BacktestDecision(measured=measured, plan=plan))
             warnings.update(measured.momentum.warnings)
             pending = plan
+        progress(index + 1, len(schedule.sessions))
     if cancelled():
         raise BacktestFailure("CANCELLED")
     return BacktestCoreResult(

@@ -11,6 +11,7 @@ from sqlalchemy import Engine, exists, func, or_, select, text
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import Session, aliased
 
+from backend.backtesting.errors import SAFE_BACKTEST_REASONS
 from backend.domain.common import ErrorCode, ErrorDetail, JobResult, JobV1
 from backend.domain.types import canonical_json
 from backend.jobs.registry import AttemptMetrics, JobLimits, validate_payload
@@ -426,8 +427,11 @@ class Queue:
         retry_after: int = 0,
         reason: str | None = None,
     ) -> bool:
-        if reason is not None and reason not in SAFE_PROVIDER_REASONS:
-            raise ValueError("Unsupported provider failure reason")
+        allowed_reasons = (
+            SAFE_BACKTEST_REASONS if lease.kind == "backtest_core" else SAFE_PROVIDER_REASONS
+        )
+        if reason is not None and reason not in allowed_reasons:
+            raise ValueError("Unsupported job failure reason")
         if retry_after < 0:
             raise ValueError("Negative retry-after")
         with Session(self.engine) as session, session.begin():
