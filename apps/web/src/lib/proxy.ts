@@ -197,7 +197,10 @@ export async function proxyApi(
     );
     if (!response.headers.get("content-type")?.includes("application/json"))
       throw new Error("Unexpected response");
-    const body: unknown = await response.json();
+    const rawBody = await response.text();
+    // Validate/sanitize the envelope without re-encoding successful JSON.
+    // Parsing into JS numbers and serializing again corrupts uint64 literals.
+    const body: unknown = JSON.parse(rawBody);
     if (body === null || typeof body !== "object" || Array.isArray(body))
       throw new Error("Unexpected response");
     const healthFailure =
@@ -262,9 +265,12 @@ export async function proxyApi(
             correlation,
           );
     }
-    return Response.json(body, {
+    return new Response(rawBody, {
       status: response.status,
-      headers: { "Cache-Control": "no-store" },
+      headers: {
+        "Content-Type": "application/json",
+        "Cache-Control": "no-store",
+      },
     });
   } catch {
     return safeError(

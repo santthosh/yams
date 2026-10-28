@@ -374,7 +374,17 @@ export function StrategyBrowser() {
         />
       )}
       <p>
-        Experiments and comparisons are staged separately.{" "}
+        {currentRoot && currentVersion && !historyLoading && !historyError && (
+          <>
+            <Link
+              href={`/lab/experiments?strategy=${currentRoot.id}&version=${currentVersion.id}`}
+            >
+              Run selected version
+            </Link>
+            {" · "}
+          </>
+        )}
+        Comparison is planned separately.{" "}
         <Link href="/lab/candidates">
           Inspect candidates from a saved version
         </Link>

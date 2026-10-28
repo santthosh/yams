@@ -1,0 +1,297 @@
+{
+  "basis": "Observed real Docker/browser HTTP results, decoded losslessly from response text; not a golden financial oracle.",
+  "label": "SYNTHETIC_DATA_ONLY",
+  "passed_checks": [
+    "clean boot and real same-origin API readiness",
+    "real persisted diagnostic job completed by bounded worker",
+    "warm-up plus three diagnostic batches with concurrent API/DB reads",
+    "real Docker browser Dashboard/Settings/job at both widths",
+    "real browser same-origin strategy creation, immutable append, conflict and pagination",
+    "real browser candidate/target reruns and cash-only cases via supervised worker",
+    "real browser public experiment rerun, pages, cancellation and fingerprints",
+    "real mobile/desktop experiment form, charts/tables/Axe, exact uint64 rerun, original preservation and cancellation",
+    "internal core admission, actual supervised next-open replay and sealed artifact",
+    "worker-side Q12 metrics, aligned SPY/cash, continuing holdout and exposure",
+    "API and worker external routing blocked",
+    "restart preserves workspace, job, fixtures and artifact hash",
+    "rebuild/recreate preserves named-volume state",
+    "actual private ports and aggregate 4 CPU/4.5 GiB caps",
+    "failed migration blocks application startup; repair preserves workspace"
+  ],
+  "project": "yams-smoke-dbef3ff39df3",
+  "records": [
+    {
+      "fork_run": {
+        "config_sha256": "b74492cf22e689d8e8418cccf0efaa414d670d7682b2abd418f0c0a6dc32d1e0",
+        "curve_artifact": {
+          "id": "b3d56e63-dc2c-53fb-beb4-150ebc1322e4",
+          "schema_version": 1,
+          "sha256": "e23901e57001262c7ae431e13bf04a24dca118ef72cc725d7ded801e9bf45e65"
+        },
+        "engine_version": "b67f125ed73c01f60c84206de80760aca5173cdabdd3c47c7741136d5cfca29b",
+        "id": "52233660-a2b0-475d-804d-070962d410df",
+        "inputs": {
+          "benchmark_asset_id": "SYN:SPY",
+          "end_session_exclusive": "2028-07-24",
+          "evaluation_split": {
+            "holdout_fraction": 0.25,
+            "kind": "chronological"
+          },
+          "execution_policy_id": "us_eod_next_open_v1",
+          "initial_capital_usd": "1000.00",
+          "random_seed": 42,
+          "snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+          "start_session": "2028-07-18",
+          "strategy_version_id": "57c2bfe0-3599-4b9a-a597-40dca92a38d6"
+        },
+        "inputs_canonical_json": "{\"benchmark_asset_id\":\"SYN:SPY\",\"end_session_exclusive\":\"2028-07-24\",\"evaluation_split\":{\"holdout_fraction\":0.25,\"kind\":\"chronological\"},\"execution_policy_id\":\"us_eod_next_open_v1\",\"initial_capital_usd\":\"1000.00\",\"random_seed\":42,\"snapshot_id\":\"5c223992-90ec-59a7-a1e7-7889b76cacea\",\"start_session\":\"2028-07-18\",\"strategy_version_id\":\"57c2bfe0-3599-4b9a-a597-40dca92a38d6\"}",
+        "job_id": "2db05050-23c1-4fef-a31f-c1826449d55b",
+        "reproducibility_manifest": {
+          "id": "10df6a73-c768-5b8b-b116-700b1105b143",
+          "schema_version": 1,
+          "sha256": "ccddc0a3350c19e4e31145b8a6aa0441325ffd2f140514a6a3d69ca1b64252c4"
+        },
+        "snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+        "status": "completed",
+        "trade_artifact": {
+          "id": "3793e6e2-746b-534c-bc09-95aa44cad21f",
+          "schema_version": 1,
+          "sha256": "406dc125b11a789be272fb8c0d223163706bbc50e010ec3f5630e25b43de977e"
+        }
+      },
+      "source_version_id": "57c2bfe0-3599-4b9a-a597-40dca92a38d6",
+      "width": 360
+    },
+    {
+      "original": {
+        "config_sha256": "10904787385cca66062bcb1b27d264799b3cc954ee7fed62a91d11339295d81b",
+        "curve_artifact": {
+          "id": "4ef106dd-9d1e-58b3-b7ad-527d0b214779",
+          "schema_version": 1,
+          "sha256": "6c0f839d91646aee5de9edaced689f6de15603b6686bef5e60197eff1dbf454c"
+        },
+        "engine_version": "b67f125ed73c01f60c84206de80760aca5173cdabdd3c47c7741136d5cfca29b",
+        "id": "b66a3b8a-f0e7-4498-b15b-f98e6e9fbd5a",
+        "inputs": {
+          "benchmark_asset_id": "SYN:SPY",
+          "end_session_exclusive": "2028-07-24",
+          "evaluation_split": {
+            "holdout_fraction": 0.25,
+            "kind": "chronological"
+          },
+          "execution_policy_id": "us_eod_next_open_v1",
+          "initial_capital_usd": "1000.00",
+          "random_seed": 42,
+          "snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+          "start_session": "2028-07-18",
+          "strategy_version_id": "22fd08a0-5d5c-5a74-b622-8afff87b25b3"
+        },
+        "inputs_canonical_json": "{\"benchmark_asset_id\":\"SYN:SPY\",\"end_session_exclusive\":\"2028-07-24\",\"evaluation_split\":{\"holdout_fraction\":0.25,\"kind\":\"chronological\"},\"execution_policy_id\":\"us_eod_next_open_v1\",\"initial_capital_usd\":\"1000.00\",\"random_seed\":42,\"snapshot_id\":\"5c223992-90ec-59a7-a1e7-7889b76cacea\",\"start_session\":\"2028-07-18\",\"strategy_version_id\":\"22fd08a0-5d5c-5a74-b622-8afff87b25b3\"}",
+        "job_id": "aca4393f-5fa7-42b0-9aea-5d87132a55b0",
+        "reproducibility_manifest": {
+          "id": "e6607243-07c8-570a-a11d-4c19d67c79e4",
+          "schema_version": 1,
+          "sha256": "937563e6373e119ed5895fd2a6d94073a8a01d7a7e0c40f618732c4ab431df3b"
+        },
+        "snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+        "status": "completed",
+        "trade_artifact": {
+          "id": "123ee482-9e91-516b-ae4e-0dbb470de30f",
+          "schema_version": 1,
+          "sha256": "a45df2ada1b87423fa8d367b9a9904348ea52def552f7ba75910fb4967e58cb4"
+        }
+      },
+      "rerun": {
+        "config_sha256": "10904787385cca66062bcb1b27d264799b3cc954ee7fed62a91d11339295d81b",
+        "curve_artifact": {
+          "id": "4ef106dd-9d1e-58b3-b7ad-527d0b214779",
+          "schema_version": 1,
+          "sha256": "6c0f839d91646aee5de9edaced689f6de15603b6686bef5e60197eff1dbf454c"
+        },
+        "engine_version": "b67f125ed73c01f60c84206de80760aca5173cdabdd3c47c7741136d5cfca29b",
+        "id": "5f49525d-8db6-4723-85cb-db85cd302032",
+        "inputs": {
+          "benchmark_asset_id": "SYN:SPY",
+          "end_session_exclusive": "2028-07-24",
+          "evaluation_split": {
+            "holdout_fraction": 0.25,
+            "kind": "chronological"
+          },
+          "execution_policy_id": "us_eod_next_open_v1",
+          "initial_capital_usd": "1000.00",
+          "random_seed": 42,
+          "snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+          "start_session": "2028-07-18",
+          "strategy_version_id": "22fd08a0-5d5c-5a74-b622-8afff87b25b3"
+        },
+        "inputs_canonical_json": "{\"benchmark_asset_id\":\"SYN:SPY\",\"end_session_exclusive\":\"2028-07-24\",\"evaluation_split\":{\"holdout_fraction\":0.25,\"kind\":\"chronological\"},\"execution_policy_id\":\"us_eod_next_open_v1\",\"initial_capital_usd\":\"1000.00\",\"random_seed\":42,\"snapshot_id\":\"5c223992-90ec-59a7-a1e7-7889b76cacea\",\"start_session\":\"2028-07-18\",\"strategy_version_id\":\"22fd08a0-5d5c-5a74-b622-8afff87b25b3\"}",
+        "job_id": "a73a5e9f-d3bf-4b0f-a40d-ef3112e6482c",
+        "reproducibility_manifest": {
+          "id": "e6607243-07c8-570a-a11d-4c19d67c79e4",
+          "schema_version": 1,
+          "sha256": "937563e6373e119ed5895fd2a6d94073a8a01d7a7e0c40f618732c4ab431df3b"
+        },
+        "snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+        "status": "completed",
+        "trade_artifact": {
+          "id": "123ee482-9e91-516b-ae4e-0dbb470de30f",
+          "schema_version": 1,
+          "sha256": "a45df2ada1b87423fa8d367b9a9904348ea52def552f7ba75910fb4967e58cb4"
+        }
+      },
+      "seed_text": "42",
+      "width": 360
+    },
+    {
+      "cancelled": {
+        "config_sha256": "10904787385cca66062bcb1b27d264799b3cc954ee7fed62a91d11339295d81b",
+        "curve_artifact": null,
+        "engine_version": "b67f125ed73c01f60c84206de80760aca5173cdabdd3c47c7741136d5cfca29b",
+        "id": "487e2e6b-feb7-4030-a08d-b150ddbbb8ae",
+        "inputs": {
+          "benchmark_asset_id": "SYN:SPY",
+          "end_session_exclusive": "2030-12-31",
+          "evaluation_split": {
+            "holdout_fraction": 0.25,
+            "kind": "chronological"
+          },
+          "execution_policy_id": "us_eod_next_open_v1",
+          "initial_capital_usd": "1000.00",
+          "random_seed": 42,
+          "snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+          "start_session": "2027-01-04",
+          "strategy_version_id": "22fd08a0-5d5c-5a74-b622-8afff87b25b3"
+        },
+        "inputs_canonical_json": "{\"benchmark_asset_id\":\"SYN:SPY\",\"end_session_exclusive\":\"2030-12-31\",\"evaluation_split\":{\"holdout_fraction\":0.25,\"kind\":\"chronological\"},\"execution_policy_id\":\"us_eod_next_open_v1\",\"initial_capital_usd\":\"1000.00\",\"random_seed\":42,\"snapshot_id\":\"5c223992-90ec-59a7-a1e7-7889b76cacea\",\"start_session\":\"2027-01-04\",\"strategy_version_id\":\"22fd08a0-5d5c-5a74-b622-8afff87b25b3\"}",
+        "job_id": "3df586da-7241-4b09-86fa-f9128e7d0bb2",
+        "reproducibility_manifest": null,
+        "snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+        "status": "cancelled",
+        "trade_artifact": null
+      },
+      "width": 360
+    },
+    {
+      "fork_run": {
+        "config_sha256": "c302159667f99176bdda69f75451780e5bf01185eac6d6705db514e5c1a4e974",
+        "curve_artifact": {
+          "id": "b3d56e63-dc2c-53fb-beb4-150ebc1322e4",
+          "schema_version": 1,
+          "sha256": "e23901e57001262c7ae431e13bf04a24dca118ef72cc725d7ded801e9bf45e65"
+        },
+        "engine_version": "b67f125ed73c01f60c84206de80760aca5173cdabdd3c47c7741136d5cfca29b",
+        "id": "c2ac2be1-d397-4d46-b54a-7098c3d6d039",
+        "inputs": {
+          "benchmark_asset_id": "SYN:SPY",
+          "end_session_exclusive": "2028-07-24",
+          "evaluation_split": {
+            "holdout_fraction": 0.25,
+            "kind": "chronological"
+          },
+          "execution_policy_id": "us_eod_next_open_v1",
+          "initial_capital_usd": "1000.00",
+          "random_seed": 42,
+          "snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+          "start_session": "2028-07-18",
+          "strategy_version_id": "3c67da16-91e9-4479-b435-76cd62c3690f"
+        },
+        "inputs_canonical_json": "{\"benchmark_asset_id\":\"SYN:SPY\",\"end_session_exclusive\":\"2028-07-24\",\"evaluation_split\":{\"holdout_fraction\":0.25,\"kind\":\"chronological\"},\"execution_policy_id\":\"us_eod_next_open_v1\",\"initial_capital_usd\":\"1000.00\",\"random_seed\":42,\"snapshot_id\":\"5c223992-90ec-59a7-a1e7-7889b76cacea\",\"start_session\":\"2028-07-18\",\"strategy_version_id\":\"3c67da16-91e9-4479-b435-76cd62c3690f\"}",
+        "job_id": "7450b4e2-7f03-460d-a0ca-cbe538ab4eaa",
+        "reproducibility_manifest": {
+          "id": "86f0a963-03c4-5433-a18c-8278e952414b",
+          "schema_version": 1,
+          "sha256": "24ec023c2cfdcb942b175d22c7c2a5eaf30516763fd9ab9ae1d83f74fcb930c1"
+        },
+        "snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+        "status": "completed",
+        "trade_artifact": {
+          "id": "3793e6e2-746b-534c-bc09-95aa44cad21f",
+          "schema_version": 1,
+          "sha256": "406dc125b11a789be272fb8c0d223163706bbc50e010ec3f5630e25b43de977e"
+        }
+      },
+      "source_version_id": "3c67da16-91e9-4479-b435-76cd62c3690f",
+      "width": 1280
+    },
+    {
+      "original": {
+        "config_sha256": "10904787385cca66062bcb1b27d264799b3cc954ee7fed62a91d11339295d81b",
+        "curve_artifact": {
+          "id": "4ef106dd-9d1e-58b3-b7ad-527d0b214779",
+          "schema_version": 1,
+          "sha256": "6c0f839d91646aee5de9edaced689f6de15603b6686bef5e60197eff1dbf454c"
+        },
+        "engine_version": "b67f125ed73c01f60c84206de80760aca5173cdabdd3c47c7741136d5cfca29b",
+        "id": "af30f02a-1d61-4b92-815e-b72abd7cbddf",
+        "inputs": {
+          "benchmark_asset_id": "SYN:SPY",
+          "end_session_exclusive": "2028-07-24",
+          "evaluation_split": {
+            "holdout_fraction": 0.25,
+            "kind": "chronological"
+          },
+          "execution_policy_id": "us_eod_next_open_v1",
+          "initial_capital_usd": "1000.00",
+          "random_seed": 18446744073709551615,
+          "snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+          "start_session": "2028-07-18",
+          "strategy_version_id": "22fd08a0-5d5c-5a74-b622-8afff87b25b3"
+        },
+        "inputs_canonical_json": "{\"benchmark_asset_id\":\"SYN:SPY\",\"end_session_exclusive\":\"2028-07-24\",\"evaluation_split\":{\"holdout_fraction\":0.25,\"kind\":\"chronological\"},\"execution_policy_id\":\"us_eod_next_open_v1\",\"initial_capital_usd\":\"1000.00\",\"random_seed\":18446744073709551615,\"snapshot_id\":\"5c223992-90ec-59a7-a1e7-7889b76cacea\",\"start_session\":\"2028-07-18\",\"strategy_version_id\":\"22fd08a0-5d5c-5a74-b622-8afff87b25b3\"}",
+        "job_id": "0386270c-c974-4a62-bd58-5c58c81202a7",
+        "reproducibility_manifest": {
+          "id": "446d3fa3-7949-5317-81cd-b0e1fb3fc258",
+          "schema_version": 1,
+          "sha256": "845dc28d1192d5e23bc385e11ea9df44231dd68334b874d1372dc778d6b3c327"
+        },
+        "snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+        "status": "completed",
+        "trade_artifact": {
+          "id": "123ee482-9e91-516b-ae4e-0dbb470de30f",
+          "schema_version": 1,
+          "sha256": "a45df2ada1b87423fa8d367b9a9904348ea52def552f7ba75910fb4967e58cb4"
+        }
+      },
+      "rerun": {
+        "config_sha256": "10904787385cca66062bcb1b27d264799b3cc954ee7fed62a91d11339295d81b",
+        "curve_artifact": {
+          "id": "4ef106dd-9d1e-58b3-b7ad-527d0b214779",
+          "schema_version": 1,
+          "sha256": "6c0f839d91646aee5de9edaced689f6de15603b6686bef5e60197eff1dbf454c"
+        },
+        "engine_version": "b67f125ed73c01f60c84206de80760aca5173cdabdd3c47c7741136d5cfca29b",
+        "id": "dd44ce3c-8c26-4c08-b0c6-75d924904a8e",
+        "inputs": {
+          "benchmark_asset_id": "SYN:SPY",
+          "end_session_exclusive": "2028-07-24",
+          "evaluation_split": {
+            "holdout_fraction": 0.25,
+            "kind": "chronological"
+          },
+          "execution_policy_id": "us_eod_next_open_v1",
+          "initial_capital_usd": "1000.00",
+          "random_seed": 18446744073709551615,
+          "snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+          "start_session": "2028-07-18",
+          "strategy_version_id": "22fd08a0-5d5c-5a74-b622-8afff87b25b3"
+        },
+        "inputs_canonical_json": "{\"benchmark_asset_id\":\"SYN:SPY\",\"end_session_exclusive\":\"2028-07-24\",\"evaluation_split\":{\"holdout_fraction\":0.25,\"kind\":\"chronological\"},\"execution_policy_id\":\"us_eod_next_open_v1\",\"initial_capital_usd\":\"1000.00\",\"random_seed\":18446744073709551615,\"snapshot_id\":\"5c223992-90ec-59a7-a1e7-7889b76cacea\",\"start_session\":\"2028-07-18\",\"strategy_version_id\":\"22fd08a0-5d5c-5a74-b622-8afff87b25b3\"}",
+        "job_id": "da902832-8912-477d-9aaf-3d510784fe05",
+        "reproducibility_manifest": {
+          "id": "446d3fa3-7949-5317-81cd-b0e1fb3fc258",
+          "schema_version": 1,
+          "sha256": "845dc28d1192d5e23bc385e11ea9df44231dd68334b874d1372dc778d6b3c327"
+        },
+        "snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+        "status": "completed",
+        "trade_artifact": {
+          "id": "123ee482-9e91-516b-ae4e-0dbb470de30f",
+          "schema_version": 1,
+          "sha256": "a45df2ada1b87423fa8d367b9a9904348ea52def552f7ba75910fb4967e58cb4"
+        }
+      },
+      "seed_text": "18446744073709551615",
+      "width": 1280
+    }
+  ]
+}

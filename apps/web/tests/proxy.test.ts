@@ -426,3 +426,20 @@ it("forwards experiment pages and same-origin cancellation through the closed ro
     ).status,
   ).toBe(404);
 });
+
+it("preserves exact uint64 literals in successful upstream JSON bytes", async () => {
+  const id = "11111111-1111-4111-8111-111111111111";
+  const raw =
+    '{"inputs":{"random_seed":18446744073709551615},"currency":"USD"}';
+  const fetcher = vi.fn(
+    async () =>
+      new Response(raw, { headers: { "Content-Type": "application/json" } }),
+  );
+  const response = await proxyApi(
+    request(`experiments/${id}`),
+    ["experiments", id],
+    fetcher,
+  );
+  expect(response.status).toBe(200);
+  expect(await response.text()).toBe(raw);
+});

@@ -1356,6 +1356,12 @@
           "inputs": {
             "$ref": "#/components/schemas/ExperimentRequest"
           },
+          "inputs_canonical_json": {
+            "maxLength": 8192,
+            "minLength": 2,
+            "title": "Inputs Canonical Json",
+            "type": "string"
+          },
           "job_id": {
             "format": "uuid",
             "title": "Job Id",
@@ -1450,6 +1456,7 @@
           "reproducibility_manifest",
           "warnings",
           "error",
+          "inputs_canonical_json",
           "provider",
           "strategy_config",
           "report"

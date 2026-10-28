@@ -15,7 +15,8 @@ function Navigation() {
         { path: "/", name: "Dashboard", mark: "01" },
         { path: "/lab/candidates", name: "Candidate inspection", mark: "02" },
         { path: "/lab/strategies", name: "Strategy Lab", mark: "03" },
-        { path: "/settings", name: "Settings & data", mark: "04" },
+        { path: "/lab/experiments", name: "Experiments", mark: "04" },
+        { path: "/settings", name: "Settings & data", mark: "05" },
       ].map((item) => (
         <Link
           key={item.path}
@@ -39,7 +40,7 @@ export function Shell({ children }: { children: ReactNode }) {
         Skip to content
       </a>
       <aside className="sidebar">
-        <Link href="/" className="brand" aria-label="YAMS home">
+        <Link href="/" className="brand">
           <span className="brand-icon" aria-hidden="true">
             y
           </span>
@@ -73,11 +74,16 @@ export function Shell({ children }: { children: ReactNode }) {
           <summary>Navigation</summary>
           <Navigation />
         </details>
-        <div className="context-bar">
+        <div
+          className="context-bar"
+          role="region"
+          aria-label="Workspace context"
+        >
           {pathname === "/lab/strategies" ? (
             <span>Strategy rules · No market data required</span>
           ) : pathname === "/settings/data" ||
-            pathname === "/lab/candidates" ? (
+            pathname === "/lab/candidates" ||
+            pathname.startsWith("/lab/experiments") ? (
             <span>Dataset coverage · Selected source below</span>
           ) : (
             <DataProvenanceBadge
@@ -85,7 +91,7 @@ export function Shell({ children }: { children: ReactNode }) {
               asOf={fixture?.last_session ?? null}
               freshness={fixture ? "fixture" : "unavailable"}
             />
-          )}
+          )}{" "}
           <Link className="job-link" href="/settings#job-status">
             {job
               ? `Last checked job: ${job.status.replaceAll("_", " ")}`

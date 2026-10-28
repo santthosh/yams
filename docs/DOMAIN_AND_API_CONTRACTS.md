@@ -234,7 +234,11 @@ report composition and public transport after the core is delivered.
 See [experiment API operations](operations/experiment-api.md). Creation returns202
 with experiment/job UUIDs; history is a bounded descending keyset page. Detail
 includes the pinned configuration, provider, Q12 period/report summary and managed
-UUID/SHA/schema references only after atomic completion. Series/trades are separate
+UUID/SHA/schema references only after atomic completion. `inputs_canonical_json`
+projects the existing immutable canonical request text, validated against typed
+inputs; browser clients use it unchanged for exact reruns, including full uint64
+seeds. This additive unreleased response projection changes no financial request,
+stored report bytes or artifact identity. Series/trades are separate
 bounded pages (default25, maximum100), with optional contained half-open session
 windows and run/artifact/role/window/page-size-bound cursors. Unfinished output is409;
 unknown resources404; invalid IDs, windows/cursors422; unavailable storage/integrity503.

@@ -28,6 +28,9 @@ importers:
       openapi-fetch:
         specifier: 0.17.0
         version: 0.17.0
+      plotly.js-basic-dist-min:
+        specifier: 4.1.2
+        version: 4.1.2
       react:
         specifier: 19.3.1
         version: 19.3.1
@@ -53,6 +56,9 @@ importers:
       '@types/node':
         specifier: 22.20.5
         version: 22.20.5
+      '@types/plotly.js':
+        specifier: 3.0.15
+        version: 3.0.15
       '@types/react':
         specifier: 19.3.0
         version: 19.3.0
@@ -948,6 +954,9 @@ packages:
 
   '@types/node@22.20.5':
     resolution: {integrity: sha512-U2+DNr+wSjpsTS/wZGYHq7GcwfuSmKiKvoPvK22zwTlRhU91yOniN4qRR5KhIjvif7ysw/dz/hKmfDH0Ris4aA==}
+
+  '@types/plotly.js@3.0.15':
+    resolution: {integrity: sha512-ftBxk2fB7BxxeMpT0IVEb/3HKpYTXO5nCdR5mGEz6gHpLd6GGRFxvDVoG1gpD/gBAgoN36KIyRflxCnOfWlskQ==}
 
   '@types/react-dom@19.3.0':
     resolution: {integrity: sha512-ZI7bU42mZXXKHn/qNLEw2IrbiINU7X5+vfgdixBHkCNpYWXjKgfQ/P+uyGb5CjOLB9UcnTeg3rylQtV2hym44Q==}
@@ -2323,6 +2332,9 @@ packages:
     engines: {node: '>=20'}
     hasBin: true
 
+  plotly.js-basic-dist-min@4.1.2:
+    resolution: {integrity: sha512-LvfKTeVYIKzEyMj9TuH+8ot0I7IMG1fET2YxgUtbpZVHd2fBrOlBFsk26wKgnAckHyNhKG7vDk4tEyqGCYs2Aw==}
+
   pluralize@8.0.0:
     resolution: {integrity: sha512-Nc3IT5yHzflTfbjgqWcCPpo7DaKy4FnpB0l/zCAW0Tc7jxAiuqSxHasntB3D7887LSrA93kDJ9IXovxJYxyLCA==}
     engines: {node: '>=4'}
@@ -3638,6 +3650,8 @@ snapshots:
   '@types/node@22.20.5':
     dependencies:
       undici-types: 6.21.0
+
+  '@types/plotly.js@3.0.15': {}
 
   '@types/react-dom@19.3.0(@types/react@19.3.0)':
     dependencies:
@@ -5136,6 +5150,8 @@ snapshots:
   playwright@1.64.1:
     dependencies:
       playwright-core: 1.64.1
+
+  plotly.js-basic-dist-min@4.1.2: {}
 
   pluralize@8.0.0: {}
 

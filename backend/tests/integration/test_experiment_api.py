@@ -373,3 +373,48 @@ def test_live_full_worker_cancellation_and_failed_report_remain_unsealed(
             "reason": "MISSING_ELIGIBLE_OPEN"
         }
         assert client.get(f"/api/v1/experiments/{failed.experiment_id}/series").status_code == 409
+
+
+def test_exact_uint64_canonical_rerun_and_unmodified_sealed_artifacts(
+    database: Engine,
+    tmp_path: Path,
+) -> None:
+    request = prepare(database, tmp_path).model_copy(update={"random_seed": 18446744073709551615})
+    refs = []
+    ids = []
+    with client_for(database, tmp_path) as client:
+        content = request.model_dump_json()
+        for _ in range(2):
+            created = client.post(
+                "/api/v1/experiments", content=content, headers={"content-type": "application/json"}
+            )
+            assert created.status_code == 202
+            identity = created.json()["experiment_id"]
+            ids.append(identity)
+            assert Worker(Queue(database), artifact_root=tmp_path).run_once()
+            run = client.get(f"/api/v1/experiments/{identity}")
+            assert run.status_code == 200
+            value = run.json()
+            assert value["status"] == "completed"
+            assert value["inputs"]["random_seed"] == 18446744073709551615
+            content = value["inputs_canonical_json"]
+            assert '"random_seed":18446744073709551615' in content
+            refs.append(
+                [value[k] for k in ("curve_artifact", "trade_artifact", "reproducibility_manifest")]
+            )
+        assert ids[0] != ids[1] and refs[0] == refs[1]
+        # Detail is a projection of existing immutable payload metadata; it does
+        # not add fields to or rewrite already sealed report artifacts.
+        before = {
+            p.relative_to(tmp_path): p.read_bytes()
+            for p in (tmp_path / "experiment-reports").rglob("*")
+            if p.is_file()
+        }
+        assert (
+            client.get(f"/api/v1/experiments/{ids[0]}").json()["inputs_canonical_json"] == content
+        )
+        assert before == {
+            p.relative_to(tmp_path): p.read_bytes()
+            for p in (tmp_path / "experiment-reports").rglob("*")
+            if p.is_file()
+        }

@@ -173,3 +173,29 @@ def test_experiment_schema_keeps_exact_uint64_seed_and_no_dangling_refs() -> Non
                 references(nested)
 
     references(schema)
+
+
+def test_legacy_report_projection_keeps_evidence_and_rejects_changed_rerun_text() -> None:
+    from backend.domain.experiment_api import ExperimentDetailV1
+    from backend.domain.types import canonical_json, load_json
+
+    root = Path(__file__).resolve().parents[3]
+    legacy = json.loads((root / "apps/web/tests/experiment-transport.json").read_bytes())
+    assert isinstance(legacy, dict) and isinstance(legacy["completed"], dict)
+    sample = legacy["completed"]
+    actual = ExperimentDetailV1.model_validate(sample)
+    assert actual.engine_version == sample["engine_version"]
+    assert (
+        actual.inputs_canonical_json
+        == canonical_json(load_json(json.dumps(sample["inputs"]))).decode()
+    )
+    assert (
+        actual.curve_artifact is not None
+        and actual.curve_artifact.sha256 == sample["curve_artifact"]["sha256"]
+    )
+    for text in (
+        actual.inputs_canonical_json.replace('"random_seed":42', '"random_seed":43'),
+        " " + actual.inputs_canonical_json,
+    ):
+        with pytest.raises(ValidationError):
+            ExperimentDetailV1.model_validate(sample | {"inputs_canonical_json": text})

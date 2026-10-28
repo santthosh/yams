@@ -914,3 +914,70 @@ input::placeholder {
 .strategy-browser code {
   overflow-wrap: anywhere;
 }
+
+/* Experiment controls and plots share the existing card/table vocabulary. */
+.experiment-form .form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+}
+.experiment-form label,
+.experiment-window label {
+  display: grid;
+  gap: 7px;
+  min-width: 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+.experiment-form select,
+.experiment-window input {
+  min-width: 0;
+  width: 100%;
+  min-height: 44px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: white;
+  padding: 10px;
+}
+.experiment-window,
+.experiment-form .button-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 12px;
+  margin-block: 16px;
+}
+.experiment-window label {
+  flex: 1 1 180px;
+}
+.experiment-figure {
+  margin: 16px 0;
+  padding: 12px 4px;
+  border-top: 1px solid var(--color-border);
+  min-width: 0;
+}
+.experiment-figure figcaption {
+  padding-inline: 8px;
+  font-weight: 600;
+}
+.experiment-chart {
+  width: 100%;
+  min-height: 340px;
+  min-width: 0;
+}
+.experiment-trades,
+.record-list {
+  padding-left: 20px;
+}
+.experiment-trades li,
+.record-list li {
+  margin-block: 12px;
+  overflow-wrap: anywhere;
+}
+.experiment-report .notice {
+  overflow-wrap: anywhere;
+}
+.experiment-report > .card {
+  margin-top: 20px;
+}

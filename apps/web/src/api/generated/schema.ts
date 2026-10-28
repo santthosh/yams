@@ -839,6 +839,8 @@ export interface components {
        */
       id: string;
       inputs: components["schemas"]["ExperimentRequest"];
+      /** Inputs Canonical Json */
+      inputs_canonical_json: string;
       /**
        * Job Id
        * Format: uuid
