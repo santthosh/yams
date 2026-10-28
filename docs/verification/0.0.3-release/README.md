@@ -49,9 +49,10 @@ successfully at 2026-10-28T22:07:51Z.
 All nine public release assets were independently downloaded **without authentication**.
 Every checksum, exact tag/source/version, native evidence/image identity and
 safe configuration check passed; both final image indexes contain native
-linux/amd64 and linux/arm64. [Verification summary](public-verification.json)
-records the actual source/run/digests/platforms. The public release retains both
-complete native evidence records, checksums and source/run/fixture provenance.
+linux/amd64 and linux/arm64. The actual source/run/digests are recorded here;
+the [public release assets](https://github.com/santthosh/yams/releases/tag/v0.0.3)
+retain both complete native evidence records (`evidence-amd64.json` and
+`evidence-arm64.json`), checksums and source/run/fixture provenance.
 BuildKit provenance/SBOM accompanies image manifests.
 
 Final digest-pinned images:
