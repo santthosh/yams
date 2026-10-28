@@ -108,6 +108,15 @@ Cards for Momentum, Mean Reversion and Low Volatility, with a separately labeled
 
 **Report:** status and data provenance at top; equity curve vs SPY, summary metrics, drawdown chart, holdings/concentration over time, full trade log, strategy explanation, experiment config, warning panel, and an exact `Rerun with same inputs` action. Show **separate exploration vs untouched holdout** sections; never imply that optimizing on the holdout was independent verification.
 
+The implemented [experiment lab](operations/experiment-lab.md) uses paginated
+published versions and synthetic snapshots, covered half-open windows and readonly
+execution-policy costs. Current real providers remain diagnostic-only. It shows
+separate unavailable/empty/pending/cancelled/failed states, backend-owned charts and
+exact accessible tables, explicit partial-window/page notices, and canonical-input
+reruns that preserve full-range seeds. Viewing a narrower sample window does not
+recompute or relabel the original summary metrics. No browser financial math or
+paper-ledger posting is performed.
+
 **No comparison without alignment:** if two experiments differ in dates, costs, universe or benchmark, the UI must highlight their incompatible settings; `Compare fairly` prompts rerunning with shared settings.
 
 ### 5.4 Comparison (`/lab/compare`)

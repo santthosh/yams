@@ -1,9 +1,9 @@
 """Public experiment projections; bulk financial samples stay in bounded pages."""
 
-from typing import Literal, Self
+from typing import Annotated, Literal, Self
 from uuid import UUID
 
-from pydantic import model_validator
+from pydantic import StringConstraints, model_validator
 
 from backend.backtesting.benchmark import ComparisonTerms
 from backend.backtesting.metrics import MetricsPeriods
@@ -19,6 +19,8 @@ from backend.domain.types import (
     SessionDate,
     SourceMode,
     UTCTimestamp,
+    canonical_json,
+    load_json,
 )
 from backend.portfolio.execution import ExecutionResult, Position
 
@@ -82,6 +84,10 @@ class ExperimentReportSummaryV1(Contract):
 
 
 class ExperimentDetailV1(ExperimentRunV1):
+    # Exact rerun transport: JSON numbers beyond JS safe integers must not round.
+    inputs_canonical_json: Annotated[
+        str, StringConstraints(strict=True, min_length=2, max_length=8192)
+    ]
     currency: Literal["USD"] = "USD"
     provider: str
     strategy_config: StrategyConfigV1
@@ -89,6 +95,12 @@ class ExperimentDetailV1(ExperimentRunV1):
 
     @model_validator(mode="after")
     def complete_report(self) -> Self:
+        parsed = load_json(self.inputs_canonical_json)
+        if (
+            ExperimentRequest.model_validate(parsed) != self.inputs
+            or canonical_json(parsed).decode() != self.inputs_canonical_json
+        ):
+            raise ValueError("Canonical rerun inputs differ from immutable typed inputs")
         if (self.status == "completed") != (self.report is not None):
             raise ValueError("Only completed public experiments expose a complete report")
         if self.strategy_config.config_hash() != self.config_sha256:

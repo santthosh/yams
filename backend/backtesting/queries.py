@@ -173,6 +173,7 @@ def _load(
             raise ValueError("Experiment report lineage is unavailable")
     detail = ExperimentDetailV1(
         **base.model_dump(),
+        inputs_canonical_json=payload.inputs_canonical_json,
         provider=provider,
         strategy_config=StrategyConfigV1.from_json(payload.config_canonical_json),
         metrics=summary.portfolio.total.metrics if summary else None,

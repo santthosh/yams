@@ -260,6 +260,32 @@ def main() -> None:
             "real browser public experiment rerun, pages, cancellation and fingerprints"
         )
 
+        subprocess.run(
+            ["pnpm", "--filter", "@yams/web", "exec", "node", "tests/experiment-ui-browser.mjs"],
+            cwd=ROOT,
+            env={
+                **env,
+                "YAMS_SMOKE_URL": f"http://{address}",
+                "YAMS_SMOKE_EVIDENCE": str(destination),
+            },
+            check=True,
+        )
+        ui_runs = json.loads((destination / "experiment-ui.json").read_text())
+        # Browser JS objects cannot represent uint64 seeds. Preserve original
+        # HTTP text in the recorder and decode here without binary rounding.
+        for record in ui_runs["records"]:
+            for role in ("original", "rerun", "cancelled", "fork_run"):
+                raw_key = role + "_raw_json"
+                if raw_key in record:
+                    saved = json.loads(record.pop(raw_key))
+                    assert saved["inputs"] == json.loads(saved["inputs_canonical_json"])
+                    record[role] = saved
+        evidence["experiment_ui"] = ui_runs
+        evidence["checks"].append(
+            "real mobile/desktop experiment form, charts/tables/Axe, exact uint64 rerun, "
+            "original preservation and cancellation"
+        )
+
         def verify_public_runs() -> None:
             for saved in public_runs["runs"]:
                 identity = saved["run"]["id"]
@@ -267,6 +293,11 @@ def main() -> None:
                 assert get(f"experiments/{identity}/series?limit=2") == saved["first"]
                 assert get(f"experiments/{identity}/trades") == saved["trades"]
             assert get(f"experiments/{public_runs['cancelled']['id']}") == public_runs["cancelled"]
+            for record in ui_runs["records"]:
+                for key in ("original", "rerun", "cancelled", "fork_run"):
+                    if key in record:
+                        saved = record[key]
+                        assert get(f"experiments/{saved['id']}") == saved
 
         # Internal compatibility remains covered alongside the new public flow.
         core = json.loads(
