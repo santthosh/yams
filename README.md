@@ -217,10 +217,12 @@ action accounting, historical publication evidence and paper execution remain
 unsupported; no order or holding changes occur in Candidate inspection. Credentials
 do not authorize redistribution of cached source data.
 
-Backtest core implementation for0.0.3 is tracked in#39; see the
-[internal engine handoff](docs/operations/backtest-core.md). The proposed
-[walk-forward conventions](docs/adr/0012-walk-forward-core.md) document exact
-session boundaries, strict missing-data failures and shared accounting. Internal core admission, immutable artifacts and supervised persistence are
-described in that handoff. This source work does not add a public experiment endpoint or change the published
-0.0.2 installation. Tiingo data remains diagnostic-only until historical raw
-execution/action/publication/membership capabilities are verified.
+Source for planned0.0.3 includes the shared backtest core and immutable internal
+core persistence; see the [core handoff](docs/operations/backtest-core.md).
+[Q12 reporting](docs/operations/backtest-reporting.md) adds net metrics,
+development/holdout sections, aligned SPY/cash references and shared exposure
+calculations under the [reviewed methodology](docs/adr/0013-backtest-reporting-methodology.md).
+Public experiment/report transport remains owned by#41 and report UI by#74;
+internal core or report calculations are not a completed public experiment.
+The published0.0.2 installation remains unchanged. Tiingo data stays diagnostic-only
+until historical raw execution/action/publication/membership capabilities are verified.

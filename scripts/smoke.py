@@ -308,6 +308,55 @@ def main() -> None:
         evidence["checks"].append(
             "internal core admission, actual supervised next-open replay and sealed artifact"
         )
+
+        def metrics_report() -> Any:
+            code = (
+                "import sys\n"
+                "from uuid import UUID\n"
+                "from backend.backtesting.benchmark import build_report\n"
+                "from backend.backtesting.service import read_core_run\n"
+                "from backend.market_data.files import PinnedSnapshot\n"
+                "from backend.market_data.repository import MarketRepository\n"
+                "from backend.persistence.database import Settings,database_engine\n"
+                "settings=Settings.from_environment()\n"
+                "engine=database_engine(settings.database_url)\n"
+                "saved=read_core_run(engine,settings.artifact_root,UUID(sys.argv[1]))\n"
+                "snapshot=PinnedSnapshot.open(settings.artifact_root/'snapshots'/"
+                "saved.payload.snapshot_sha256,saved.payload.snapshot_sha256)\n"
+                "with MarketRepository(snapshot) as repository:\n"
+                "    report=build_report(saved,repository)\n"
+                "print(report.model_dump_json())\n"
+                "engine.dispose()"
+            )
+            return json.loads(
+                compose("exec", "-T", "worker", "python", "-c", code, core["experiment_id"])
+            )
+
+        report = metrics_report()
+        golden_metrics = json.loads(
+            (ROOT / "data/fixtures/metrics_extensions/case.json").read_text()
+        )["core_report"]["expected"]
+        metric_fields = {
+            "cumulative_return_fraction": "cumulative_return",
+            "annualized_return_fraction": "annualized_return",
+            "annualized_volatility_fraction": "annualized_volatility",
+            "max_drawdown_fraction": "max_drawdown",
+            "sharpe_ratio": "sharpe",
+            "turnover_fraction": "turnover",
+        }
+        for field, golden in metric_fields.items():
+            observed = report["portfolio"]["total"]["metrics"][field]
+            assert observed["unavailable_reason"] is None
+            assert abs(observed["value"] - golden_metrics[golden]) <= 1e-12
+        assert report["benchmark"]["available"]
+        assert report["benchmark"]["nav_usd"] == ["1000.00", "1000.23", "1000.45", "1000.68"]
+        assert report["cash_nav_usd"] == ["1000.00"] * 4
+        assert report["portfolio"]["holdout"]["return_observations"] == 1
+        evidence["backtest_metrics"] = report
+        (destination / "backtest-metrics.json").write_text(json.dumps(report, indent=2))
+        evidence["checks"].append(
+            "worker-side Q12 metrics, aligned SPY/cash, continuing holdout and exposure"
+        )
         for service in ("api", "worker"):
             blocked = compose(
                 "exec",
@@ -333,6 +382,7 @@ def main() -> None:
         address = web_address()
         assert get("workspace") == workspace
         assert core_state() == core_result
+        assert metrics_report() == report
         assert get("strategies") == strategies
         assert get(f"strategies/{strategy_id}/versions") == versions
         for editor_id, history in editor_versions.items():
@@ -352,6 +402,7 @@ def main() -> None:
         address = web_address()
         assert get("workspace") == workspace
         assert core_state() == core_result
+        assert metrics_report() == report
         assert get("strategies") == strategies
         assert get(f"strategies/{strategy_id}/versions") == versions
         for editor_id, history in editor_versions.items():
@@ -449,6 +500,7 @@ def main() -> None:
         address = web_address()
         assert get("workspace") == workspace
         assert core_state() == core_result
+        assert metrics_report() == report
         evidence["checks"].append(
             "failed migration blocks application startup; repair preserves workspace"
         )

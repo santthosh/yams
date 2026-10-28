@@ -1,0 +1,72 @@
+{
+  "label": "SYNTHETIC_DATA_ONLY",
+  "parent_fixture": "FIX-07",
+  "derivation": "Authored before metrics implementation, using standalone Fraction/Decimal arithmetic over the independent core-case.json; no production imports.",
+  "core_report": {
+    "nav_usd": [
+      "1000.00",
+      "999.40",
+      "993.66",
+      "1000.22"
+    ],
+    "gross_notional_usd": "607.16",
+    "mean_nav_usd": "998.32",
+    "fees_usd": "0.00",
+    "slippage_usd": "0.61",
+    "trade_count": 3,
+    "expected": {
+      "cumulative_return": 0.00022,
+      "annualized_return": 0.018649741519960364,
+      "annualized_volatility": 0.09844077475005868,
+      "sharpe": 0.22050227337002146,
+      "max_drawdown": 0.00634,
+      "turnover": 0.6081817453321581
+    }
+  },
+  "half_holdout": {
+    "nav_usd": [
+      "100.00",
+      "120.00",
+      "90.00",
+      "108.00"
+    ],
+    "holdout_owned_nav_usd": [
+      "90.00",
+      "108.00"
+    ],
+    "baseline_usd": "120.00",
+    "gross_notional_usd": "60.00",
+    "mean_owned_nav_usd": "99.00",
+    "expected_cumulative_return": -0.1,
+    "expected_max_drawdown": 0.25,
+    "expected_turnover": 0.6060606060606061
+  },
+  "benchmark": {
+    "initial_capital_usd": "100.00",
+    "adjusted_closes": [
+      "200",
+      "220",
+      "198",
+      "242"
+    ],
+    "expected_nav_usd": [
+      "100.00",
+      "110.00",
+      "99.00",
+      "121.00"
+    ],
+    "expected_cumulative_return": 0.21,
+    "expected_max_drawdown": 0.1
+  },
+  "missing_benchmark": {
+    "adjusted_closes": [
+      "200",
+      null,
+      "198",
+      "242"
+    ],
+    "expected_available": false,
+    "expected_reason": "INSUFFICIENT_MARKET_DATA",
+    "retained_observations": 4
+  }
+}
