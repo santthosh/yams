@@ -118,3 +118,4 @@ The [pinned market repository](docs/MARKET_REPOSITORY.md) documents immutable Pa
 See [market refresh operations](docs/operations/market-refresh.md) for internal refresh jobs, optional research acquisition, publication recovery and current capability limits.
 
 The [shared momentum engine](docs/operations/momentum-engine.md) documents deterministic eligibility, ranking evidence and the allocation handoff.
+The [shared allocation engine](docs/operations/allocation-engine.md) documents capped inverse-volatility targets, exact cash conservation and risk evidence.
