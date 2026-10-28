@@ -25,3 +25,11 @@ def test_short_history_is_unavailable_not_zero():
     f = forecast.run_forecast(close, {}, {"AAA": 0.9}, 1000.0, 1.0)
     assert f["status"] == "unavailable" and "AAA" in f["reason"]
     assert "proposed" not in f
+
+
+def test_drift_replaced_by_benchmark_mean(market):
+    close = market[0]
+    raw = forecast.run_forecast(close, {}, {"AAA": 0.95}, 1000.0, 0.0, benchmark=None)
+    adj = forecast.run_forecast(close, {}, {"AAA": 0.95}, 1000.0, 0.0)
+    # AAA has 4x SPY's drift in the fixture, so removing selection bias lowers its projected median.
+    assert adj["proposed"]["median_return"] < raw["proposed"]["median_return"]

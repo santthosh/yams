@@ -30,13 +30,20 @@ def run_forecast(
     portfolio_value: float,
     trade_cost: float,
     cfg: ForecastConfig = FORECAST,
+    benchmark: str | None = "SPY",
 ) -> dict:
-    """Weights exclude cash (cash earns 0). `trade_cost` (USD) is charged up front to the proposed case."""
+    """Weights exclude cash (cash earns 0). `trade_cost` (USD) is charged up front to the proposed case.
+
+    Drift adjustment: stocks are picked *because* their recent returns were high, so replaying their
+    raw history would project that selection bias forward. Each asset's mean daily return is replaced
+    with the benchmark's mean over the same window; volatility and co-movement are kept.
+    """
     tickers = sorted({t for t, w in {**current, **proposed}.items() if w > 0} | {t for t in current if current[t] > 0})
     base = {
         "horizon_calendar_days": cfg.horizon_calendar_days,
         "horizon_sessions": cfg.horizon_sessions,
-        "method": "5-day block bootstrap of the last 252 daily returns (all assets resampled together)",
+        "method": "5-day block bootstrap of the last 252 daily returns (all assets resampled together), "
+                  "each stock's average return replaced by SPY's",
         "paths": cfg.paths,
         "seed": cfg.seed,
         "lookback_returns": cfg.lookback_returns,
@@ -54,6 +61,10 @@ def run_forecast(
         return {**base, "status": "unavailable", "reason": f"Less than a year of daily returns for: {bad}."}
 
     R = rets.to_numpy() if tickers else np.zeros((cfg.lookback_returns, 0))
+    if benchmark and benchmark in close.columns and len(R.T):
+        bench = close[benchmark].tail(cfg.lookback_returns + 1).pct_change().iloc[1:]
+        if bench.notna().all():
+            R = R - R.mean(axis=0) + float(bench.mean())
     rng = np.random.default_rng(cfg.seed)
     n_blocks = math.ceil(cfg.horizon_sessions / cfg.block_sessions)
     starts = rng.integers(0, len(R) - cfg.block_sessions + 1, size=(cfg.paths, n_blocks))
