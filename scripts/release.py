@@ -154,6 +154,71 @@ def preflight() -> None:
     print(f"Validated v{version} at exact main-tested SHA {sha}")
 
 
+def recovery_preflight() -> None:
+    # The recovery implementation itself must be reviewed and pass main CI.
+    if os.environ["GITHUB_REPOSITORY"] != REPO:
+        raise SystemExit("Recovery repository mismatch")
+    if (
+        os.environ["GITHUB_EVENT_NAME"] != "workflow_dispatch"
+        or os.environ["GITHUB_REF"] != "refs/heads/main"
+    ):
+        raise SystemExit("Recovery must be dispatched from main")
+    current = command("git", "rev-parse", "HEAD")
+    runs = api(
+        f"repos/{REPO}/actions/workflows/ci.yml/runs?event=push&head_sha={current}&per_page=100"
+    )
+    if not passed_main(runs["workflow_runs"], current):
+        raise SystemExit("Recovery implementation has no successful main CI")
+    version, run_id = os.environ["VERSION_INPUT"], os.environ["RECOVERY_RUN"]
+    if not VERSION.fullmatch(version) or not run_id.isdecimal():
+        raise SystemExit("Invalid recovery version/run")
+    run = api(f"repos/{REPO}/actions/runs/{run_id}")
+    jobs = api(f"repos/{REPO}/actions/runs/{run_id}/jobs?per_page=100")["jobs"]
+    if not recoverable_run(run, jobs, version):
+        raise SystemExit("Recovery requires a failed tag publication with all native gates passed")
+    sha = run["head_sha"]
+    target = api(f"repos/{REPO}/git/ref/tags/v{version}")["object"]
+    if target["type"] != "commit" or target["sha"] != sha:
+        raise SystemExit("Recovery tag/source mismatch")
+    subprocess.run(["git", "merge-base", "--is-ancestor", sha, "origin/main"], cwd=ROOT, check=True)
+    source_runs = api(
+        f"repos/{REPO}/actions/workflows/ci.yml/runs?event=push&head_sha={sha}&per_page=100"
+    )
+    draft = existing_release("v" + version)
+    if (
+        not passed_main(source_runs["workflow_runs"], sha)
+        or not draft
+        or not release_available(draft, sha)
+    ):
+        raise SystemExit("Recovery requires an identical unpublished draft and passing source CI")
+    emit(version=version, sha=sha)
+
+
+def recoverable_run(run: dict[str, Any], jobs: list[dict[str, Any]], version: str) -> bool:
+    expected = {
+        "validate",
+        "package",
+        "build (backend, amd64, ubuntu-24.04)",
+        "build (backend, arm64, ubuntu-24.04-arm)",
+        "build (web, amd64, ubuntu-24.04)",
+        "build (web, arm64, ubuntu-24.04-arm)",
+        "verify (amd64, ubuntu-24.04)",
+        "verify (arm64, ubuntu-24.04-arm)",
+    }
+    results = {job["name"]: job["conclusion"] for job in jobs}
+    return (
+        run.get("event") == "push"
+        and run.get("head_branch") == "v" + version
+        and run.get("path") == ".github/workflows/release.yml"
+        and run.get("status") == "completed"
+        and run.get("conclusion") == "failure"
+        and len(jobs) == len(expected) + 1
+        and set(results) == expected | {"publish"}
+        and all(results[name] == "success" for name in expected)
+        and results["publish"] == "failure"
+    )
+
+
 def package() -> None:
     version, sha = os.environ["RELEASE_VERSION"], os.environ["RELEASE_SHA"]
     images = {
@@ -195,7 +260,7 @@ def package() -> None:
     destination = ROOT / "release-bundle"
     destination.mkdir(exist_ok=True)
     (destination / "compose.yaml").write_text(json.dumps(config, indent=2) + "\n")
-    (destination / ".env.example").write_text(
+    (destination / "env.example").write_text(
         "# Offline paper-only foundation\nYAMS_WEB_PORT=3000\n# YAMS_JOB_LIMITS={}\n"
     )
     shutil.copyfile(ROOT / "docs/releases.md", destination / "INSTALL.md")
@@ -212,7 +277,7 @@ def package() -> None:
         "build_provenance": "BuildKit provenance and SBOM attached to image manifests",
     }
     (destination / "provenance.json").write_text(json.dumps(provenance, indent=2) + "\n")
-    names = ("compose.yaml", ".env.example", "INSTALL.md", "provenance.json")
+    names = ("compose.yaml", "env.example", "INSTALL.md", "provenance.json")
     (destination / "SHA256SUMS").write_text(
         "".join(
             f"{hashlib.sha256((destination / name).read_bytes()).hexdigest()}  {name}\n"
@@ -298,7 +363,16 @@ def publish() -> None:
     # Resume only identical draft assets; never clobber an existing asset.
     release = existing_release(tag)
     assert release is not None
-    assets = {asset["name"]: asset for asset in release["assets"]}
+    allowed_assets = {path.name for path in destination.iterdir() if path.is_file()}
+
+    def logical_name(name: str) -> str:
+        # GitHub sanitizes a leading-dot upload name. Keep the original verified
+        # bytes/checksums for legacy bundles; future bundles use env.example.
+        if name == "default.env.example" and ".env.example" in allowed_assets:
+            return ".env.example"
+        return name
+
+    assets = {logical_name(asset["name"]): asset for asset in release["assets"]}
     for path in sorted(destination.iterdir()):
         if not path.is_file():
             continue
@@ -321,9 +395,10 @@ def publish() -> None:
     with tempfile.TemporaryDirectory(prefix="yams-draft-download-") as temporary:
         downloaded = Path(temporary)
         for asset in uploaded["assets"]:
-            if asset["name"] not in allowed_assets:
+            name = logical_name(asset["name"])
+            if name not in allowed_assets:
                 raise SystemExit("Unexpected draft asset")
-            local = destination / asset["name"]
+            local = destination / name
             content = subprocess.check_output(
                 [
                     "gh",
@@ -335,16 +410,42 @@ def publish() -> None:
             )
             if content != local.read_bytes():
                 raise SystemExit("Uploaded draft asset checksum mismatch")
-            (downloaded / asset["name"]).write_bytes(content)
+            (downloaded / name).write_bytes(content)
         if len(uploaded["assets"]) != len(allowed_assets):
             raise SystemExit("Missing release asset")
         # Exercise the complete installer command against fresh draft downloads,
         # including both platform evidence files added after native smoke tests.
         subprocess.run(["sha256sum", "--check", "SHA256SUMS"], cwd=downloaded, check=True)
-    command("gh", "release", "edit", tag, "--repo", REPO, "--draft=false", "--prerelease")
+    notes = (
+        "Local paper-only foundation. Download all assets, verify SHA256SUMS and follow "
+        "INSTALL.md. No financial engine or live provider execution is included."
+    )
+    if ".env.example" in allowed_assets:
+        notes += (
+            "\n\n**0.0.1 installation prerequisite:** GitHub names the configuration asset "
+            "`default.env.example`. After downloading all assets, run "
+            "`cp default.env.example .env.example` **before** the checksum command in INSTALL.md. "
+            "This restores the original verified filename without changing its bytes."
+        )
+    command(
+        "gh",
+        "release",
+        "edit",
+        tag,
+        "--repo",
+        REPO,
+        "--draft=false",
+        "--prerelease",
+        "--notes",
+        notes,
+    )
 
 
 if __name__ == "__main__":
-    {"preflight": preflight, "indexes": indexes, "package": package, "publish": publish}[
-        sys.argv[1]
-    ]()
+    {
+        "preflight": preflight,
+        "recovery-preflight": recovery_preflight,
+        "indexes": indexes,
+        "package": package,
+        "publish": publish,
+    }[sys.argv[1]]()

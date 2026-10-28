@@ -21,13 +21,13 @@ def main() -> None:
     checksum_names = []
     for line in (bundle / "SHA256SUMS").read_text().splitlines():
         digest, name = line.split("  ", 1)
-        if name not in {"compose.yaml", ".env.example", "INSTALL.md", "provenance.json"}:
+        if name not in {"compose.yaml", "env.example", "INSTALL.md", "provenance.json"}:
             raise SystemExit("Unexpected checksum path")
         assert hashlib.sha256((bundle / name).read_bytes()).hexdigest() == digest
         checksum_names.append(name)
     assert len(checksum_names) == 4 and set(checksum_names) == {
         "compose.yaml",
-        ".env.example",
+        "env.example",
         "INSTALL.md",
         "provenance.json",
     }
