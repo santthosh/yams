@@ -14,6 +14,19 @@ Store event timestamps as timezone-aware RFC3339 UTC `Z`; session dates are exch
 
 A close-derived decision is made only after the session's closing bar is complete, validated and available. Record `decision_cutoff_utc` and require every input's `available_at <= decision_cutoff_utc`; this cutoff is at or after that session's scheduled close. Data downloaded later is not automatically evidence that it was historically available (ADR-002 owns availability proxies and disclosures).
 
+Approved Q15 (#34, 2026-10-28): end-of-day strategy diagnostics use a fixed
+`decision_cutoff_utc = scheduled_close_utc + 15 minutes` from the pinned calendar,
+including early-close and DST sessions. The cutoff is independent of bar arrival
+order, snapshot download time and evaluation wall clock. Use only complete,
+validated evidence available at or before the cutoff; live-like use additionally
+requires ingestion by the cutoff. Late/missing bars are excluded with reasons,
+never repaired or backdated. No eligible candidates yields a completed cash-only
+target with exclusion evidence. Fifteen minutes is an initial policy default,
+not a provider completeness guarantee; store it with reproducibility evidence.
+A real-market evaluation cannot run before this cutoff has elapsed. Synthetic
+replay uses its explicitly authored calendar and availability without pretending
+that fictional dates are real future market evidence.
+
 Given `decision_cutoff_utc`, `approved_at` and the pinned schedule, choose the first session whose opening instant is **strictly greater than both timestamps**. Equality is too late for that open. For a deterministic historical backtest, the simulated approval instant is the decision cutoff; it is not the wall-clock time when the backtest ran. A live-like approval always uses the actual recorded approval time and cannot fill at a past opening. Preserve these timestamps through restart.
 
 Eligibility of a session does not imply a usable execution price. Require a validated raw opening price and coherent corporate-action evidence. Partial/unvalidated opening quotes, absent bars, provider errors or unsafe stale evidence leave the order unfilled/pending with a reason; never use adjusted close, a previous close, zero or an inferred quote. A later-arriving validated bar for the originally eligible session may support that session's synthetic fill if its open was after approval; retain both execution-session and ingestion/posting timestamps. Do not silently substitute a different day's price for a missing scheduled opening.

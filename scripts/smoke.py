@@ -205,6 +205,16 @@ def main() -> None:
             check=True,
         )
         evidence["checks"].append("real Docker browser Dashboard/Settings/job at both widths")
+        evaluations = [
+            row
+            for path in sorted(destination.glob("candidate-runs-*.json"))
+            for row in json.loads(path.read_text())
+        ]
+        assert len(evaluations) == 6
+        evidence["strategy_evaluations"] = evaluations
+        evidence["checks"].append(
+            "real browser candidate/target reruns and cash-only cases via supervised worker"
+        )
         for service in ("api", "worker"):
             blocked = compose(
                 "exec",
@@ -230,6 +240,8 @@ def main() -> None:
         address = web_address()
         assert get("workspace") == workspace
         assert get("strategies") == strategies
+        for saved in evaluations:
+            assert get(f"strategy-evaluations/{saved['id']}") == saved
         assert get("health")["fixture_metadata"] == health["fixture_metadata"]
         assert get(f"jobs/{job}")["status"] == "completed"
         actual = python(
@@ -243,6 +255,8 @@ def main() -> None:
         address = web_address()
         assert get("workspace") == workspace
         assert get("strategies") == strategies
+        for saved in evaluations:
+            assert get(f"strategy-evaluations/{saved['id']}") == saved
         assert (
             python(
                 "from pathlib import Path; import hashlib; "

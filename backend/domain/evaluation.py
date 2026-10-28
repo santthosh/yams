@@ -167,4 +167,5 @@ class StrategyEvaluationPayload(Contract):
     config_sha256: Hash256
     calendar_sha256: Hash256
     engine_version: Hash256
+    decision_cutoff_utc: UTCTimestamp
     config_canonical_json: Annotated[str, Field(strict=True, min_length=1, max_length=16384)]

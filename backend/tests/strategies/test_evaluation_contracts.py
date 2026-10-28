@@ -35,9 +35,8 @@ def explicit_fixture_result(
     digest = json.loads((ROOT / "manifest.json").read_text())["snapshot_sha256"]
     pinned = PinnedSnapshot.open(tmp_path / "snapshot", digest)
     config = StrategyConfigV1.from_json((ROOT / "fix-01/strategy.canonical.json").read_bytes())
-    # FIX-01 session400 closing bar is explicitly published at20:00:01Z.
-    # This is a test input; it does NOT choose a default staggered-arrival cutoff.
-    cutoff = datetime(2028, 7, 17, 20, 0, 1, tzinfo=UTC)
+    # Approved Q15: FIX-01 session400 closes20:00Z; decision is20:15Z.
+    cutoff = datetime(2028, 7, 17, 20, 15, tzinfo=UTC)
     measured = allocate_momentum(
         evaluate_snapshot(
             pinned, config, cutoff, date(2028, 7, 17), engine_version=engine_fingerprint()
@@ -56,6 +55,7 @@ def explicit_fixture_result(
         snapshot_sha256=digest,
         calendar_sha256=measured.momentum.calendar_sha256,
         engine_version=measured.momentum.engine_version,
+        decision_cutoff_utc=cutoff,
         config_canonical_json=config.canonical_bytes().decode(),
     )
     return payload, result_from_engine(payload, measured)

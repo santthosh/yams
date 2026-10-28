@@ -31,6 +31,7 @@ from backend.portfolio.allocation import AllocatedMomentum
 from backend.portfolio.execution import calendar_digest
 from backend.portfolio.risk import assess_targets
 from backend.strategies.build import engine_fingerprint
+from backend.strategies.clock import decision_cutoff
 from backend.strategies.registry import version_view
 
 MAX_RESULT_BYTES = 8 * 1024 * 1024
@@ -106,9 +107,10 @@ def admit_evaluation(
             raise EvaluationAdmissionError(
                 "INSUFFICIENT_MARKET_DATA", "Session is not covered by this snapshot."
             )
-        if manifest.mode == "research_market_data" and scheduled.close_at > datetime.now(UTC):
+        cutoff = decision_cutoff(calendar, request.as_of_session)
+        if manifest.mode == "research_market_data" and cutoff > datetime.now(UTC):
             raise EvaluationAdmissionError(
-                "VALIDATION_ERROR", "A future market session cannot be evaluated."
+                "VALIDATION_ERROR", "The market session decision cutoff has not elapsed."
             )
         if (
             coverage.latest_completed_session is None
@@ -138,6 +140,7 @@ def admit_evaluation(
             config_sha256=published.config_sha256,
             calendar_sha256=calendar_digest(calendar),
             engine_version=build,
+            decision_cutoff_utc=cutoff,
             config_canonical_json=published.config.canonical_bytes().decode(),
         )
         # The resource and job must commit together: a runnable job cannot be left
@@ -199,6 +202,7 @@ def seal_evaluation(queue: Queue, lease: Lease, value: str) -> None:
             or row.snapshot_sha256 != payload.snapshot_sha256
             or row.calendar_sha256 != payload.calendar_sha256
             or result.as_of_session != row.as_of_session
+            or result.decision_cutoff_utc != payload.decision_cutoff_utc
             or result.mode != row.source_mode
             or repro.strategy_version_id != row.strategy_version_id
             or repro.snapshot_id != row.snapshot_id
@@ -249,6 +253,8 @@ def read_evaluation(engine: Engine, identity: UUID) -> StrategyEvaluationV1 | No
             if sealed is not None
             else None
         )
+        if result is not None and result.decision_cutoff_utc != payload.decision_cutoff_utc:
+            raise ValueError("Diagnostic cutoff differs from immutable job inputs")
         return StrategyEvaluationV1.model_validate(
             dict(
                 id=row.id,

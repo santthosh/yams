@@ -21,12 +21,14 @@ from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
 
 from backend.domain.common import ErrorCode
+from backend.jobs.handlers.evaluate_strategy import EvaluationFailure, evaluate_strategy
 from backend.jobs.handlers.refresh_market_data import refresh_market_data
 from backend.jobs.queue import Lease, Queue
 from backend.jobs.registry import AttemptMetrics, DiagnosticPayload, JobLimits
 from backend.market_data.providers.yahoo import ProviderFailure
 from backend.market_data.snapshots import PublicationFenceError, publish_snapshot
 from backend.persistence.database import Settings, database_engine
+from backend.strategies.evaluations import seal_evaluation
 
 logger = logging.getLogger(__name__)
 Handler = Callable[[dict[str, Any], Event], int | str]
@@ -103,6 +105,8 @@ def child_entry(
         pipe.send(("cancelled",))
     except ProviderFailure as error:
         pipe.send(("provider_error", error.reason))
+    except EvaluationFailure as error:
+        pipe.send(("evaluation_error", error.code))
     except MemoryError:
         pipe.send(("error", "RESOURCE_EXHAUSTED"))
     except Exception:
@@ -176,6 +180,8 @@ class Worker:
             store.mkdir(mode=0o700, parents=True, exist_ok=True)
             stage = staging / f"{lease.job_id}-{lease.token}"
             handler = partial(refresh_market_data, stage=stage)
+        elif lease.kind == "evaluate_strategy":
+            handler = partial(evaluate_strategy, root=self.artifact_root)
         context = mp.get_context("spawn")
         cancelled = context.Event()
         reader, writer = context.Pipe(duplex=False)
@@ -283,6 +289,10 @@ class Worker:
                         if not isinstance(message[1], str):
                             raise ValueError("Invalid refresh completion")
                         publish_snapshot(self.queue, lease, stage, store, message[1])
+                    elif lease.kind == "evaluate_strategy":
+                        if not isinstance(message[1], str):
+                            raise ValueError("Invalid diagnostic completion")
+                        seal_evaluation(self.queue, lease, message[1])
                     elif not self.queue.complete_diagnostic(lease, message[1]):
                         self.queue.acknowledge_cancel(lease)
                 except PublicationFenceError:
@@ -295,6 +305,9 @@ class Worker:
                     code = "TIME_LIMIT"
                 if message and message[:2] == ("error", "RESOURCE_EXHAUSTED"):
                     code = "RESOURCE_EXHAUSTED"
+                if message and message[0] == "evaluation_error":
+                    if message[1] in {"VALIDATION_ERROR", "STALE_DATA"}:
+                        code = message[1]
                 if message and message[0] == "provider_error":
                     provider = ProviderFailure(message[1])
                     self.queue.fail(

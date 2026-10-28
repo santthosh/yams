@@ -1,8 +1,4 @@
-"""Real diagnostic transaction proofs with an EXPLICIT synthetic test cutoff.
-
-These tests do not ratify a staggered-arrival policy or claim supervised handler
-coverage before that policy/handler is implemented.
-"""
+"""Real diagnostic transaction, supervised handler and restart integrity proofs."""
 
 import json
 import shutil
@@ -18,6 +14,7 @@ from sqlalchemy.exc import DBAPIError
 from backend.api.main import create_app
 from backend.domain.evaluation import StrategyEvaluationRequest
 from backend.jobs.queue import Queue
+from backend.jobs.worker import Worker
 from backend.market_data.snapshots import PublicationFenceError, publish_snapshot
 from backend.persistence.bootstrap import bootstrap
 from backend.persistence.database import Settings, database_engine
@@ -144,6 +141,14 @@ def test_publication_fault_rolls_back_and_bad_lineage_cannot_seal(
     )
     with pytest.raises(ValueError, match="lineage"):
         seal_evaluation(queue, lease, wrong.model_dump_json())
+    with pytest.raises(ValueError, match="lineage"):
+        seal_evaluation(
+            queue,
+            lease,
+            expected.model_copy(
+                update={"decision_cutoff_utc": expected.decision_cutoff_utc + timedelta(seconds=1)}
+            ).model_dump_json(),
+        )
 
     def crash(*args: object, **kwargs: object) -> None:
         raise RuntimeError("injected diagnostic completion fault")
@@ -158,6 +163,23 @@ def test_publication_fault_rolls_back_and_bad_lineage_cannot_seal(
             connection.execute(text("SELECT count(*) FROM strategy_evaluation_result")).scalar_one()
             == 0
         )
+
+
+def test_real_supervised_evaluation_handler_and_rerun(database: Engine, tmp_path: Path) -> None:
+    request = prepare(database, tmp_path)
+    queue = Queue(database)
+    results = []
+    for _ in range(2):
+        accepted = admit_evaluation(database, tmp_path, request)
+        assert Worker(queue, artifact_root=tmp_path).run_once()
+        actual = read_evaluation(database, accepted.evaluation_id)
+        assert actual is not None and actual.status == "completed", actual
+        assert actual.result is not None
+        assert actual.result.decision_cutoff_utc.isoformat() == "2028-07-17T20:15:00+00:00"
+        assert actual.result.selected_ids == ("SYN:AAA", "SYN:BBB", "SYN:CCC")
+        assert actual.result.cash_target_weight == "0.4"
+        results.append(actual.result_sha256)
+    assert results[0] == results[1]
 
 
 def test_prepare_evaluation_restart() -> None:

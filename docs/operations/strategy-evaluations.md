@@ -1,9 +1,10 @@
 # Snapshot-to-target diagnostics
 
-**Draft implementation under #34.** The independent transport, persistence and UI
-work is implemented on its feature branch. Q15 (staggered closing-bar cutoff) is
-pending user input. No default cutoff or supervised evaluation handler is ratified
-by this draft, and no real worker-to-browser completion is claimed yet.
+The diagnostic slice combines immutable transport/persistence, the supervised
+shared quant engine and a responsive inspection UI. Approved Q15 fixes the cutoff
+at scheduled close plus15 minutes, including early-close days. Only validated
+evidence available by that instant is usable; late bars retain exclusion reasons.
+This is a paper-only research diagnostic, not an approval or order operation.
 
 ## Contract and identity
 
@@ -71,9 +72,16 @@ metadata. Native and Linux worker fingerprints must agree for equivalent source,
 dependencies and architecture. Different architecture/runtime fingerprints remain
 distinguishable. Stored results retain their original fingerprint across updates.
 
-The worker implementation must compare the pinned build/config/snapshot/calendar
-identities before evaluating and use the resolved Q15 timing policy. This pending
-work must not be replaced with a guessed cutoff or an unsupported job handler.
+The supervised worker compares pinned build/config/snapshot/calendar identities
+before evaluating and enforces Q15's scheduled-close-plus15-minute cutoff. Admission
+pins this instant in the immutable job payload; the child independently derives it
+from the verified calendar, and publication/reads reject a different result cutoff.
+Bar arrival order cannot change it. Real-market admission and execution of the
+handler reject a cutoff that has not elapsed. All current diagnostics are
+historical as-of views, so they filter by availability; a future live-like caller
+must additionally enforce local ingestion as ADR-002 requires. The child performs
+no database writes. Only the supervisor may seal its bounded result under the
+active lease. Validation/stale failures expose sanitized typed codes.
 
 ## Inspection UI
 
@@ -90,17 +98,33 @@ features/contributions, exclusions and reproducibility. Tables scroll horizontal
 and accept keyboard focus; details expose exact stored values. There is no paper
 approval action in this diagnostic slice. Public cancellation is staged to #41.
 
-## Current verification scope
+## Verification and limitations
 
-Independent FIX-01 momentum values are checked at an **explicit fixture cutoff**
-(`2028-07-17T20:00:01Z`), not a chosen default arrival policy. PostgreSQL tests
-cover admission/reads, direct fenced sealing, repeat-result hashes, immutability,
-cancel/expiry, injected rollback and actual container restart. These tests do not
-prove the still-pending supervised evaluation handler.
+FIX-01 momentum values are checked against independently authored expectations at
+the approved cutoff `2028-07-17T20:15:00Z`; authored target weights are20% each for
+SYN:AAA/BBB/CCC and40% cash. The insufficient-history session2027-01-04 completes
+with100% cash and exclusions. Boundary tests cover availability exactly at the
+cutoff and ±1 microsecond, separate late ingestion, DST and early closes.
 
-Browser transport fixtures are labeled `SYNTHETIC_DATA_ONLY`, generated from
-explicit-cutoff engine runs, and are **not independent financial oracles**. Four
-desktop/mobile tests verify polling/rerun display, recovery, cash-only/failure/
-unknown/stale/research-empty states, keyboard tables, width and Axe accessibility.
-The real worker/API/browser and fresh-Docker demonstration remain required after
-the cutoff decision, before #34 or milestone0.0.2 can be completed.
+PostgreSQL tests cover admission/reads, fenced sealing, repeat-result hashes,
+immutability, wrong cutoff/lineage, cancel/expiry, injected rollback and actual
+container restart. A real supervised-child test verifies two identical financial
+results through the queue. The Compose browser journey refreshes fixtures, selects
+pinned inputs and evaluates/reruns both populated and cash-only results through
+the actual API/worker at desktop/mobile widths. Its saved envelopes are checked
+after restart/recreate. Native packaged-install verification uses the same browser
+journey and checks retained evaluation evidence after restart; per-platform release
+runs remain necessary before a release is declared supported.
+
+Separate browser transport fixtures are labeled `SYNTHETIC_DATA_ONLY`, generated
+from explicit-cutoff engine runs, and are **not independent financial oracles**.
+They retain their original historical build/cutoff values. Four desktop/mobile
+tests cover polling/rerun display, recovery, cash-only/failure/unknown/stale/
+research-empty states, keyboard tables, width and Axe accessibility. A reproduced
+polling regression ensures completion of an older run cannot erase a failed new
+submission's admission error.
+
+Optional external research remains subject to provider permission/capability and
+chronology restrictions. No real provider-derived universe, calibrated prediction,
+portfolio deployment, order execution or completed0.0.2 release is established by
+this synthetic diagnostic journey. The milestone epic owns its integrated gate.
