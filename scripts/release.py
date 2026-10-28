@@ -184,13 +184,8 @@ def recovery_preflight() -> None:
     source_runs = api(
         f"repos/{REPO}/actions/workflows/ci.yml/runs?event=push&head_sha={sha}&per_page=100"
     )
-    draft = existing_release("v" + version)
-    if (
-        not passed_main(source_runs["workflow_runs"], sha)
-        or not draft
-        or not release_available(draft, sha)
-    ):
-        raise SystemExit("Recovery requires an identical unpublished draft and passing source CI")
+    if not passed_main(source_runs["workflow_runs"], sha):
+        raise SystemExit("Recovery requires passing source CI")
     emit(version=version, sha=sha)
 
 
@@ -290,6 +285,9 @@ def publish() -> None:
     version, sha = os.environ["RELEASE_VERSION"], os.environ["RELEASE_SHA"]
     tag = "v" + version
     release = existing_release(tag)
+    # Drafts require write-scoped API visibility; validate them here before any mutation.
+    if os.environ.get("RECOVERY_RUN") and not release:
+        raise SystemExit("Recovery requires an existing unpublished draft")
     if not release_available(release, sha):
         raise SystemExit("Refusing to replace a published version or conflicting draft")
     destination = ROOT / "release-bundle"

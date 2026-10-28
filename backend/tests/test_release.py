@@ -247,3 +247,14 @@ def test_recovery_rejects_missing_failed_or_wrong_release_gates() -> None:
         ("conclusion", "success"),
     ):
         assert not release_script.recoverable_run({**run, key: value}, jobs, "0.0.1")
+
+
+def test_recovery_requires_visible_existing_draft_before_mutations(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("RECOVERY_RUN", "123")
+    monkeypatch.setenv("RELEASE_VERSION", "0.0.1")
+    monkeypatch.setenv("RELEASE_SHA", "source")
+    monkeypatch.setattr(release_script, "existing_release", lambda tag: None)
+    with pytest.raises(SystemExit, match="existing unpublished draft"):
+        release_script.publish()

@@ -64,6 +64,7 @@ jobs:
           github-token: ${{ github.token }}
       - env:
           GH_TOKEN: ${{ github.token }}
+          RECOVERY_RUN: ${{ inputs.run_id }}
           RELEASE_VERSION: ${{ needs.validate.outputs.version }}
           RELEASE_SHA: ${{ needs.validate.outputs.sha }}
         run: python3 scripts/release.py publish
