@@ -141,10 +141,13 @@ alone does not activate new kinds. Defaults are hypotheses, not optimized result
 
 **Algorithm:** for each portfolio rebalance session T, pin ADR-001's approved cutoff (the next scheduled opening minus one hour) and compute candidates and targets using only evidence available by that cutoff. Simulated historical approval equals that cutoff; schedule and fill orders at the first eligible opening strictly after both cutoff and approval; apply actions and value through time; rebalance monthly using exchange session calendar. Use same strategies, allocation, order planner, corporate-action policy, and fill simulator as ongoing paper accounts. For unavailable bars, record a skip/error according to a documented gap policy—never invent fills.
 
-[ADR-012](adr/0012-walk-forward-core.md) specifies the proposed exact initial-close
-anchor, pinned month ends, chronological split rounding/carry, strict replay gaps
-and accounting-versus-eligibility views for #39. These details require reviewed
-implementation; a sealed core alone is not a completed report or public endpoint.
+[ADR-012](adr/0012-walk-forward-core.md) owns exact initial-close/month-end anchors,
+chronological split rounding/carry, strict replay gaps and accounting eligibility.
+The internal core/persistence is implemented by#39. [ADR-013](adr/0013-backtest-reporting-methodology.md)
+ratifies Q12 metrics, observations, explicit unavailable outcomes and aligned
+benchmark/cash assumptions for#40. A completed public experiment still requires
+#41's coordinated report artifacts, metrics and lifecycle; an internal core alone
+is not a completed report or public endpoint.
 
 **DEFAULT evaluation windows:** request at least 4 years of daily data when available: ~1 year warmup for 252-session features, ~2 years exploratory development and ~1 year untouched holdout. Shorter windows are permitted but flagged (`INSUFFICIENT_HOLDOUT`, `LIMITED_WARMUP`) and must not imply validated performance. An out-of-sample period can be used once for final evaluation but must not automatically drive parameter search. Repeated human selection across holdout runs must be indicated as a caveat.
 

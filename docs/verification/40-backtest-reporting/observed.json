@@ -1,0 +1,328 @@
+{
+  "label": "SYNTHETIC_DATA_ONLY",
+  "purpose": "Observed Docker reporting proof; independent expected vectors remain in FIX-07 and metrics_extensions/case.json.",
+  "project": "yams-smoke-c511c2c326ef",
+  "checks_passed": 13,
+  "reporting_version": "q12_v1",
+  "reporting_engine_version": "6915eb134f5860e82e6e87c3047c1178036ac9480120789fb3e245573e525637",
+  "core_manifest_sha256": "b73f3b8064a82188a8f1dd0ff82ec4f0aa46baf40eb9f0354f83d7a3d391f9ab",
+  "comparison": {
+    "snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+    "calendar_sha256": "e3d2312d54e172d7aada8239f296eecf38c6038d66b5a203c5c5690ede82d660",
+    "core_engine_version": "6915eb134f5860e82e6e87c3047c1178036ac9480120789fb3e245573e525637",
+    "reporting_engine_version": "6915eb134f5860e82e6e87c3047c1178036ac9480120789fb3e245573e525637",
+    "core_policy_version": "walk_forward_v1",
+    "reporting_version": "q12_v1",
+    "source_mode": "synthetic_fixture",
+    "sessions": [
+      "2028-07-18",
+      "2028-07-19",
+      "2028-07-20",
+      "2028-07-21"
+    ],
+    "start_session": "2028-07-18",
+    "end_session_exclusive": "2028-07-24",
+    "initial_capital_usd": "1000.00",
+    "universe_canonical_json": "{\"kind\":\"liquid_us_equities\",\"min_history_sessions\":252,\"min_median_dollar_volume_usd\":\"1000000\",\"min_price_usd\":\"5\"}",
+    "execution_policy": {
+      "id": "us_eod_next_open_v1",
+      "slippage_fraction": "0.001",
+      "commission_usd": "0.00"
+    },
+    "benchmark_asset_id": "SYN:SPY",
+    "evaluation_split": {
+      "kind": "chronological",
+      "holdout_fraction": 0.25
+    },
+    "holdout_start_session": "2028-07-21"
+  },
+  "comparison_sha256": "ab3f2ac66785cb57636f7146d6c6d19c9ca009eee3856c74da2aeb8753caa996",
+  "portfolio": {
+    "total": {
+      "daily_nav_observations": 4,
+      "return_observations": 3,
+      "metrics": {
+        "cumulative_return_fraction": {
+          "value": 0.00022,
+          "unavailable_reason": null
+        },
+        "annualized_return_fraction": {
+          "value": 0.018649741519960364,
+          "unavailable_reason": null
+        },
+        "annualized_volatility_fraction": {
+          "value": 0.09844077475005868,
+          "unavailable_reason": null
+        },
+        "max_drawdown_fraction": {
+          "value": 0.00634,
+          "unavailable_reason": null
+        },
+        "turnover_fraction": {
+          "value": 0.6081817453321581,
+          "unavailable_reason": null
+        },
+        "sharpe_ratio": {
+          "value": 0.22050227337002146,
+          "unavailable_reason": null
+        },
+        "slippage_usd": "0.61",
+        "fees_usd": "0.00",
+        "trade_count": 3
+      }
+    },
+    "development": {
+      "daily_nav_observations": 3,
+      "return_observations": 2,
+      "metrics": {
+        "cumulative_return_fraction": {
+          "value": -0.00634,
+          "unavailable_reason": null
+        },
+        "annualized_return_fraction": {
+          "value": -0.5512920629821995,
+          "unavailable_reason": null
+        },
+        "annualized_volatility_fraction": {
+          "value": 0.05773503891738232,
+          "unavailable_reason": null
+        },
+        "max_drawdown_fraction": {
+          "value": 0.00634,
+          "unavailable_reason": null
+        },
+        "turnover_fraction": {
+          "value": 0.6085678202241185,
+          "unavailable_reason": null
+        },
+        "sharpe_ratio": {
+          "value": -13.84383243711776,
+          "unavailable_reason": null
+        },
+        "slippage_usd": "0.61",
+        "fees_usd": "0.00",
+        "trade_count": 3
+      }
+    },
+    "holdout": {
+      "daily_nav_observations": 1,
+      "return_observations": 1,
+      "metrics": {
+        "cumulative_return_fraction": {
+          "value": 0.00660185576555361,
+          "unavailable_reason": null
+        },
+        "annualized_return_fraction": {
+          "value": 4.249852898986226,
+          "unavailable_reason": null
+        },
+        "annualized_volatility_fraction": {
+          "value": null,
+          "unavailable_reason": "INSUFFICIENT_RETURN_HISTORY"
+        },
+        "max_drawdown_fraction": {
+          "value": 0.0,
+          "unavailable_reason": null
+        },
+        "turnover_fraction": {
+          "value": 0.0,
+          "unavailable_reason": null
+        },
+        "sharpe_ratio": {
+          "value": null,
+          "unavailable_reason": "INSUFFICIENT_RETURN_HISTORY"
+        },
+        "slippage_usd": "0.00",
+        "fees_usd": "0.00",
+        "trade_count": 0
+      }
+    }
+  },
+  "benchmark": {
+    "asset_id": "SYN:SPY",
+    "sessions": [
+      "2028-07-18",
+      "2028-07-19",
+      "2028-07-20",
+      "2028-07-21"
+    ],
+    "nav_usd": [
+      "1000.00",
+      "1000.23",
+      "1000.45",
+      "1000.68"
+    ],
+    "available": true,
+    "unavailable_reason": null,
+    "periods": {
+      "total": {
+        "daily_nav_observations": 4,
+        "return_observations": 3,
+        "metrics": {
+          "cumulative_return_fraction": {
+            "value": 0.00068,
+            "unavailable_reason": null
+          },
+          "annualized_return_fraction": {
+            "value": 0.05876230382163209,
+            "unavailable_reason": null
+          },
+          "annualized_volatility_fraction": {
+            "value": 9.164475943383685e-05,
+            "unavailable_reason": null
+          },
+          "max_drawdown_fraction": {
+            "value": 0.0,
+            "unavailable_reason": null
+          },
+          "turnover_fraction": {
+            "value": 0.0,
+            "unavailable_reason": null
+          },
+          "sharpe_ratio": {
+            "value": 623.135036206146,
+            "unavailable_reason": null
+          },
+          "slippage_usd": "0.00",
+          "fees_usd": "0.00",
+          "trade_count": 0
+        }
+      },
+      "development": {
+        "daily_nav_observations": 3,
+        "return_observations": 2,
+        "metrics": {
+          "cumulative_return_fraction": {
+            "value": 0.00045,
+            "unavailable_reason": null
+          },
+          "annualized_return_fraction": {
+            "value": 0.05832476367199176,
+            "unavailable_reason": null
+          },
+          "annualized_volatility_fraction": {
+            "value": 0.00011281757458834395,
+            "unavailable_reason": null
+          },
+          "max_drawdown_fraction": {
+            "value": 0.0,
+            "unavailable_reason": null
+          },
+          "turnover_fraction": {
+            "value": 0.0,
+            "unavailable_reason": null
+          },
+          "sharpe_ratio": {
+            "value": 502.52477127715406,
+            "unavailable_reason": null
+          },
+          "slippage_usd": "0.00",
+          "fees_usd": "0.00",
+          "trade_count": 0
+        }
+      },
+      "holdout": {
+        "daily_nav_observations": 1,
+        "return_observations": 1,
+        "metrics": {
+          "cumulative_return_fraction": {
+            "value": 0.00022989654655405068,
+            "unavailable_reason": null
+          },
+          "annualized_return_fraction": {
+            "value": 0.05963792686857813,
+            "unavailable_reason": null
+          },
+          "annualized_volatility_fraction": {
+            "value": null,
+            "unavailable_reason": "INSUFFICIENT_RETURN_HISTORY"
+          },
+          "max_drawdown_fraction": {
+            "value": 0.0,
+            "unavailable_reason": null
+          },
+          "turnover_fraction": {
+            "value": 0.0,
+            "unavailable_reason": null
+          },
+          "sharpe_ratio": {
+            "value": null,
+            "unavailable_reason": "INSUFFICIENT_RETURN_HISTORY"
+          },
+          "slippage_usd": "0.00",
+          "fees_usd": "0.00",
+          "trade_count": 0
+        }
+      }
+    },
+    "warnings": [
+      "BENCHMARK_ADJUSTED_TOTAL_RETURN_APPROXIMATION",
+      "BENCHMARK_DIVIDEND_RECOGNITION_DIFFERS",
+      "BENCHMARK_FRICTION_FREE_FULLY_INVESTED",
+      "BENCHMARK_INITIAL_CLOSE_DIFFERS_FROM_NEXT_OPEN"
+    ]
+  },
+  "cash_nav_usd": [
+    "1000.00",
+    "1000.00",
+    "1000.00",
+    "1000.00"
+  ],
+  "exposures": [
+    {
+      "session_date": "2028-07-18",
+      "cash_weight": {
+        "value": 1.0,
+        "unavailable_reason": null
+      },
+      "max_position_weight": {
+        "value": 0.0,
+        "unavailable_reason": null
+      }
+    },
+    {
+      "session_date": "2028-07-19",
+      "cash_weight": {
+        "value": 0.39307645396165125,
+        "unavailable_reason": null
+      },
+      "max_position_weight": {
+        "value": 0.20639716999842103,
+        "unavailable_reason": null
+      }
+    },
+    {
+      "session_date": "2028-07-20",
+      "cash_weight": {
+        "value": 0.3953477283969298,
+        "unavailable_reason": null
+      },
+      "max_position_weight": {
+        "value": 0.20156401524808204,
+        "unavailable_reason": null
+      }
+    },
+    {
+      "session_date": "2028-07-21",
+      "cash_weight": {
+        "value": 0.39275537064375515,
+        "unavailable_reason": null
+      },
+      "max_position_weight": {
+        "value": 0.20647452449535983,
+        "unavailable_reason": null
+      }
+    }
+  ],
+  "warnings": [
+    "BENCHMARK_ADJUSTED_TOTAL_RETURN_APPROXIMATION",
+    "BENCHMARK_DIVIDEND_RECOGNITION_DIFFERS",
+    "BENCHMARK_FRICTION_FREE_FULLY_INVESTED",
+    "BENCHMARK_INITIAL_CLOSE_DIFFERS_FROM_NEXT_OPEN",
+    "HOLDOUT_REPEATED_SELECTION_CAVEAT",
+    "INSUFFICIENT_HOLDOUT",
+    "SYNTHETIC_DATA_ONLY",
+    "ZERO_CASH_RETURN"
+  ],
+  "identical_through_restart_and_rebuild": true
+}
