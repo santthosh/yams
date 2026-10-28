@@ -37,6 +37,9 @@ JSON API: `GET /api/status`, `GET /api/portfolio`, `POST /api/recommendations`, 
 
 ## How it decides (fixed in advance, not tuned to the backtest)
 
+Risk-adjusted momentum: own the S&P 500 stocks that have risen most steadily, capped and diversified, and move to
+cash when the market turns down. Rationale, rules and weaknesses: [`docs/STRATEGY.md`](docs/STRATEGY.md).
+
 | Step | Rule |
 |---|---|
 | Universe and filters | Today's S&P 500 (Wikipedia). ≥1 year of prices, price ≥ $5, ≥ $10M daily dollar volume, above 200-day average |
