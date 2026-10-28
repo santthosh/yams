@@ -12,6 +12,12 @@ from pydantic.json_schema import models_json_schema
 
 from backend.domain.common import ErrorEnvelope, JobV1, PageRequest
 from backend.domain.data import AssetPageV1, DataHealthV1, SnapshotV1
+from backend.domain.evaluation import (
+    StrategyEvaluationAccepted,
+    StrategyEvaluationRequest,
+    StrategyEvaluationResultV1,
+    StrategyEvaluationV1,
+)
 from backend.domain.experiment import ExperimentRequest, ExperimentRunV1
 from backend.domain.forecast import ForecastV1
 from backend.domain.market import AssetV1, MarketBarV1, SnapshotManifestV1
@@ -25,6 +31,10 @@ MODELS: tuple[type[BaseModel], ...] = (
     StrategyConfigV1,
     StrategyV1,
     StrategyVersionV1,
+    StrategyEvaluationRequest,
+    StrategyEvaluationAccepted,
+    StrategyEvaluationResultV1,
+    StrategyEvaluationV1,
     SnapshotV1,
     DataHealthV1,
     AssetPageV1,

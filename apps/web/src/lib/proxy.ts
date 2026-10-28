@@ -33,8 +33,17 @@ export async function proxyApi(
   const readData =
     dataPath && ["snapshots", "assets", "health"].includes(segments[1]);
   const refresh = dataPath && segments[1] === "refresh";
+  const evaluate =
+    segments.length === 1 && segments[0] === "strategy-evaluations";
+  const readEvaluation =
+    segments.length === 2 &&
+    segments[0] === "strategy-evaluations" &&
+    UUID_PATTERN.test(segments[1]);
   const readStrategies = segments.length === 1 && segments[0] === "strategies";
-  if (request.method !== "GET" && !(request.method === "POST" && refresh))
+  if (
+    request.method !== "GET" &&
+    !(request.method === "POST" && (refresh || evaluate))
+  )
     return safeError(
       "METHOD_NOT_ALLOWED",
       "This operation is not available.",
@@ -42,9 +51,10 @@ export async function proxyApi(
     );
   const allowed =
     request.method === "POST"
-      ? refresh
+      ? refresh || evaluate
       : readData ||
         readStrategies ||
+        readEvaluation ||
         (segments.length === 1 &&
           ["health", "workspace"].includes(segments[0])) ||
         (segments.length === 2 &&
@@ -83,7 +93,7 @@ export async function proxyApi(
         422,
       );
     const key = request.headers.get("Idempotency-Key");
-    if (!key || !UUID_PATTERN.test(key))
+    if (refresh && (!key || !UUID_PATTERN.test(key)))
       return safeError(
         "VALIDATION_ERROR",
         "Refresh requires a valid request key.",
@@ -112,7 +122,7 @@ export async function proxyApi(
     }
     payload = new TextDecoder().decode(bytes);
     headers["Content-Type"] = "application/json";
-    headers["Idempotency-Key"] = key;
+    if (refresh && key) headers["Idempotency-Key"] = key;
   }
   try {
     const origin = new URL(
@@ -161,20 +171,36 @@ export async function proxyApi(
         typeof error.correlation_id === "string"
           ? error.correlation_id
           : undefined;
-      if (response.status === 422)
+      if (response.status === 422) {
+        const code =
+          error && "code" in error && error.code === "WORKLOAD_LIMIT"
+            ? "WORKLOAD_LIMIT"
+            : error &&
+                "code" in error &&
+                error.code === "INSUFFICIENT_MARKET_DATA"
+              ? "INSUFFICIENT_MARKET_DATA"
+              : "VALIDATION_ERROR";
         return safeError(
-          "VALIDATION_ERROR",
+          code,
           "Request does not match the data contract.",
           422,
           correlation,
         );
-      if (response.status === 409)
+      }
+      if (response.status === 409) {
+        const code =
+          error && "code" in error && error.code === "STALE_DATA"
+            ? "STALE_DATA"
+            : refresh
+              ? "IDEMPOTENCY_CONFLICT"
+              : "STATE_CONFLICT";
         return safeError(
-          "IDEMPOTENCY_CONFLICT",
+          code,
           "Request conflicts with an earlier operation.",
           409,
           correlation,
         );
+      }
       return response.status === 404
         ? safeError(
             "NOT_FOUND",

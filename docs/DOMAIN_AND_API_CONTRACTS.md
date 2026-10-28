@@ -315,6 +315,19 @@ A route listed here is a planned contract, not a claim that 0.0.1 implements it.
 
 A completed result includes `decision_cutoff_utc`, mode/warnings, eligible candidates with feature values/contributions and deterministic ranks, rejected candidates with reasons, complete `target_weights`, `cash_target_weight`, constraint evidence and a reproducibility manifest (config/snapshot hashes and engine build). Serialization follows §1; weights plus cash sum to one within `1e-8`. Empty eligible universe is a completed result with `target_weights=[]`, `cash_target_weight="1.00"` and exclusion evidence. Repeated requests may have different IDs, but identical pinned inputs and engine version reproduce financial results. The flow performs no portfolio, recommendation, forecast, order, cash or holdings writes.
 
+The #34 transport models name these resources `StrategyEvaluationRequest`,
+`StrategyEvaluationAccepted`, `StrategyEvaluationV1` and
+`StrategyEvaluationResultV1`. The envelope additionally exposes pinned canonical
+`strategy_config`, `mode`, `provider`, `config_sha256`, `snapshot_sha256`,
+`engine_version`, `created_at` and nullable `result_sha256`. Completed results name
+their constraints `constraint_evidence`, with `allocation_reasons`,
+`allocation_exclusions`, `data_diagnostics` and `reproducibility` alongside the
+candidate/target fields above. The engine fingerprint is a SHA-256 of source and
+core runtime identity; numerical results retain their original fingerprint.
+[Diagnostic implementation handoff](operations/strategy-evaluations.md) records
+the draft verification scope and unresolved Q15 cutoff policy. This transport
+inventory does not settle that financial timing question or claim handler delivery.
+
 ### 6.2 Implemented default strategy registry (0.0.2, #71)
 
 `GET /strategies` accepts `limit` (default25, 1–100) and an optional existing

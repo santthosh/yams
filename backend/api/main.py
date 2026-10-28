@@ -14,6 +14,7 @@ from backend.api.routes.data import data_router
 from backend.api.routes.health import health_router
 from backend.api.routes.jobs import jobs_router
 from backend.api.routes.strategies import strategies_router
+from backend.api.routes.strategy_evaluations import evaluations_router
 from backend.api.routes.workspace import workspace_router
 from backend.api.routing import ContractRoute
 from backend.persistence.database import Settings, database_engine
@@ -53,6 +54,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(jobs_router(engine))
     app.include_router(data_router(engine, settings))
     app.include_router(strategies_router(engine))
+    app.include_router(evaluations_router(engine, settings))
 
     @app.get("/livez", response_model=Liveness, tags=["operations"])
     def liveness() -> Liveness:
