@@ -19,7 +19,7 @@ from sqlalchemy.orm import Session
 
 from backend.domain.market import SnapshotManifestV1
 from backend.domain.strategy import StrategyConfigV1
-from backend.domain.types import Money, UTCTimestamp, canonical_json
+from backend.domain.types import Money, SourceMode, UTCTimestamp, canonical_json
 from backend.market_data.models import Calendar, CorporateAction
 from backend.persistence.models.ledger import (
     ActionEvidence,
@@ -263,9 +263,11 @@ def create_portfolio(
     strategy_version_id: UUID,
     name: str,
     opening_cash_usd: str = "1000.00",
+    source_mode: SourceMode = "synthetic_fixture",
     created_at: datetime,
 ) -> LedgerView:
     """Fund an independently identified account exactly once, without holdings."""
+    mode = TypeAdapter(SourceMode).validate_python(source_mode)
     amount = TypeAdapter(Money).validate_python(opening_cash_usd)
     timestamp = TypeAdapter(UTCTimestamp).validate_python(created_at)
     if Decimal(amount) <= 0:
@@ -283,6 +285,7 @@ def create_portfolio(
         "strategy_version_id": str(strategy_version_id),
         "name": name,
         "opening_cash_usd": after.cash_usd,
+        "source_mode": mode,
     }
     fingerprint = digest(command)
     with Session(engine) as session, session.begin():
@@ -297,6 +300,7 @@ def create_portfolio(
                 workspace_id=workspace_id,
                 name=name,
                 currency="USD",
+                source_mode=mode,
                 strategy_version_id=strategy_version_id,
                 opening_cash_usd=Decimal(after.cash_usd),
                 opening_event_id=uuid5(portfolio_id, "opening_funding"),
@@ -508,6 +512,7 @@ def post_order(
             or snapshot.manifest_hash != context.snapshot_sha256
             or snapshot.id != context.snapshot_id
             or snapshot.source_mode != context.mode
+            or snapshot.source_mode != account.source_mode
             or snapshot.quality == "blocked"
             or batch.snapshot_sha256 != context.snapshot_sha256
             or batch.calendar_sha256 != context.calendar_sha256
@@ -708,7 +713,11 @@ def post_action(
     with Session(engine) as session, session.begin():
         account = _locked(session, identity)
         source = session.get(DatasetSnapshot, snapshot_id)
-        if source is None or source.quality == "blocked":
+        if (
+            source is None
+            or source.quality == "blocked"
+            or source.source_mode != account.source_mode
+        ):
             raise LedgerConflict("Usable corporate-action snapshot is required")
         if source.manifest["calendar"]["version"] != calendar_digest(calendar):
             raise LedgerConflict("Corporate-action calendar differs from snapshot")

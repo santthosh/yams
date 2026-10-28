@@ -21,6 +21,7 @@ class PaperPortfolio(Base):
     )
     name: Mapped[str] = mapped_column(String(120))
     currency: Mapped[str] = mapped_column(String(3))
+    source_mode: Mapped[str] = mapped_column(String(32))
     strategy_version_id: Mapped[UUID] = mapped_column(
         ForeignKey("strategy_version.id", ondelete="RESTRICT")
     )

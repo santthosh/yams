@@ -13,7 +13,8 @@ recommendations. The 0.0.5 recommendation producer remains #49.
 `create_portfolio` takes explicit account/workspace/published-strategy UUIDs,
 a trimmed name and a UTC creation timestamp. Opening USD cash defaults to
 `"1000.00"`, must be positive and fit 22 whole digits/two decimal places, and
-creates no holdings. The account UUID identifies the creation command: exact
+creates no holdings. Source mode defaults to `synthetic_fixture` and is immutable;
+research-source and fixture effects cannot mix in one account. The account UUID identifies the creation command: exact
 semantic retry returns the existing account, including after later activity;
 changing its original opening intent is a `LedgerConflict`. Retried observation
 timestamps do not change the original creation time. Funding is the first event,

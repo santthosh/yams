@@ -42,6 +42,7 @@ def authored_funding(engine: Engine, cash: str = "1000.00") -> tuple[UUID, UUID]
                 workspace_id=workspace,
                 name="SYNTHETIC_DATA_ONLY",
                 currency="USD",
+                source_mode="synthetic_fixture",
                 strategy_version_id=DEFAULT_VERSION_ID,
                 opening_cash_usd=Decimal(cash),
                 opening_event_id=event_id,
@@ -1013,3 +1014,131 @@ def test_missing_payable_date_can_be_learned_once_without_early_cash(database: E
         post(learned.model_copy(update={"payable_session": date(2030, 1, 9)}), 9)
     assert post(learned, 15) is not None
     assert reconcile(database, identity).state.cash_usd == "802.30"
+
+
+def test_account_source_mode_is_immutable_and_cannot_mix_fixture_fills(database: Engine) -> None:
+    from backend.portfolio.ledger import (
+        LedgerConflict,
+        create_portfolio,
+        post_order,
+        read_portfolio,
+    )
+    from backend.tests.portfolio.test_execution import at, calendar
+
+    workspace = bootstrap(database)
+    identity = uuid4()
+    create_portfolio(
+        database,
+        portfolio_id=identity,
+        workspace_id=workspace,
+        strategy_version_id=DEFAULT_VERSION_ID,
+        name="research paper capital",
+        source_mode="research_market_data",
+        created_at=NOW,
+    )
+    _, order = seed_batch(database, identity=identity)
+    with pytest.raises(LedgerConflict, match="lineage"):
+        post_order(
+            database,
+            order,
+            calendar=calendar(),
+            market=evidence_for(database, order),
+            observed_at=at(4),
+        )
+    assert read_portfolio(database, identity).state == PortfolioState(
+        cash_usd="1000.00", positions=()
+    )
+    with pytest.raises(DBAPIError), database.begin() as connection:
+        connection.execute(
+            text("UPDATE paper_portfolio SET source_mode='synthetic_fixture' WHERE id=:id"),
+            {"id": identity},
+        )
+
+
+def test_concurrent_oversize_sale_revalidates_holdings_and_never_shorts(database: Engine) -> None:
+    from concurrent.futures import ThreadPoolExecutor
+
+    from backend.portfolio.ledger import post_order, reconcile
+    from backend.tests.portfolio.test_execution import at, calendar
+
+    identity, buy = seed_batch(database)
+    post_order(
+        database, buy, calendar=calendar(), market=evidence_for(database, buy), observed_at=at(4)
+    )
+    _, sell = seed_batch(database, identity=identity, side="SELL", shares="5.000000", decision=4)
+    evidence = evidence_for(database, sell, day=8)
+
+    def post() -> UUID | None:
+        return post_order(database, sell, calendar=calendar(), market=evidence, observed_at=at(8))
+
+    with ThreadPoolExecutor(max_workers=2) as workers:
+        result = list(workers.map(lambda _: post(), range(2)))
+    assert result[0] is not None and result[0] == result[1]
+    assert reconcile(database, identity).state == PortfolioState(cash_usd="999.60", positions=())
+    with database.connect() as connection:
+        assert connection.execute(
+            text("SELECT filled_quantity,closed_quantity,terminal FROM paper_order WHERE id=:id"),
+            {"id": sell},
+        ).one() == (Decimal("2.000000"), Decimal("3.000000"), True)
+        assert connection.execute(text("SELECT count(*) FROM paper_fill")).scalar_one() == 2
+
+
+def test_negative_cash_correction_is_blocked_without_unexplained_funding(database: Engine) -> None:
+    from backend.portfolio.ledger import (
+        ReconciliationFailure,
+        correct_dividend,
+        post_action,
+        post_order,
+        read_portfolio,
+    )
+    from backend.tests.portfolio.test_execution import action, at, calendar
+
+    identity, buy = seed_batch(database)
+    evidence = evidence_for(database, buy)
+    post_order(database, buy, calendar=calendar(), market=evidence, observed_at=at(4))
+    dividend = action("dividend", per_share="500.00", payable_session=date(2030, 1, 9))
+    for day in (8, 9):
+        paid = post_action(
+            database,
+            identity,
+            snapshot_id=evidence.snapshot_id,
+            action=dividend,
+            calendar=calendar(),
+            session_date=date(2030, 1, day),
+            observed_at=at(day),
+            live=True,
+        )
+        assert paid is not None
+    assert paid is not None
+    assert read_portfolio(database, identity).state.cash_usd == "1799.80"
+    _, spend = seed_batch(database, identity=identity, shares="1000.000000", decision=9)
+    post_order(
+        database,
+        spend,
+        calendar=calendar(),
+        market=evidence_for(database, spend, day=15),
+        observed_at=at(15),
+    )
+    assert read_portfolio(database, identity).state.cash_usd == "0.00"
+    with pytest.raises(ReconciliationFailure, match="negative cash"):
+        correct_dividend(
+            database,
+            identity,
+            target_event_id=paid,
+            command_id=uuid4(),
+            revised_action=dividend.model_copy(update={"per_share": "0.00"}),
+            reason="SYNTHETIC_DATA_ONLY negative compensation",
+            observed_at=at(15),
+        )
+    actual = read_portfolio(database, identity)
+    assert actual.state.cash_usd == "0.00" and actual.reconciliation_failed
+    with database.connect() as connection:
+        assert (
+            connection.execute(
+                text("SELECT count(*) FROM ledger_event WHERE kind='correction'")
+            ).scalar_one()
+            == 0
+        )
+        assert connection.execute(
+            text("SELECT delta_usd FROM cash_ledger_entry WHERE event_id=:id"), {"id": paid}
+        ).scalar_one() == Decimal("1000.00")

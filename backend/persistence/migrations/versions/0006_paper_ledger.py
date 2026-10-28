@@ -15,6 +15,8 @@ def upgrade() -> None:
             workspace_id UUID NOT NULL REFERENCES local_workspace(id) ON DELETE RESTRICT,
             name VARCHAR(120) NOT NULL CHECK (length(name)>0),
             currency VARCHAR(3) NOT NULL CHECK (currency='USD'),
+            source_mode VARCHAR(32) NOT NULL CHECK (source_mode IN ('synthetic_fixture',
+                'research_market_data')),
             strategy_version_id UUID NOT NULL REFERENCES strategy_version(id) ON DELETE RESTRICT,
             opening_cash_usd NUMERIC(24, 2) NOT NULL CHECK (opening_cash_usd>0 AND
                 opening_cash_usd<1e22),
