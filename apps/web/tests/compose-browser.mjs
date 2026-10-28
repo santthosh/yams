@@ -160,6 +160,77 @@ try {
     assert.deepEqual(external, []);
     await page.close();
   }
+  // Exercise publication through a real browser origin, after the candidate UI
+  // checks so extra strategies cannot change their default option selection.
+  const page = await browser.newPage();
+  await page.goto(origin);
+  const publication = await page.evaluate(async () => {
+    const get = async (path) => {
+      const response = await fetch(`/api/v1/strategies${path}`);
+      if (!response.ok)
+        throw new Error(`Strategy read failed: ${response.status}`);
+      return response.json();
+    };
+    const post = async (path, body) => {
+      const response = await fetch(`/api/v1/strategies${path}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      return { status: response.status, body: await response.json() };
+    };
+    const initial = await get("");
+    const template = initial.items.find((row) => row.is_template);
+    const created = await post("", {
+      name: "Synthetic smoke fork",
+      config: template.published_version.config,
+    });
+    if (created.status !== 201) throw new Error("Strategy creation failed");
+    const path = `/${created.body.id}`;
+    const changed = structuredClone(created.body.published_version.config);
+    changed.portfolio.max_position_weight = "0.15";
+    const appended = await post(`${path}/versions`, changed);
+    const duplicate = await post("", {
+      name: "SYNTHETIC SMOKE FORK",
+      config: changed,
+    });
+    const first = await get(`${path}/versions?limit=1`);
+    const second = await get(`${path}/versions?cursor=${first.next_cursor}`);
+    return {
+      created,
+      appended,
+      duplicate,
+      first,
+      second,
+      detail: await get(path),
+    };
+  });
+  assert.equal(publication.appended.status, 201);
+  assert.equal(publication.duplicate.status, 409);
+  assert.equal(publication.duplicate.body.error.code, "STATE_CONFLICT");
+  assert.deepEqual(publication.first.items, [
+    publication.created.body.published_version,
+  ]);
+  assert.deepEqual(publication.second.items, [publication.appended.body]);
+  assert.equal(publication.second.next_cursor, null);
+  assert.equal(publication.appended.body.version, 2);
+  assert.notEqual(
+    publication.appended.body.id,
+    publication.created.body.published_version.id,
+  );
+  assert.notEqual(
+    publication.appended.body.config_sha256,
+    publication.created.body.published_version.config_sha256,
+  );
+  assert.deepEqual(
+    publication.detail.published_version,
+    publication.appended.body,
+  );
+  fs.writeFileSync(
+    path.join(destination, "strategy-publication.json"),
+    JSON.stringify(publication, null, 2) + "\n",
+  );
+  await page.close();
 } finally {
   await browser.close();
 }

@@ -12,6 +12,11 @@ reproducible results retained through restart. Portfolio approval, backtesting a
 forecasts remain with their later milestone owners; the shared execution kernel
 is available but does not itself post durable trades.
 
+Development toward 0.0.3 also adds named strategy creation, detail and immutable
+version publication/history APIs over the existing registry. See the
+[strategy workflow](docs/operations/strategy-registry.md); the authoring UI and
+historical experiment services remain with their owning issues.
+
 Download published bundles and platform evidence from [GitHub Releases](https://github.com/santthosh/yams/releases).
 Source implementation alone does not establish publication: use each release's
 exact tag, immutable image digests, checksums and supported-capability notes.
@@ -73,7 +78,7 @@ Read [AGENTS.md](AGENTS.md), the [implementation blueprint](docs/IMPLEMENTATION_
 
 `backend/domain` implements closed Pydantic contracts for strategies, market bars and snapshot manifests, recommendations, forecasts, paper orders, experiments, jobs, errors and pagination. Money, quantities, prices and allocation weights remain decimal strings; statistical numbers must be finite. Cross-field validators enforce complete allocations and lifecycle-dependent results. These validators do not implement financial calculations, storage, calendar verification or artifact-byte verification.
 
-Run `make contracts` after changing a model or route. It regenerates `contracts/openapi.json`, input/output JSON schema goldens and `apps/web/src/api/generated/` using pinned tools. Commit these artifacts together. `make contracts-check` compares them byte-for-byte without rewriting; Python and frontend tests deliberately introduce isolated schema drift and require failure before regeneration. The generated `createApiClient` accepts a base URL and optional fetch implementation. Implemented typed paths are `/livez`, `/api/v1/health`, `/api/v1/workspace` and `/api/v1/jobs/{job_id}`; future domain components do not activate financial endpoints.
+Run `make contracts` after changing a model or route. It regenerates `contracts/openapi.json`, input/output JSON schema goldens and `apps/web/src/api/generated/` using pinned tools. Commit these artifacts together. `make contracts-check` compares them byte-for-byte without rewriting; Python and frontend tests deliberately introduce isolated schema drift and require failure before regeneration. The generated `createApiClient` accepts a base URL and optional fetch implementation. Implemented typed paths include health/workspace, job inspection, data discovery/refresh, strategy creation/detail/version history/publication and asynchronous strategy evaluation. The generated OpenAPI path inventory is authoritative; future domain components do not activate financial endpoints.
 
 New API routers must use `APIRouter(route_class=ContractRoute)` from `backend.api.routing` to preserve exact JSON score numbers and reject duplicate keys/NaN before Pydantic validation. Direct routes on `create_app()` already use this class. For raw offline strategy documents, use `StrategyConfigV1.from_json`; parsing with ordinary float-based `json.loads` first loses precision. Serialize validated models with `model_dump(mode="json")` or FastAPI response models. Use the shared typed error envelope and `error_response` for documented feature failures; validation errors expose field paths without submitted values.
 

@@ -40,9 +40,21 @@ export async function proxyApi(
     segments[0] === "strategy-evaluations" &&
     UUID_PATTERN.test(segments[1]);
   const readStrategies = segments.length === 1 && segments[0] === "strategies";
+  const strategyDetail =
+    segments.length === 2 &&
+    segments[0] === "strategies" &&
+    UUID_PATTERN.test(segments[1]);
+  const strategyVersions =
+    segments.length === 3 &&
+    segments[0] === "strategies" &&
+    UUID_PATTERN.test(segments[1]) &&
+    segments[2] === "versions";
   if (
     request.method !== "GET" &&
-    !(request.method === "POST" && (refresh || evaluate))
+    !(
+      request.method === "POST" &&
+      (refresh || evaluate || readStrategies || strategyVersions)
+    )
   )
     return safeError(
       "METHOD_NOT_ALLOWED",
@@ -51,9 +63,11 @@ export async function proxyApi(
     );
   const allowed =
     request.method === "POST"
-      ? refresh || evaluate
+      ? refresh || evaluate || readStrategies || strategyVersions
       : readData ||
         readStrategies ||
+        strategyDetail ||
+        strategyVersions ||
         readEvaluation ||
         (segments.length === 1 &&
           ["health", "workspace"].includes(segments[0])) ||
@@ -66,7 +80,7 @@ export async function proxyApi(
       : segments[1] === "snapshots"
         ? ["mode", "limit", "cursor"]
         : ["mode"]
-    : readStrategies
+    : (readStrategies || strategyVersions) && request.method === "GET"
       ? ["limit", "cursor"]
       : [];
   if (
@@ -81,7 +95,7 @@ export async function proxyApi(
     // Next may construct an internal localhost URL while Host retains the published port.
     // Origin must match that browser-facing authority, never X-Forwarded-Host.
     if (host && !/^[a-z0-9.:[\]-]+$/i.test(host))
-      return safeError("VALIDATION_ERROR", "Refresh host is invalid.", 422);
+      return safeError("VALIDATION_ERROR", "Request host is invalid.", 422);
     const browserOrigin = host ? `${url.protocol}//${host}` : url.origin;
     if (
       request.headers.get("origin") !== browserOrigin ||
@@ -89,7 +103,7 @@ export async function proxyApi(
     )
       return safeError(
         "VALIDATION_ERROR",
-        "Refresh requires a same-origin JSON request.",
+        "Operation requires a same-origin JSON request.",
         422,
       );
     const key = request.headers.get("Idempotency-Key");
@@ -101,7 +115,7 @@ export async function proxyApi(
       );
     const reader = request.body?.getReader();
     if (!reader)
-      return safeError("VALIDATION_ERROR", "Refresh input is required.", 422);
+      return safeError("VALIDATION_ERROR", "Request input is required.", 422);
     const chunks: Uint8Array[] = [];
     let size = 0;
     while (true) {
@@ -110,7 +124,7 @@ export async function proxyApi(
       size += chunk.value.byteLength;
       if (size > 1024 * 1024) {
         await reader.cancel();
-        return safeError("LIMIT_EXCEEDED", "Refresh input is too large.", 413);
+        return safeError("LIMIT_EXCEEDED", "Request input is too large.", 413);
       }
       chunks.push(chunk.value);
     }

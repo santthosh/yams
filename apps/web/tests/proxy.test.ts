@@ -65,7 +65,7 @@ describe("same-origin proxy boundary", () => {
       ).status,
     ).toBe(404);
     expect(
-      (await proxyApi(request("strategies", "POST"), ["strategies"], fetcher))
+      (await proxyApi(request("strategies", "PATCH"), ["strategies"], fetcher))
         .status,
     ).toBe(405);
     expect(fetcher).toHaveBeenCalledTimes(1);
@@ -277,5 +277,81 @@ it("rejects oversized refresh bodies and missing request keys before upstream ac
   expect((await proxyApi(missing, ["data", "refresh"], fetcher)).status).toBe(
     422,
   );
+  expect(fetcher).not.toHaveBeenCalled();
+});
+
+it("publishes closed same-origin strategy paths and preserves safe conflict responses", async () => {
+  const id = "184f4ef7-c542-5387-a5aa-9bd4d162efde";
+  for (const segments of [["strategies"], ["strategies", id, "versions"]]) {
+    const fetcher = vi.fn(async (_input, init) => {
+      expect(init.method).toBe("POST");
+      expect(init.headers).toEqual({
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      });
+      return Response.json(
+        { error: { code: "STATE_CONFLICT", message: "private" } },
+        { status: 409 },
+      );
+    });
+    const make = (origin: string, body = "{}") =>
+      new Request(`http://web.test/api/v1/${segments.join("/")}`, {
+        method: "POST",
+        headers: {
+          origin,
+          "Content-Type": "application/json",
+          Authorization: "private",
+          Cookie: "private",
+        },
+        body,
+      });
+    expect(
+      (await proxyApi(make("http://outside.test"), segments, fetcher)).status,
+    ).toBe(422);
+    expect(
+      (
+        await proxyApi(
+          make("http://web.test", "x".repeat(1024 * 1024 + 1)),
+          segments,
+          fetcher,
+        )
+      ).status,
+    ).toBe(413);
+    expect(fetcher).not.toHaveBeenCalled();
+    const result = await proxyApi(make("http://web.test"), segments, fetcher);
+    expect(result.status).toBe(409);
+    expect((await result.json()).error.code).toBe("STATE_CONFLICT");
+    expect(fetcher).toHaveBeenCalledTimes(1);
+  }
+  for (const segments of [
+    ["strategies", id],
+    ["strategies", id, "versions"],
+  ]) {
+    const fetcher = vi.fn(async () =>
+      Response.json({ items: [], next_cursor: null }),
+    );
+    expect(
+      (await proxyApi(request(segments.join("/")), segments, fetcher)).status,
+    ).toBe(200);
+  }
+  const fetcher = vi.fn();
+  expect(
+    (
+      await proxyApi(
+        request("strategies/not-uuid/versions"),
+        ["strategies", "not-uuid", "versions"],
+        fetcher,
+      )
+    ).status,
+  ).toBe(404);
+  expect(
+    (
+      await proxyApi(
+        request(`strategies/${id}/versions?url=private`),
+        ["strategies", id, "versions"],
+        fetcher,
+      )
+    ).status,
+  ).toBe(404);
   expect(fetcher).not.toHaveBeenCalled();
 });
