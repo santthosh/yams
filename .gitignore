@@ -23,3 +23,6 @@ data/downloads/
 data/artifacts/
 backups/
 *.log
+/release-bundle/
+/digests/
+/verification/

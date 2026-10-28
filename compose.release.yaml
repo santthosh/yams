@@ -1,0 +1,14 @@
+# Source overlay. The release bundle contains a flattened manifest with literal digests.
+services:
+  migrate:
+    build: !reset null
+    image: ${YAMS_BACKEND_IMAGE:?Set the verified backend digest}
+  api:
+    image: ${YAMS_BACKEND_IMAGE:?Set the verified backend digest}
+    pull_policy: missing
+  worker:
+    image: ${YAMS_BACKEND_IMAGE:?Set the verified backend digest}
+    pull_policy: missing
+  web:
+    build: !reset null
+    image: ${YAMS_WEB_IMAGE:?Set the verified web digest}

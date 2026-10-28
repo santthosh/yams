@@ -4,7 +4,7 @@ Yet Another Market Simulator is a local, single-user paper research workspace. I
 
 ## Current state
 
-The `0.0.1` foundation provides an importable FastAPI package, an accessible Next.js Dashboard/Settings shell, versioned contracts, synthetic fixtures, PostgreSQL workspace/job migrations, a bounded diagnostic worker and working quality commands. `/livez` checks only that the API process responds; `/api/v1/health` checks database/migration/workspace/fixture readiness. Local Compose and isolated smoke checks are implemented; CI and release packaging remain tracked foundation work. No portfolio values or investment results are seeded by this foundation.
+The `0.0.1` foundation provides an importable FastAPI package, an accessible Next.js Dashboard/Settings shell, versioned contracts, synthetic fixtures, PostgreSQL workspace/job migrations, a bounded diagnostic worker and working quality commands. `/livez` checks only that the API process responds; `/api/v1/health` checks database/migration/workspace/fixture readiness. Local Compose, isolated smoke checks and protected GitHub Actions CI are implemented. The release workflow builds and verifies native amd64/arm64 candidates before publication; see [release installation and recovery](docs/releases.md). Publication is complete only when the corresponding verified GitHub Release exists. No portfolio values or investment results are seeded by this foundation.
 
 ## Local Docker startup
 

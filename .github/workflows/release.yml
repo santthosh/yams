@@ -1,0 +1,215 @@
+name: Release
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Semver version without v (foundation prerelease)
+        required: true
+        default: '0.0.1'
+  push:
+    tags: ['v*']
+permissions:
+  contents: read
+concurrency:
+  group: yams-release-publication
+  cancel-in-progress: false
+defaults:
+  run:
+    shell: bash
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      actions: read
+    outputs:
+      version: ${{ steps.validate.outputs.version }}
+      sha: ${{ steps.validate.outputs.sha }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - id: validate
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION_INPUT: ${{ inputs.version }}
+        run: python3 scripts/release.py preflight
+  build:
+    needs: validate
+    strategy:
+      fail-fast: false
+      matrix:
+        component: [backend, web]
+        platform:
+          - arch: amd64
+            runner: ubuntu-24.04
+          - arch: arm64
+            runner: ubuntu-24.04-arm
+    runs-on: ${{ matrix.platform.runner }}
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f
+      - uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - id: build
+        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8
+        with:
+          context: .
+          file: infra/docker/${{ matrix.component }}.Dockerfile
+          platforms: linux/${{ matrix.platform.arch }}
+          push: true
+          tags: ghcr.io/santthosh/yams-${{ matrix.component }}:candidate-${{ github.run_id }}-${{ matrix.platform.arch }}
+          provenance: mode=max
+          sbom: true
+          labels: |
+            org.opencontainers.image.source=https://github.com/santthosh/yams
+            org.opencontainers.image.revision=${{ needs.validate.outputs.sha }}
+            org.opencontainers.image.version=${{ needs.validate.outputs.version }}
+      - name: Record immutable candidate
+        env:
+          YAMS_COMPONENT: ${{ matrix.component }}
+          YAMS_ARCH: ${{ matrix.platform.arch }}
+          YAMS_DIGEST: ${{ steps.build.outputs.digest }}
+          RELEASE_SHA: ${{ needs.validate.outputs.sha }}
+        run: |
+          mkdir -p digests
+          python3 - <<'PYCODE'
+          import json, os
+          from pathlib import Path
+          from scripts.release import image_ref
+          name, arch, digest = os.environ['YAMS_COMPONENT'], os.environ['YAMS_ARCH'], os.environ['YAMS_DIGEST']
+          image_ref(name, digest)
+          Path(f'digests/{name}-{arch}.json').write_text(json.dumps({'component':name,'arch':arch,'digest':digest,'source_sha':os.environ['RELEASE_SHA']}))
+          PYCODE
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: digests-${{ matrix.component }}-${{ matrix.platform.arch }}
+          path: digests/
+          if-no-files-found: error
+          retention-days: 30
+  package:
+    needs: [validate, build]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      packages: write
+    env:
+      RELEASE_VERSION: ${{ needs.validate.outputs.version }}
+      RELEASE_SHA: ${{ needs.validate.outputs.sha }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f
+      - uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          pattern: digests-*
+          path: digests
+          merge-multiple: true
+      - id: indexes
+        run: python3 scripts/release.py indexes
+      - name: Package digest-pinned installation
+        env:
+          BACKEND_DIGEST: ${{ steps.indexes.outputs.backend_digest }}
+          WEB_DIGEST: ${{ steps.indexes.outputs.web_digest }}
+        run: python3 scripts/release.py package
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: release-bundle
+          path: release-bundle/
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 30
+  verify:
+    needs: [validate, package]
+    strategy:
+      fail-fast: false
+      matrix:
+        platform:
+          - arch: amd64
+            runner: ubuntu-24.04
+          - arch: arm64
+            runner: ubuntu-24.04-arm
+    runs-on: ${{ matrix.platform.runner }}
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: release-bundle
+          path: release-bundle
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22.17.0'
+      - name: Install browser verification dependencies
+        run: |
+          corepack enable
+          corepack prepare pnpm@10.23.0 --activate
+          pnpm install --frozen-lockfile
+          pnpm --filter @yams/web exec playwright install --with-deps chromium
+      - name: Verify anonymous native packaged installation
+        env:
+          RELEASE_ARCH: ${{ matrix.platform.arch }}
+        run: python3 scripts/release_smoke.py
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: verified-${{ matrix.platform.arch }}
+          path: test-results/release/${{ matrix.platform.arch }}/
+          if-no-files-found: error
+          retention-days: 30
+  publish:
+    if: github.event_name == 'push'
+    needs: [validate, package, verify]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: write
+      packages: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      RELEASE_VERSION: ${{ needs.validate.outputs.version }}
+      RELEASE_SHA: ${{ needs.validate.outputs.sha }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f
+      - uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: release-bundle
+          path: release-bundle
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          pattern: verified-*
+          path: verification
+      - name: Publish only verified immutable prerelease
+        run: python3 scripts/release.py publish
