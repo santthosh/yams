@@ -158,6 +158,24 @@ the durable job; changed inputs with the same key return 409. Browser proxy acce
 only same-origin JSON, caps input at 1 MiB and forwards no user credentials. Public
 cancellation remains unavailable until #41.
 
+The research configuration is a closed provider-specific union. Existing Yahoo
+`ResearchConfig` remains supported for conditional inspection. Tiingo uses
+`TiingoResearchConfigV1`: schema1, `provider="tiingo_eod"`, strict boolean
+`rights_verified_local_use`, fixed optional `rights_reference`, history252–2000
+sessions (default400), cohort1–20 (default20), optional `as_of_session`. Tokens,
+URLs and filesystem paths are forbidden fields. The worker reads its token only
+from the local environment; default Compose remains offline. See
+[ADR-010](adr/0010-free-research-provider.md) and the
+[local workflow](operations/tiingo-research.md).
+
+Verified Tiingo snapshots carry `usable_with_warnings`, observed availability,
+current-only membership and an explicit budget-sampled universe rule. Ambiguous
+metadata identities are excluded, never resolved by response order. Provenance
+records `supports_diagnostics=true`, `supports_complete_action_accounting=false`
+and `raw_execution_prices=false`; diagnostic support cannot authorize accounting
+or paper fills. Immutable source evidence remains local and is not redistributed.
+
+
 `GET /data/health` returns `DataHealthV1`: checked time, source mode, persisted
 usable current snapshot, latest same-mode refresh job and safe warnings. Status is
 empty/ready/refreshing/failed. Failed refresh retains the last valid snapshot and

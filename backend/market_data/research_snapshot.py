@@ -3,6 +3,7 @@
 import hashlib
 from datetime import date
 from types import MappingProxyType
+from typing import Any, Literal
 
 from pydantic import TypeAdapter
 
@@ -28,6 +29,10 @@ def build_research_snapshot(
     first_session: date,
     last_session: date,
     request_hash: str | None = None,
+    provider: Literal["yahoo_yfinance", "tiingo_eod"] = "yahoo_yfinance",
+    diagnostic_supported: bool = False,
+    source_evidence: bytes | None = None,
+    provider_evidence: dict[str, Any] | None = None,
 ) -> PinnedSnapshot:
     permission.require_verified()
     source_payload_hash = TypeAdapter(Hash256).validate_python(source_payload_hash)
@@ -39,6 +44,19 @@ def build_research_snapshot(
     if any(row.bar.availability_basis != "observed" for row in observations):
         raise ProviderFailure("RESEARCH_AVAILABILITY_UNSUPPORTED")
     bars = tuple(row.bar for row in observations)
+    if diagnostic_supported and (
+        provider != "tiingo_eod"
+        or source_evidence is None
+        or provider_evidence is None
+        or any(
+            bar.provider != provider
+            or bar.price_basis != "raw_as_traded"
+            or bar.volume_basis != "raw_shares_v1"
+            for bar in bars
+        )
+        or any(asset.provider != provider for asset in assets)
+    ):
+        raise ProviderFailure("PROVIDER_CAPABILITY_UNAVAILABLE")
     requested = {
         session.session_date
         for session in calendar.sessions
@@ -54,7 +72,7 @@ def build_research_snapshot(
     provenance = {
         "request_hash": request_hash,
         "schema_version": 1,
-        "provider": "yahoo_yfinance",
+        "provider": provider,
         "adapter_version": permission.adapter_version,
         "rights_reference": permission.rights_reference,
         "directory_reference": permission.directory_reference,
@@ -64,6 +82,9 @@ def build_research_snapshot(
         "complete_action_accounting": False,
         "historical_membership": False,
         "historical_publication_times": False,
+        "supports_diagnostics": diagnostic_supported,
+        "supports_complete_action_accounting": False,
+        "provider_evidence": provider_evidence,
         "parquet_writer": "duckdb_2.0.0_zstd_rowgroup2048_threads1",
     }
     content = {
@@ -84,6 +105,9 @@ def build_research_snapshot(
         "provenance.json": ("provenance", 1, None),
         "bars.parquet": ("bars", 1, len(bars)),
     }
+    if source_evidence is not None:
+        content["source_evidence.json"] = source_evidence
+        roles["source_evidence.json"] = ("provenance", 2, None)
 
     def digest(name: str) -> str:
         return hashlib.sha256(content[name]).hexdigest()
@@ -94,17 +118,17 @@ def build_research_snapshot(
             "schema_version": 1,
             "mode": "research_market_data",
             "source": {
-                "provider": "yahoo_yfinance",
+                "provider": provider,
                 "adapter_version": permission.adapter_version,
-                "normalization_version": "1",
+                "normalization_version": "tiingo_eod_v1" if diagnostic_supported else "1",
                 "rights_reference": permission.rights_reference,
                 "rights_status": "verified_local_use",
                 "capabilities_sha256": digest("provenance.json"),
             },
             "price_basis": {
-                "ohlc": "provider_unverified",
+                "ohlc": "raw_as_traded" if diagnostic_supported else "provider_unverified",
                 "adjusted_close": "provider_observed",
-                "volume": "provider_unverified",
+                "volume": "raw_shares_v1" if diagnostic_supported else "provider_unverified",
                 "currency": "USD",
                 "corporate_action_policy": "unverified_no_accounting",
             },
@@ -122,9 +146,16 @@ def build_research_snapshot(
                 "missing_sessions": [],
                 "membership_basis": "current_only",
             },
-            "quality": "blocked",
+            "quality": "usable_with_warnings" if diagnostic_supported else "blocked",
             "warnings": sorted(
                 [
+                    "SURVIVORSHIP_BIAS_RISK",
+                    "BUDGET_SAMPLED_UNIVERSE",
+                    "OBSERVED_AVAILABILITY_ONLY",
+                    "ACTION_ACCOUNTING_UNSUPPORTED",
+                ]
+                if diagnostic_supported
+                else [
                     "SURVIVORSHIP_BIAS_RISK",
                     "RAW_PRICE_BASIS_UNVERIFIED",
                     "ACTION_COVERAGE_UNVERIFIED",

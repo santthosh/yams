@@ -1,6 +1,7 @@
 """Complete conditional acquisition into an immutable inspection snapshot."""
 
 import hashlib
+from collections.abc import Callable
 from datetime import UTC, datetime, timedelta
 
 from backend.domain.types import canonical_json
@@ -17,17 +18,22 @@ from backend.market_data.providers.yahoo import (
 )
 from backend.market_data.research_config import ResearchConfig
 from backend.market_data.research_snapshot import build_research_snapshot
+from backend.market_data.tiingo_config import TiingoResearchConfigV1
+from backend.market_data.tiingo_research import acquire_tiingo_snapshot
 
 # Source-documented exchange identities; unsupported codes require explicit evidence.
 VENUES = {"NASDAQ": "XNAS", "N": "XNYS", "A": "XASE", "P": "ARCX"}
 
 
 def acquire_research_snapshot(
-    config: ResearchConfig,
+    config: ResearchConfig | TiingoResearchConfigV1,
     *,
     downloader: DirectoryDownloader | None = None,
     client: HistoryClient | None = None,
+    cancelled: Callable[[], bool] = lambda: False,
 ) -> PinnedSnapshot:
+    if isinstance(config, TiingoResearchConfigV1):
+        return acquire_tiingo_snapshot(config, cancelled=cancelled)
     permission = config.permission()
     permission.require_verified()
     directory = acquire_directory(config.directory_kind, permission, downloader)
@@ -53,6 +59,7 @@ def acquire_research_snapshot(
         [asset.provider_id for asset in config.assets],
         start=config.first_session.isoformat(),
         end=(config.last_session + timedelta(days=1)).isoformat(),
+        cancelled=cancelled,
     )
     observed = datetime.now(UTC)
     by_provider = {asset.provider_id: asset.asset_id for asset in config.assets}

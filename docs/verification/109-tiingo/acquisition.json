@@ -1,0 +1,17 @@
+{
+  "snapshot_id": "bd2554f4-1823-539a-8eba-319c51de02cd",
+  "manifest_sha256": "dc8c67e279f2623376d466850134eab238f753bdb1a6d2e97977ba5f94dee6ac",
+  "quality": "usable_with_warnings",
+  "asset_count": 20,
+  "calendar_sessions": 401,
+  "source_requests": 42,
+  "source_hashes_verified": true,
+  "supports_diagnostics": true,
+  "supports_complete_action_accounting": false,
+  "rejected_identities": 14,
+  "observed_at_min": "2026-10-28T10:12:08.105554Z",
+  "observed_at_max": "2026-10-28T10:12:17.677069Z",
+  "cutoff_utc": "2026-10-28T12:30:00Z",
+  "pre_cutoff_admission_rejected": true,
+  "post_cutoff_evaluation": "pending"
+}

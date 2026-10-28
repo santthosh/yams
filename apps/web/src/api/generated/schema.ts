@@ -1257,7 +1257,11 @@ export interface components {
     RefreshPayload: {
       /** Expected Manifest Hash */
       expected_manifest_hash?: string | null;
-      research_config?: components["schemas"]["ResearchConfig"] | null;
+      /** Research Config */
+      research_config?:
+        | components["schemas"]["ResearchConfig"]
+        | components["schemas"]["TiingoResearchConfigV1"]
+        | null;
       /**
        * Schema Version
        * @constant
@@ -1775,6 +1779,39 @@ export interface components {
       reason_codes: string[];
       /** Weight */
       weight: string;
+    };
+    /** TiingoResearchConfigV1 */
+    TiingoResearchConfigV1: {
+      /** As Of Session */
+      as_of_session?: string | null;
+      /**
+       * History Sessions
+       * @default 400
+       */
+      history_sessions: number;
+      /**
+       * Max Assets
+       * @default 20
+       */
+      max_assets: number;
+      /**
+       * Provider
+       * @constant
+       */
+      provider: "tiingo_eod";
+      /**
+       * Rights Reference
+       * @default https://www.tiingo.com/documentation/
+       * @constant
+       */
+      rights_reference: "https://www.tiingo.com/documentation/";
+      /** Rights Verified Local Use */
+      rights_verified_local_use: boolean;
+      /**
+       * Schema Version
+       * @constant
+       */
+      schema_version: 1;
     };
     /** UniverseConfig */
     UniverseConfig: {

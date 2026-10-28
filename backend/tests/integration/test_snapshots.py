@@ -206,3 +206,43 @@ def test_blocked_refresh_is_inspectable_without_replacing_current(
         assert session.get(DatasetSnapshot, published) is not None
         pointer = session.get(CurrentSnapshot, "synthetic_fixture")
         assert pointer is not None and pointer.snapshot_id == original
+
+
+def test_tiingo_without_token_fails_without_publishing_or_changing_fixture_pointer(
+    database: Engine, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from backend.jobs.worker import Worker
+    from backend.persistence.models.job import Job
+
+    monkeypatch.delenv("TIINGO_API_TOKEN", raising=False)
+    queue, stage, store = setup(database, tmp_path)
+    enqueue(queue)
+    lease = queue.claim("existing-fixture")
+    assert lease is not None
+    original = publish_snapshot(queue, lease, stage, store, IDENTITY)
+    identity = queue.enqueue(
+        "refresh_market_data",
+        {
+            "schema_version": 1,
+            "source_mode": "research_market_data",
+            "research_config": {
+                "schema_version": 1,
+                "provider": "tiingo_eod",
+                "rights_verified_local_use": True,
+                "history_sessions": 252,
+                "max_assets": 1,
+            },
+        },
+        uuid4(),
+    )
+    assert Worker(queue, artifact_root=tmp_path / "research").run_once()
+    result = queue.get(identity)
+    assert result is not None and result.status == "failed" and result.error is not None
+    assert result.error.details == {"reason": "PROVIDER_NOT_CONFIGURED"}
+    with Session(database) as session:
+        job = session.get(Job, identity)
+        assert job is not None and job.status == "failed"
+        pointer = session.get(CurrentSnapshot, "synthetic_fixture")
+        assert pointer is not None and pointer.snapshot_id == original
+        assert session.get(CurrentSnapshot, "research_market_data") is None
+        assert session.scalar(select(func.count()).select_from(DatasetSnapshot)) == 1

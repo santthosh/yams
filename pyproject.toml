@@ -6,6 +6,7 @@ requires-python = ">=3.13,<3.14"
 dependencies = [
     "alembic==1.20.1",
     "duckdb==2.0.0",
+    "exchange-calendars==4.13.2",
     "fastapi==0.162.0",
     "psycopg[binary]==3.3.6",
     "pydantic==2.14.1",
