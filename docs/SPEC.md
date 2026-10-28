@@ -65,11 +65,11 @@ accounting, holdout/parameter-search tooling, short selling, leverage, options.
 | Prices | `yfinance.download(tickers, period="5y", auto_adjust=True)` | Daily Open, Close, Volume for the universe and **SPY**. Prices are split- and dividend-adjusted (see §8). |
 | Market context | SPY close vs its 200-day SMA | Drives the risk-off regime rule (§4.4). |
 
-- Cache: `data/cache/prices.parquet` and `universe.csv`, plus `meta.json` (`as_of` = last
+- Cache: `data/runtime/cache/prices.parquet` and `universe.csv`, plus `meta.json` (`as_of` = last
   completed session, `fetched_at`, ticker count, missing tickers).
 - **Startup:** use the cache if present, otherwise copy `data/sample/`. Never block startup on the network.
-- **Refresh** (`Refresh data` button): download → validate (drop tickers with <252 rows or
-  non-positive prices) → write to a temp file → atomic rename. A failed refresh keeps the previous cache.
+- **Refresh** (`Refresh data` button): download universe + **currently held tickers** + SPY → validate (drop tickers with <252 rows or
+  non-positive prices) → write to a temp file → atomic rename. A failed refresh (including any held ticker or SPY missing) keeps the previous cache.
 - **Freshness:** always show `Data as of YYYY-MM-DD (sample | live)`. If the data is more than 5
   calendar days old, show a warning (applying trades is still allowed, since this is a simulation).
 - Ticker format: Yahoo style (`BRK-B`, not `BRK.B`). Normalize on ingest.
@@ -105,7 +105,8 @@ All parameters live in `app/config.py` as one frozen dataclass. They were fixed 
 
 ### 4.3 Portfolio construction
 
-1. Take the top **N = 8** by score.
+1. Walk down the ranking and take the top **N = 8**, skipping a name when its sector already has
+   ⌊8 × 40%⌋ = **3** picks (otherwise the sector cap would strand budget in cash).
 2. Raw weight ∝ 1 / VOL60 (inverse volatility).
 3. Scale to the **investable budget** = 1 − cash floor (95% normally, 50% when risk-off, §4.4).
 4. Apply caps by iterative water-fill: **max 20% per position**, **max 40% per sector**.
@@ -148,6 +149,9 @@ All parameters live in `app/config.py` as one frozen dataclass. They were fixed 
 ## 6. Forecast (forward-looking)
 
 - **Horizon:** 90 calendar days ≈ **62 trading sessions** (90 × 252/365, rounded).
+- **Drift adjustment:** stocks are chosen *because* their recent returns were high, so each asset's
+  mean daily return is replaced with SPY's mean over the same window (volatility and correlations kept).
+  Without this, the forecast replays the selection bias (e.g. +25% median in 90 days).
 - **Method:** block bootstrap. Take the last 252 daily return vectors for every asset in either
   the current or the proposed portfolio (plus a zero-return cash column). Sample **5-day blocks**
   of whole rows (keeping assets correlated) to build **2,000 paths** of 62 days. Seed = 42, stored
@@ -218,16 +222,16 @@ Browser ──HTTP──▶ FastAPI (single process, port 8000)
                           explain.py   explanation templates
                           ledger.py    SQLite: trades + recommendations
                           config.py    strategy parameters
-                  data/cache/*.parquet   market data   (gitignored)
+                  data/runtime/cache/*   market data   (gitignored, Docker volume)
                   data/sample/*          committed offline snapshot
-                  data/yams.db           SQLite ledger (gitignored, Docker volume)
+                  data/runtime/yams.db   SQLite ledger (gitignored, Docker volume)
 ```
 
 - **Stack:** Python 3.12, `uv`, FastAPI, Jinja2, pandas, NumPy, yfinance, pyarrow, SQLite
   (stdlib), pytest. There is no Node toolchain.
 - **Money:** `Decimal` for cash, prices and quantities in the ledger (stored as TEXT; cash to cents,
   shares to 6dp). Floats are used only for research statistics (scores, returns, forecasts).
-- **Ledger:** `portfolio(id=1, initial_cash, created_at)`, `trades(id, created_at, rec_id,
+- **Ledger:** `portfolio(id=1, initial_cash, created_at, spy_start_price, start_as_of)`, `trades(id, created_at, rec_id,
   ticker, side, qty, price, cost, cash_delta)`, `recommendations(id, created_at, data_as_of,
   status, payload_json)`. Holdings and cash are **derived** from trades and never stored separately.
 
@@ -310,7 +314,7 @@ uv sync && uv run uvicorn app.main:app --port 8000
 uv run pytest
 ```
 
-Compose runs one service, binds to `127.0.0.1:8000`, and mounts a named volume for `data/`
+Compose runs one service, binds to `127.0.0.1:8000`, and mounts a named volume at `data/runtime/`
 (cache + SQLite) so the portfolio survives restarts. No API keys are needed.
 
 ## 14. Build order (≈4h)
