@@ -97,7 +97,9 @@ rejected (409) if the portfolio or the data changed since it was made.
 | Bootstrap scenario forecast | Calibrated, back-tested forecasts | Honest ranges; not validated against outcomes |
 | Fills at the last close (live) | Pending next-open orders | No order state; the backtest still uses next-open fills |
 | yfinance + committed snapshot | Licensed market data | Free, works offline; unofficial, personal-use terms, 9 MB in the repo |
-| One portfolio and strategy | Strategy lab, multiple portfolios, auth | Out of scope for a POC |
+| One portfolio and strategy | Strategy Lab, Arena, multiple portfolios | Out of scope for a POC |
+
+How the POC grows into the full design, with diagrams of both: [`docs/FUTURE.md`](docs/FUTURE.md).
 
 Also: adjusted prices treat dividends as reinvested; cash earns 0%; live intraday prices never feed decisions
 (`YAMS_LIVE_QUOTES=0` turns them off); a refresh fails safely, keeping old data, if a held stock or SPY can't be
