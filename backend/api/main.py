@@ -46,7 +46,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             if engine is not None:
                 engine.dispose()
 
-    app = ContractAPI(title="YAMS", version="0.0.1", lifespan=lifespan)
+    app = ContractAPI(title="YAMS", version="0.0.2", lifespan=lifespan)
     app.router.route_class = ContractRoute
     register_error_handlers(app)
     app.include_router(health_router(engine, settings.fixture_root, database_reason))

@@ -258,3 +258,93 @@ def test_recovery_requires_visible_existing_draft_before_mutations(
     monkeypatch.setattr(release_script, "existing_release", lambda tag: None)
     with pytest.raises(SystemExit, match="existing unpublished draft"):
         release_script.publish()
+
+
+def test_002_bundle_includes_safe_research_override_and_all_checksums(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import hashlib
+    import json
+    import shutil
+
+    original_root = release_script.ROOT
+    for relative in (
+        "compose.research.yaml",
+        "docs/releases.md",
+        "docs/operations/tiingo-research.md",
+        "data/fixtures/manifest.json",
+    ):
+        destination = tmp_path / relative
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(original_root / relative, destination)
+    digest = "sha256:" + "a" * 64
+    services: dict[str, Any] = {
+        name: {"image": image_ref("backend", digest), "environment": {}}
+        for name in ("api", "worker", "migrate", "postgres")
+    }
+    services["web"] = {
+        "image": image_ref("web", digest),
+        "ports": [{"host_ip": "127.0.0.1", "published": "3000", "target": 3000}],
+    }
+    config = {
+        "services": services,
+        "networks": {"private": {"internal": True, "name": "rendered-private"}},
+        "volumes": {"database": {"name": "rendered-database"}},
+    }
+    monkeypatch.setattr(release_script, "ROOT", tmp_path)
+    for name, value in {
+        "RELEASE_VERSION": "0.0.2",
+        "RELEASE_SHA": "source-sha",
+        "BACKEND_DIGEST": digest,
+        "WEB_DIGEST": digest,
+        "GITHUB_RUN_ID": "123",
+        "TIINGO_API_TOKEN": "synthetic_secret_never_package",
+    }.items():
+        monkeypatch.setenv(name, value)
+    monkeypatch.setattr(subprocess, "check_output", lambda *a, **k: json.dumps(config))
+    release_script.package()
+    bundle = tmp_path / "release-bundle"
+    expected = {
+        "compose.yaml",
+        "compose.research.yaml",
+        "env.example",
+        "INSTALL.md",
+        "RESEARCH.md",
+        "provenance.json",
+    }
+    checksums = {}
+    for line in (bundle / "SHA256SUMS").read_text().splitlines():
+        checksum, name = line.split("  ", 1)
+        checksums[name] = checksum
+        assert checksum == hashlib.sha256((bundle / name).read_bytes()).hexdigest()
+    assert set(checksums) == expected
+    assert all(
+        b"synthetic_secret_never_package" not in (bundle / name).read_bytes() for name in expected
+    )
+    assert "${TIINGO_API_TOKEN:?" in (bundle / "compose.research.yaml").read_text()
+    assert "blob/source-sha/docs/adr/0010" in (bundle / "RESEARCH.md").read_text()
+    packaged = json.loads((bundle / "compose.yaml").read_text())
+    assert "name" not in packaged["volumes"]["database"]
+    assert "name" not in packaged["networks"]["private"]
+    assert "TIINGO_API_TOKEN" not in (bundle / "compose.yaml").read_text()
+
+
+def test_release_version_must_match_all_application_packages(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import json
+
+    (tmp_path / "apps/web").mkdir(parents=True)
+    (tmp_path / "contracts").mkdir()
+    (tmp_path / "pyproject.toml").write_text('[project]\nversion = "0.0.2"\n')
+    web = tmp_path / "apps/web/package.json"
+    web.write_text(json.dumps({"version": "0.0.2"}))
+    (tmp_path / "contracts/openapi.json").write_text(json.dumps({"info": {"version": "0.0.2"}}))
+    monkeypatch.setattr(release_script, "ROOT", tmp_path)
+    release_script.validate_application_version("0.0.2")
+    release_script.validate_application_version("0.0.2-rc.1")
+    with pytest.raises(SystemExit, match="differs"):
+        release_script.validate_application_version("0.0.3")
+    web.write_text(json.dumps({"version": "0.0.1"}))
+    with pytest.raises(SystemExit, match="differs"):
+        release_script.validate_application_version("0.0.2")

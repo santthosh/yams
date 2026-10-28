@@ -1,10 +1,17 @@
 # Installing and upgrading YAMS releases
 
-YAMS 0.0.1 is a **prerelease foundation**, not the complete 0.0.5 financial product.
-It provides a clearly labeled synthetic Dashboard/Settings shell, durable local
-workspace, bounded diagnostic worker and offline fixtures. Recommendations,
-backtests, forecasts and paper trading remain unavailable. No real money, broker,
-provider account or API key is used.
+YAMS 0.0.2 is a **candidate diagnostics prerelease**, preceding the complete 0.0.5
+core product. It adds immutable market snapshots, source discovery/refresh,
+published strategy versions, shared momentum ranking and feasible target-weight
+diagnostics. The offline fixture journey is clearly labeled synthetic. Optional
+personal-use Tiingo acquisition requires the operator's own token and terms;
+source data remains local. Complete corporate-action accounting, backtests,
+forecasts and durable paper accounts/orders/fills remain unavailable. No real
+money or brokerage is involved. See `RESEARCH.md` for the optional source workflow.
+
+The existing 0.0.1 release remains an immutable foundation with its original
+installation assets and capabilities; its filename compatibility note appears below.
+A milestone name alone does not establish that a release has been published.
 
 ## Fresh installation
 
@@ -14,7 +21,8 @@ for the 4 CPU / 4.5 GiB application allocation plus Docker overhead (at least
 and linux/arm64, verified separately. Docker Desktop supplies Linux on macOS.
 
 Download **all assets** from the same GitHub prerelease into a new directory:
-`compose.yaml`, `env.example`, `INSTALL.md`, `provenance.json`, both platform
+`compose.yaml`, `compose.research.yaml`, `env.example`, `INSTALL.md`, `RESEARCH.md`,
+`provenance.json`, both platform
 evidence JSON files and `SHA256SUMS`. Verify before startup:
 
 ```bash
@@ -55,6 +63,12 @@ Verify that backup files are nonempty and test restoration into a separate proje
 before relying on them. A successful dump command alone is not restoration proof.
 
 ## Upgrade and restore-aware rollback
+
+The 0.0.1 → 0.0.2 upgrade adds snapshot publication, immutable strategy versions and
+diagnostic-evaluation tables. Startup applies Alembic migrations in order and
+preserves the workspace and existing artifacts; it never resets either store.
+The default strategy is seeded immutably. Back up both durable stores first.
+Older images must not be run against a newer schema as an assumed rollback.
 
 Read the new release's migration notes. Download/verify its assets separately,
 back up the old installation, stop old services with `docker compose down`, then

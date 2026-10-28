@@ -18,19 +18,22 @@ ROOT = Path(__file__).resolve().parents[1]
 def main() -> None:
     bundle = ROOT / "release-bundle"
     provenance = json.loads((bundle / "provenance.json").read_text())
+    expected_files = {
+        "compose.yaml",
+        "compose.research.yaml",
+        "env.example",
+        "INSTALL.md",
+        "RESEARCH.md",
+        "provenance.json",
+    }
     checksum_names = []
     for line in (bundle / "SHA256SUMS").read_text().splitlines():
         digest, name = line.split("  ", 1)
-        if name not in {"compose.yaml", "env.example", "INSTALL.md", "provenance.json"}:
+        if name not in expected_files:
             raise SystemExit("Unexpected checksum path")
         assert hashlib.sha256((bundle / name).read_bytes()).hexdigest() == digest
         checksum_names.append(name)
-    assert len(checksum_names) == 4 and set(checksum_names) == {
-        "compose.yaml",
-        "env.example",
-        "INSTALL.md",
-        "provenance.json",
-    }
+    assert len(checksum_names) == len(expected_files) and set(checksum_names) == expected_files
     expected_arch = os.environ["RELEASE_ARCH"]
     assert expected_arch in {"amd64", "arm64"}
     assert (
@@ -43,6 +46,36 @@ def main() -> None:
             not value.get("external") and not value.get("name")
             for value in config[section].values()
         )
+    # Render the packaged opt-in path with a synthetic token, without starting it
+    # or making provider calls. Never expose actual runner credentials.
+    synthetic_token = "SYNTHETIC_DATA_ONLY_not_a_provider_key"
+    research = json.loads(
+        subprocess.check_output(
+            [
+                "docker",
+                "compose",
+                "-f",
+                str(bundle / "compose.yaml"),
+                "-f",
+                str(bundle / "compose.research.yaml"),
+                "config",
+                "--format",
+                "json",
+            ],
+            env={**os.environ, "TIINGO_API_TOKEN": synthetic_token},
+            text=True,
+        )
+    )
+    assert research["networks"]["research-egress"].get("internal", False) is False
+    for name, service in research["services"].items():
+        assert service["image"] == config["services"][name]["image"]
+        token = service.get("environment", {}).get("TIINGO_API_TOKEN")
+        assert token == (synthetic_token if name == "worker" else None)
+        assert ("research-egress" in service.get("networks", {})) == (name == "worker")
+        if name != "web":
+            assert not service.get("ports")
+    for section in ("networks", "volumes"):
+        assert all(not value.get("external") for value in research[section].values())
     project = "yams-release-smoke-" + uuid4().hex[:12]
     destination = ROOT / "test-results" / "release" / expected_arch
     destination.mkdir(parents=True, exist_ok=True)
@@ -50,7 +83,7 @@ def main() -> None:
         "project": project,
         "native_host": platform.machine(),
         "source_sha": provenance["source_sha"],
-        "checks": [],
+        "checks": ["packaged research override: worker-only synthetic token and egress"],
     }
     with tempfile.TemporaryDirectory(prefix="yams-anonymous-") as docker_config:
         env = {

@@ -185,7 +185,7 @@ export function SettingsView() {
             </div>
             <div>
               <dt>Application version</dt>
-              <dd>0.0.1 · Foundation</dd>
+              <dd>0.0.2 · Candidate diagnostics</dd>
             </div>
           </dl>
           <VersionIdentity
