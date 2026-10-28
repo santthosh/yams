@@ -15,6 +15,21 @@ spread risk across stocks and sectors, and hold cash in downtrends.
 
 ## The rules
 
+```mermaid
+flowchart TD
+  U[S&P 500 today<br/>~500 stocks] --> F{Filters<br/>1y history · ≥$5 · ≥$10M/day<br/>above 200-day average · has sector}
+  F -->|fail| X[Excluded, with a reason code]
+  F -->|pass, ~300| S[Score<br/>0.60·z 6-mo + 0.25·z 3-mo − 0.15·z volatility]
+  S --> T[Top 8 by score<br/>max 3 per sector]
+  T --> W[Inverse-volatility weights]
+  W --> R{SPY above its<br/>200-day average?}
+  R -->|yes| C1[Invest up to 95%]
+  R -->|no, risk-off| C2[Invest up to 50%]
+  C1 --> K[Caps: ≤20% per stock, ≤40% per sector<br/>leftover stays in cash]
+  C2 --> K
+  K --> O[Target portfolio → orders]
+```
+
 **1. Universe (what it can buy).** Today's S&P 500 list from Wikipedia, so nothing is hand-picked. A stock must pass all of these:
 
 | Filter | Rule | Why |
@@ -46,7 +61,19 @@ subtracts a little for wild price swings, so a steady climb outranks an erratic 
 **4. Market safety switch.** If SPY is below its 200-day average, the market is treated as being in a downtrend
 and the portfolio keeps **at least 50% in cash**.
 
-**5. Trading (turning targets into orders).**
+**5. Trading (turning targets into orders).** For each stock held or targeted:
+
+```mermaid
+flowchart LR
+  Q{In the new<br/>target?} -->|no| SELL[SELL all]
+  Q -->|yes| O{Over a cap?}
+  O -->|yes| RED[REDUCE to target]
+  O -->|no| D{Off target by<br/>≥ 2 points and ≥ $5?}
+  D -->|no| HOLD[HOLD]
+  D -->|yes, below| BUY[BUY / INCREASE]
+  D -->|yes, above| RED
+```
+
 - A position within **2 percentage points** of its target is left alone (**HOLD**), so small drifts don't cost money.
 - Positions that dropped out of the top 8 are **sold** in full; positions over a cap are trimmed.
 - Trades under **$5** are skipped.
@@ -62,6 +89,15 @@ The strategy is long-only, with no leverage, shorting or options.
 - **Backtest:** once a month, at each month-end close.
 
 ## How it is checked
+
+```mermaid
+flowchart LR
+  subgraph M1 [Each month-end]
+    A[Prices up to day T only] --> E[Same engine as live] --> P[Planned orders]
+  end
+  P -->|fill at T+1 open<br/>+0.10% slippage| H[Holdings]
+  H -->|marked daily at close| Q[Equity curve vs SPY buy-and-hold]
+```
 
 **Backtest (looking back).** The same engine code replays the rules monthly over the past 3 years, or from a
 start date you choose. Each decision uses only data available on that day, and orders fill at the **next day's

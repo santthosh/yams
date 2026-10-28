@@ -216,21 +216,47 @@ reason codes and explanation text. The portfolio-level summary is one of `REBALA
 
 ## 9. Architecture
 
-```text
-Browser ──HTTP──▶ FastAPI (single process, port 8000)
-                    ├── pages: Jinja2 templates + Chart.js (vendored, no CDN)
-                    ├── /api/*: JSON
-                    └── app/ (pure Python)
-                          data.py      yfinance download, cache, sample fallback
-                          engine.py    eligibility → features → score → weights → orders  (pure, no I/O)
-                          backtest.py  monthly walk-forward using engine.py
-                          forecast.py  block bootstrap
-                          explain.py   explanation templates
-                          ledger.py    SQLite: trades + recommendations
-                          config.py    strategy parameters
-                  data/runtime/cache/*   market data   (gitignored, Docker volume)
-                  data/sample/*          committed offline snapshot
-                  data/runtime/yams.db   SQLite ledger (gitignored, Docker volume)
+```mermaid
+flowchart LR
+  U([Browser]) -->|HTTP :8000| M[FastAPI app/main.py<br/>Jinja2 pages + /api JSON<br/>Chart.js vendored]
+  M --> S[service.py]
+  S --> E[engine.py<br/>eligibility → features → score<br/>→ weights → orders → fills<br/>pure, no I/O]
+  S --> B[backtest.py<br/>monthly walk-forward] --> E
+  S --> F[forecast.py<br/>block bootstrap]
+  S --> X[explain.py · glossary.py]
+  S --> L[(ledger.py → data/runtime/yams.db<br/>SQLite, Docker volume)]
+  M --> D[data.py]
+  D --> C[(data/runtime/cache<br/>market data, Docker volume)]
+  D -.seed on first boot.-> SM[(data/sample<br/>committed snapshot)]
+  D -.refresh.-> Y{{Yahoo Finance · Wikipedia}}
+  CFG[config.py<br/>strategy parameters] -.-> E
+```
+
+Recommend and apply (the state-changing path):
+
+```mermaid
+sequenceDiagram
+  actor User
+  participant UI as FastAPI
+  participant Svc as service.py
+  participant Eng as engine.py
+  participant DB as SQLite ledger
+  User->>UI: Get recommendation
+  UI->>Svc: build_recommendation(data, ledger)
+  Svc->>Eng: evaluate(closes ≤ as_of) + plan_orders(holdings)
+  Svc->>DB: save immutable recommendation (trade_count, data_fetched_at)
+  UI-->>User: recommendation page
+  User->>UI: Apply (confirm box ticked)
+  UI->>Svc: apply_recommendation(id)
+  Svc->>Eng: execute(orders) → fills
+  Svc->>DB: BEGIN IMMEDIATE: status ready? trade_count and data unchanged?
+  alt unchanged
+    DB-->>Svc: insert trades, mark applied
+    UI-->>User: portfolio updated
+  else changed
+    DB-->>UI: Conflict
+    UI-->>User: 409, recommendation is stale
+  end
 ```
 
 - **Stack:** Python 3.12, `uv`, FastAPI, Jinja2, pandas, NumPy, yfinance, pyarrow, SQLite
@@ -244,8 +270,9 @@ Browser ──HTTP──▶ FastAPI (single process, port 8000)
 ### Repository layout
 
 ```text
-app/  main.py config.py data.py engine.py backtest.py forecast.py explain.py ledger.py
-      templates/ static/ (chart.umd.min.js, style.css)
+app/  main.py config.py data.py engine.py backtest.py forecast.py explain.py glossary.py ledger.py service.py
+      templates/ static/ (chart.umd.min.js, charts.js, style.css)
+docs/ SPEC.md (this file)  STRATEGY.md (plain-English strategy)  archive/ (superseded full design)
 data/sample/  universe.csv prices.parquet meta.json
 scripts/make_sample.py      regenerates data/sample from yfinance
 tests/                      engine, backtest, forecast, ledger

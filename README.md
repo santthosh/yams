@@ -22,6 +22,17 @@ Portfolio state lives in a Docker volume, so it survives `docker compose restart
 
 ## Use it
 
+```mermaid
+flowchart LR
+  R[Refresh data<br/>latest close] --> G[Get recommendation]
+  G --> V{Review:<br/>picks, trades,<br/>forecast, backtest}
+  V -->|tick box + Apply| A[Paper trades filled<br/>holdings saved]
+  V -->|nothing to trade| H[HOLD]
+  A --> W[Portfolio page<br/>live value + reasons]
+  H --> W
+  W -->|after next close| R
+```
+
 1. **Portfolio:** a *next step* card always shows what to do: get prices → get a recommendation → review and apply.
    While the market is open, holdings are valued at live Yahoo prices with today's change (for display only).
    Every metric has a **?** that explains it in plain English.
@@ -55,12 +66,20 @@ cash when the market turns down. Rationale, rules and weaknesses: [`docs/STRATEG
 Python 3.12 · FastAPI · Jinja2 (server-rendered) · Chart.js (vendored) · pandas/NumPy · yfinance · SQLite · pytest · Docker.
 One process, no build step, no external services.
 
-```text
-Browser ─▶ app/main.py (pages + /api)
-            ├ service.py   valuation, build/apply recommendation      ├ engine.py   filters→score→weights→orders→fills (pure)
-            ├ backtest.py  walk-forward on engine.py                  ├ forecast.py bootstrap, proposed vs hold
-            ├ explain.py   reasons from numbers (no LLM)              ├ glossary.py metric tooltips
-            ├ ledger.py    SQLite trades + immutable recommendations  └ data.py     Yahoo → validate → atomic cache
+```mermaid
+flowchart LR
+  U([Browser]) -->|HTML pages, /api JSON| M[main.py<br/>FastAPI routes]
+  M --> S[service.py<br/>value, recommend, apply]
+  S --> E[engine.py<br/>filter → score → weights → orders → fills]
+  S --> B[backtest.py<br/>monthly walk-forward]
+  S --> F[forecast.py<br/>90-day bootstrap]
+  S --> X[explain.py + glossary.py<br/>plain-English text]
+  B --> E
+  S --> L[(ledger.py<br/>SQLite: trades,<br/>recommendations)]
+  M --> D[data.py<br/>validate + atomic cache]
+  D --> C[(data/runtime/cache<br/>Docker volume)]
+  D -.first boot, offline.-> SM[(data/sample<br/>committed snapshot)]
+  D -.Refresh data.-> Y{{Yahoo Finance<br/>+ Wikipedia S&P 500}}
 ```
 
 Money uses `Decimal`; holdings and cash are derived from the trade ledger. A recommendation applies **once** and is
