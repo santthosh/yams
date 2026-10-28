@@ -100,6 +100,23 @@ For candidate `i` as of T:
 
 Skip candidates with missing/nonfinite inputs; record filters and quality flags. Save intermediate features and score contributions for explanations. These coefficient defaults should be versioned and independently tested—not optimized against a hidden evaluation window.
 
+### 5.2.1 Alternative stock baselines (Q07, ADR-011)
+
+[ADR-011](adr/0011-strategy-templates.md) specifies the reviewed0.0.3 extension:
+mean reversion scores the population z-score of `1-adjusted_close[T]/SMA20(T)`;
+low volatility scores `-z(VOL60)` (ascending volatility). SMA20 includes T and
+needs20 closes; VOL60 keeps the sample59 denominator and61 closes. Both retain
+shared eligibility, default positive SMA200 trend, inverse-volatility allocation,
+zero-volatility removal before top-N, risk, rebalance and execution. No implicit
+positive mean-reversion-score gate is added. Equal dispersion yields zero scores
+and ascending asset-ID ties. See its closed field/range/compatibility table and
+[independent worked fixtures](verification/37-templates/README.md).
+
+SPY is benchmark-only under Q07; it is not a publishable stock family or a way to
+bypass stock constraints. Existing momentum canonical content remains unchanged.
+#38 owns model/engine/fixture activation after this contract lands; documentation
+alone does not activate new kinds. Defaults are hypotheses, not optimized results.
+
 ### 5.3 Target allocation
 
 - DEFAULT: top **8** eligible scored assets; **20% maximum per position**, **40% maximum per sector**, **5% minimum cash reserve**. Sector of unknown assets counts as one `Unknown` sector.

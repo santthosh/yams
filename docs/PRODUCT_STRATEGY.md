@@ -90,7 +90,9 @@ The Strategy Lab supports documented starting templates:
 - **Momentum:** Favor securities demonstrating sustained relative strength.
 - **Mean reversion:** Evaluate potential rebounds after unusually weak price action, subject to trend and risk filters.
 - **Low volatility:** Favor comparatively stable securities with appropriate diversification.
-- **Passive benchmark:** Buy-and-hold reference for measuring whether complexity adds value.
+- **Passive benchmark:** Buy-and-hold reference for measuring whether complexity adds value; under approved Q07, SPY is benchmark-only and cannot be published or deployed as a stock strategy.
+
+The exact alternative-family rules and runtime handoff are in [ADR-011](adr/0011-strategy-templates.md). Names alone do not activate operators or establish profitability.
 
 Each strategy is defined by **universe → eligibility filters → scoring → selection → weighting → risk rules → rebalance/exit rules**.
 

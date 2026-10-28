@@ -98,7 +98,7 @@ Dashboard shows current portfolio value, most recent settled fills, pending pape
 
 ### 5.2 Strategy Lab (`/lab`)
 
-Cards for Momentum, Mean Reversion, Low Volatility, and Passive Benchmark. Each has a plain-language thesis, underlying input data, risk profile note and supported features. `Create version`, `Run backtest`, `Compare`. Strategy configuration is form-driven; advanced/unsupported operators are absent or explicitly disabled. The original version remains inspectable after a fork.
+Cards for Momentum, Mean Reversion and Low Volatility, with a separately labeled Passive Benchmark reference (SPY is benchmark-only under Q07; no publish/deploy action). Each has a plain-language thesis, underlying input data, risk profile note and supported features. `Create version`, `Run backtest`, `Compare`. Strategy configuration is form-driven; advanced/unsupported operators are absent or explicitly disabled. The original version remains inspectable after a fork. [ADR-011](adr/0011-strategy-templates.md) owns alternative-family formulas and staging; show unsupported kinds as unavailable until their schema/engine owner lands.
 
 **Version detail:** human-friendly summary with exact parameter values and `See underlying rules` expandable section; dataset eligibility and warnings. Track immutable version IDs and experiment links. Avoid showing investment recommendations sourced only from description text.
 

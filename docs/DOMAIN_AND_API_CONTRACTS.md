@@ -117,6 +117,27 @@ Required foreign key and unique constraints: `strategy_version(strategy_id, vers
 
 Other `signals.kind` values become supported only with documented operator contracts and golden fixtures. Never evaluate user/LLM-submitted code.
 
+[ADR-011](adr/0011-strategy-templates.md) defines Q07's0.0.3 extension contract,
+with runtime schema/client support owned by #38. `signals` becomes a closed union
+keyed by `kind`; complete existing momentum fields/canonical bytes/hash stay
+unchanged. `mean_reversion` requires exactly `kind`, strict integer
+`mean_reversion_sessions` (2–2520), `volatility_sessions` (2–2519),
+`trend_sma_sessions` (1–2520) and strict boolean `require_positive_trend`.
+`low_volatility` requires exactly `kind`, `volatility_sessions`,
+`trend_sma_sessions` and `require_positive_trend` with the same bounds. Defaults
+expand to20/60/200/true for mean reversion and60/200/true for low volatility;
+publication never silently supplies omitted values. Shared config objects and
+schema_version1 remain unchanged. History must cover all actual family windows,
+including volatility+1 and20 liquidity closes; cross-family fields are rejected.
+
+These supported kinds activate only when #38's validated models, dispatcher,
+independent canonical/feature fixtures and generated contracts land together.
+Until then the actual generated schema correctly accepts only momentum. There is
+no passive/SPY kind. Config publication still validates syntax independently of
+market-data availability, and immutable old versions keep their original meaning.
+Family feature/score evidence must reflect the pinned kind without invented
+momentum values. See ADR-011 for exact formulas, identities and upgrade limits.
+
 ## 4. Market-data and experiment contracts
 
 [ADR-007](adr/0007-dataset-snapshots.md) defines manifest fields, canonical SHA-256/derived UUID identity, immutable artifact references, safe publication and recovery. Snapshot `published_at` is local registration/publication time; source availability remains in hashed row-level evidence and must not be inferred from this envelope timestamp.
