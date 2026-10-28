@@ -313,6 +313,7 @@ def test_populated_prior_schema_upgrade_preserves_workspace_versions_and_jobs(
 
     prior = tmp_path / "prior-migrations"
     shutil.copytree(MIGRATIONS, prior)
+    (prior / "versions/0006_paper_ledger.py").unlink()
     (prior / "versions/0005a_experiment_reports.py").unlink()
     (prior / "versions/0005_experiments.py").unlink()
     identity = bootstrap(database, prior)

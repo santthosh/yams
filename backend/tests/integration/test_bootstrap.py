@@ -96,6 +96,16 @@ def test_fresh_repeat_and_concurrent_bootstrap_preserves_identity_and_preference
         "experiment",
         "experiment_core",
         "experiment_report",
+        "paper_portfolio",
+        "paper_position",
+        "recommendation",
+        "paper_order_batch",
+        "paper_order",
+        "paper_action_evidence",
+        "ledger_event",
+        "cash_ledger_entry",
+        "position_event",
+        "paper_fill",
     }
     with database.connect() as connection:
         assert connection.execute(text("SELECT count(*) FROM local_workspace")).scalar_one() == 1
