@@ -29,7 +29,7 @@ test("foundation navigation, keyboard and modal at each viewport", async ({
   ).toEqual([]);
   await expect(page.getByText("No paper portfolio yet")).toBeVisible();
   await expect(
-    page.getByRole("link", { name: /Lab|Arena|Journal|Portfolios/ }),
+    page.getByRole("link", { name: /Arena|Journal|Portfolios/ }),
   ).toHaveCount(0);
   expect(
     await page.evaluate(

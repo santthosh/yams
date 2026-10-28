@@ -191,6 +191,11 @@ def main() -> None:
             publication = json.loads((destination / "strategy-publication.json").read_text())
             strategy_id = publication["created"]["body"]["id"]
             versions = get(f"strategies/{strategy_id}/versions")
+            editor_versions = {
+                json.loads(path.read_text())["fork"]["id"]: json.loads(path.read_text())["history"]
+                for path in destination.glob("strategy-editor-*.json")
+            }
+            assert len(editor_versions) == 2
             evidence["strategy_evaluations"] = evaluations
             evidence["checks"].append(
                 "native real-worker candidate rerun hashes and explicit cash-only results"
@@ -199,6 +204,8 @@ def main() -> None:
             run("up", "-d", "--wait", "--wait-timeout", "120", "--pull", "never")
             assert get("workspace")["id"] == workspace["id"]
             assert get(f"strategies/{strategy_id}/versions") == versions
+            for editor_id, history in editor_versions.items():
+                assert get(f"strategies/{editor_id}/versions") == history
             assert get(f"jobs/{job}")["status"] == "completed"
             for saved in evaluations:
                 assert get(f"strategy-evaluations/{saved['id']}") == saved
