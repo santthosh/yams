@@ -286,7 +286,56 @@ def main() -> None:
             "original preservation and cancellation"
         )
 
+        subprocess.run(
+            ["pnpm", "--filter", "@yams/web", "exec", "node", "tests/comparison-browser.mjs"],
+            cwd=ROOT,
+            env={
+                **env,
+                "YAMS_SMOKE_URL": f"http://{address}",
+                "YAMS_SMOKE_EVIDENCE": str(destination),
+            },
+            check=True,
+        )
+        comparison_runs = json.loads((destination / "comparison-ui.json").read_text())
+        for record in comparison_runs["records"]:
+            for role in ("source", "challenge", "mismatched"):
+                record[role] = json.loads(record.pop(role + "_raw_json"))
+                assert record[role]["inputs"] == json.loads(record[role]["inputs_canonical_json"])
+            record["common"] = [json.loads(raw) for raw in record.pop("common_raw_json")]
+            for saved in record["common"]:
+                assert saved["inputs"] == json.loads(saved["inputs_canonical_json"])
+        evidence["comparison_ui"] = comparison_runs
+        evidence["checks"].append(
+            "real mobile/desktop aligned and mismatched comparison, one-rule challenge, "
+            "shared-setting exact-seed reruns and immutable source evidence"
+        )
+
+        # Challenge publication deliberately adds two immutable strategy roots.
+        # Snapshot the registry after all writes, while proving the original six
+        # rows and every old version are unchanged rather than weakening replay.
+        original_strategy_rows = strategies["items"]
+        strategies = get("strategies")
+        original_strategy_ids = {row["id"] for row in original_strategy_rows}
+        assert [
+            row for row in strategies["items"] if row["id"] in original_strategy_ids
+        ] == original_strategy_rows
+        challenge_roots = [
+            row for row in strategies["items"] if row["id"] not in original_strategy_ids
+        ]
+        assert len(challenge_roots) == 2 and len(strategies["items"]) == 8
+        assert {row["published_version"]["id"] for row in challenge_roots} == {
+            record["challenge"]["inputs"]["strategy_version_id"]
+            for record in comparison_runs["records"]
+        }
+        challenge_versions = {
+            row["id"]: get(f"strategies/{row['id']}/versions") for row in challenge_roots
+        }
+        for row in challenge_roots:
+            assert challenge_versions[row["id"]]["items"] == [row["published_version"]]
+
         def verify_public_runs() -> None:
+            for identity, history in challenge_versions.items():
+                assert get(f"strategies/{identity}/versions") == history
             for saved in public_runs["runs"]:
                 identity = saved["run"]["id"]
                 assert get(f"experiments/{identity}") == saved["run"]
@@ -298,6 +347,15 @@ def main() -> None:
                     if key in record:
                         saved = record[key]
                         assert get(f"experiments/{saved['id']}") == saved
+
+            for record in comparison_runs["records"]:
+                for saved in [
+                    record["source"],
+                    record["challenge"],
+                    record["mismatched"],
+                    *record["common"],
+                ]:
+                    assert get(f"experiments/{saved['id']}") == saved
 
         # Internal compatibility remains covered alongside the new public flow.
         core = json.loads(

@@ -125,6 +125,13 @@ Select 2–4 finished experiments. Plot comparable equity curves, cumulative ret
 
 **Challenge strategy:** `Change one rule` pre-fills a new version with a one-parameter diff and experiment settings, preserving the original. Show before/after parameters and warnings about repeated parameter tuning.
 
+The implemented [comparison workflow](operations/experiment-comparison.md) uses
+stored backend alignment terms, explicit shared-setting reruns and a constrained
+maximum-position-weight challenge. It retains immutable source/target IDs in a
+shareable comparison link and derives rule diffs from saved configurations.
+Incompatible runs have exact differences and no ranking/curves; partial pages,
+benchmark gaps, failed submissions and full forks remain explicit.
+
 ### 5.5 Portfolio detail (`/portfolios/[id]`)
 
 **Top:** value + change over selected historical period + cash + price as-of + active strategy/version. **Middle:** current actual synthetic holdings table with price, fractional shares, value, current weight, target weight, rationale and sector; cash is explicit. **Bottom:** open order batches, fill history, fees, valuation and ledger reconciliation status. A missing price makes valuation stale/unavailable with a reason rather than carrying forward silently without a warning.
