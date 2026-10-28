@@ -1,0 +1,13 @@
+{
+  "as_of": "2026-10-27",
+  "fetched_at": "2026-10-28T10:19:03Z",
+  "ticker_count": 500,
+  "missing": [
+    "FDXF",
+    "HONA",
+    "VYLR"
+  ],
+  "provider": "Yahoo Finance via yfinance (auto-adjusted daily OHLCV); S&P 500 list from Wikipedia",
+  "source": "sample",
+  "license_note": "Snapshot of Yahoo Finance data for personal/educational research only; subject to Yahoo's terms. Do not redistribute commercially."
+}
