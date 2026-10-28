@@ -14,6 +14,7 @@ from sqlalchemy.orm import Session, aliased
 from backend.domain.common import ErrorCode, ErrorDetail, JobResult, JobV1
 from backend.domain.types import canonical_json
 from backend.jobs.registry import AttemptMetrics, JobLimits, validate_payload
+from backend.market_data.providers.yahoo import SAFE_PROVIDER_REASONS
 from backend.persistence.models.job import DiagnosticEffect, Job, JobAttempt, Schedule
 
 TERMINAL = {"completed", "failed", "cancelled"}
@@ -87,6 +88,7 @@ class Queue:
         schedule: Schedule | None = None,
     ) -> UUID:
         validated = validate_payload(kind, payload).model_dump(mode="json")
+        source_mode = validated.get("source_mode", "synthetic_fixture")
         effective = limits or self.limits
         if scheduled_at is not None and (
             scheduled_at.tzinfo is None or scheduled_at.utcoffset() != timedelta(0)
@@ -100,7 +102,7 @@ class Queue:
                     "payload": validated,
                     "limits": effective.model_dump(mode="json"),
                     "scheduled_at": scheduled_at.isoformat() if scheduled_at else None,
-                    "source_mode": "synthetic_fixture",
+                    "source_mode": source_mode,
                     "schedule_id": str(schedule.id) if schedule else None,
                     "schedule_version": schedule.version if schedule else None,
                     "target": schedule.target if schedule else None,
@@ -119,7 +121,7 @@ class Queue:
                 payload_hash=payload_hash,
                 request_hash=request_hash,
                 idempotency_key=idempotency_key,
-                source_mode="synthetic_fixture",
+                source_mode=source_mode,
                 correlation_id=correlation_id or uuid4(),
                 status="queued",
                 created_at=now,
@@ -416,8 +418,16 @@ class Queue:
             return True
 
     def fail(
-        self, lease: Lease, code: ErrorCode, *, retryable: bool = False, retry_after: int = 0
+        self,
+        lease: Lease,
+        code: ErrorCode,
+        *,
+        retryable: bool = False,
+        retry_after: int = 0,
+        reason: str | None = None,
     ) -> bool:
+        if reason is not None and reason not in SAFE_PROVIDER_REASONS:
+            raise ValueError("Unsupported provider failure reason")
         if retry_after < 0:
             raise ValueError("Negative retry-after")
         with Session(self.engine) as session, session.begin():
@@ -432,6 +442,8 @@ class Queue:
             delay = min(30, max(2 ** (row.attempts - 1), retry_after))
             row.status = "queued" if retry else "failed"
             row.error = None if retry else self.error(row, code)
+            if row.error is not None and reason is not None:
+                row.error = {**row.error, "details": {"reason": reason}}
             if retry:
                 row.available_at = now + timedelta(seconds=delay)
             self.finish_attempt(
@@ -441,6 +453,7 @@ class Queue:
                 "retry" if retry else "failed",
                 code=code,
                 backoff_seconds=delay if retry else 0,
+                **({"reason": reason} if reason is not None else {}),
             )
             return True
 
