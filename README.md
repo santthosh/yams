@@ -21,7 +21,8 @@ Tests: `uv run pytest` (28 tests, no network).
 
 ## Use it
 
-1. **Dashboard:** the portfolio starts as $1,000 cash. Click **Get recommendation**. While the market is open the
+1. **Portfolio page:** starts as $1,000 cash. A "next step" card always shows what to do: get prices → get a
+   recommendation → review and apply. Click **Get recommendation**. While the market is open the
    dashboard values holdings at live Yahoo prices (cached 60 s; display only) with today's change.
 2. **Recommendation page**, read top to bottom:
    - **Proposed portfolio**: up to 8 stocks plus cash, each with a plain-English reason (momentum, rank, volatility, caps).

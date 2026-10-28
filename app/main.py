@@ -132,8 +132,31 @@ def do_apply(rec_id: str):
 @app.get("/")
 def dashboard(request: Request):
     recs = [with_status(r) for r in ledger().list_recommendations(10)]
-    pending = recs[0] if recs and recs[0]["status"] == "ready" and recs[0]["summary_action"] != "HOLD" else None
-    return render(request, "dashboard.html", p=portfolio(), trades=ledger().trades(25), recs=recs, pending=pending)
+    p = portfolio()
+    return render(request, "dashboard.html", p=p, trades=ledger().trades(25), recs=recs,
+                  next=next_step(p, recs[0] if recs else None))
+
+
+def next_step(p: dict, latest: dict | None) -> dict:
+    """The one thing the user should do now: 1 get prices → 2 get a recommendation → 3 review and apply."""
+    if latest and latest["status"] == "ready" and latest["summary_action"] != "HOLD":
+        return {"step": 3, "action": "review", "href": f"/recommendations/{latest['id']}",
+                "title": "Review and apply your recommendation",
+                "text": f"Recommendation from {latest['created_at'][11:16]} UTC not applied yet: {latest['summary']}"}
+    if md().status()["stale"]:
+        return {"step": 1, "action": "refresh", "title": "Get the latest prices",
+                "text": f"Your data stops at the {md().as_of} close. Refresh before asking for a recommendation."}
+    if latest and latest["status"] == "ready":
+        return {"step": 4, "action": "recommend", "title": "You're up to date",
+                "text": f"The last check on {md().as_of} prices found nothing worth trading. New closing prices "
+                        "arrive after 4:15 PM ET; refresh data then and check again."}
+    if not p["holdings"]:
+        return {"step": 2, "action": "recommend", "title": "Get your first recommendation",
+                "text": f"The strategy scores the S&P 500 on {md().as_of} prices and proposes up to 8 stocks for "
+                        f"your {p['cash']:,.2f} dollars of paper cash. Nothing is bought until you apply it."}
+    return {"step": 2, "action": "recommend", "title": "Check for changes",
+            "text": f"Re-run the strategy on {md().as_of} prices against what you hold. "
+                    "Small drifts are left alone; you only trade when something meaningful changed."}
 
 
 @app.get("/recommendations/{rec_id}")

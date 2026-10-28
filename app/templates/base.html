@@ -3,30 +3,37 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{% block title %}YAMS{% endblock %} · Paper portfolio</title>
+  <title>{% block title %}YAMS{% endblock %} · YAMS paper portfolio</title>
   <link rel="stylesheet" href="/static/style.css">
   <script src="/static/chart.umd.min.js"></script>
+  <script src="/static/charts.js"></script>
 </head>
 <body>
-<header>
+{% set path = request.url.path %}
+<header class="top">
   <div class="bar">
-    <a class="brand" href="/">YAMS<small>Invest fake. Learn real.</small></a>
-    <nav><a href="/">Dashboard</a><a href="/backtest">Backtest</a></nav>
+    <a class="brand" href="/"><span class="logo">Y</span><span>YAMS <small>Invest fake. Learn real.</small></span></a>
+    <nav class="main">
+      <a href="/" class="{{ 'active' if path == '/' }}">Portfolio</a>
+      <a href="/backtest" class="{{ 'active' if path.startswith('/backtest') }}">Backtest</a>
+    </nav>
     <span class="spacer"></span>
-    <span class="chip paper">Paper only</span>
-    <span class="chip {{ 'stale' if status.stale }}" title="Fetched {{ status.fetched_at }}">
-      Data as of {{ status.as_of }} ({{ status.source }}){% if status.stale %} · stale{% endif %}
-    </span>
-    <form class="inline" method="post" action="/ui/refresh"
-          onsubmit="this.querySelector('button').disabled=true;this.querySelector('button').textContent='Refreshing… (~1 min)'">
-      <button class="secondary" type="submit">Refresh data</button>
-    </form>
+    <div class="status">
+      <span class="chip paper" title="No real money or broker is involved">Paper money</span>
+      <span class="chip {{ 'stale' if status.stale }}" title="Fetched {{ status.fetched_at }} · source: {{ status.source }}">
+        <span class="dot"></span>Prices as of {{ status.as_of }} close{% if status.stale %} · stale{% endif %}
+      </span>
+      <form class="inline" method="post" action="/ui/refresh"
+            onsubmit="this.querySelector('button').disabled=true;this.querySelector('button').textContent='Refreshing… ~1 min'">
+        <button class="secondary" type="submit" title="Download the latest daily prices from Yahoo Finance">Refresh data</button>
+      </form>
+    </div>
   </div>
 </header>
 <main>
   {% if msg %}<div class="flash ok" role="status">{{ msg }}</div>{% endif %}
   {% if err %}<div class="flash err" role="alert">{{ err }}</div>{% endif %}
-  {% if status.stale %}<div class="warn">Market data is {{ status.age_days }} days old. Click “Refresh data” for the latest prices (needs internet).</div>{% endif %}
+  {% if status.stale %}<div class="warn" style="margin-bottom:16px"><span>Market data is {{ status.age_days }} days old. Refresh for the latest closing prices (needs internet).</span></div>{% endif %}
   {% block content %}{% endblock %}
 </main>
 <footer>YAMS is a research and paper-trading simulator. All money, orders and fills are simulated. Not investment advice.</footer>

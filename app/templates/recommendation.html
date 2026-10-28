@@ -2,111 +2,184 @@
 {% block title %}Recommendation{% endblock %}
 {% block content %}
 {% set f = rec.forecast %}
+{% set n_trades = rec.actions|rejectattr('side', 'equalto', 'HOLD')|list|length %}
+{% set can_apply = rec.status == 'ready' and rec.summary_action != 'HOLD' %}
 {% macro apply_form() %}
-  {% if rec.status == 'applied' %}
-    <p>These trades were applied to the paper portfolio. <a href="/">See holdings →</a></p>
-  {% elif not stale %}
   <form method="post" action="/ui/recommendations/{{ rec.id }}/apply"
-        onsubmit="this.querySelector('button').disabled=true">
-    <p class="small">Simulated fills at the {{ rec.data_as_of }} close, ±{{ strategy.slippage_bps|int }} bps slippage. Sells execute first; buys are trimmed if cash runs short. No real money or broker is involved.</p>
-    <label><input type="checkbox" name="confirm" value="yes" required> I understand these are simulated paper trades.</label><br><br>
-    <button type="submit" {{ 'disabled' if rec.summary_action == 'HOLD' }}>Apply paper trades</button>
-    {% if rec.summary_action == 'HOLD' %}<span class="small muted">Nothing to trade.</span>{% endif %}
+        onsubmit="this.querySelector('button').disabled=true;this.querySelector('button').textContent='Applying…'">
+    <label class="check"><input type="checkbox" name="confirm" value="yes" required>
+      <span>I understand these are simulated paper trades.</span></label>
+    <button type="submit">Apply paper trades</button>
   </form>
-  {% endif %}
 {% endmacro %}
-<h1>Recommendation <span class="tag">{{ rec.status }}</span></h1>
-<p class="muted small">Created {{ rec.created_at[:19]|replace('T', ' ') }} UTC · data as of {{ rec.data_as_of }} ({{ rec.data_source }}) · portfolio value {{ rec.portfolio_value|money }}</p>
-{% if stale %}<div class="warn">This recommendation is out of date: the portfolio or market data changed since it was made. <form class="inline" method="post" action="/ui/recommend"><button class="secondary" type="submit">Get a new one</button></form></div>{% endif %}
 
-<div class="panel">
-  <div style="font-size:19px;font-weight:700">{{ rec.summary }}</div>
-  <p>{{ rec.regime_text }}</p>
-  <p class="small muted">{{ rec.n_eligible }} of {{ rec.n_universe }} S&amp;P 500 stocks passed the filters. Estimated trading cost: {{ rec.est_total_cost|money }} ({{ strategy.slippage_bps|int }} bps slippage per trade).</p>
-  {% if rec.status == 'ready' and rec.summary_action != 'HOLD' %}<hr>{{ apply_form() }}
-  <p class="small muted">The details below explain each pick, the trades, a 90-day forecast and the backtest.</p>{% endif %}
-</div>
+<a class="small" href="/">← Portfolio</a>
+<section class="card rec-head" style="margin-top:10px">
+  <div>
+    {% if rec.status == 'ready' and rec.summary_action == 'HOLD' %}<span class="tag">no trades</span>{% else %}<span class="tag {{ rec.status }}">{{ rec.status }}</span>{% endif %}
+    <span class="small muted">&nbsp;Created {{ rec.created_at[:16]|replace('T', ' ') }} UTC · prices as of {{ rec.data_as_of }} close ({{ rec.data_source }})</span>
+    <h1>{{ rec.summary }}</h1>
+    <p class="ink2 small">{{ rec.regime_text }}</p>
+    <div class="tiles four" style="margin-top:14px">
+      <div class="card tile"><div class="label">Portfolio value</div><div class="value">{{ rec.portfolio_value|money }}</div><div class="sub">at the {{ rec.data_as_of }} close</div></div>
+      <div class="card tile"><div class="label">Trades</div><div class="value">{{ n_trades }}</div><div class="sub">{{ rec.actions|length - n_trades }} held as is</div></div>
+      <div class="card tile"><div class="label">Est. trading cost</div><div class="value">{{ rec.est_total_cost|money }}</div><div class="sub">{{ strategy.slippage_bps|int }} bps slippage</div></div>
+      <div class="card tile"><div class="label">90-day median</div>
+        {% if f.status == 'available' %}<div class="value {{ 'pos' if f.proposed.median_return > 0 else 'neg' }}">{{ f.proposed.median_return|pct(1, true) }}</div>
+        <div class="sub">{{ f.proposed.prob_loss|pct(0) }} chance of a loss</div>
+        {% else %}<div class="value">—</div><div class="sub">forecast unavailable</div>{% endif %}</div>
+    </div>
+  </div>
+  <div class="apply-box">
+    {% if can_apply %}
+      <h3>Apply to your paper portfolio</h3>
+      <p class="small muted">Fills at the {{ rec.data_as_of }} close ±{{ strategy.slippage_bps|int }} bps. Sells go first; buys are trimmed if cash runs short. No real money or broker.</p>
+      {{ apply_form() }}
+    {% elif rec.status == 'applied' %}
+      <h3>Applied ✓</h3>
+      <p class="small muted">These trades are in your paper portfolio.</p>
+      <a class="btn secondary" href="/">See holdings →</a>
+    {% elif stale %}
+      <h3>Out of date</h3>
+      <p class="small muted">Your portfolio or the market data changed after this was made, so it can no longer be applied.</p>
+      <form method="post" action="/ui/recommend"><button type="submit">Get a new recommendation</button></form>
+    {% else %}
+      <h3>Nothing to trade</h3>
+      <p class="small muted">Every holding is within {{ (strategy.rebalance_band * 100)|int }} points of its target, so trading would only cost slippage. Check again after the next close.</p>
+      <a class="btn secondary" href="/">Back to portfolio</a>
+    {% endif %}
+  </div>
+</section>
 
-<h2><span class="step">1</span>Proposed portfolio</h2>
-{% if rec.positions %}
-<div class="table-wrap"><table>
-  <thead><tr><th>Stock</th><th class="num">Target</th><th class="num">6-mo</th><th class="num">3-mo</th><th class="num">Volatility</th><th class="num">Rank</th><th>Why this position</th></tr></thead>
-  <tbody>
-  {% for p in rec.positions %}
-    <tr><td><strong>{{ p.ticker }}</strong><br><span class="small muted">{{ p.name }} · {{ p.sector }}</span></td>
-      <td class="num"><strong>{{ p.weight|pct }}</strong>{% if p.capped %}<br><span class="tag">{{ p.capped }} cap</span>{% endif %}</td>
-      <td class="num">{{ p.m126|pct(0, true) }}</td><td class="num">{{ p.m63|pct(0, true) }}</td>
-      <td class="num">{{ p.vol60|pct(0) }}</td><td class="num">#{{ p.rank }}<br><span class="small muted">score {{ '%.2f'|format(p.score) }}</span></td>
-      <td class="small">{{ p.explanation }}</td></tr>
-  {% endfor %}
-    <tr><td><strong>Cash</strong></td><td class="num"><strong>{{ rec.cash_target_weight|pct }}</strong></td><td colspan="5" class="small muted">Cash reserve ({{ 'risk-off market' if rec.regime == 'risk_off' else 'minimum buffer' }}{% if rec.cash_target_weight > (0.5 if rec.regime == 'risk_off' else 0.05) + 0.0001 %}, plus weight the caps could not place{% endif %}).</td></tr>
-  </tbody>
-</table></div>
-<p class="small muted">Sector mix:
-  {% for s, w in rec.sector_weights.items() %}{{ s }} {{ w|pct(0) }}{% if not loop.last %} · {% endif %}{% endfor %}
-  · Cash {{ rec.cash_target_weight|pct(0) }}. Score = 0.60×z(6-mo return) + 0.25×z(3-mo return) − 0.15×z(volatility).</p>
-{% else %}
-<div class="panel">No stock passed the filters, so the target is 100% cash.</div>
+<nav class="subnav" aria-label="Sections">
+  <a href="#portfolio">Proposed portfolio</a><a href="#trades">Trades</a><a href="#forecast">90-day forecast</a>
+  <a href="#track">Track record</a><a href="#close">Close calls</a>
+</nav>
+
+<section class="section" id="portfolio">
+  <div class="section-head"><h2><span class="num-badge">1</span>Proposed portfolio</h2>
+    <span class="small muted">{{ rec.n_eligible }} of {{ rec.n_universe }} S&amp;P 500 stocks passed the filters</span></div>
+  {% if rec.positions %}
+  <div class="card table-wrap"><table>
+    <thead><tr><th>Stock</th><th class="num">Target</th><th class="num">6-mo</th><th class="num">3-mo</th><th class="num">Volatility</th><th class="num">Rank</th><th>Why this position</th></tr></thead>
+    <tbody>
+    {% for p in rec.positions %}
+      <tr><td><span class="tick">{{ p.ticker }}</span><span class="co">{{ p.name }} · {{ p.sector }}</span></td>
+        <td class="num"><div class="wbar"><strong>{{ p.weight|pct }}</strong><span class="track"><span class="fill" style="width:{{ [p.weight * 500, 100]|min|round(1) }}%"></span></span></div>
+          {% if p.capped %}<span class="tag" style="margin-top:4px">{{ p.capped }} cap</span>{% endif %}</td>
+        <td class="num {{ 'pos' if p.m126 > 0 else 'neg' }}">{{ p.m126|pct(0, true) }}</td>
+        <td class="num {{ 'pos' if p.m63 > 0 else 'neg' }}">{{ p.m63|pct(0, true) }}</td>
+        <td class="num">{{ p.vol60|pct(0) }}</td>
+        <td class="num">#{{ p.rank }}<span class="co">score {{ '%.2f'|format(p.score) }}</span></td>
+        <td class="why">{{ p.explanation }}</td></tr>
+    {% endfor %}
+      <tr class="cash"><td><span class="tick">Cash</span></td><td class="num"><strong>{{ rec.cash_target_weight|pct }}</strong></td>
+        <td colspan="5" class="why">Cash reserve ({{ 'risk-off market' if rec.regime == 'risk_off' else 'minimum buffer' }}{% if rec.cash_target_weight > (0.5 if rec.regime == 'risk_off' else 0.05) + 0.0001 %}, plus weight the caps could not place{% endif %}).</td></tr>
+    </tbody>
+  </table></div>
+  <p class="tiny muted" style="margin-top:8px">Sector mix: {% for s, w in rec.sector_weights.items() %}{{ s }} {{ w|pct(0) }}{% if not loop.last %} · {% endif %}{% endfor %} · Cash {{ rec.cash_target_weight|pct(0) }}.
+    Score = 0.60×z(6-mo return) + 0.25×z(3-mo return) − 0.15×z(volatility). Bars are drawn against the 20% cap.</p>
+  {% else %}
+  <div class="card pad">No stock passed the filters, so the target is 100% cash.</div>
+  {% endif %}
+</section>
+
+<section class="section" id="trades">
+  <div class="section-head"><h2><span class="num-badge">2</span>Trades to get there</h2>
+    <span class="small muted">Est. cost {{ rec.est_total_cost|money }}</span></div>
+  <div class="card table-wrap"><table>
+    <thead><tr><th>Action</th><th>Stock</th><th class="num">Now</th><th class="num">Target</th><th class="num">Shares</th><th class="num">Amount</th><th>Reason</th></tr></thead>
+    <tbody>
+    {% for a in rec.actions %}
+      <tr><td><span class="tag {{ a.action }}">{{ a.action }}</span></td><td class="tick">{{ a.ticker }}</td>
+        <td class="num">{{ a.current_weight|pct }}</td><td class="num">{{ a.target_weight|pct }}</td>
+        <td class="num">{{ a.qty if a.side != 'HOLD' else '—' }}</td>
+        <td class="num">{{ a.notional|money if a.side != 'HOLD' else '—' }}</td>
+        <td class="why">{{ a.explanation }}</td></tr>
+    {% else %}<tr><td colspan="7" class="muted">Nothing to trade.</td></tr>{% endfor %}
+    </tbody>
+  </table></div>
+</section>
+
+<section class="section" id="forecast">
+  <div class="section-head"><h2><span class="num-badge">3</span>What could happen in the next {{ f.horizon_calendar_days }} days</h2></div>
+  <div class="card pad">
+  {% if f.status == 'available' %}
+    {% set lo = [f.proposed.p10_return, f.hold.p10_return, 0]|min %}{% set hi = [f.proposed.p90_return, f.hold.p90_return, 0]|max %}
+    {% set pad = (hi - lo) * 0.08 %}{% set lo = lo - pad %}{% set span = (hi + pad) - lo %}
+    <p class="small ink2">Each bar spans the bad case (P10) to the good case (P90) across {{ f.paths }} simulated paths; the dot is the median.</p>
+    <div class="range-plot">
+      {% for key, label, sub, cls in [('proposed', 'Apply these trades', 'after ' ~ (f.trade_cost|money) ~ ' cost', 's1'), ('hold', 'Keep what you hold', 'do nothing', 's0')] %}
+      {% set s = f[key] %}
+      <div class="range-row" title="{{ label }}: median {{ s.median_return|pct(1, true) }}, P10 {{ s.p10_return|pct(1, true) }}, P90 {{ s.p90_return|pct(1, true) }}, chance of loss {{ s.prob_loss|pct(0) }}">
+        <div class="range-label">{{ label }}<span class="sub">{{ sub }}</span></div>
+        <div class="range-track">
+          <div class="range-zero" style="left:{{ ((0 - lo) / span * 100)|round(2) }}%"></div>
+          {% if s.p90_return - s.p10_return > 0.0005 %}
+          <div class="range-bar {{ cls }}" style="left:{{ ((s.p10_return - lo) / span * 100)|round(2) }}%;width:{{ ((s.p90_return - s.p10_return) / span * 100)|round(2) }}%"></div>
+          <div class="range-val end" style="left:{{ ((s.p10_return - lo) / span * 100)|round(2) }}%">{{ s.p10_return|pct(1, true) }}</div>
+          <div class="range-val end" style="left:{{ ((s.p90_return - lo) / span * 100)|round(2) }}%">{{ s.p90_return|pct(1, true) }}</div>
+          <div class="range-val" style="left:{{ ((s.median_return - lo) / span * 100)|round(2) }}%"><strong>{{ s.median_return|pct(1, true) }}</strong></div>
+          {% else %}
+          <div class="range-val" style="left:{{ ((s.median_return - lo) / span * 100)|round(2) }}%"><strong>{{ s.median_return|pct(1, true) }}</strong>{{ ' · all cash, no risk' if s.median_return|abs < 0.0005 }}</div>
+          {% endif %}
+          <div class="range-dot {{ cls }}" style="left:{{ ((s.median_return - lo) / span * 100)|round(2) }}%"></div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    <div class="table-wrap" style="margin-top:18px"><table>
+      <thead><tr><th></th><th class="num">Median</th><th class="num">Bad case (P10)</th><th class="num">Good case (P90)</th><th class="num">Chance of a loss</th><th class="num">Median ending value</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Apply these trades</strong></td><td class="num"><strong>{{ f.proposed.median_return|pct(1, true) }}</strong></td>
+          <td class="num">{{ f.proposed.p10_return|pct(1, true) }}</td><td class="num">{{ f.proposed.p90_return|pct(1, true) }}</td>
+          <td class="num">{{ f.proposed.prob_loss|pct(0) }}</td><td class="num"><strong>{{ f.proposed.median_ending_value|money }}</strong></td></tr>
+        <tr><td>Keep what you hold</td><td class="num">{{ f.hold.median_return|pct(1, true) }}</td>
+          <td class="num">{{ f.hold.p10_return|pct(1, true) }}</td><td class="num">{{ f.hold.p90_return|pct(1, true) }}</td>
+          <td class="num">{{ f.hold.prob_loss|pct(0) }}</td><td class="num">{{ f.hold.median_ending_value|money }}</td></tr>
+      </tbody>
+    </table></div>
+    <p class="small" style="margin-top:12px">Applying vs keeping, median: <strong>{{ f.delta_median_return|pct(1, true) }}</strong> ({{ f.delta_median_value|money(true) }}), after {{ f.trade_cost|money }} estimated trading cost.</p>
+    <p class="tiny muted">{{ caption }} Seed {{ f.seed }}; both portfolios use the same simulated paths. Cash earns 0%.</p>
+  {% else %}
+    <div class="warn">Forecast unavailable: {{ f.reason }} No number is shown rather than a made-up one.</div>
+  {% endif %}
+  </div>
+</section>
+
+<section class="section" id="track">
+  <div class="section-head"><h2><span class="num-badge">4</span>Would these rules have made money before?</h2>
+    <a class="small" href="/backtest">Full backtest →</a></div>
+  <div class="card pad">
+    <p class="ink2">{{ rec.backtest.verdict }}</p>
+    <div class="legend"><span><i class="s1"></i>Strategy</span><span><i class="s2"></i>SPY buy &amp; hold</span></div>
+    <div class="chart-box short"><canvas id="mini" aria-label="Backtest: strategy value vs SPY over time"></canvas></div>
+  </div>
+</section>
+
+<section class="section" id="close">
+  <div class="section-head"><h2><span class="num-badge">5</span>Close calls</h2>
+    <span class="small muted">Excluded by filters: {% for code, n in rec.excluded.items() %}{{ n }} {{ code|replace('_', ' ')|lower }}{% if not loop.last %} · {% endif %}{% endfor %}</span></div>
+  <div class="card pad">
+    {% if rec.runners_up %}
+    <ul class="clean">{% for r in rec.runners_up %}<li><span class="tick">{{ r.ticker }}</span> <span class="muted">{{ r.name }}</span><br><span class="small ink2">Not held because {{ r.why }}.</span></li>{% endfor %}</ul>
+    {% else %}<p class="small muted">No close calls.</p>{% endif %}
+  </div>
+</section>
+
+{% if can_apply %}
+<section class="section">
+  <div class="card pad" style="display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap">
+    <div><h2>Apply paper trades</h2><p class="small muted" style="margin:4px 0 0">{{ rec.summary }} Simulated fills at the {{ rec.data_as_of }} close.</p></div>
+    <div style="min-width:280px">{{ apply_form() }}</div>
+  </div>
+</section>
 {% endif %}
-
-<h2><span class="step">2</span>Trades to get there</h2>
-<div class="table-wrap"><table>
-  <thead><tr><th>Action</th><th>Stock</th><th class="num">Now</th><th class="num">Target</th><th class="num">Shares</th><th class="num">Amount</th><th>Reason</th></tr></thead>
-  <tbody>
-  {% for a in rec.actions %}
-    <tr><td><span class="tag {{ a.action }}">{{ a.action }}</span></td><td><strong>{{ a.ticker }}</strong></td>
-      <td class="num">{{ a.current_weight|pct }}</td><td class="num">{{ a.target_weight|pct }}</td>
-      <td class="num">{{ a.qty if a.side != 'HOLD' else '—' }}</td>
-      <td class="num">{{ a.notional|money if a.side != 'HOLD' else '—' }}</td>
-      <td class="small">{{ a.explanation }}</td></tr>
-  {% else %}<tr><td colspan="7" class="muted">Nothing to trade.</td></tr>{% endfor %}
-  </tbody>
-</table></div>
-
-<h2><span class="step">3</span>What could happen in the next {{ f.horizon_calendar_days }} days</h2>
-{% if f.status == 'available' %}
-<div class="table-wrap"><table>
-  <thead><tr><th></th><th class="num">Median return</th><th class="num">Bad case (P10)</th><th class="num">Good case (P90)</th><th class="num">Chance of a loss</th><th class="num">Median ending value</th></tr></thead>
-  <tbody>
-    <tr><td><strong>Apply these trades</strong></td><td class="num"><strong>{{ f.proposed.median_return|pct(1, true) }}</strong></td>
-      <td class="num">{{ f.proposed.p10_return|pct(1, true) }}</td><td class="num">{{ f.proposed.p90_return|pct(1, true) }}</td>
-      <td class="num">{{ f.proposed.prob_loss|pct(0) }}</td><td class="num"><strong>{{ f.proposed.median_ending_value|money }}</strong></td></tr>
-    <tr><td>Keep current holdings</td><td class="num">{{ f.hold.median_return|pct(1, true) }}</td>
-      <td class="num">{{ f.hold.p10_return|pct(1, true) }}</td><td class="num">{{ f.hold.p90_return|pct(1, true) }}</td>
-      <td class="num">{{ f.hold.prob_loss|pct(0) }}</td><td class="num">{{ f.hold.median_ending_value|money }}</td></tr>
-  </tbody>
-</table></div>
-<p class="small">Difference (apply − keep), median: <strong>{{ f.delta_median_return|pct(1, true) }}</strong> ({{ f.delta_median_value|money(true) }}), after {{ f.trade_cost|money }} estimated trading cost.</p>
-<p class="small muted">{{ caption }} {{ f.paths }} paths, seed {{ f.seed }}; both portfolios use the same simulated paths. Cash earns 0%.</p>
-{% else %}
-<div class="warn">Forecast unavailable — {{ f.reason }} No number is shown rather than a made-up one.</div>
-{% endif %}
-
-<h2><span class="step">4</span>Would these rules have made money before?</h2>
-<div class="panel">
-  <p>{{ rec.backtest.verdict }}</p>
-  <div class="chart-box"><canvas id="mini"></canvas></div>
-  <p class="small"><a href="/backtest">Full backtest: metrics, drawdowns and assumptions →</a></p>
-</div>
-
-<h2><span class="step">5</span>Close calls</h2>
-{% if rec.runners_up %}
-<ul class="small">{% for r in rec.runners_up %}<li><strong>{{ r.ticker }}</strong> ({{ r.name }}): not held because {{ r.why }}.</li>{% endfor %}</ul>
-{% endif %}
-<p class="small muted">Excluded by filters:
-  {% for code, n in rec.excluded.items() %}{{ n }} {{ code|replace('_', ' ')|lower }}{% if not loop.last %} · {% endif %}{% endfor %}</p>
-
-<h2><span class="step">6</span>Apply paper trades</h2>
-<div class="panel">{{ apply_form() }}</div>
 
 <script>
-new Chart(document.getElementById('mini'), {
-  type: 'line',
-  data: { labels: {{ rec.backtest.dates|tojson }}, datasets: [
-    { label: 'Strategy', data: {{ rec.backtest.equity|tojson }}, borderWidth: 2, pointRadius: 0, borderColor: '#2f5bd3' },
-    { label: 'SPY buy & hold', data: {{ rec.backtest.benchmark|tojson }}, borderWidth: 2, pointRadius: 0, borderColor: '#9a9a9a', borderDash: [6, 4] } ] },
-  options: { maintainAspectRatio: false, interaction: { mode: 'index', intersect: false },
-    scales: { x: { ticks: { maxTicksLimit: 8 } }, y: { title: { display: true, text: 'Portfolio value ($)' } } } }
-});
+yamsLine('mini', {{ rec.backtest.dates|tojson }}, [
+  { label: 'Strategy', data: {{ rec.backtest.equity|tojson }}, color: '--series-1' },
+  { label: 'SPY buy & hold', data: {{ rec.backtest.benchmark|tojson }}, color: '--series-2', dashed: true },
+], 'money');
 </script>
 {% endblock %}

@@ -2,58 +2,84 @@
 {% block title %}Backtest{% endblock %}
 {% block content %}
 {% set s = bt.metrics.strategy %}{% set b = bt.metrics.benchmark %}
-<h1>Backtest: would these rules have made money?</h1>
-<form class="panel" method="get" action="/backtest">
-  <label>Start date <input type="date" name="start" value="{{ bt.start }}" min="{{ start_min }}" max="{{ start_max }}" required></label>
-  <button class="secondary" type="submit">Run backtest</button>
-  {% if custom %}<a class="small" href="/backtest" style="margin-left:8px">Back to the last 3 years</a>{% endif %}
-  <div class="small muted" style="margin-top:6px">Runs from the chosen date to {{ bt.end }}. Earliest {{ start_min }} (each stock needs a year of prices first), latest {{ start_max }}.</div>
-</form>
-<div class="panel"><p style="margin:0">{{ verdict }}</p></div>
+<div class="section-head" style="align-items:flex-end">
+  <div>
+    <h1>Would these rules have made money?</h1>
+    <p class="ink2 small" style="margin:6px 0 0">The exact strategy, replayed month by month from {{ bt.start }} to {{ bt.end }}, against simply buying and holding SPY.</p>
+  </div>
+  <form method="get" action="/backtest" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+    <label class="small ink2" for="start">Start date</label>
+    <input id="start" type="date" name="start" value="{{ bt.start }}" min="{{ start_min }}" max="{{ start_max }}" required>
+    <button class="secondary" type="submit">Run</button>
+    {% if custom %}<a class="small" href="/backtest">Reset to last 3 years</a>{% endif %}
+  </form>
+</div>
+<p class="tiny muted" style="text-align:right;margin-top:4px">Earliest {{ start_min }} (each stock needs a year of prices first) · latest {{ start_max }}</p>
 
-<h2>Results</h2>
-<div class="table-wrap"><table>
-  <thead><tr><th>Metric</th><th class="num">Strategy</th><th class="num">SPY buy &amp; hold</th></tr></thead>
-  <tbody>
-    <tr><td>Ending value (from {{ bt.initial_cash|money }})</td><td class="num">{{ s.ending_value|money }}</td><td class="num">{{ b.ending_value|money }}</td></tr>
-    <tr><td>Total return</td><td class="num">{{ s.total_return|pct(1, true) }}</td><td class="num">{{ b.total_return|pct(1, true) }}</td></tr>
-    <tr><td>Annualized return (CAGR)</td><td class="num">{{ s.cagr|pct(1, true) }}</td><td class="num">{{ b.cagr|pct(1, true) }}</td></tr>
-    <tr><td>Annualized volatility</td><td class="num">{{ s.volatility|pct }}</td><td class="num">{{ b.volatility|pct }}</td></tr>
-    <tr><td>Sharpe ratio (risk-free = 0)</td><td class="num">{{ '%.2f'|format(s.sharpe) }}</td><td class="num">{{ '%.2f'|format(b.sharpe) }}</td></tr>
-    <tr><td>Worst peak-to-trough drop</td><td class="num">{{ s.max_drawdown|pct }}</td><td class="num">{{ b.max_drawdown|pct }}</td></tr>
-    <tr><td>Trades</td><td class="num">{{ s.trades }}</td><td class="num">{{ b.trades }}</td></tr>
-    <tr><td>Trading costs paid</td><td class="num">{{ s.costs|money }}</td><td class="num">{{ b.costs|money }}</td></tr>
-    <tr><td>Average turnover per rebalance</td><td class="num">{{ s.avg_turnover|pct(0) }}</td><td class="num">—</td></tr>
-  </tbody>
-</table></div>
+<div class="card pad" style="margin-top:12px"><p class="ink2" style="margin:0">{{ verdict }}</p></div>
 
-<h2>Portfolio value</h2>
-<div class="panel"><div class="chart-box"><canvas id="equity"></canvas></div></div>
-<h2>Drawdown (drop from previous peak)</h2>
-<div class="panel"><div class="chart-box"><canvas id="dd"></canvas></div></div>
+<div class="tiles four" style="margin-top:16px">
+  <div class="card tile"><div class="label">Ending value</div><div class="value">{{ s.ending_value|money }}</div>
+    <div class="sub">SPY {{ b.ending_value|money }} · from {{ bt.initial_cash|money }}</div></div>
+  <div class="card tile"><div class="label">Annual return</div><div class="value {{ 'pos' if s.cagr > 0 else 'neg' }}">{{ s.cagr|pct(1, true) }}</div>
+    <div class="sub">SPY {{ b.cagr|pct(1, true) }}</div></div>
+  <div class="card tile"><div class="label">Worst drop</div><div class="value neg">{{ s.max_drawdown|pct }}</div>
+    <div class="sub">SPY {{ b.max_drawdown|pct }}</div></div>
+  <div class="card tile"><div class="label">Sharpe ratio</div><div class="value">{{ '%.2f'|format(s.sharpe) }}</div>
+    <div class="sub">SPY {{ '%.2f'|format(b.sharpe) }} · higher is better</div></div>
+</div>
 
-<h2>How it was run</h2>
-<ul class="small">
-  <li>Window {{ bt.start }} → {{ bt.end }}, {{ bt.rebalances }} monthly rebalances, starting with {{ bt.initial_cash|money }} (your portfolio's starting cash).</li>
-  <li>At each month-end close the same engine used for live recommendations picks targets using only data up to that day; orders fill at the <strong>next session's open</strong> with {{ strategy.slippage_bps|int }} bps slippage. Same rebalance band ({{ (strategy.rebalance_band * 100)|int }} pts), $5 minimum trade, caps and cash rules.</li>
-  <li>SPY benchmark: bought once with the same capital, date and slippage, then held.</li>
-  <li>Prices are Yahoo's split/dividend-adjusted prices, so dividends are treated as reinvested.</li>
-  {% for w in bt.warnings %}<li><strong>{{ w.split(':')[0]|replace('_', ' ')|title }}:</strong>{{ w.split(':', 1)[1] }}.{% if w.startswith('SURVIVORSHIP') %} Stocks that were dropped from the index (often after falling) are missing, so results are flattered; more so the earlier the start.{% endif %}</li>{% endfor %}
-  <li>Parameters were fixed before running this test, not tuned to it. Past performance does not guarantee future results.</li>
-</ul>
+<section class="section">
+  <div class="section-head"><h2>Portfolio value</h2>
+    <div class="legend" style="margin:0"><span><i class="s1"></i>Strategy</span><span><i class="s2"></i>SPY buy &amp; hold</span></div></div>
+  <div class="card pad"><div class="chart-box"><canvas id="equity" aria-label="Portfolio value over time, strategy vs SPY"></canvas></div></div>
+</section>
+
+<section class="section">
+  <div class="section-head"><h2>Drawdown</h2><span class="small muted">How far each portfolio sat below its previous peak</span></div>
+  <div class="card pad"><div class="chart-box short"><canvas id="dd" aria-label="Drawdown over time, strategy vs SPY"></canvas></div></div>
+</section>
+
+<section class="section grid2">
+  <div>
+    <div class="section-head"><h2>All metrics</h2></div>
+    <div class="card table-wrap"><table>
+      <thead><tr><th>Metric</th><th class="num">Strategy</th><th class="num">SPY buy &amp; hold</th></tr></thead>
+      <tbody>
+        <tr><td>Ending value (from {{ bt.initial_cash|money }})</td><td class="num">{{ s.ending_value|money }}</td><td class="num">{{ b.ending_value|money }}</td></tr>
+        <tr><td>Total return</td><td class="num">{{ s.total_return|pct(1, true) }}</td><td class="num">{{ b.total_return|pct(1, true) }}</td></tr>
+        <tr><td>Annualized return (CAGR)</td><td class="num">{{ s.cagr|pct(1, true) }}</td><td class="num">{{ b.cagr|pct(1, true) }}</td></tr>
+        <tr><td>Annualized volatility</td><td class="num">{{ s.volatility|pct }}</td><td class="num">{{ b.volatility|pct }}</td></tr>
+        <tr><td>Sharpe ratio (risk-free = 0)</td><td class="num">{{ '%.2f'|format(s.sharpe) }}</td><td class="num">{{ '%.2f'|format(b.sharpe) }}</td></tr>
+        <tr><td>Worst peak-to-trough drop</td><td class="num">{{ s.max_drawdown|pct }}</td><td class="num">{{ b.max_drawdown|pct }}</td></tr>
+        <tr><td>Trades</td><td class="num">{{ s.trades }}</td><td class="num">{{ b.trades }}</td></tr>
+        <tr><td>Trading costs paid</td><td class="num">{{ s.costs|money }}</td><td class="num">{{ b.costs|money }}</td></tr>
+        <tr><td>Average turnover per rebalance</td><td class="num">{{ s.avg_turnover|pct(0) }}</td><td class="num">—</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+  <div>
+    <div class="section-head"><h2>How it was run</h2></div>
+    <div class="card pad"><ul class="notes">
+      <li>{{ bt.rebalances }} monthly rebalances, starting with {{ bt.initial_cash|money }} (your portfolio's starting cash).</li>
+      <li>At each month-end close the same engine used for live recommendations picks targets using only data up to that day. Orders fill at the <strong>next session's open</strong> with {{ strategy.slippage_bps|int }} bps slippage, with the same {{ (strategy.rebalance_band * 100)|int }}-point rebalance band, $5 minimum trade, caps and cash rules.</li>
+      <li>SPY benchmark: bought once with the same capital, date and slippage, then held.</li>
+      <li>Prices are Yahoo's split- and dividend-adjusted prices, so dividends are treated as reinvested.</li>
+      {% for w in bt.warnings %}<li><strong>{{ w.split(':')[0]|replace('_', ' ')|title }}:</strong>{{ w.split(':', 1)[1] }}.{% if w.startswith('SURVIVORSHIP') %} Stocks that were dropped from the index (often after falling) are missing, so results are flattered; more so the earlier the start.{% endif %}</li>{% endfor %}
+      <li>Parameters were fixed before running this test, not tuned to it. Past performance does not guarantee future results.</li>
+    </ul></div>
+  </div>
+</section>
 
 <script>
 const dates = {{ bt.dates|tojson }}, eq = {{ bt.equity|tojson }}, bm = {{ bt.benchmark|tojson }};
-const dd = a => { let m = -Infinity; return a.map(v => { m = Math.max(m, v); return +(100 * (v / m - 1)).toFixed(2); }); };
-const opts = y => ({ maintainAspectRatio: false, interaction: { mode: 'index', intersect: false },
-  scales: { x: { ticks: { maxTicksLimit: 10 } }, y: { title: { display: true, text: y } } } });
-new Chart(document.getElementById('equity'), { type: 'line', data: { labels: dates, datasets: [
-  { label: 'Strategy', data: eq, borderWidth: 2, pointRadius: 0, borderColor: '#2f5bd3' },
-  { label: 'SPY buy & hold', data: bm, borderWidth: 2, pointRadius: 0, borderColor: '#9a9a9a', borderDash: [6, 4] } ] },
-  options: opts('Portfolio value ($)') });
-new Chart(document.getElementById('dd'), { type: 'line', data: { labels: dates, datasets: [
-  { label: 'Strategy', data: dd(eq), borderWidth: 2, pointRadius: 0, borderColor: '#2f5bd3' },
-  { label: 'SPY buy & hold', data: dd(bm), borderWidth: 2, pointRadius: 0, borderColor: '#9a9a9a', borderDash: [6, 4] } ] },
-  options: opts('Drawdown (%)') });
+yamsLine('equity', dates, [
+  { label: 'Strategy', data: eq, color: '--series-1' },
+  { label: 'SPY buy & hold', data: bm, color: '--series-2', dashed: true },
+], 'money');
+yamsLine('dd', dates, [
+  { label: 'Strategy', data: yamsDrawdown(eq), color: '--series-1' },
+  { label: 'SPY buy & hold', data: yamsDrawdown(bm), color: '--series-2', dashed: true },
+], 'pct');
 </script>
 {% endblock %}

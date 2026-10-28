@@ -1,84 +1,141 @@
 {% extends "base.html" %}
-{% block title %}Dashboard{% endblock %}
+{% block title %}Portfolio{% endblock %}
 {% block content %}
-<h1>Your paper portfolio</h1>
-{% if pending %}<div class="warn">Recommendation from {{ pending.created_at[11:16] }} UTC not applied yet: {{ pending.summary }}
-  <a href="/recommendations/{{ pending.id }}"><strong>Review and apply →</strong></a></div>{% endif %}
 {% set live = p.live if p.live.status == 'live' else none %}
 {% set v = live or p %}
-<div class="cards">
-  <div class="card"><div class="label">Total value</div><div class="value">{{ v.total|money }}</div>
-    <div class="small muted">{% if live %}<span class="{{ 'pos' if live.day_change > 0 else ('neg' if live.day_change < 0) }}">{{ live.day_change|money(true) }} ({{ live.day_return|pct(2, true) }})</span> since {{ p.valued_as_of }} close{% else %}valued at {{ p.valued_as_of }} close{% endif %}</div></div>
-  <div class="card"><div class="label">Cash</div><div class="value">{{ p.cash|money }}</div>
-    <div class="small muted">{{ v.cash_weight|pct }} of portfolio</div></div>
-  <div class="card"><div class="label">Profit / loss</div>
-    <div class="value {{ 'pos' if v.pnl and v.pnl > 0 else ('neg' if v.pnl and v.pnl < 0) }}">{{ v.pnl|money(true) }}</div>
-    <div class="small muted">{{ v.return|pct(1, true) }} on {{ p.initial_cash|money }} starting cash</div></div>
-  <div class="card"><div class="label">SPY over same period</div><div class="value">{{ v.spy_return|pct(1, true) }}</div>
-    <div class="small muted">since {{ p.start_as_of }} (portfolio start){% if live %} · {{ live.spy_day_return|pct(2, true) }} today{% endif %}</div></div>
-</div>
-<p class="small muted">{% if live %}<strong>Live prices</strong> as of {{ live.time }} (Yahoo Finance, may be delayed). Recommendations still use the {{ p.valued_as_of }} closing prices.{% else %}{{ p.live.message }}{% endif %}</p>
-{% if p.unavailable %}<div class="warn">Value unavailable — no price for {{ p.unavailable|join(', ') }}. Refresh data.</div>{% endif %}
+{% set invested = (v.total - p.cash) if v.total is not none else none %}
 
-<div class="panel">
-  <form method="post" action="/ui/recommend"
-        onsubmit="this.querySelector('button').disabled=true;this.querySelector('button').textContent='Analysing 500 stocks…'">
-    <button class="big" type="submit">Get recommendation</button>
-    <span class="muted small" style="margin-left:10px">Scores the S&amp;P 500, builds a target portfolio, backtests the rules and forecasts 90 days.</span>
-  </form>
-</div>
+<section class="hero">
+  <div class="card hero-main">
+    <div>
+      <div class="eyebrow">Paper portfolio value</div>
+      <div class="hero-figure">{{ v.total|money }}</div>
+      <div class="delta-row">
+        {% if live %}
+        <span><strong class="{{ 'pos' if live.day_change > 0 else ('neg' if live.day_change < 0) }}">{{ live.day_change|money(true) }} ({{ live.day_return|pct(2, true) }})</strong> <span class="muted">today</span></span>
+        {% endif %}
+        <span><strong class="{{ 'pos' if v.pnl and v.pnl > 0 else ('neg' if v.pnl and v.pnl < 0) }}">{{ v.pnl|money(true) }} ({{ v.return|pct(1, true) }})</strong> <span class="muted">since start ({{ p.initial_cash|money }})</span></span>
+      </div>
+    </div>
+    <div class="small muted">
+      {% if live %}<span class="chip live"><span class="dot"></span>Live</span>&nbsp; Prices as of {{ live.time }} from Yahoo Finance (may be delayed). Recommendations use the {{ p.valued_as_of }} closing prices.
+      {% else %}{{ p.live.message }}{% endif %}
+    </div>
+  </div>
+  <div class="tiles">
+    <div class="card tile"><div class="label">Invested</div><div class="value">{{ invested|money }}</div>
+      <div class="sub">{{ p.holdings|length }} stock{{ '' if p.holdings|length == 1 else 's' }}</div></div>
+    <div class="card tile"><div class="label">Cash</div><div class="value">{{ p.cash|money }}</div>
+      <div class="sub">{{ v.cash_weight|pct }} of portfolio · earns 0%</div></div>
+    <div class="card tile"><div class="label">SPY since start</div><div class="value">{{ v.spy_return|pct(1, true) }}</div>
+      <div class="sub">{% if live %}{{ live.spy_day_return|pct(2, true) }} today · {% endif %}from {{ p.start_as_of }}</div></div>
+    <div class="card tile"><div class="label">You vs SPY</div>
+      {% set edge = (v.return - v.spy_return) if v.return is not none and v.spy_return is not none else none %}
+      <div class="value {{ 'pos' if edge and edge > 0 else ('neg' if edge and edge < 0) }}">{{ edge|pct(1, true) }}</div>
+      <div class="sub">percentage points since start</div></div>
+  </div>
+</section>
+{% if p.unavailable %}<div class="warn" style="margin-top:16px">Value unavailable: no price for {{ p.unavailable|join(', ') }}. Refresh data.</div>{% endif %}
 
-<h2>Holdings</h2>
-{% if p.holdings %}
-<div class="table-wrap"><table>
-  <thead><tr><th>Stock</th><th>Sector</th><th class="num">Shares</th><th class="num">Price</th>{% if live %}<th class="num">Today</th>{% endif %}<th class="num">Value</th><th class="num">Weight</th><th>Why we hold it</th></tr></thead>
-  <tbody>
-  {% for h in p.holdings %}
-    <tr><td><strong>{{ h.ticker }}</strong><br><span class="small muted">{{ h.name }}</span></td>
-      <td class="small">{{ h.sector }}</td>
+<section class="card next section" style="margin-top:16px">
+  <div>
+    <ol class="steps">
+      {% for label in ['Get latest prices', 'Get a recommendation', 'Review and apply'] %}
+        {% set n = loop.index %}
+        <li class="{{ 'done' if n < next.step else ('current' if n == next.step) }}"><span class="n">{{ '✓' if n < next.step else n }}</span>{{ label }}</li>
+      {% endfor %}
+    </ol>
+    <h2>{{ next.title }}</h2>
+    <p class="ink2 small" style="margin:0">{{ next.text }}</p>
+  </div>
+  <div>
+    {% if next.action == 'review' %}
+      <a class="btn big" href="{{ next.href }}">Review and apply →</a>
+    {% elif next.action == 'refresh' %}
+      <form method="post" action="/ui/refresh" onsubmit="this.querySelector('button').disabled=true;this.querySelector('button').textContent='Refreshing… ~1 min'">
+        <button class="big" type="submit">Refresh data</button></form>
+    {% else %}
+      <form method="post" action="/ui/recommend"
+            onsubmit="this.querySelector('button').disabled=true;this.querySelector('button').textContent='Analysing 500 stocks…'">
+        <button class="big {{ 'secondary' if next.step == 4 }}" type="submit">{{ 'Check again' if next.step == 4 else 'Get recommendation' }}</button>
+      </form>
+    {% endif %}
+  </div>
+</section>
+
+<section class="section">
+  <div class="section-head"><h2>Holdings</h2>
+    {% if p.holdings %}<span class="small muted">Weights at {{ 'live' if live else p.valued_as_of ~ ' closing' }} prices</span>{% endif %}</div>
+  {% if p.holdings %}
+  <div class="card table-wrap"><table>
+    <thead><tr><th>Stock</th><th class="num">Shares</th><th class="num">Price</th>{% if live %}<th class="num">Today</th>{% endif %}<th class="num">Value</th><th class="num">Weight</th><th>Why we hold it</th></tr></thead>
+    <tbody>
+    {% for h in p.holdings %}
       {% set q = live.prices[h.ticker] if live else h %}
-      <td class="num">{{ '%.4f'|format(h.qty) }}</td><td class="num">{{ q.price|money }}</td>
-      {% if live %}<td class="num {{ 'pos' if q.change and q.change > 0 else ('neg' if q.change and q.change < 0) }}">{{ q.change|pct(2, true) }}</td>{% endif %}
-      <td class="num">{{ q.value|money }}</td><td class="num">{{ q.weight|pct }}</td>
-      <td class="small">{{ h.reason or '—' }}</td></tr>
-  {% endfor %}
-    <tr><td><strong>Cash</strong></td><td></td><td></td><td></td>{% if live %}<td></td>{% endif %}<td class="num">{{ p.cash|money }}</td><td class="num">{{ v.cash_weight|pct }}</td><td class="small muted">Uninvested paper cash (earns 0%).</td></tr>
-  </tbody>
-</table></div>
-{% else %}
-<div class="panel">{{ p.cash|money }} cash, no positions yet. Click <strong>Get recommendation</strong> to see what the strategy would buy.</div>
-{% endif %}
+      <tr>
+        <td><span class="tick">{{ h.ticker }}</span><span class="co">{{ h.name }} · {{ h.sector }}</span></td>
+        <td class="num">{{ '%.4f'|format(h.qty) }}</td>
+        <td class="num">{{ q.price|money }}</td>
+        {% if live %}<td class="num {{ 'pos' if q.change and q.change > 0 else ('neg' if q.change and q.change < 0) }}">{{ q.change|pct(2, true) }}</td>{% endif %}
+        <td class="num">{{ q.value|money }}</td>
+        <td class="num"><div class="wbar"><span>{{ q.weight|pct }}</span><span class="track"><span class="fill" style="width:{{ [q.weight * 500, 100]|min|round(1) if q.weight else 0 }}%"></span></span></div></td>
+        <td class="why">{{ h.reason or '—' }}</td>
+      </tr>
+    {% endfor %}
+      <tr class="cash"><td><span class="tick">Cash</span><span class="co">Uninvested paper cash</span></td><td></td><td></td>{% if live %}<td></td>{% endif %}
+        <td class="num">{{ p.cash|money }}</td><td class="num">{{ v.cash_weight|pct }}</td><td class="why">Kept as a buffer (at least 5%), or more when the market is falling.</td></tr>
+    </tbody>
+  </table></div>
+  <p class="tiny muted" style="margin-top:8px">Weight bars are drawn against the 20% per-stock cap.</p>
+  {% else %}
+  <div class="card empty">
+    <div class="big-icon">$</div>
+    <h2>{{ p.cash|money }} in paper cash, no stocks yet</h2>
+    <p class="small muted" style="max-width:520px;margin:6px auto 0">Get a recommendation above to see which stocks the strategy would buy and why. Nothing is bought until you apply it.</p>
+  </div>
+  {% endif %}
+</section>
 
-<div class="grid2">
+<section class="section grid2">
   <div>
-    <h2>Recent simulated trades</h2>
-    {% if trades %}
-    <div class="table-wrap"><table>
-      <thead><tr><th>When (UTC)</th><th>Side</th><th>Stock</th><th class="num">Shares</th><th class="num">Fill price</th><th class="num">Cost</th></tr></thead>
-      <tbody>{% for t in trades %}
-        <tr><td class="small">{{ t.created_at[:16]|replace('T', ' ') }}</td><td><span class="tag {{ t.side }}">{{ t.side }}</span></td>
-          <td>{{ t.ticker }}</td><td class="num">{{ t.qty }}</td><td class="num">${{ t.price }}</td><td class="num">${{ t.cost }}</td></tr>
-      {% endfor %}</tbody></table></div>
-    {% else %}<p class="muted">No trades yet.</p>{% endif %}
+    <div class="section-head"><h2>Recommendations</h2></div>
+    <div class="card table-wrap">
+      {% if recs %}
+      <table>
+        <thead><tr><th>Created (UTC)</th><th>Summary</th><th>Status</th></tr></thead>
+        <tbody>{% for r in recs %}
+          <tr><td class="small nowrap"><a href="/recommendations/{{ r.id }}">{{ r.created_at[:16]|replace('T', ' ') }}</a><span class="co">prices {{ r.data_as_of }}</span></td>
+            <td class="small">{{ r.summary }}</td>{% set label = 'no trades' if r.status == 'ready' and r.summary_action == 'HOLD' else r.status %}
+            <td><span class="tag {{ r.status if label != 'no trades' }}">{{ label }}</span></td></tr>
+        {% endfor %}</tbody>
+      </table>
+      {% else %}<p class="small muted" style="padding:16px;margin:0">None yet.</p>{% endif %}
+    </div>
   </div>
   <div>
-    <h2>Past recommendations</h2>
-    {% if recs %}
-    <div class="table-wrap"><table>
-      <thead><tr><th>Created (UTC)</th><th>Data as of</th><th>Summary</th><th>Status</th></tr></thead>
-      <tbody>{% for r in recs %}
-        <tr><td class="small"><a href="/recommendations/{{ r.id }}">{{ r.created_at[:16]|replace('T', ' ') }}</a></td>
-          <td class="small">{{ r.data_as_of }}</td><td class="small">{{ r.summary }}</td><td><span class="tag {{ r.status }}">{{ r.status }}</span></td></tr>
-      {% endfor %}</tbody></table></div>
-    {% else %}<p class="muted">None yet.</p>{% endif %}
+    <div class="section-head"><h2>Simulated trades</h2></div>
+    <div class="card table-wrap">
+      {% if trades %}
+      <table>
+        <thead><tr><th>When (UTC)</th><th>Side</th><th>Stock</th><th class="num">Shares</th><th class="num">Fill price</th></tr></thead>
+        <tbody>{% for t in trades %}
+          <tr><td class="small nowrap">{{ t.created_at[:16]|replace('T', ' ') }}</td><td><span class="tag {{ t.side }}">{{ t.side }}</span></td>
+            <td class="tick">{{ t.ticker }}</td><td class="num">{{ t.qty }}</td><td class="num">${{ t.price }}<span class="co">cost ${{ t.cost }}</span></td></tr>
+        {% endfor %}</tbody>
+      </table>
+      {% else %}<p class="small muted" style="padding:16px;margin:0">No trades yet.</p>{% endif %}
+    </div>
   </div>
-</div>
+</section>
 
-<h2>Reset portfolio</h2>
-<div class="panel">
-  <form method="post" action="/ui/reset">
-    <label>Starting paper cash $ <input type="number" name="initial_cash" value="1000" min="100" max="10000000" step="0.01" required></label>
-    <button class="secondary" type="submit">Reset (deletes trades and recommendations)</button>
-  </form>
-</div>
+<section class="section">
+  <details class="settings card pad">
+    <summary>Start over with a new paper portfolio</summary>
+    <form method="post" action="/ui/reset" style="margin-top:14px;display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+      <label class="small">Starting paper cash ($) <input type="number" name="initial_cash" value="1000" min="100" max="10000000" step="0.01" required></label>
+      <button class="danger" type="submit">Reset portfolio</button>
+      <span class="tiny muted">Deletes all trades and recommendations.</span>
+    </form>
+  </details>
+</section>
 {% endblock %}

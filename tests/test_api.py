@@ -101,7 +101,7 @@ def test_live_quotes_value_the_dashboard_but_not_decisions(client, monkeypatch):
     invested = p["total"] - p["cash"]
     assert abs(live["total"] - (p["cash"] + invested * 1.01)) < 1e-6
     assert abs(live["day_change"] - invested * 0.01) < 1e-6
-    assert "Live prices" in client.get("/").text
+    assert "chip live" in client.get("/").text
     # Decisions still use the daily close: same prices, nothing to trade.
     rec2 = client.post("/api/recommendations").json()
     assert rec2["summary_action"] == "HOLD" and all(a["price"] == md.latest_close(a["ticker"]) for a in rec2["actions"])
