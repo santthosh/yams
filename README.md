@@ -4,7 +4,7 @@ Yet Another Market Simulator is a local, single-user paper research workspace. I
 
 ## Current state
 
-The source checkout includes the0.0.2 market repository, immutable snapshots and
+The source checkout includes the 0.0.2 market repository, immutable snapshots and
 strategy registry, shared momentum/allocation engine, and asynchronous candidate
 inspection backed by PostgreSQL and a supervised worker. The synthetic Docker
 journey produces measured candidates, exclusions and feasible targets, with
@@ -12,13 +12,18 @@ reproducible results retained through restart. Portfolio approval, backtesting a
 forecasts remain with their later milestone owners; the shared execution kernel
 is available but does not itself post durable trades.
 
-[v0.0.1](https://github.com/santthosh/yams/releases/tag/v0.0.1) remains the published
-foundation prerelease, verified on native linux/amd64 and linux/arm64. The0.0.2
-release gate still requires a verified real provider-derived universe and native
-packaged-install evidence; source implementation does not establish publication.
-See [release evidence](docs/verification/28-release/README.md) and
-[installation/upgrade guidance](docs/releases.md). For the first release, follow
-its release-note filename-copy step before verifying downloaded checksums.
+Download published bundles and platform evidence from [GitHub Releases](https://github.com/santthosh/yams/releases).
+Source implementation alone does not establish publication: use each release's
+exact tag, immutable image digests, checksums and supported-capability notes.
+The 0.0.2 release gate includes a verified real provider-derived universe and
+native linux/amd64 and linux/arm64 packaged installation, tracked in
+[epic #3](https://github.com/santthosh/yams/issues/3).
+
+[v0.0.1](https://github.com/santthosh/yams/releases/tag/v0.0.1) is the immutable
+foundation prerelease; its [verification evidence](docs/verification/28-release/README.md)
+and original assets remain intact. For that first release, follow its release-note
+filename-copy step before verifying downloaded checksums. See the
+[installation/upgrade guide](docs/releases.md) for the current bundle workflow.
 
 ## Local Docker startup
 
@@ -95,9 +100,10 @@ Migration `0001_workspace` owns only `local_workspace` and Alembic metadata. Def
 Migration `0002_jobs` adds immutable job envelopes, attempt history, fixed-interval
 schedules and one idempotent diagnostic effect per job. The PostgreSQL queue uses
 fenced leases and bounded recovery; a Linux supervisor renews heartbeats while a
-separate resource-limited process executes the diagnostic. No financial handlers
-are registered. `GET /api/v1/jobs/{job_id}` is read-only; public cancellation is
-owned by #41, not this foundation endpoint.
+separate resource-limited process executes the handler. Registered kinds are
+`diagnostic`, `refresh_market_data` and `evaluate_strategy`. Backtest, forecast and
+durable trade-posting handlers remain unavailable. `GET /api/v1/jobs/{job_id}` is
+read-only; public cancellation is owned by #41.
 
 See [worker operations](docs/operations/durable-jobs.md) for configuration,
 enqueue/schedule/cancel service examples, guarantees and deployment limitations.
