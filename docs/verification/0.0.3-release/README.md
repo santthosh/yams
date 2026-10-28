@@ -41,9 +41,9 @@ no frontend financial calculation or new financial default was added.
 ## Publication and independent public verification
 
 The first publication attempt created the correct draft but its immediate lookup
-could not see it. After confirming the same empty draft/source, a single failed-
-publication-job retry reused every passing build/native artifact and identical
-image digest. No tag or image was rebuilt, moved or overwritten. Attempt 2 published
+could not see it. After confirming the same empty draft and source, a single retry of the failed
+publication job reused every passing build/native artifact and identical image
+digest. The retry did not rebuild images or change the tag/digests. Attempt 2 published
 successfully at 2026-10-28T22:07:51Z.
 
 All nine public release assets were independently downloaded **without authentication**.
