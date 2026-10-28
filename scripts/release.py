@@ -7,6 +7,7 @@ import re
 import shutil
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 from typing import Any
 
@@ -317,25 +318,29 @@ def publish() -> None:
             command("gh", "release", "upload", tag, str(path), "--repo", REPO)
     uploaded = existing_release(tag)
     allowed_assets = {path.name for path in destination.iterdir() if path.is_file()}
-    for asset in uploaded["assets"]:
-        if asset["name"] not in allowed_assets:
-            raise SystemExit("Unexpected draft asset")
-        local = destination / asset["name"]
-        if not local.is_file():
-            raise SystemExit("Unexpected draft asset")
-        content = subprocess.check_output(
-            [
-                "gh",
-                "api",
-                "-H",
-                "Accept: application/octet-stream",
-                f"repos/{REPO}/releases/assets/{asset['id']}",
-            ]
-        )
-        if content != local.read_bytes():
-            raise SystemExit("Uploaded draft asset checksum mismatch")
-    if len(uploaded["assets"]) != len(list(destination.iterdir())):
-        raise SystemExit("Missing release asset")
+    with tempfile.TemporaryDirectory(prefix="yams-draft-download-") as temporary:
+        downloaded = Path(temporary)
+        for asset in uploaded["assets"]:
+            if asset["name"] not in allowed_assets:
+                raise SystemExit("Unexpected draft asset")
+            local = destination / asset["name"]
+            content = subprocess.check_output(
+                [
+                    "gh",
+                    "api",
+                    "-H",
+                    "Accept: application/octet-stream",
+                    f"repos/{REPO}/releases/assets/{asset['id']}",
+                ]
+            )
+            if content != local.read_bytes():
+                raise SystemExit("Uploaded draft asset checksum mismatch")
+            (downloaded / asset["name"]).write_bytes(content)
+        if len(uploaded["assets"]) != len(allowed_assets):
+            raise SystemExit("Missing release asset")
+        # Exercise the complete installer command against fresh draft downloads,
+        # including both platform evidence files added after native smoke tests.
+        subprocess.run(["sha256sum", "--check", "SHA256SUMS"], cwd=downloaded, check=True)
     command("gh", "release", "edit", tag, "--repo", REPO, "--draft=false", "--prerelease")
 
 

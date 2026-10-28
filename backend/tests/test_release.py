@@ -132,6 +132,7 @@ def test_interrupted_draft_resumes_only_identical_assets(
     monkeypatch.setenv("RELEASE_VERSION", "0.0.1")
     monkeypatch.setenv("RELEASE_SHA", "source")
     state: dict[str, Any] = {"release": None, "assets": {}, "interrupt": True}
+    checksum_directories: list[Path] = []
 
     def current_release(tag: str) -> Any:
         if state["release"] is None:
@@ -150,6 +151,13 @@ def test_interrupted_draft_resumes_only_identical_assets(
         if args[:4] == ["docker", "buildx", "imagetools", "inspect"]:
             return subprocess.CompletedProcess(args, 0, "existing verified alias", "")
         if args == ["sha256sum", "--check", "SHA256SUMS"]:
+            import hashlib
+
+            directory = Path(kwargs["cwd"])
+            checksum_directories.append(directory)
+            for line in (directory / "SHA256SUMS").read_text().splitlines():
+                digest, name = line.split("  ", 1)
+                assert hashlib.sha256((directory / name).read_bytes()).hexdigest() == digest
             return subprocess.CompletedProcess(args, 0, "", "")
         raise AssertionError(args)
 
@@ -191,6 +199,7 @@ def test_interrupted_draft_resumes_only_identical_assets(
     state["assets"][name] = original
     release_script.publish()
     assert state["release"] == "published"
+    assert any(directory != bundle for directory in checksum_directories)
     assert set(state["assets"]) == {path.name for path in bundle.iterdir()}
     with pytest.raises(SystemExit, match="published version"):
         release_script.publish()
