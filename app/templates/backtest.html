@@ -3,6 +3,12 @@
 {% block content %}
 {% set s = bt.metrics.strategy %}{% set b = bt.metrics.benchmark %}
 <h1>Backtest: would these rules have made money?</h1>
+<form class="panel" method="get" action="/backtest">
+  <label>Start date <input type="date" name="start" value="{{ bt.start }}" min="{{ start_min }}" max="{{ start_max }}" required></label>
+  <button class="secondary" type="submit">Run backtest</button>
+  {% if custom %}<a class="small" href="/backtest" style="margin-left:8px">Back to the last 3 years</a>{% endif %}
+  <div class="small muted" style="margin-top:6px">Runs from the chosen date to {{ bt.end }}. Earliest {{ start_min }} (each stock needs a year of prices first), latest {{ start_max }}.</div>
+</form>
 <div class="panel"><p style="margin:0">{{ verdict }}</p></div>
 
 <h2>Results</h2>
@@ -32,7 +38,7 @@
   <li>At each month-end close the same engine used for live recommendations picks targets using only data up to that day; orders fill at the <strong>next session's open</strong> with {{ strategy.slippage_bps|int }} bps slippage. Same rebalance band ({{ (strategy.rebalance_band * 100)|int }} pts), $5 minimum trade, caps and cash rules.</li>
   <li>SPY benchmark: bought once with the same capital, date and slippage, then held.</li>
   <li>Prices are Yahoo's split/dividend-adjusted prices, so dividends are treated as reinvested.</li>
-  {% for w in bt.warnings %}<li><strong>{{ w.split(':')[0]|replace('_', ' ')|title }}:</strong>{{ w.split(':', 1)[1] }}. Stocks that were dropped from the index (often after falling) are missing, so results are flattered.</li>{% endfor %}
+  {% for w in bt.warnings %}<li><strong>{{ w.split(':')[0]|replace('_', ' ')|title }}:</strong>{{ w.split(':', 1)[1] }}.{% if w.startswith('SURVIVORSHIP') %} Stocks that were dropped from the index (often after falling) are missing, so results are flattered; more so the earlier the start.{% endif %}</li>{% endfor %}
   <li>Parameters were fixed before running this test, not tuned to it. Past performance does not guarantee future results.</li>
 </ul>
 

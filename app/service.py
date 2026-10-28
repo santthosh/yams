@@ -29,12 +29,14 @@ def sectors(md: MarketData) -> dict[str, str | None]:
     return {t: md.sector(t) for t in md.universe.index}
 
 
-def get_backtest(md: MarketData, initial_cash: float) -> BacktestResult:
-    key = (md.fetched_at, round(initial_cash, 2))
+def get_backtest(md: MarketData, initial_cash: float, start: str | None = None) -> BacktestResult:
+    key = (md.fetched_at, round(initial_cash, 2), start)
     with _bt_lock:
         if key not in _bt_cache:
-            _bt_cache.clear()
-            _bt_cache[key] = run_backtest(md.close, md.open, md.volume, sectors(md), md.members, initial_cash)
+            if len(_bt_cache) >= 8 or any(k[0] != md.fetched_at for k in _bt_cache):
+                _bt_cache.clear()
+            _bt_cache[key] = run_backtest(md.close, md.open, md.volume, sectors(md), md.members, initial_cash,
+                                          start=start)
         return _bt_cache[key]
 
 

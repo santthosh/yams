@@ -51,6 +51,16 @@ def decision_indices(index: pd.DatetimeIndex, start_i: int) -> list[int]:
     return out
 
 
+MIN_WINDOW_SESSIONS = 63  # a backtest shorter than ~3 months says nothing
+
+
+def start_bounds(index: pd.DatetimeIndex, cfg: StrategyConfig = STRATEGY) -> tuple[str, str]:
+    """Earliest start (after a 1-year feature warmup) and latest start (leaves MIN_WINDOW_SESSIONS) as YYYY-MM-DD."""
+    lo = min(cfg.min_history_sessions + 1, len(index) - 1)
+    hi = max(lo, len(index) - 1 - MIN_WINDOW_SESSIONS)
+    return index[lo].strftime("%Y-%m-%d"), index[hi].strftime("%Y-%m-%d")
+
+
 def run_backtest(
     close: pd.DataFrame,
     open_: pd.DataFrame,
@@ -60,14 +70,20 @@ def run_backtest(
     initial_cash: float = 1000.0,
     cfg: StrategyConfig = STRATEGY,
     years: int = BACKTEST.years,
+    start: str | None = None,
 ) -> BacktestResult:
+    """Backtest from `start` (YYYY-MM-DD, first session on or after it) or else the last `years` years."""
     idx = close.index
     warmup = cfg.min_history_sessions + 1
     warnings = ["SURVIVORSHIP_BIAS: universe is today's S&P 500 membership applied to the past"]
-    start_i = int(idx.searchsorted(idx[-1] - pd.DateOffset(years=years)))
+    anchor = pd.Timestamp(start) if start else idx[-1] - pd.DateOffset(years=years)
+    start_i = int(idx.searchsorted(anchor))
     if start_i < warmup:
         start_i = warmup
-        warnings.append("LIMITED_HISTORY: backtest window shortened to keep a 1-year feature warmup")
+        warnings.append("LIMITED_HISTORY: start moved later to keep a 1-year feature warmup")
+    if start and start_i > len(idx) - 1 - MIN_WINDOW_SESSIONS:
+        start_i = max(warmup, len(idx) - 1 - MIN_WINDOW_SESSIONS)
+        warnings.append(f"SHORT_WINDOW: start moved earlier to keep at least {MIN_WINDOW_SESSIONS} sessions")
     if start_i >= len(idx) - 2:
         raise ValueError("Not enough history to backtest")
 

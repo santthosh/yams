@@ -126,3 +126,14 @@ def test_live_quotes_fall_back_to_closes(client, monkeypatch):
     p = client.get("/api/portfolio").json()
     assert p["live"]["status"] == "unavailable" and p["total"] == 1000
     assert "Live prices unavailable" in client.get("/").text
+
+
+def test_backtest_start_date(client):
+    default = client.get("/api/backtest").json()
+    custom = client.get("/api/backtest", params={"start": "2024-06-03"}).json()
+    assert custom["start"] == "2024-06-03" and custom["end"] == default["end"]
+    assert custom["start"] > default["start"]
+    assert client.get("/api/backtest", params={"start": "June 3"}).status_code == 422
+    page = client.get("/backtest", params={"start": "2024-06-03"})
+    assert page.status_code == 200 and 'value="2024-06-03"' in page.text
+    assert "Start date must look like" in client.get("/backtest", params={"start": "nope"}).text

@@ -40,3 +40,14 @@ def test_backtest_ignores_future_data():
     early = lambda r: [t for t in r.trades if pd.Timestamp(t["date"]) <= cut]  # noqa: E731
     assert early(r1) and early(r1) == early(r2)
     assert r1.equity[:101] == r2.equity[:101]
+
+
+def test_custom_start_is_used_and_clamped():
+    close, open_, volume, sectors = make_market(n_days=420)
+    lo, hi = backtest.start_bounds(close.index)
+    mid = close.index[300].strftime("%Y-%m-%d")
+    assert backtest.run_backtest(close, open_, volume, sectors, MEMBERS, start=mid).start == mid
+    early = backtest.run_backtest(close, open_, volume, sectors, MEMBERS, start="2000-01-01")
+    assert early.start == lo and any(w.startswith("LIMITED_HISTORY") for w in early.warnings)
+    late = backtest.run_backtest(close, open_, volume, sectors, MEMBERS, start=close.index[-5].strftime("%Y-%m-%d"))
+    assert late.start == hi and any(w.startswith("SHORT_WINDOW") for w in late.warnings)

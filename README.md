@@ -17,7 +17,7 @@ That's all. No API keys are needed, and the app works offline using a committed 
 `docker compose down -v` wipes it.
 
 Without Docker (needs [uv](https://docs.astral.sh/uv/)): `uv sync && uv run uvicorn app.main:app --port 8000`.
-Tests: `uv run pytest` (26 tests, no network).
+Tests: `uv run pytest` (28 tests, no network).
 
 ## Use it
 
@@ -33,10 +33,11 @@ Tests: `uv run pytest` (26 tests, no network).
    - Tick the box and click **Apply paper trades**. Holdings update and are explained on the dashboard.
 3. Come back later, click **Refresh data** (needs internet, ~1 min), then **Get recommendation** again. It now proposes
    *changes* to what you hold. Small drifts are left alone (HOLD).
-4. **Backtest** page: full metrics, equity and drawdown charts, and assumptions. **Reset** lets you restart with any starting cash.
+4. **Backtest** page: full metrics, equity and drawdown charts, and assumptions. Pick a **start date** (default: last
+   3 years; earliest is one year after the data begins). **Reset** lets you restart with any starting cash.
 
 JSON API: `GET /api/status`, `GET /api/portfolio`, `POST /api/recommendations`,
-`POST /api/recommendations/{id}/apply`, `GET /api/backtest`, `POST /api/data/refresh`, `POST /api/portfolio/reset`.
+`POST /api/recommendations/{id}/apply`, `GET /api/backtest?start=YYYY-MM-DD`, `POST /api/data/refresh`, `POST /api/portfolio/reset`.
 
 ## How it decides (fixed rules, not tuned to the backtest)
 

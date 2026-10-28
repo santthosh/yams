@@ -132,7 +132,9 @@ All parameters live in `app/config.py` as one frozen dataclass. They were fixed 
 
 ## 5. Backtest (the historical check)
 
-- **Window:** the last 3 years of the cache; the preceding ~1 year is warmup for the 252-session features.
+- **Window:** the last 3 years of the cache by default; the preceding ~1 year is warmup for the 252-session features.
+  The backtest page and API accept a `start` date. It is clamped to the warmup at the early end and to at least
+  63 sessions at the late end, with a warning. Recommendations always show the default 3-year window.
 - **Walk-forward, monthly:** on the last session of each month, run the *same* `engine.evaluate(prices ≤ T)`
   used for live recommendations (shared code, no copy), plan orders with the same band/min-trade
   rules, and fill at the next session's **open** with slippage. Mark to market daily at close.
@@ -256,7 +258,7 @@ Dockerfile  compose.yaml  pyproject.toml  uv.lock  README.md
 |---|---|
 | `GET /` | Dashboard page |
 | `GET /recommendations/{id}` | Recommendation page |
-| `GET /backtest` | Backtest page |
+| `GET /backtest` | Backtest page, optional `?start=YYYY-MM-DD` |
 | `GET /api/status` | Data `as_of`, source (`sample`/`live`), staleness, ticker count |
 | `POST /api/data/refresh` | Synchronous refresh (~1 min); returns new status or error |
 | `GET /api/portfolio` | Cash, holdings (qty, price, value, weight), total, P&L vs initial, plus a `live` intraday block |
@@ -265,7 +267,7 @@ Dockerfile  compose.yaml  pyproject.toml  uv.lock  README.md
 | `GET /api/recommendations` | List (newest first) |
 | `GET /api/recommendations/{id}` | One recommendation |
 | `POST /api/recommendations/{id}/apply` | Apply as simulated trades. 409 on stale or applied |
-| `GET /api/backtest` | Metrics + daily equity series (strategy, SPY) |
+| `GET /api/backtest` | Metrics + daily equity series (strategy, SPY). Optional `?start=YYYY-MM-DD` |
 
 Errors are returned as `{"error": {"code": "...", "message": "..."}}`.
 

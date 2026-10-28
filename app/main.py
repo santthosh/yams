@@ -5,6 +5,7 @@ from __future__ import annotations
 import threading
 from contextlib import asynccontextmanager
 from dataclasses import asdict
+from datetime import date
 from decimal import Decimal, InvalidOperation
 from urllib.parse import quote
 
@@ -15,6 +16,7 @@ from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel, Field
 
 from app import data, service
+from app.backtest import start_bounds
 from app.config import DB_PATH, ROOT, STRATEGY
 from app.ledger import Ledger
 from app.service import AppError
@@ -76,7 +78,8 @@ def with_status(rec: dict) -> dict:
 
 
 def render(request: Request, name: str, **ctx):
-    ctx.update(status=md().status(), msg=request.query_params.get("msg"), err=request.query_params.get("err"))
+    ctx.update(status=md().status(), msg=request.query_params.get("msg"),
+               err=getattr(request.state, "err", None) or request.query_params.get("err"))
     return templates.TemplateResponse(request, name, ctx)
 
 
@@ -143,13 +146,26 @@ def recommendation_page(request: Request, rec_id: str):
                   caption=service.FORECAST_CAPTION)
 
 
+def backtest_for(start: str | None):
+    if start:
+        try:
+            start = date.fromisoformat(start).isoformat()
+        except ValueError as e:
+            raise AppError("VALIDATION_ERROR", "Start date must look like 2023-01-31.", 422) from e
+    return service.get_backtest(md(), float(ledger().portfolio()["initial_cash"]), start or None)
+
+
 @app.get("/backtest")
-def backtest_page(request: Request):
-    initial = float(ledger().portfolio()["initial_cash"])
-    bt = service.get_backtest(md(), initial)
+def backtest_page(request: Request, start: str | None = None):
     from app.explain import verdict
 
-    return render(request, "backtest.html", bt=bt, verdict=verdict(bt))
+    try:
+        bt = backtest_for(start)
+    except AppError as e:  # a bad date in the form: show the default window with the error
+        request.state.err, start = e.message, None
+        bt = backtest_for(None)
+    lo, hi = start_bounds(md().close.index)
+    return render(request, "backtest.html", bt=bt, verdict=verdict(bt), custom=bool(start), start_min=lo, start_max=hi)
 
 
 @app.post("/ui/recommend")
@@ -232,6 +248,5 @@ def api_apply(rec_id: str):
 
 
 @app.get("/api/backtest")
-def api_backtest():
-    bt = service.get_backtest(md(), float(ledger().portfolio()["initial_cash"]))
-    return asdict(bt)
+def api_backtest(start: str | None = None):
+    return asdict(backtest_for(start))
