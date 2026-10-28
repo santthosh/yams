@@ -2,6 +2,7 @@
 
 import hashlib
 import json
+import shutil
 from dataclasses import replace
 from datetime import UTC, date, datetime, timedelta
 from decimal import Decimal, localcontext
@@ -49,10 +50,11 @@ def test_config_canonical_vectors_and_validation(kind: str) -> None:
 
 
 @pytest.mark.parametrize("kind", ["mean_reversion", "low_volatility"])
-def test_full_asof_snapshot_golden_features_ranks_and_targets(kind: str) -> None:
+def test_full_asof_snapshot_golden_features_ranks_and_targets(kind: str, tmp_path: Path) -> None:
     identity = json.loads((ROOT / "manifest.json").read_text())["snapshot_sha256"]
     config = template_config(kind)
-    with MarketRepository(PinnedSnapshot.open(ROOT / "snapshot", identity)) as repository:
+    shutil.copytree(ROOT / "snapshot", tmp_path / "snapshot")
+    with MarketRepository(PinnedSnapshot.open(tmp_path / "snapshot", identity)) as repository:
         view = repository.as_of(datetime(2028, 7, 19, 12, 30, tzinfo=UTC), date(2028, 7, 18))
         assert view.session_date.isoformat() == ORACLE["as_of_session"]
         evaluated = evaluate_strategy(
@@ -142,13 +144,14 @@ def test_full_asof_snapshot_golden_features_ranks_and_targets(kind: str) -> None
 
 
 @pytest.mark.parametrize("kind", ["mean_reversion", "low_volatility"])
-def test_ties_and_zero_volatility_keep_shared_selection_policy(kind: str) -> None:
+def test_ties_and_zero_volatility_keep_shared_selection_policy(kind: str, tmp_path: Path) -> None:
     identity = json.loads((ROOT / "manifest.json").read_text())["snapshot_sha256"]
     raw = template_config(kind).model_dump(mode="json")
     raw["signals"]["require_positive_trend"] = False
     raw["portfolio"]["max_positions"] = 1
     config = StrategyConfigV1.model_validate(raw)
-    with MarketRepository(PinnedSnapshot.open(ROOT / "snapshot", identity)) as repository:
+    shutil.copytree(ROOT / "snapshot", tmp_path / "snapshot")
+    with MarketRepository(PinnedSnapshot.open(tmp_path / "snapshot", identity)) as repository:
         view = repository.as_of(datetime(2028, 7, 19, 12, 30, tzinfo=UTC), date(2028, 7, 18))
         tied = replace(
             view, assets=tuple(row for row in view.assets if row.asset_id in {"SYN:AAA", "SYN:BBB"})
