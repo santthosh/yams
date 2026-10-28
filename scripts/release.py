@@ -8,6 +8,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import tomllib
 from pathlib import Path
 from typing import Any
 
@@ -129,6 +130,17 @@ def verified_platforms(records: list[dict[str, Any]], provenance: dict[str, Any]
     )
 
 
+def validate_application_version(version: str) -> None:
+    base = version.split("-", 1)[0]
+    versions = {
+        tomllib.loads((ROOT / "pyproject.toml").read_text())["project"]["version"],
+        json.loads((ROOT / "apps/web/package.json").read_text())["version"],
+        json.loads((ROOT / "contracts/openapi.json").read_text())["info"]["version"],
+    }
+    if versions != {base}:
+        raise SystemExit("Release version differs from package/API versions")
+
+
 def preflight() -> None:
     event = os.environ["GITHUB_EVENT_NAME"]
     ref = os.environ["GITHUB_REF"]
@@ -147,6 +159,7 @@ def preflight() -> None:
     runs = api(f"repos/{REPO}/actions/workflows/ci.yml/runs?event=push&head_sha={sha}&per_page=100")
     if not passed_main(runs["workflow_runs"], sha):
         raise SystemExit("Exact release SHA has no successful main CI run")
+    validate_application_version(version)
     release = existing_release("v" + version)
     if not release_available(release, sha):
         raise SystemExit("Published version or conflicting draft already exists; never overwrite")
@@ -214,6 +227,31 @@ def recoverable_run(run: dict[str, Any], jobs: list[dict[str, Any]], version: st
     )
 
 
+def release_summary(version: str) -> tuple[str, str]:
+    if version == "0.0.1":
+        return (
+            "offline foundation",
+            "Local paper-only foundation. Download all assets, verify SHA256SUMS and follow "
+            "INSTALL.md. No financial engine or live provider execution is included.",
+        )
+    if version == "0.0.2":
+        return (
+            "market data and candidate diagnostics",
+            "Local paper-only research prerelease: immutable market snapshots, published "
+            "strategy versions and reproducible candidate/target diagnostics. Offline "
+            "synthetic examples and optional personal-use Tiingo acquisition are included. "
+            "Download all assets, verify SHA256SUMS and follow INSTALL.md. See RESEARCH.md "
+            "for user-owned credentials, source quotas and timing. No backtests, forecasts "
+            "or durable paper accounts/orders/fills are included. Real source data is not "
+            "redistributed; complete corporate-action accounting remains unsupported.",
+        )
+    return (
+        "local paper research prerelease",
+        "Local paper-only research prerelease. Download all assets, verify SHA256SUMS "
+        "and follow INSTALL.md for delivered capabilities and limits. No real-money trading.",
+    )
+
+
 def package() -> None:
     version, sha = os.environ["RELEASE_VERSION"], os.environ["RELEASE_SHA"]
     images = {
@@ -256,9 +294,18 @@ def package() -> None:
     destination.mkdir(exist_ok=True)
     (destination / "compose.yaml").write_text(json.dumps(config, indent=2) + "\n")
     (destination / "env.example").write_text(
-        "# Offline paper-only foundation\nYAMS_WEB_PORT=3000\n# YAMS_JOB_LIMITS={}\n"
+        "# Offline paper-only default\nYAMS_WEB_PORT=3000\n# YAMS_JOB_LIMITS={}\n"
+        "# Optional local research only; see RESEARCH.md. Never publish your token.\n"
+        "# TIINGO_API_TOKEN=\n"
     )
     shutil.copyfile(ROOT / "docs/releases.md", destination / "INSTALL.md")
+    shutil.copyfile(ROOT / "compose.research.yaml", destination / "compose.research.yaml")
+    research = (ROOT / "docs/operations/tiingo-research.md").read_text()
+    research = research.replace(
+        "../adr/0010-free-research-provider.md",
+        f"https://github.com/{REPO}/blob/{sha}/docs/adr/0010-free-research-provider.md",
+    )
+    (destination / "RESEARCH.md").write_text(research)
     provenance = {
         "repository": REPO,
         "version": version,
@@ -272,7 +319,14 @@ def package() -> None:
         "build_provenance": "BuildKit provenance and SBOM attached to image manifests",
     }
     (destination / "provenance.json").write_text(json.dumps(provenance, indent=2) + "\n")
-    names = ("compose.yaml", "env.example", "INSTALL.md", "provenance.json")
+    names = (
+        "compose.yaml",
+        "compose.research.yaml",
+        "env.example",
+        "INSTALL.md",
+        "RESEARCH.md",
+        "provenance.json",
+    )
     (destination / "SHA256SUMS").write_text(
         "".join(
             f"{hashlib.sha256((destination / name).read_bytes()).hexdigest()}  {name}\n"
@@ -353,10 +407,9 @@ def publish() -> None:
             "--draft",
             "--prerelease",
             "--title",
-            f"YAMS {tag} — offline foundation",
+            f"YAMS {tag} — {release_summary(version)[0]}",
             "--notes",
-            "Local paper-only foundation. Download all assets, verify SHA256SUMS and follow "
-            "INSTALL.md. No financial engine or live provider execution is included.",
+            release_summary(version)[1],
         )
     # Resume only identical draft assets; never clobber an existing asset.
     release = existing_release(tag)
@@ -414,10 +467,7 @@ def publish() -> None:
         # Exercise the complete installer command against fresh draft downloads,
         # including both platform evidence files added after native smoke tests.
         subprocess.run(["sha256sum", "--check", "SHA256SUMS"], cwd=downloaded, check=True)
-    notes = (
-        "Local paper-only foundation. Download all assets, verify SHA256SUMS and follow "
-        "INSTALL.md. No financial engine or live provider execution is included."
-    )
+    notes = release_summary(version)[1]
     if ".env.example" in allowed_assets:
         notes += (
             "\n\n**0.0.1 installation prerequisite:** GitHub names the configuration asset "

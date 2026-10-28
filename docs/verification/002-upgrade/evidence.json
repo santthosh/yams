@@ -1,0 +1,20 @@
+{
+  "project": "yams-upgrade002-73a3a57f5ae9",
+  "legacy_source": "9878dbb2dd562f1b19667189c07dd33376c9ac0d",
+  "new_branch_commit": "c33b8ba",
+  "passed": true,
+  "checks": [
+    "published foundation install checksums verified",
+    "upgrade applies actual ordered migrations",
+    "workspace JSON unchanged",
+    "artifact retained",
+    "new strategy seed and API ready"
+  ],
+  "old_schema": "0002_jobs",
+  "new_schema": "0004a_evaluations",
+  "workspace_identity_retained": true,
+  "workspace_preferences_retained": true,
+  "nondefault_preferences_retained": true,
+  "artifact_retained": true,
+  "immutable_default_strategy_seeded": true
+}

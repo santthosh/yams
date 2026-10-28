@@ -136,8 +136,8 @@ export function Dashboard() {
             <Money value={null} />
           </div>
           <EmptyState title="No paper portfolio yet">
-            Portfolio creation and investment results are not available in this
-            foundation version.
+            Portfolio accounts, backtests and forecasts arrive in later
+            milestones. Candidate inspection provides strategy diagnostics.
           </EmptyState>
         </Card>
       </div>
@@ -185,7 +185,7 @@ export function SettingsView() {
             </div>
             <div>
               <dt>Application version</dt>
-              <dd>0.0.1 · Foundation</dd>
+              <dd>0.0.2 · Candidate diagnostics</dd>
             </div>
           </dl>
           <VersionIdentity
@@ -223,7 +223,7 @@ export function SettingsView() {
             {fixture
               ? "Bundled synthetic data is available for offline exploration."
               : "Validated fixture metadata is unavailable."}{" "}
-            Market-data connections are not available in this version.
+            Open Market data to manage snapshots and optional research sources.
           </p>
           <VersionIdentity
             label="Snapshot ID"

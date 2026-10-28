@@ -3,9 +3,9 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: Semver version without v (foundation prerelease)
+        description: Semver version without v (local research prerelease)
         required: true
-        default: '0.0.1'
+        default: '0.0.2'
   push:
     tags: ['v*']
 permissions:
