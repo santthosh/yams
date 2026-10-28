@@ -1,6 +1,7 @@
 """End-to-end API flow on the committed sample snapshot, in a temporary runtime dir (no network)."""
 
 import importlib
+from datetime import datetime, timedelta
 from decimal import Decimal
 
 import pytest
@@ -10,6 +11,7 @@ from fastapi.testclient import TestClient
 @pytest.fixture
 def client(tmp_path, monkeypatch):
     monkeypatch.setenv("YAMS_RUNTIME_DIR", str(tmp_path))
+    monkeypatch.setenv("YAMS_LIVE_QUOTES", "0")  # tests never touch the network
     import app.config
     import app.data
     import app.main
@@ -73,3 +75,50 @@ def test_reset_validates(client):
     assert client.post("/api/portfolio/reset", json={"initial_cash": 5}).status_code == 422
     r = client.post("/api/portfolio/reset", json={"initial_cash": 2500})
     assert r.status_code == 200 and r.json()["cash"] == 2500
+
+
+def test_live_quotes_value_the_dashboard_but_not_decisions(client, monkeypatch):
+    import app.data
+    import app.main
+
+    rec = client.post("/api/recommendations").json()
+    client.post(f"/api/recommendations/{rec['id']}/apply")
+    md = app.main.md()
+    next_day = datetime.fromisoformat(md.as_of).replace(hour=11, tzinfo=app.data.NY) + timedelta(days=1)
+
+    def fake(tickers):
+        return {t: (md.latest_close(t) * 1.01, next_day) for t in tickers}
+
+    monkeypatch.setattr(app.data, "LIVE_QUOTES", True)
+    monkeypatch.setattr(app.data, "fetch_quotes", fake)
+    p = client.get("/api/portfolio").json()
+    live = p["live"]
+    assert live["status"] == "live" and abs(live["spy_day_return"] - 0.01) < 1e-9
+    invested = p["total"] - p["cash"]
+    assert abs(live["total"] - (p["cash"] + invested * 1.01)) < 1e-6
+    assert abs(live["day_change"] - invested * 0.01) < 1e-6
+    assert "Live prices" in client.get("/").text
+    # Decisions still use the daily close: same prices, nothing to trade.
+    rec2 = client.post("/api/recommendations").json()
+    assert rec2["summary_action"] == "HOLD" and all(a["price"] == md.latest_close(a["ticker"]) for a in rec2["actions"])
+
+
+def test_live_quotes_fall_back_to_closes(client, monkeypatch):
+    import app.data
+    import app.main
+
+    md = app.main.md()
+    same_day = datetime.fromisoformat(md.as_of).replace(hour=15, tzinfo=app.data.NY)
+    monkeypatch.setattr(app.data, "LIVE_QUOTES", True)
+    monkeypatch.setattr(app.data, "_quotes", {"key": None, "at": 0.0, "data": {}})
+    monkeypatch.setattr(app.data, "fetch_quotes", lambda ts: {t: (1.0, same_day) for t in ts})
+    assert client.get("/api/portfolio").json()["live"]["status"] == "closed"
+
+    def offline(_):
+        raise OSError("no network")
+
+    monkeypatch.setattr(app.data, "_quotes", {"key": None, "at": 0.0, "data": {}})
+    monkeypatch.setattr(app.data, "fetch_quotes", offline)
+    p = client.get("/api/portfolio").json()
+    assert p["live"]["status"] == "unavailable" and p["total"] == 1000
+    assert "Live prices unavailable" in client.get("/").text

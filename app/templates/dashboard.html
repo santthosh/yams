@@ -2,17 +2,20 @@
 {% block title %}Dashboard{% endblock %}
 {% block content %}
 <h1>Your paper portfolio</h1>
+{% set live = p.live if p.live.status == 'live' else none %}
+{% set v = live or p %}
 <div class="cards">
-  <div class="card"><div class="label">Total value</div><div class="value">{{ p.total|money }}</div>
-    <div class="small muted">valued at {{ p.valued_as_of }} close</div></div>
+  <div class="card"><div class="label">Total value</div><div class="value">{{ v.total|money }}</div>
+    <div class="small muted">{% if live %}<span class="{{ 'pos' if live.day_change > 0 else ('neg' if live.day_change < 0) }}">{{ live.day_change|money(true) }} ({{ live.day_return|pct(2, true) }})</span> since {{ p.valued_as_of }} close{% else %}valued at {{ p.valued_as_of }} close{% endif %}</div></div>
   <div class="card"><div class="label">Cash</div><div class="value">{{ p.cash|money }}</div>
-    <div class="small muted">{{ p.cash_weight|pct }} of portfolio</div></div>
+    <div class="small muted">{{ v.cash_weight|pct }} of portfolio</div></div>
   <div class="card"><div class="label">Profit / loss</div>
-    <div class="value {{ 'pos' if p.pnl and p.pnl > 0 else ('neg' if p.pnl and p.pnl < 0) }}">{{ p.pnl|money(true) }}</div>
-    <div class="small muted">{{ p.return|pct(1, true) }} on {{ p.initial_cash|money }} starting cash</div></div>
-  <div class="card"><div class="label">SPY over same period</div><div class="value">{{ p.spy_return|pct(1, true) }}</div>
-    <div class="small muted">since {{ p.start_as_of }} (portfolio start)</div></div>
+    <div class="value {{ 'pos' if v.pnl and v.pnl > 0 else ('neg' if v.pnl and v.pnl < 0) }}">{{ v.pnl|money(true) }}</div>
+    <div class="small muted">{{ v.return|pct(1, true) }} on {{ p.initial_cash|money }} starting cash</div></div>
+  <div class="card"><div class="label">SPY over same period</div><div class="value">{{ v.spy_return|pct(1, true) }}</div>
+    <div class="small muted">since {{ p.start_as_of }} (portfolio start){% if live %} · {{ live.spy_day_return|pct(2, true) }} today{% endif %}</div></div>
 </div>
+<p class="small muted">{% if live %}<strong>Live prices</strong> as of {{ live.time }} (Yahoo Finance, may be delayed). Recommendations still use the {{ p.valued_as_of }} closing prices.{% else %}{{ p.live.message }}{% endif %}</p>
 {% if p.unavailable %}<div class="warn">Value unavailable — no price for {{ p.unavailable|join(', ') }}. Refresh data.</div>{% endif %}
 
 <div class="panel">
@@ -26,16 +29,18 @@
 <h2>Holdings</h2>
 {% if p.holdings %}
 <div class="table-wrap"><table>
-  <thead><tr><th>Stock</th><th>Sector</th><th class="num">Shares</th><th class="num">Price</th><th class="num">Value</th><th class="num">Weight</th><th>Why we hold it</th></tr></thead>
+  <thead><tr><th>Stock</th><th>Sector</th><th class="num">Shares</th><th class="num">Price</th>{% if live %}<th class="num">Today</th>{% endif %}<th class="num">Value</th><th class="num">Weight</th><th>Why we hold it</th></tr></thead>
   <tbody>
   {% for h in p.holdings %}
     <tr><td><strong>{{ h.ticker }}</strong><br><span class="small muted">{{ h.name }}</span></td>
       <td class="small">{{ h.sector }}</td>
-      <td class="num">{{ '%.4f'|format(h.qty) }}</td><td class="num">{{ h.price|money }}</td>
-      <td class="num">{{ h.value|money }}</td><td class="num">{{ h.weight|pct }}</td>
+      {% set q = live.prices[h.ticker] if live else h %}
+      <td class="num">{{ '%.4f'|format(h.qty) }}</td><td class="num">{{ q.price|money }}</td>
+      {% if live %}<td class="num {{ 'pos' if q.change and q.change > 0 else ('neg' if q.change and q.change < 0) }}">{{ q.change|pct(2, true) }}</td>{% endif %}
+      <td class="num">{{ q.value|money }}</td><td class="num">{{ q.weight|pct }}</td>
       <td class="small">{{ h.reason or '—' }}</td></tr>
   {% endfor %}
-    <tr><td><strong>Cash</strong></td><td></td><td></td><td></td><td class="num">{{ p.cash|money }}</td><td class="num">{{ p.cash_weight|pct }}</td><td class="small muted">Uninvested paper cash (earns 0%).</td></tr>
+    <tr><td><strong>Cash</strong></td><td></td><td></td><td></td>{% if live %}<td></td>{% endif %}<td class="num">{{ p.cash|money }}</td><td class="num">{{ v.cash_weight|pct }}</td><td class="small muted">Uninvested paper cash (earns 0%).</td></tr>
   </tbody>
 </table></div>
 {% else %}

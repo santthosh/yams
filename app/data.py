@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import json
 import shutil
+import threading
+import time
 import urllib.request
 from dataclasses import dataclass
 from datetime import UTC, datetime
@@ -13,7 +15,7 @@ from zoneinfo import ZoneInfo
 
 import pandas as pd
 
-from app.config import CACHE_DIR, SAMPLE_DIR, STALE_AFTER_DAYS, STRATEGY
+from app.config import CACHE_DIR, LIVE_QUOTES, LIVE_QUOTES_TTL_SECONDS, SAMPLE_DIR, STALE_AFTER_DAYS, STRATEGY
 
 WIKI_SP500 = "https://en.wikipedia.org/wiki/List_of_S%26P_500_companies"
 NY = ZoneInfo("America/New_York")
@@ -237,3 +239,45 @@ def write_sample(dest: Path = SAMPLE_DIR) -> dict:
     )
     _write(dest, close, open_, volume, universe, meta)
     return meta
+
+
+# ---------------------------------------------------------------- intraday quotes (display only)
+
+_quotes: dict = {"key": None, "at": 0.0, "data": {}}
+_quotes_lock = threading.Lock()
+
+
+def fetch_quotes(tickers: list[str]) -> dict[str, tuple[float, datetime]]:
+    """Latest 1-minute price per ticker from Yahoo: {ticker: (price, time in New York)}. Missing tickers are left out."""
+    import warnings
+
+    import yfinance as yf
+
+    warnings.filterwarnings("ignore", module="yfinance")
+    raw = yf.download(tickers, period="1d", interval="1m", auto_adjust=True, progress=False, threads=True,
+                      group_by="column", timeout=5)
+    if raw is None or raw.empty:
+        return {}
+    out = {}
+    for t in tickers:
+        if t in raw["Close"].columns:
+            s = raw["Close"][t].dropna()
+            if len(s):
+                out[t] = (float(s.iloc[-1]), s.index[-1].tz_convert(NY).to_pydatetime())
+    return out
+
+
+def live_quotes(tickers: list[str]) -> dict[str, tuple[float, datetime]]:
+    """fetch_quotes with a short in-memory cache. Failures are cached too, so an offline app never stalls page loads."""
+    if not LIVE_QUOTES or not tickers:
+        return {}
+    key = tuple(sorted(tickers))
+    with _quotes_lock:
+        if _quotes["key"] == key and time.monotonic() - _quotes["at"] < LIVE_QUOTES_TTL_SECONDS:
+            return _quotes["data"]
+        try:
+            fresh = fetch_quotes(list(key))
+        except Exception:  # network or provider failure: fall back to closing prices
+            fresh = {}
+        _quotes.update(key=key, at=time.monotonic(), data=fresh)
+        return fresh

@@ -6,6 +6,8 @@ import threading
 import uuid
 from decimal import Decimal
 
+import pandas as pd
+
 from app import engine, explain
 from app.backtest import BacktestResult, run_backtest
 from app.config import FORECAST, STRATEGY
@@ -36,7 +38,8 @@ def get_backtest(md: MarketData, initial_cash: float) -> BacktestResult:
         return _bt_cache[key]
 
 
-def portfolio_view(md: MarketData, ledger: Ledger) -> dict:
+def portfolio_view(md: MarketData, ledger: Ledger, quotes: dict | None = None) -> dict:
+    """Valued at the latest daily close; `live` adds an intraday view when quotes newer than that close exist."""
     p = ledger.portfolio()
     holdings, cash = ledger.state()
     reasons = {}
@@ -71,6 +74,41 @@ def portfolio_view(md: MarketData, ledger: Ledger) -> dict:
         "return": None if unavailable else total / initial - 1,
         "spy_return": spy_ret,
         "valued_as_of": md.as_of,
+        "live": _live_view(md, holdings, cash, initial, p["spy_start_price"], quotes or {}),
+    }
+
+
+def _live_view(md: MarketData, holdings, cash, initial: float, spy_start: float, quotes: dict) -> dict:
+    """Value the portfolio at intraday quotes. Display only: recommendations always use daily closes."""
+    as_of_date = pd.Timestamp(md.as_of).date()
+    newer = {t: q for t, q in quotes.items() if q[1].date() > as_of_date}  # same-day quotes add nothing
+    needed = [*holdings, STRATEGY.benchmark]
+    if not quotes:
+        return {"status": "unavailable", "message": "Live prices unavailable; showing closing prices."}
+    if any(t not in newer for t in needed):
+        return {"status": "closed", "message": f"No trading since the {md.as_of} close; showing closing prices."}
+    prices, total, prev_total = {}, float(cash), float(cash)
+    for t, q in holdings.items():
+        px, prev = newer[t][0], md.latest_close(t)
+        prices[t] = {"price": px, "value": float(q) * px, "change": px / prev - 1 if prev else None}
+        total += float(q) * px
+        prev_total += float(q) * (prev or px)
+    for v in prices.values():
+        v["weight"] = v["value"] / total if total > 0 else None
+    spy_px = newer[STRATEGY.benchmark][0]
+    spy_prev = md.latest_close(STRATEGY.benchmark)
+    return {
+        "status": "live",
+        "time": min(newer[t][1] for t in needed).strftime("%b %d, %I:%M %p ET"),
+        "prices": prices,
+        "total": total,
+        "cash_weight": float(cash) / total if total > 0 else None,
+        "pnl": total - initial,
+        "return": total / initial - 1,
+        "day_change": total - prev_total,
+        "day_return": total / prev_total - 1 if prev_total > 0 else None,
+        "spy_return": spy_px / spy_start - 1 if spy_start else None,
+        "spy_day_return": spy_px / spy_prev - 1 if spy_prev else None,
     }
 
 

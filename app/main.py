@@ -61,6 +61,12 @@ def ledger() -> Ledger:
     return STATE["ledger"]
 
 
+def portfolio() -> dict:
+    """Portfolio view including intraday quotes (cached; empty when offline or disabled)."""
+    holdings, _ = ledger().state()
+    return service.portfolio_view(md(), ledger(), data.live_quotes([*holdings, STRATEGY.benchmark]))
+
+
 def render(request: Request, name: str, **ctx):
     ctx.update(status=md().status(), msg=request.query_params.get("msg"), err=request.query_params.get("err"))
     return templates.TemplateResponse(request, name, ctx)
@@ -114,7 +120,7 @@ def do_apply(rec_id: str):
 
 @app.get("/")
 def dashboard(request: Request):
-    return render(request, "dashboard.html", p=service.portfolio_view(md(), ledger()),
+    return render(request, "dashboard.html", p=portfolio(),
                   trades=ledger().trades(25), recs=ledger().list_recommendations(10))
 
 
@@ -182,7 +188,7 @@ def api_refresh():
 
 @app.get("/api/portfolio")
 def api_portfolio():
-    return service.portfolio_view(md(), ledger())
+    return portfolio()
 
 
 @app.post("/api/portfolio/reset")

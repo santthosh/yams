@@ -17,11 +17,12 @@ That's all. No API keys are needed, and the app works offline using a committed 
 `docker compose down -v` wipes it.
 
 Without Docker (needs [uv](https://docs.astral.sh/uv/)): `uv sync && uv run uvicorn app.main:app --port 8000`.
-Tests: `uv run pytest` (24 tests, no network).
+Tests: `uv run pytest` (26 tests, no network).
 
 ## Use it
 
-1. **Dashboard:** the portfolio starts as $1,000 cash. Click **Get recommendation**.
+1. **Dashboard:** the portfolio starts as $1,000 cash. Click **Get recommendation**. While the market is open the
+   dashboard values holdings at live Yahoo prices (cached 60 s; display only) with today's change.
 2. **Recommendation page**, read top to bottom:
    - **Proposed portfolio**: up to 8 stocks plus cash, each with a plain-English reason (momentum, rank, volatility, caps).
    - **Trades**: BUY / INCREASE / REDUCE / SELL / HOLD, with shares, dollars and why.
@@ -76,7 +77,8 @@ the portfolio or the market data changed after it was made. The full spec is in 
   the committed sample, the backtest is far ahead of SPY. Treat that as an upper bound, not an expectation.
 - **Adjusted prices everywhere:** dividends are treated as reinvested via Yahoo's adjusted prices. There is no
   separate dividend or split accounting.
-- **Live paper fills use the latest close** (±slippage), so there are no pending orders. The backtest uses next-day
+- **Live paper fills use the latest close** (±slippage), so there are no pending orders. Intraday prices only
+  value the dashboard; they never feed scoring or fills. Set `YAMS_LIVE_QUOTES=0` to turn them off. The backtest uses next-day
   opens to avoid look-ahead bias.
 - The forecast is a **scenario, not a prediction**. Cash earns 0%. There is no out-of-sample holdout; instead,
   parameters were fixed in advance.

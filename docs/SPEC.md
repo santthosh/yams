@@ -202,6 +202,10 @@ reason codes and explanation text. The portfolio-level summary is one of `REBALA
   auto-adjusted prices. Dividends are therefore approximated as reinvested price return, and no
   split or dividend ledger is needed. Live holdings are marked at the latest close, where
   adjusted and raw prices are equal.
+- **Intraday quotes are display only.** The dashboard and `GET /api/portfolio` add a `live` block that values
+  holdings and SPY at Yahoo 1-minute quotes newer than the last close, with today's change. Quotes are cached
+  for 60 s and fall back to closes when offline or disabled (`YAMS_LIVE_QUOTES=0`). Scoring, recommendations
+  and fills never use them.
 - **Live fills happen at the last close**, not the next open. This keeps the app synchronous with
   no pending-order state. The backtest still uses next-open fills to avoid look-ahead bias.
 - **Today's S&P 500 is used as the universe** in the backtest (survivorship bias).
@@ -255,7 +259,7 @@ Dockerfile  compose.yaml  pyproject.toml  uv.lock  README.md
 | `GET /backtest` | Backtest page |
 | `GET /api/status` | Data `as_of`, source (`sample`/`live`), staleness, ticker count |
 | `POST /api/data/refresh` | Synchronous refresh (~1 min); returns new status or error |
-| `GET /api/portfolio` | Cash, holdings (qty, price, value, weight), total, P&L vs initial |
+| `GET /api/portfolio` | Cash, holdings (qty, price, value, weight), total, P&L vs initial, plus a `live` intraday block |
 | `POST /api/portfolio/reset` | `{initial_cash}` (default 1000). Wipes trades and recommendations |
 | `POST /api/recommendations` | Compute and store a recommendation, return it |
 | `GET /api/recommendations` | List (newest first) |
@@ -270,7 +274,8 @@ Errors are returned as `{"error": {"code": "...", "message": "..."}}`.
 A persistent header shows **YAMS · Paper only · Data as of 2026-10-27 (live)**, the
 `Refresh data` button, and links to *Dashboard* and *Backtest*.
 
-1. **Dashboard `/`.** Total value, cash, P&L vs starting cash, and P&L vs SPY since start.
+1. **Dashboard `/`.** Total value, cash, P&L vs starting cash, and P&L vs SPY since start, at live
+   prices (with today's change) when available, otherwise at the last close.
    A holdings table (ticker, sector, shares, price, value, weight, one-line reason). The primary
    button is **Get recommendation**. Below that: recent trades, past recommendations, and a
    `Reset portfolio` form with a starting-cash input. The empty state reads

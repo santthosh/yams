@@ -62,3 +62,6 @@ RUNTIME_DIR = Path(os.environ.get("YAMS_RUNTIME_DIR", ROOT / "data" / "runtime")
 CACHE_DIR = RUNTIME_DIR / "cache"
 DB_PATH = RUNTIME_DIR / "yams.db"
 STALE_AFTER_DAYS = 5
+# Intraday quotes for the dashboard only (never used for decisions). YAMS_LIVE_QUOTES=0 turns them off.
+LIVE_QUOTES = os.environ.get("YAMS_LIVE_QUOTES", "1") != "0"
+LIVE_QUOTES_TTL_SECONDS = 60
