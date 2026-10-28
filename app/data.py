@@ -203,8 +203,9 @@ def fetch_market(held: list[str] | None = None, previous: MarketData | None = No
             missing.append(t)
         else:
             keep.append(t)
-    if STRATEGY.benchmark not in keep:
-        raise RuntimeError(f"Benchmark {STRATEGY.benchmark} could not be downloaded")
+    lost = sorted(t for t in must_keep if t not in keep)
+    if lost:  # never drop the price of something we hold (or the benchmark): keep the old cache instead
+        raise RuntimeError(f"could not download {', '.join(lost)}; try again later")
     close, open_, volume = close[keep], open_[keep], volume[keep]
     close = close.dropna(how="all")
     open_, volume = open_.loc[close.index], volume.loc[close.index]
