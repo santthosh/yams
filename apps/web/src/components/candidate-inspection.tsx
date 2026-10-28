@@ -173,8 +173,8 @@ function Result({ evaluation }: { evaluation: S["StrategyEvaluationV1"] }) {
           </div>
         ) : (
           <EmptyState title="Cash-only target">
-            No allocation-eligible candidates were selected. Cash and exclusions
-            remain explicit.
+            The engine allocated all capital to cash. Inspect the allocation
+            reasons and exclusions below.
           </EmptyState>
         )}
         <WarningsPanel warnings={result.allocation_reasons} />
@@ -331,6 +331,11 @@ export function CandidateInspection() {
   const [cursor, setCursor] = useState<string | null>(null);
   const [inventoryError, setInventoryError] = useState("");
   const [error, setError] = useState("");
+  const [admissionError, setAdmissionError] = useState("");
+  const [admissionCorrelation, setAdmissionCorrelation] = useState<
+    string | null
+  >(null);
+  const [lookupError, setLookupError] = useState("");
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
   const [reload, setReload] = useState(0);
@@ -449,6 +454,9 @@ export function CandidateInspection() {
   }, [runId, pollRevision, setJob]);
   function selectRun(identity: string) {
     setEvaluation(null);
+    setAdmissionError("");
+    setAdmissionCorrelation(null);
+    setLookupError("");
     setError("");
     setRunId(identity);
     setLookup(identity);
@@ -465,7 +473,8 @@ export function CandidateInspection() {
   async function submit(event: FormEvent) {
     event.preventDefault();
     setBusy(true);
-    setError("");
+    setAdmissionError("");
+    setAdmissionCorrelation(null);
     try {
       const response = await client().POST("/api/v1/strategy-evaluations", {
         body: {
@@ -475,8 +484,9 @@ export function CandidateInspection() {
         },
       });
       if (!response.data) {
+        setAdmissionCorrelation(response.error?.error.correlation_id ?? null);
         const code = response.error?.error.code;
-        setError(
+        setAdmissionError(
           code === "STALE_DATA"
             ? "The selected snapshot is blocked or lacks a completed session at that date."
             : code === "INSUFFICIENT_MARKET_DATA"
@@ -489,7 +499,7 @@ export function CandidateInspection() {
       }
       selectRun(response.data.evaluation_id);
     } catch {
-      setError(
+      setAdmissionError(
         "Evaluation could not be queued. Check the local service and try again.",
       );
     } finally {
@@ -511,13 +521,16 @@ export function CandidateInspection() {
       setSnapshots((old) => [...old, ...response.data!.items]);
       setCursor(response.data.next_cursor);
     } catch {
-      setInventoryError(
-        "More snapshot history could not be loaded. Try again.",
-      );
+      if (!controller.signal.aborted && discovery.current === controller)
+        setInventoryError(
+          "More snapshot history could not be loaded. Try again.",
+        );
     }
   }
   function resetChoices(nextMode: Mode = mode) {
     setMode(nextMode);
+    setAdmissionError("");
+    setAdmissionCorrelation(null);
     setLoading(true);
     setInventoryError("");
     setSnapshots([]);
@@ -547,6 +560,17 @@ export function CandidateInspection() {
         {inventoryError && (
           <p role="alert" className="notice notice-error">
             {inventoryError}
+          </p>
+        )}
+        {admissionError && (
+          <p role="alert" className="notice notice-error">
+            {admissionError}
+            {admissionCorrelation && (
+              <>
+                {" "}
+                Diagnostic ID: <code>{admissionCorrelation}</code>
+              </>
+            )}
           </p>
         )}
         <form
@@ -678,14 +702,17 @@ export function CandidateInspection() {
           onSubmit={(event) => {
             event.preventDefault();
             if (UUID_PATTERN.test(lookup ?? runId)) selectRun(lookup ?? runId);
-            else setError("Enter a valid saved evaluation UUID.");
+            else setLookupError("Enter a valid saved evaluation UUID.");
           }}
         >
           <label htmlFor="evaluation-lookup">Evaluation ID</label>
           <input
             id="evaluation-lookup"
             value={lookup ?? runId}
-            onChange={(event) => setLookup(event.target.value)}
+            onChange={(event) => {
+              setLookup(event.target.value);
+              setLookupError("");
+            }}
           />
           <Button variant="outline" type="submit">
             Load saved evaluation
@@ -704,9 +731,9 @@ export function CandidateInspection() {
             </Button>
           </>
         )}
-        {error && (
+        {(lookupError || error) && (
           <p role="alert" className="notice notice-error">
-            {error}
+            {lookupError || error}
           </p>
         )}
         {runId && !evaluation && !error && (

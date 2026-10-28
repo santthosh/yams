@@ -23,6 +23,7 @@ test("pinned diagnostics: polling, rerun evidence, keyboard and responsive table
   await choices(page);
   let reads = 0;
   let submissions = 0;
+  let rejectNext = false;
   let identity = sample.completed.id;
   const posts: string[] = [];
   page.on("request", (request) => {
@@ -31,6 +32,14 @@ test("pinned diagnostics: polling, rerun evidence, keyboard and responsive table
   });
   await page.route("**/api/v1/strategy-evaluations**", async (route) => {
     if (route.request().method() === "POST") {
+      if (rejectNext) {
+        rejectNext = false;
+        await route.fulfill({
+          status: 409,
+          json: { error: { code: "STALE_DATA" } },
+        });
+        return;
+      }
       expect(route.request().postDataJSON()).toEqual({
         strategy_version_id: sample.strategy.published_version.id,
         snapshot_id: sample.snapshot.id,
@@ -95,9 +104,16 @@ test("pinned diagnostics: polling, rerun evidence, keyboard and responsive table
   await expect(
     page.getByText("The worker is processing pinned inputs.", { exact: false }),
   ).toBeVisible();
+  rejectNext = true;
+  await page.getByRole("button", { name: "Evaluate pinned inputs" }).click();
+  const admissionError = page.getByText(
+    "The selected snapshot is blocked or lacks a completed session at that date.",
+  );
+  await expect(admissionError).toBeVisible();
   await expect(
     page.getByRole("heading", { name: "Target allocation", exact: true }),
   ).toBeVisible();
+  await expect(admissionError).toBeVisible();
   const targets = page.getByRole("region", { name: "Target allocation table" });
   await expect(
     targets.getByRole("rowheader", { name: "SYN:AAA", exact: true }),
@@ -160,6 +176,7 @@ test("pinned diagnostics: polling, rerun evidence, keyboard and responsive table
   ).toBeVisible();
   expect(submissions).toBe(2);
   expect(posts).toEqual([
+    "/api/v1/strategy-evaluations",
     "/api/v1/strategy-evaluations",
     "/api/v1/strategy-evaluations",
   ]);
