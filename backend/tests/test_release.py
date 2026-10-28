@@ -112,6 +112,7 @@ def test_interrupted_draft_resumes_only_identical_assets(
     images = {name: image_ref(name, "sha256:" + "a" * 64) for name in ("backend", "web")}
     (bundle / "provenance.json").write_text(json.dumps({"source_sha": "source", "images": images}))
     (bundle / "INSTALL.md").write_text("Installation fixture")
+    (bundle / ".env.example").write_text("YAMS_WEB_PORT=3000\n")
     for host, arch in (("x86_64", "amd64"), ("aarch64", "arm64")):
         directory = verification / arch
         directory.mkdir()
@@ -168,10 +169,12 @@ def test_interrupted_draft_resumes_only_identical_assets(
             path = Path(args[4])
             if state["interrupt"] and state["assets"]:
                 raise RuntimeError("Simulated interrupted upload")
-            assert path.name not in state["assets"]
-            state["assets"][path.name] = path.read_bytes()
+            name = "default.env.example" if path.name == ".env.example" else path.name
+            assert name not in state["assets"]
+            state["assets"][name] = path.read_bytes()
         elif args[:3] == ("gh", "release", "edit"):
             assert "--draft=false" in args
+            assert "cp default.env.example .env.example" in args[-1]
             state["release"] = "published"
         else:
             raise AssertionError(args)
@@ -200,6 +203,47 @@ def test_interrupted_draft_resumes_only_identical_assets(
     release_script.publish()
     assert state["release"] == "published"
     assert any(directory != bundle for directory in checksum_directories)
-    assert set(state["assets"]) == {path.name for path in bundle.iterdir()}
+    assert set(state["assets"]) == {
+        "default.env.example" if path.name == ".env.example" else path.name
+        for path in bundle.iterdir()
+    }
     with pytest.raises(SystemExit, match="published version"):
         release_script.publish()
+
+
+def test_recovery_rejects_missing_failed_or_wrong_release_gates() -> None:
+    run = {
+        "event": "push",
+        "head_branch": "v0.0.1",
+        "path": ".github/workflows/release.yml",
+        "status": "completed",
+        "conclusion": "failure",
+    }
+    jobs = [
+        {"name": name, "conclusion": "success"}
+        for name in (
+            "validate",
+            "package",
+            "build (backend, amd64, ubuntu-24.04)",
+            "build (backend, arm64, ubuntu-24.04-arm)",
+            "build (web, amd64, ubuntu-24.04)",
+            "build (web, arm64, ubuntu-24.04-arm)",
+            "verify (amd64, ubuntu-24.04)",
+            "verify (arm64, ubuntu-24.04-arm)",
+        )
+    ]
+    jobs.append({"name": "publish", "conclusion": "failure"})
+    assert release_script.recoverable_run(run, jobs, "0.0.1")
+    assert not release_script.recoverable_run(run, jobs[:-1], "0.0.1")
+    for i in range(len(jobs) - 1):
+        changed = deepcopy(jobs)
+        changed[i]["conclusion"] = "failure"
+        assert not release_script.recoverable_run(run, changed, "0.0.1")
+    for key, value in (
+        ("event", "workflow_dispatch"),
+        ("head_branch", "v0.0.2"),
+        ("path", "other.yml"),
+        ("status", "in_progress"),
+        ("conclusion", "success"),
+    ):
+        assert not release_script.recoverable_run({**run, key: value}, jobs, "0.0.1")

@@ -14,13 +14,13 @@ for the 4 CPU / 4.5 GiB application allocation plus Docker overhead (at least
 and linux/arm64, verified separately. Docker Desktop supplies Linux on macOS.
 
 Download **all assets** from the same GitHub prerelease into a new directory:
-`compose.yaml`, `.env.example`, `INSTALL.md`, `provenance.json`, both platform
+`compose.yaml`, `env.example`, `INSTALL.md`, `provenance.json`, both platform
 evidence JSON files and `SHA256SUMS`. Verify before startup:
 
 ```bash
 sha256sum --check SHA256SUMS
 # macOS alternative: shasum -a 256 -c SHA256SUMS
-cp .env.example .env
+cp env.example .env
 docker compose pull
 docker compose up -d --wait --pull never
 ```
@@ -106,3 +106,17 @@ rejected. Downloaded assets are byte-checked before the draft becomes public.
 `provenance.json` links the source/run and immutable images; platform evidence
 records actual native architecture, fixture hash, browser/job and restart checks.
 The release's `SHA256SUMS` covers all installation and evidence assets.
+
+## Recovering the first release upload
+
+GitHub renamed the original 0.0.1 `.env.example` upload to `default.env.example`.
+The immutable 0.0.1 bundle retains its original bytes and checksums: follow the
+release note and copy `default.env.example` to `.env.example` before checking
+checksums and following that bundle's INSTALL.md. Future bundles use `env.example`
+to avoid this filename normalization.
+
+The manual Release recovery workflow accepts only a failed tag run whose native
+build/package/installation gates all passed and whose identical draft still exists.
+Both the recovery implementation and original source must have passed main CI.
+It reuses retained artifacts and image digests, verifies downloaded asset bytes and
+checksums, and never rebuilds images, moves tags or replaces conflicting assets.
