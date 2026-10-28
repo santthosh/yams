@@ -195,6 +195,25 @@ class MarketRepository:
         start_session: date | None = None,
         live: bool = False,
     ) -> MarketView:
+        return self._view(cutoff, session_date, start_session=start_session, live=live)
+
+    def accounting_as_of(self, cutoff: datetime, session_date: date) -> MarketView:
+        """Validated bars/actions remain usable for holdings after universe exit.
+
+        Assets still describe the eligible decision universe. Accounting consumers
+        use bars/actions only; this view must never enlarge strategy eligibility.
+        """
+        return self._view(cutoff, session_date, include_inactive=True)
+
+    def _view(
+        self,
+        cutoff: datetime,
+        session_date: date,
+        *,
+        start_session: date | None = None,
+        live: bool = False,
+        include_inactive: bool = False,
+    ) -> MarketView:
         cutoff = TypeAdapter(UTCTimestamp).validate_python(cutoff)
         session_date = TypeAdapter(SessionDate).validate_python(session_date)
         if self._connection is None:
@@ -272,7 +291,7 @@ class MarketRepository:
         grouped: dict[tuple[str, date], list[MarketBarV1]] = defaultdict(list)
         for (payload,) in rows:
             bar = self._rows[payload]
-            if bar.asset_id in active:
+            if include_inactive or bar.asset_id in active:
                 grouped[bar.asset_id, bar.session_date].append(bar)
         bars = []
         for (asset_id, day), candidates in sorted(grouped.items()):
@@ -326,7 +345,9 @@ class MarketRepository:
             and row.visible(cutoff, live)
         )
         actions = tuple(
-            row for row in self._actions if row.asset_id in active and row.visible(cutoff, live)
+            row
+            for row in self._actions
+            if (include_inactive or row.asset_id in active) and row.visible(cutoff, live)
         )
         for action in actions:
             if action.kind == "dividend" and action.payable_session is None:

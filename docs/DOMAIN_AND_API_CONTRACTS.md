@@ -223,6 +223,11 @@ Snapshot lists may include blocked inspection data; these do not become current.
 
 Use half-open `[start_session, end_session_exclusive)`; warmup is read *before* start if available, but not counted in performance. `GET /experiments/{id}` returns `job_id`, status, config and snapshot fingerprints, metrics with named units (`cumulative_return_fraction`, `annualized_volatility_fraction`, `max_drawdown_fraction`, `turnover_fraction`, `sharpe_ratio`, `slippage_usd`), curve/trade artifact references, warnings, and reproducibility manifest. Time-series artifacts are served by paginated/windowed endpoints; do not inline millions of rows.
 
+[ADR-012](adr/0012-walk-forward-core.md) owns the proposed exact core session and
+split conventions. Internal core output does not weaken the completed experiment
+contract: metrics and all sealed output references remain required. #40/#41 own
+report composition and public transport after the core is delivered.
+
 ## 5. Portfolios, orders, recommendations and forecasts
 
 **Portfolio state** (`GET /portfolios/{id}`):
