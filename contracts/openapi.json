@@ -700,9 +700,16 @@
                 "$ref": "#/components/schemas/FeatureValues"
               },
               {
+                "$ref": "#/components/schemas/MeanReversionFeatures"
+              },
+              {
+                "$ref": "#/components/schemas/LowVolatilityFeatures"
+              },
+              {
                 "type": "null"
               }
-            ]
+            ],
+            "title": "Features"
           },
           "input_sha256": {
             "pattern": "^[0-9a-f]{64}$",
@@ -755,9 +762,16 @@
                 "$ref": "#/components/schemas/ScoreEvidence"
               },
               {
+                "$ref": "#/components/schemas/MeanReversionScore"
+              },
+              {
+                "$ref": "#/components/schemas/LowVolatilityScore"
+              },
+              {
                 "type": "null"
               }
-            ]
+            ],
+            "title": "Scoring"
           },
           "sector": {
             "anyOf": [
@@ -1896,6 +1910,86 @@
         "title": "Liveness",
         "type": "object"
       },
+      "LowVolatilityFeatures": {
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "const": "low_volatility",
+            "title": "Kind",
+            "type": "string"
+          },
+          "volatility": {
+            "ge": 0,
+            "title": "Volatility",
+            "type": "number"
+          }
+        },
+        "required": [
+          "kind",
+          "volatility"
+        ],
+        "title": "LowVolatilityFeatures",
+        "type": "object"
+      },
+      "LowVolatilityScore": {
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "const": "low_volatility",
+            "title": "Kind",
+            "type": "string"
+          },
+          "score": {
+            "title": "Score",
+            "type": "number"
+          },
+          "volatility_z": {
+            "title": "Volatility Z",
+            "type": "number"
+          }
+        },
+        "required": [
+          "kind",
+          "volatility_z",
+          "score"
+        ],
+        "title": "LowVolatilityScore",
+        "type": "object"
+      },
+      "LowVolatilitySignalConfig": {
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "const": "low_volatility",
+            "title": "Kind",
+            "type": "string"
+          },
+          "require_positive_trend": {
+            "title": "Require Positive Trend",
+            "type": "boolean"
+          },
+          "trend_sma_sessions": {
+            "maximum": 2520,
+            "minimum": 1,
+            "title": "Trend Sma Sessions",
+            "type": "integer"
+          },
+          "volatility_sessions": {
+            "maximum": 2519,
+            "minimum": 2,
+            "title": "Volatility Sessions",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "volatility_sessions",
+          "trend_sma_sessions",
+          "require_positive_trend",
+          "kind"
+        ],
+        "title": "LowVolatilitySignalConfig",
+        "type": "object"
+      },
       "MarketBarV1": {
         "additionalProperties": false,
         "properties": {
@@ -2030,6 +2124,104 @@
           "quality_flags"
         ],
         "title": "MarketBarV1",
+        "type": "object"
+      },
+      "MeanReversionFeatures": {
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "const": "mean_reversion",
+            "title": "Kind",
+            "type": "string"
+          },
+          "mean_reversion_distance": {
+            "title": "Mean Reversion Distance",
+            "type": "number"
+          },
+          "mean_reversion_sma": {
+            "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$",
+            "title": "Mean Reversion Sma",
+            "type": "string"
+          },
+          "volatility": {
+            "ge": 0,
+            "title": "Volatility",
+            "type": "number"
+          }
+        },
+        "required": [
+          "kind",
+          "mean_reversion_distance",
+          "mean_reversion_sma",
+          "volatility"
+        ],
+        "title": "MeanReversionFeatures",
+        "type": "object"
+      },
+      "MeanReversionScore": {
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "const": "mean_reversion",
+            "title": "Kind",
+            "type": "string"
+          },
+          "mean_reversion_z": {
+            "title": "Mean Reversion Z",
+            "type": "number"
+          },
+          "score": {
+            "title": "Score",
+            "type": "number"
+          }
+        },
+        "required": [
+          "kind",
+          "mean_reversion_z",
+          "score"
+        ],
+        "title": "MeanReversionScore",
+        "type": "object"
+      },
+      "MeanReversionSignalConfig": {
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "const": "mean_reversion",
+            "title": "Kind",
+            "type": "string"
+          },
+          "mean_reversion_sessions": {
+            "maximum": 2520,
+            "minimum": 2,
+            "title": "Mean Reversion Sessions",
+            "type": "integer"
+          },
+          "require_positive_trend": {
+            "title": "Require Positive Trend",
+            "type": "boolean"
+          },
+          "trend_sma_sessions": {
+            "maximum": 2520,
+            "minimum": 1,
+            "title": "Trend Sma Sessions",
+            "type": "integer"
+          },
+          "volatility_sessions": {
+            "maximum": 2519,
+            "minimum": 2,
+            "title": "Volatility Sessions",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "volatility_sessions",
+          "trend_sma_sessions",
+          "require_positive_trend",
+          "kind",
+          "mean_reversion_sessions"
+        ],
+        "title": "MeanReversionSignalConfig",
         "type": "object"
       },
       "MetricValue": {
@@ -3670,7 +3862,26 @@
             "type": "integer"
           },
           "signals": {
-            "$ref": "#/components/schemas/SignalConfig"
+            "discriminator": {
+              "mapping": {
+                "low_volatility": "#/components/schemas/LowVolatilitySignalConfig",
+                "mean_reversion": "#/components/schemas/MeanReversionSignalConfig",
+                "risk_adjusted_momentum": "#/components/schemas/SignalConfig"
+              },
+              "propertyName": "kind"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/SignalConfig"
+              },
+              {
+                "$ref": "#/components/schemas/MeanReversionSignalConfig"
+              },
+              {
+                "$ref": "#/components/schemas/LowVolatilitySignalConfig"
+              }
+            ],
+            "title": "Signals"
           },
           "universe": {
             "$ref": "#/components/schemas/UniverseConfig"

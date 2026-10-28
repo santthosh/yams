@@ -116,6 +116,14 @@ class StrategyEvaluationV1(Contract):
     def lifecycle(self) -> Self:
         if self.strategy_config.config_hash() != self.config_sha256:
             raise ValueError("Diagnostic strategy rules differ from pinned config hash")
+        if self.result is not None:
+            for candidate in self.result.candidates:
+                if (
+                    candidate.features is not None
+                    and getattr(candidate.features, "kind", "risk_adjusted_momentum")
+                    != self.strategy_config.signals.kind
+                ):
+                    raise ValueError("Diagnostic evidence family differs from pinned config")
         if self.status == "completed":
             if self.result is None or self.result_sha256 != self.result.result_hash():
                 raise ValueError("Completed diagnostics require sealed, hash-verified evidence")

@@ -22,7 +22,7 @@ from backend.market_data.files import PinnedSnapshot
 from backend.portfolio.allocation import allocate_momentum
 from backend.strategies.build import engine_fingerprint
 from backend.strategies.evaluations import result_from_engine
-from backend.strategies.momentum import evaluate_snapshot
+from backend.strategies.momentum import FeatureValues, evaluate_snapshot
 from backend.strategies.registry import DEFAULT_VERSION_ID
 
 ROOT = Path(__file__).resolve().parents[3] / "data/fixtures"
@@ -68,6 +68,7 @@ def test_explicit_fixture_transport_and_independent_momentum_oracle(tmp_path: Pa
     ]
     row = next(row for row in result.candidates if row.asset_id == expected["asset_id"])
     assert row.features is not None
+    assert isinstance(row.features, FeatureValues)
     assert row.features.momentum_long == pytest.approx(expected["momentum126"], abs=1e-12)
     assert row.features.volatility == pytest.approx(expected["volatility60"], abs=1e-12)
     assert result.reproducibility.config_sha256 == payload.config_sha256

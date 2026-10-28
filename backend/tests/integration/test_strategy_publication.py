@@ -140,9 +140,11 @@ def test_initial_version_failure_rolls_back_root(database: Engine) -> None:
             )
     finally:
         event.remove(database, "before_cursor_execute", fail_insert)
-    assert [row.id for row in registry.list_strategies(database).items] == [
-        registry.DEFAULT_STRATEGY_ID
-    ]
+    assert {row.id for row in registry.list_strategies(database).items} == {
+        registry.DEFAULT_STRATEGY_ID,
+        registry.template_strategy_id("mean_reversion"),
+        registry.template_strategy_id("low_volatility"),
+    }
     assert len(registry.list_versions(database, registry.DEFAULT_STRATEGY_ID).items) == 1
 
 

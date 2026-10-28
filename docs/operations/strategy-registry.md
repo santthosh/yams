@@ -9,7 +9,9 @@ ledger entries are seeded or computed by the registry.
 
 The existing serialized bootstrap transaction migrates, creates/loads the singleton
 workspace, validates `backend/strategies/default_momentum.json` and seeds one
-published momentum version. Missing files, unsupported rules or a config hash
+published momentum version plus the two ADR-011 alternative templates (#38).
+See the [alternative template workflow](strategy-templates.md) for exact hashes,
+identities, collision-safe upgrade behavior and source/release limits. Missing files, unsupported rules or a config hash
 different from the approved FIX-01 hash fail bootstrap atomically. The packaged
 default is parameters only, independent of runtime market data or fixture access.
 

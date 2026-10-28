@@ -6,7 +6,7 @@ from typing import Any
 import pytest
 from pydantic import ValidationError
 
-from backend.domain.strategy import StrategyConfigV1
+from backend.domain.strategy import SignalConfig, StrategyConfigV1
 from backend.domain.types import canonical_json
 
 EXAMPLE = Path(__file__).parent / "examples" / "strategy.json"
@@ -22,6 +22,7 @@ def test_roundtrip_is_closed_and_preserves_financial_strings() -> None:
     output = json.loads(config.model_dump_json())
     assert output == example()
     assert output["portfolio"]["max_position_weight"] == "0.20"
+    assert isinstance(config.signals, SignalConfig)
     assert config.signals.z_score_weights.momentum_long == Decimal("0.60")
     with pytest.raises(ValidationError):
         config.display_name = "mutated"

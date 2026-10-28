@@ -13,9 +13,12 @@ forecasts remain with their later milestone owners; the shared execution kernel
 is available but does not itself post durable trades.
 
 Development toward 0.0.3 also adds named strategy creation, detail and immutable
-version publication/history APIs over the existing registry. See the
-[strategy workflow](docs/operations/strategy-registry.md); the authoring UI and
-historical experiment services remain with their owning issues.
+version publication/history APIs over the existing registry, plus the ratified
+mean-reversion and low-volatility templates through the shared diagnostic worker.
+See the [strategy workflow](docs/operations/strategy-registry.md) and
+[template rules/limits](docs/operations/strategy-templates.md). SPY remains
+benchmark-only; the authoring UI and historical experiment services remain with
+their owning issues.
 
 Download published bundles and platform evidence from [GitHub Releases](https://github.com/santthosh/yams/releases).
 Source implementation alone does not establish publication: use each release's

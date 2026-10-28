@@ -213,10 +213,28 @@ function Result({ evaluation }: { evaluation: S["StrategyEvaluationV1"] }) {
       </Card>
       <Card title="Candidates and exclusions">
         <p>
-          Long/short momentum use{" "}
-          {evaluation.strategy_config.signals.momentum_long_sessions}/
-          {evaluation.strategy_config.signals.momentum_short_sessions} sessions;
-          volatility uses{" "}
+          {evaluation.strategy_config.signals.kind ===
+          "risk_adjusted_momentum" ? (
+            <>
+              Long/short momentum use{" "}
+              {evaluation.strategy_config.signals.momentum_long_sessions}/
+              {evaluation.strategy_config.signals.momentum_short_sessions}{" "}
+              sessions;{" "}
+            </>
+          ) : evaluation.strategy_config.signals.kind === "mean_reversion" ? (
+            <>
+              Mean reversion ranks distance below the{" "}
+              {evaluation.strategy_config.signals.mean_reversion_sessions}
+              -session moving average. Weakness can continue; the trend and
+              allocation controls still apply.{" "}
+            </>
+          ) : (
+            <>
+              Low volatility ranks lower historical volatility first. Historical
+              stability does not guarantee smaller future losses.{" "}
+            </>
+          )}
+          Volatility uses{" "}
           {evaluation.strategy_config.signals.volatility_sessions} returns.
           Scores and ranks come from the shared engine. Values are fractional
           units (0.10 = 10%); scores are dimensionless.
@@ -254,8 +272,16 @@ function Result({ evaluation }: { evaluation: S["StrategyEvaluationV1"] }) {
                   <th scope="col">Asset</th>
                   <th scope="col">Rank</th>
                   <th scope="col">Score</th>
-                  <th scope="col">Long momentum</th>
-                  <th scope="col">Short momentum</th>
+                  {evaluation.strategy_config.signals.kind ===
+                  "risk_adjusted_momentum" ? (
+                    <>
+                      <th scope="col">Long momentum</th>
+                      <th scope="col">Short momentum</th>
+                    </>
+                  ) : evaluation.strategy_config.signals.kind ===
+                    "mean_reversion" ? (
+                    <th scope="col">Distance below moving average</th>
+                  ) : null}
                   <th scope="col">Annualized volatility</th>
                   <th scope="col">Status / evidence</th>
                 </tr>
@@ -266,8 +292,35 @@ function Result({ evaluation }: { evaluation: S["StrategyEvaluationV1"] }) {
                     <th scope="row">{row.asset_id}</th>
                     <td>{row.rank ?? "Unranked"}</td>
                     <td>{number(row.scoring?.score)}</td>
-                    <td>{number(row.features?.momentum_long)}</td>
-                    <td>{number(row.features?.momentum_short)}</td>
+                    {evaluation.strategy_config.signals.kind ===
+                    "risk_adjusted_momentum" ? (
+                      <>
+                        <td>
+                          {number(
+                            row.features && "momentum_long" in row.features
+                              ? row.features.momentum_long
+                              : null,
+                          )}
+                        </td>
+                        <td>
+                          {number(
+                            row.features && "momentum_short" in row.features
+                              ? row.features.momentum_short
+                              : null,
+                          )}
+                        </td>
+                      </>
+                    ) : evaluation.strategy_config.signals.kind ===
+                      "mean_reversion" ? (
+                      <td>
+                        {number(
+                          row.features &&
+                            "mean_reversion_distance" in row.features
+                            ? row.features.mean_reversion_distance
+                            : null,
+                        )}
+                      </td>
+                    ) : null}
                     <td>{number(row.features?.volatility)}</td>
                     <td>
                       {row.allocation_eligible
@@ -377,7 +430,11 @@ export function CandidateInspection() {
         setVersionId((old) =>
           rules.data!.items.some((row) => row.published_version.id === old)
             ? old
-            : (rules.data!.items[0]?.published_version.id ?? ""),
+            : (rules.data!.items.find(
+                (row) => row.template_key === "risk_adjusted_momentum_v1",
+              )?.published_version.id ??
+              rules.data!.items[0]?.published_version.id ??
+              ""),
         );
       } catch {
         if (!controller.signal.aborted)

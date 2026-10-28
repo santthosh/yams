@@ -53,9 +53,10 @@ describe("generated transport", () => {
     expect(row?.published_version.config.portfolio.max_position_weight).toBe(
       "0.2",
     );
-    expect(
-      row?.published_version.config.signals.z_score_weights.momentum_long,
-    ).toBe(0.6);
+    const signals = row?.published_version.config.signals;
+    if (signals?.kind !== "risk_adjusted_momentum")
+      throw new Error("Expected the unchanged momentum contract");
+    expect(signals.z_score_weights.momentum_long).toBe(0.6);
     expect(result.data?.next_cursor).toBeNull();
   });
   it("uses the implemented typed route through an injected fetch transport", async () => {
