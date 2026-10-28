@@ -113,6 +113,7 @@ def child_entry(
                 pipe.send(("progress", percent))
                 last_progress = percent
 
+        value: int | str
         if lease.kind == "backtest_core":
             value = cast(CoreHandler, handler)(lease.payload, cancelled, report_progress)
         else:

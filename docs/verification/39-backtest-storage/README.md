@@ -37,7 +37,10 @@ sanitized source/build identities and exact synthetic points/fills.
 One earlier parallel Docker run passed all77 tests but hit the existing5-second
 disposable-database teardown timeout; the unchanged integration harness passed
 when rerun once alone. No timeout, assertion or resource guard was weakened.
-Current-head CI/review evidence is recorded in the maintained #39 tracker and
+CI exposed a Linux-only inferred result type in the worker; it was reproduced
+with `mypy --platform linux --no-incremental backend/jobs/worker.py` and corrected
+with an explicit `int | str` annotation. Both host and Linux type checks pass;
+worker runtime behavior is unchanged. Current-head CI/review evidence is recorded in the maintained #39 tracker and
 storage PR. No credential, downloaded data, private volume
 or user source hardlink is part of these proofs.
 
