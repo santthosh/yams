@@ -145,3 +145,54 @@ def test_empty_future_cutoff_and_conflicts(
         "CONFLICTING_BAR"
         in next(row for row in first.candidates if row.asset_id == last.asset_id).reasons
     )
+
+
+def test_numerical_failure_and_blocked_evidence_are_explicit(
+    inputs: tuple[MarketRepository, MarketView, StrategyConfigV1],
+) -> None:
+    from backend.market_data.repository import Diagnostic
+    from backend.strategies.momentum import evaluate_snapshot
+
+    repository, view, config = inputs
+    baseline = evaluate_momentum(view, repository.calendar, config, engine_version="test-v1")
+    assert (
+        evaluate_snapshot(
+            repository.snapshot, config, view.cutoff, view.session_date, engine_version="test-v1"
+        )
+        == baseline
+    )
+    # Finite provider decimals can still exceed floating statistical resolution.
+    # Keep the input visibly excluded rather than allowing inf into cross-sectional math.
+    huge = replace(
+        view,
+        bars=tuple(
+            bar.model_copy(update={"adjusted_close": "1" + "0" * 400})
+            if bar.asset_id == "SYN:AAA" and bar.session_date == view.session_date
+            else bar
+            for bar in view.bars
+        ),
+    )
+    evaluated = evaluate_momentum(huge, repository.calendar, config, engine_version="test-v1")
+    rejected = next(row for row in evaluated.candidates if row.asset_id == "SYN:AAA")
+    assert "NONFINITE_FEATURE" in rejected.reasons
+    assert rejected.features is None and rejected.scoring is None and rejected.rank is None
+    assert not rejected.eligible and "SYN:AAA" not in evaluated.selected_ids
+    blocked = evaluate_momentum(
+        replace(view, diagnostics=(*view.diagnostics, Diagnostic("SNAPSHOT_BLOCKED"))),
+        repository.calendar,
+        config,
+        engine_version="test-v1",
+    )
+    assert blocked.selected_ids == ()
+    assert all("SNAPSHOT_BLOCKED" in row.reasons for row in blocked.candidates)
+    assert any(row.reason == "SNAPSHOT_BLOCKED" for row in blocked.data_diagnostics)
+    unverified = replace(
+        view,
+        bars=tuple(
+            bar.model_copy(update={"price_basis": "provider_unverified"}) for bar in view.bars
+        ),
+    )
+    assert all(
+        "UNVERIFIED_PRICE_VOLUME_BASIS" in row.reasons
+        for row in eligible_universe(unverified, repository.calendar, config)
+    )
