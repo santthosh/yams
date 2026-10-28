@@ -244,7 +244,31 @@ def main() -> None:
         evidence["checks"].append(
             "real browser candidate/target reruns and cash-only cases via supervised worker"
         )
-        # Internal service integration only: #41 owns public report submission.
+        subprocess.run(
+            ["pnpm", "--filter", "@yams/web", "exec", "node", "tests/experiment-browser.mjs"],
+            cwd=ROOT,
+            env={
+                **env,
+                "YAMS_SMOKE_URL": f"http://{address}",
+                "YAMS_SMOKE_EVIDENCE": str(destination),
+            },
+            check=True,
+        )
+        public_runs = json.loads((destination / "experiment-public.json").read_text())
+        evidence["public_experiments"] = public_runs
+        evidence["checks"].append(
+            "real browser public experiment rerun, pages, cancellation and fingerprints"
+        )
+
+        def verify_public_runs() -> None:
+            for saved in public_runs["runs"]:
+                identity = saved["run"]["id"]
+                assert get(f"experiments/{identity}") == saved["run"]
+                assert get(f"experiments/{identity}/series?limit=2") == saved["first"]
+                assert get(f"experiments/{identity}/trades") == saved["trades"]
+            assert get(f"experiments/{public_runs['cancelled']['id']}") == public_runs["cancelled"]
+
+        # Internal compatibility remains covered alongside the new public flow.
         core = json.loads(
             python(
                 "import json\n"
@@ -383,6 +407,7 @@ def main() -> None:
         assert get("workspace") == workspace
         assert core_state() == core_result
         assert metrics_report() == report
+        verify_public_runs()
         assert get("strategies") == strategies
         assert get(f"strategies/{strategy_id}/versions") == versions
         for editor_id, history in editor_versions.items():
@@ -403,6 +428,7 @@ def main() -> None:
         assert get("workspace") == workspace
         assert core_state() == core_result
         assert metrics_report() == report
+        verify_public_runs()
         assert get("strategies") == strategies
         assert get(f"strategies/{strategy_id}/versions") == versions
         for editor_id, history in editor_versions.items():
@@ -501,6 +527,7 @@ def main() -> None:
         assert get("workspace") == workspace
         assert core_state() == core_result
         assert metrics_report() == report
+        verify_public_runs()
         evidence["checks"].append(
             "failed migration blocks application startup; repair preserves workspace"
         )

@@ -39,6 +39,21 @@ export async function proxyApi(
     segments.length === 2 &&
     segments[0] === "strategy-evaluations" &&
     UUID_PATTERN.test(segments[1]);
+  const experiments = segments.length === 1 && segments[0] === "experiments";
+  const experimentDetail =
+    segments.length === 2 &&
+    segments[0] === "experiments" &&
+    UUID_PATTERN.test(segments[1]);
+  const experimentSamples =
+    segments.length === 3 &&
+    segments[0] === "experiments" &&
+    UUID_PATTERN.test(segments[1]) &&
+    ["series", "trades"].includes(segments[2]);
+  const cancelJob =
+    segments.length === 3 &&
+    segments[0] === "jobs" &&
+    UUID_PATTERN.test(segments[1]) &&
+    segments[2] === "cancel";
   const readStrategies = segments.length === 1 && segments[0] === "strategies";
   const strategyDetail =
     segments.length === 2 &&
@@ -53,7 +68,12 @@ export async function proxyApi(
     request.method !== "GET" &&
     !(
       request.method === "POST" &&
-      (refresh || evaluate || readStrategies || strategyVersions)
+      (refresh ||
+        evaluate ||
+        readStrategies ||
+        strategyVersions ||
+        experiments ||
+        cancelJob)
     )
   )
     return safeError(
@@ -63,8 +83,16 @@ export async function proxyApi(
     );
   const allowed =
     request.method === "POST"
-      ? refresh || evaluate || readStrategies || strategyVersions
-      : readData ||
+      ? refresh ||
+        evaluate ||
+        readStrategies ||
+        strategyVersions ||
+        experiments ||
+        cancelJob
+      : experiments ||
+        experimentDetail ||
+        experimentSamples ||
+        readData ||
         readStrategies ||
         strategyDetail ||
         strategyVersions ||
@@ -74,15 +102,20 @@ export async function proxyApi(
         (segments.length === 2 &&
           segments[0] === "jobs" &&
           UUID_PATTERN.test(segments[1]));
-  const queryKeys = readData
-    ? segments[1] === "assets"
-      ? ["mode", "snapshot_id", "query", "limit", "cursor"]
-      : segments[1] === "snapshots"
-        ? ["mode", "limit", "cursor"]
-        : ["mode"]
-    : (readStrategies || strategyVersions) && request.method === "GET"
+  const queryKeys =
+    experiments && request.method === "GET"
       ? ["limit", "cursor"]
-      : [];
+      : experimentSamples
+        ? ["limit", "cursor", "start_session", "end_session_exclusive"]
+        : readData
+          ? segments[1] === "assets"
+            ? ["mode", "snapshot_id", "query", "limit", "cursor"]
+            : segments[1] === "snapshots"
+              ? ["mode", "limit", "cursor"]
+              : ["mode"]
+          : (readStrategies || strategyVersions) && request.method === "GET"
+            ? ["limit", "cursor"]
+            : [];
   if (
     !allowed ||
     [...url.searchParams.keys()].some((key) => !queryKeys.includes(key))

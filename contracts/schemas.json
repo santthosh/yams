@@ -1429,6 +1429,3760 @@
     "title": "ErrorEnvelope",
     "type": "object"
   },
+  "ExperimentAccepted.serialization": {
+    "additionalProperties": false,
+    "properties": {
+      "experiment_id": {
+        "format": "uuid",
+        "title": "Experiment Id",
+        "type": "string"
+      },
+      "job_id": {
+        "format": "uuid",
+        "title": "Job Id",
+        "type": "string"
+      }
+    },
+    "required": [
+      "experiment_id",
+      "job_id"
+    ],
+    "title": "ExperimentAccepted",
+    "type": "object"
+  },
+  "ExperimentAccepted.validation": {
+    "additionalProperties": false,
+    "properties": {
+      "experiment_id": {
+        "format": "uuid",
+        "title": "Experiment Id",
+        "type": "string"
+      },
+      "job_id": {
+        "format": "uuid",
+        "title": "Job Id",
+        "type": "string"
+      }
+    },
+    "required": [
+      "experiment_id",
+      "job_id"
+    ],
+    "title": "ExperimentAccepted",
+    "type": "object"
+  },
+  "ExperimentDetailV1.serialization": {
+    "$defs": {
+      "ArtifactReference": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "schema_version": {
+            "minimum": 1,
+            "title": "Schema Version",
+            "type": "integer"
+          },
+          "sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Sha256",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "sha256",
+          "schema_version"
+        ],
+        "title": "ArtifactReference",
+        "type": "object"
+      },
+      "ComparisonTerms": {
+        "additionalProperties": false,
+        "properties": {
+          "benchmark_asset_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "title": "Benchmark Asset Id",
+            "type": "string"
+          },
+          "calendar_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Calendar Sha256",
+            "type": "string"
+          },
+          "core_engine_version": {
+            "title": "Core Engine Version",
+            "type": "string"
+          },
+          "core_policy_version": {
+            "const": "walk_forward_v1",
+            "title": "Core Policy Version",
+            "type": "string"
+          },
+          "end_session_exclusive": {
+            "format": "date",
+            "title": "End Session Exclusive",
+            "type": "string"
+          },
+          "evaluation_split": {
+            "$ref": "#/$defs/EvaluationSplit"
+          },
+          "execution_policy": {
+            "$ref": "#/$defs/backend__portfolio__execution__ExecutionPolicy"
+          },
+          "holdout_start_session": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Holdout Start Session"
+          },
+          "initial_capital_usd": {
+            "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Initial Capital Usd",
+            "type": "string"
+          },
+          "reporting_engine_version": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Reporting Engine Version",
+            "type": "string"
+          },
+          "reporting_version": {
+            "const": "q12_v1",
+            "default": "q12_v1",
+            "title": "Reporting Version",
+            "type": "string"
+          },
+          "sessions": {
+            "items": {
+              "format": "date",
+              "type": "string"
+            },
+            "title": "Sessions",
+            "type": "array"
+          },
+          "snapshot_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Snapshot Sha256",
+            "type": "string"
+          },
+          "source_mode": {
+            "enum": [
+              "synthetic_fixture",
+              "research_market_data"
+            ],
+            "title": "Source Mode",
+            "type": "string"
+          },
+          "start_session": {
+            "format": "date",
+            "title": "Start Session",
+            "type": "string"
+          },
+          "universe_canonical_json": {
+            "title": "Universe Canonical Json",
+            "type": "string"
+          }
+        },
+        "required": [
+          "snapshot_sha256",
+          "calendar_sha256",
+          "core_engine_version",
+          "reporting_engine_version",
+          "core_policy_version",
+          "source_mode",
+          "sessions",
+          "start_session",
+          "end_session_exclusive",
+          "initial_capital_usd",
+          "universe_canonical_json",
+          "execution_policy",
+          "benchmark_asset_id",
+          "evaluation_split",
+          "holdout_start_session"
+        ],
+        "title": "ComparisonTerms",
+        "type": "object"
+      },
+      "ErrorDetail": {
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "enum": [
+              "VALIDATION_ERROR",
+              "NOT_FOUND",
+              "METHOD_NOT_ALLOWED",
+              "HTTP_ERROR",
+              "NOT_READY",
+              "STATE_CONFLICT",
+              "IDEMPOTENCY_CONFLICT",
+              "STALE_DATA",
+              "INSUFFICIENT_MARKET_DATA",
+              "LIMIT_EXCEEDED",
+              "PROVIDER_UNAVAILABLE",
+              "FORECAST_UNAVAILABLE",
+              "JOB_FAILED",
+              "INTERNAL_ERROR",
+              "WORKLOAD_LIMIT",
+              "RESOURCE_EXHAUSTED",
+              "TIME_LIMIT"
+            ],
+            "title": "Code",
+            "type": "string"
+          },
+          "correlation_id": {
+            "format": "uuid",
+            "title": "Correlation Id",
+            "type": "string"
+          },
+          "details": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "boolean"
+                },
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                }
+              ]
+            },
+            "title": "Details",
+            "type": "object"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "retryable": {
+            "title": "Retryable",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "code",
+          "message",
+          "details",
+          "retryable",
+          "correlation_id"
+        ],
+        "title": "ErrorDetail",
+        "type": "object"
+      },
+      "EvaluationSplit": {
+        "additionalProperties": false,
+        "properties": {
+          "holdout_fraction": {
+            "gt": 0,
+            "lt": 1,
+            "title": "Holdout Fraction",
+            "type": "number"
+          },
+          "kind": {
+            "const": "chronological",
+            "title": "Kind",
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "holdout_fraction"
+        ],
+        "title": "EvaluationSplit",
+        "type": "object"
+      },
+      "ExperimentBenchmarkSummaryV1": {
+        "additionalProperties": false,
+        "properties": {
+          "asset_id": {
+            "title": "Asset Id",
+            "type": "string"
+          },
+          "available": {
+            "title": "Available",
+            "type": "boolean"
+          },
+          "periods": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/MetricsPeriods"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "unavailable_reason": {
+            "anyOf": [
+              {
+                "pattern": "^[A-Z][A-Z0-9_]*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unavailable Reason"
+          },
+          "warnings": {
+            "items": {
+              "pattern": "^[A-Z][A-Z0-9_]*$",
+              "type": "string"
+            },
+            "title": "Warnings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "asset_id",
+          "available",
+          "unavailable_reason",
+          "periods",
+          "warnings"
+        ],
+        "title": "ExperimentBenchmarkSummaryV1",
+        "type": "object"
+      },
+      "ExperimentMetrics": {
+        "additionalProperties": false,
+        "properties": {
+          "annualized_return_fraction": {
+            "$ref": "#/$defs/MetricValue"
+          },
+          "annualized_volatility_fraction": {
+            "$ref": "#/$defs/MetricValue"
+          },
+          "cumulative_return_fraction": {
+            "$ref": "#/$defs/MetricValue"
+          },
+          "fees_usd": {
+            "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Fees Usd",
+            "type": "string"
+          },
+          "max_drawdown_fraction": {
+            "$ref": "#/$defs/MetricValue"
+          },
+          "sharpe_ratio": {
+            "$ref": "#/$defs/MetricValue"
+          },
+          "slippage_usd": {
+            "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Slippage Usd",
+            "type": "string"
+          },
+          "trade_count": {
+            "minimum": 0,
+            "title": "Trade Count",
+            "type": "integer"
+          },
+          "turnover_fraction": {
+            "$ref": "#/$defs/MetricValue"
+          }
+        },
+        "required": [
+          "cumulative_return_fraction",
+          "annualized_return_fraction",
+          "annualized_volatility_fraction",
+          "max_drawdown_fraction",
+          "turnover_fraction",
+          "sharpe_ratio",
+          "slippage_usd",
+          "fees_usd",
+          "trade_count"
+        ],
+        "title": "ExperimentMetrics",
+        "type": "object"
+      },
+      "ExperimentReportSummaryV1": {
+        "additionalProperties": false,
+        "properties": {
+          "benchmark": {
+            "$ref": "#/$defs/ExperimentBenchmarkSummaryV1"
+          },
+          "cash": {
+            "$ref": "#/$defs/MetricsPeriods"
+          },
+          "comparison": {
+            "$ref": "#/$defs/ComparisonTerms"
+          },
+          "comparison_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Comparison Sha256",
+            "type": "string"
+          },
+          "core_manifest_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Core Manifest Sha256",
+            "type": "string"
+          },
+          "portfolio": {
+            "$ref": "#/$defs/MetricsPeriods"
+          },
+          "reporting_engine_version": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Reporting Engine Version",
+            "type": "string"
+          },
+          "reporting_version": {
+            "const": "q12_v1",
+            "title": "Reporting Version",
+            "type": "string"
+          },
+          "warnings": {
+            "items": {
+              "pattern": "^[A-Z][A-Z0-9_]*$",
+              "type": "string"
+            },
+            "title": "Warnings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "reporting_version",
+          "core_manifest_sha256",
+          "reporting_engine_version",
+          "comparison",
+          "comparison_sha256",
+          "portfolio",
+          "benchmark",
+          "cash",
+          "warnings"
+        ],
+        "title": "ExperimentReportSummaryV1",
+        "type": "object"
+      },
+      "ExperimentRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "benchmark_asset_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "title": "Benchmark Asset Id",
+            "type": "string"
+          },
+          "end_session_exclusive": {
+            "format": "date",
+            "title": "End Session Exclusive",
+            "type": "string"
+          },
+          "evaluation_split": {
+            "$ref": "#/$defs/EvaluationSplit"
+          },
+          "execution_policy_id": {
+            "const": "us_eod_next_open_v1",
+            "title": "Execution Policy Id",
+            "type": "string"
+          },
+          "initial_capital_usd": {
+            "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Initial Capital Usd",
+            "type": "string"
+          },
+          "random_seed": {
+            "maximum": 18446744073709551615,
+            "minimum": 0,
+            "title": "Random Seed",
+            "type": "integer"
+          },
+          "snapshot_id": {
+            "format": "uuid",
+            "title": "Snapshot Id",
+            "type": "string"
+          },
+          "start_session": {
+            "format": "date",
+            "title": "Start Session",
+            "type": "string"
+          },
+          "strategy_version_id": {
+            "format": "uuid",
+            "title": "Strategy Version Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "strategy_version_id",
+          "snapshot_id",
+          "start_session",
+          "end_session_exclusive",
+          "initial_capital_usd",
+          "benchmark_asset_id",
+          "execution_policy_id",
+          "random_seed",
+          "evaluation_split"
+        ],
+        "title": "ExperimentRequest",
+        "type": "object"
+      },
+      "LowVolatilitySignalConfig": {
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "const": "low_volatility",
+            "title": "Kind",
+            "type": "string"
+          },
+          "require_positive_trend": {
+            "title": "Require Positive Trend",
+            "type": "boolean"
+          },
+          "trend_sma_sessions": {
+            "maximum": 2520,
+            "minimum": 1,
+            "title": "Trend Sma Sessions",
+            "type": "integer"
+          },
+          "volatility_sessions": {
+            "maximum": 2519,
+            "minimum": 2,
+            "title": "Volatility Sessions",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "volatility_sessions",
+          "trend_sma_sessions",
+          "require_positive_trend",
+          "kind"
+        ],
+        "title": "LowVolatilitySignalConfig",
+        "type": "object"
+      },
+      "MeanReversionSignalConfig": {
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "const": "mean_reversion",
+            "title": "Kind",
+            "type": "string"
+          },
+          "mean_reversion_sessions": {
+            "maximum": 2520,
+            "minimum": 2,
+            "title": "Mean Reversion Sessions",
+            "type": "integer"
+          },
+          "require_positive_trend": {
+            "title": "Require Positive Trend",
+            "type": "boolean"
+          },
+          "trend_sma_sessions": {
+            "maximum": 2520,
+            "minimum": 1,
+            "title": "Trend Sma Sessions",
+            "type": "integer"
+          },
+          "volatility_sessions": {
+            "maximum": 2519,
+            "minimum": 2,
+            "title": "Volatility Sessions",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "volatility_sessions",
+          "trend_sma_sessions",
+          "require_positive_trend",
+          "kind",
+          "mean_reversion_sessions"
+        ],
+        "title": "MeanReversionSignalConfig",
+        "type": "object"
+      },
+      "MetricValue": {
+        "additionalProperties": false,
+        "properties": {
+          "unavailable_reason": {
+            "anyOf": [
+              {
+                "pattern": "^[A-Z][A-Z0-9_]*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unavailable Reason"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value"
+          }
+        },
+        "required": [
+          "value",
+          "unavailable_reason"
+        ],
+        "title": "MetricValue",
+        "type": "object"
+      },
+      "MetricsPeriods": {
+        "additionalProperties": false,
+        "properties": {
+          "development": {
+            "$ref": "#/$defs/PeriodMetrics"
+          },
+          "holdout": {
+            "$ref": "#/$defs/PeriodMetrics"
+          },
+          "total": {
+            "$ref": "#/$defs/PeriodMetrics"
+          }
+        },
+        "required": [
+          "total",
+          "development",
+          "holdout"
+        ],
+        "title": "MetricsPeriods",
+        "type": "object"
+      },
+      "PeriodMetrics": {
+        "additionalProperties": false,
+        "properties": {
+          "daily_nav_observations": {
+            "title": "Daily Nav Observations",
+            "type": "integer"
+          },
+          "metrics": {
+            "$ref": "#/$defs/ExperimentMetrics"
+          },
+          "return_observations": {
+            "title": "Return Observations",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "daily_nav_observations",
+          "return_observations",
+          "metrics"
+        ],
+        "title": "PeriodMetrics",
+        "type": "object"
+      },
+      "PortfolioConfig": {
+        "additionalProperties": false,
+        "properties": {
+          "max_position_weight": {
+            "pattern": "^(0|1)(\\.[0-9]{1,6})?$",
+            "title": "Max Position Weight",
+            "type": "string"
+          },
+          "max_positions": {
+            "maximum": 100,
+            "minimum": 1,
+            "title": "Max Positions",
+            "type": "integer"
+          },
+          "max_sector_weight": {
+            "pattern": "^(0|1)(\\.[0-9]{1,6})?$",
+            "title": "Max Sector Weight",
+            "type": "string"
+          },
+          "min_cash_weight": {
+            "pattern": "^(0|1)(\\.[0-9]{1,6})?$",
+            "title": "Min Cash Weight",
+            "type": "string"
+          },
+          "min_trade_usd": {
+            "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Min Trade Usd",
+            "type": "string"
+          },
+          "rebalance_band_absolute_weight": {
+            "pattern": "^(0|1)(\\.[0-9]{1,6})?$",
+            "title": "Rebalance Band Absolute Weight",
+            "type": "string"
+          },
+          "weighting": {
+            "const": "inverse_volatility",
+            "title": "Weighting",
+            "type": "string"
+          }
+        },
+        "required": [
+          "max_positions",
+          "weighting",
+          "max_position_weight",
+          "max_sector_weight",
+          "min_cash_weight",
+          "min_trade_usd",
+          "rebalance_band_absolute_weight"
+        ],
+        "title": "PortfolioConfig",
+        "type": "object"
+      },
+      "RebalanceConfig": {
+        "additionalProperties": false,
+        "properties": {
+          "frequency": {
+            "const": "monthly",
+            "title": "Frequency",
+            "type": "string"
+          }
+        },
+        "required": [
+          "frequency"
+        ],
+        "title": "RebalanceConfig",
+        "type": "object"
+      },
+      "ScoreWeights": {
+        "additionalProperties": false,
+        "properties": {
+          "momentum_long": {
+            "maximum": 1,
+            "minimum": -1,
+            "multipleOf": 1e-06,
+            "title": "Momentum Long",
+            "type": "number"
+          },
+          "momentum_short": {
+            "maximum": 1,
+            "minimum": -1,
+            "multipleOf": 1e-06,
+            "title": "Momentum Short",
+            "type": "number"
+          },
+          "volatility_penalty": {
+            "maximum": 1,
+            "minimum": -1,
+            "multipleOf": 1e-06,
+            "title": "Volatility Penalty",
+            "type": "number"
+          }
+        },
+        "required": [
+          "momentum_long",
+          "momentum_short",
+          "volatility_penalty"
+        ],
+        "title": "ScoreWeights",
+        "type": "object"
+      },
+      "SignalConfig": {
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "const": "risk_adjusted_momentum",
+            "title": "Kind",
+            "type": "string"
+          },
+          "momentum_long_sessions": {
+            "maximum": 2519,
+            "minimum": 1,
+            "title": "Momentum Long Sessions",
+            "type": "integer"
+          },
+          "momentum_short_sessions": {
+            "maximum": 2519,
+            "minimum": 1,
+            "title": "Momentum Short Sessions",
+            "type": "integer"
+          },
+          "require_positive_trend": {
+            "title": "Require Positive Trend",
+            "type": "boolean"
+          },
+          "trend_sma_sessions": {
+            "maximum": 2520,
+            "minimum": 1,
+            "title": "Trend Sma Sessions",
+            "type": "integer"
+          },
+          "volatility_sessions": {
+            "maximum": 2519,
+            "minimum": 2,
+            "title": "Volatility Sessions",
+            "type": "integer"
+          },
+          "z_score_weights": {
+            "$ref": "#/$defs/ScoreWeights"
+          }
+        },
+        "required": [
+          "kind",
+          "momentum_long_sessions",
+          "momentum_short_sessions",
+          "volatility_sessions",
+          "trend_sma_sessions",
+          "require_positive_trend",
+          "z_score_weights"
+        ],
+        "title": "SignalConfig",
+        "type": "object"
+      },
+      "StrategyConfigV1": {
+        "additionalProperties": false,
+        "properties": {
+          "display_name": {
+            "title": "Display Name",
+            "type": "string"
+          },
+          "execution_policy": {
+            "$ref": "#/$defs/backend__domain__strategy__ExecutionPolicy"
+          },
+          "portfolio": {
+            "$ref": "#/$defs/PortfolioConfig"
+          },
+          "rebalance": {
+            "$ref": "#/$defs/RebalanceConfig"
+          },
+          "schema_version": {
+            "const": 1,
+            "title": "Schema Version",
+            "type": "integer"
+          },
+          "signals": {
+            "discriminator": {
+              "mapping": {
+                "low_volatility": "#/$defs/LowVolatilitySignalConfig",
+                "mean_reversion": "#/$defs/MeanReversionSignalConfig",
+                "risk_adjusted_momentum": "#/$defs/SignalConfig"
+              },
+              "propertyName": "kind"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/SignalConfig"
+              },
+              {
+                "$ref": "#/$defs/MeanReversionSignalConfig"
+              },
+              {
+                "$ref": "#/$defs/LowVolatilitySignalConfig"
+              }
+            ],
+            "title": "Signals"
+          },
+          "universe": {
+            "$ref": "#/$defs/UniverseConfig"
+          }
+        },
+        "required": [
+          "schema_version",
+          "display_name",
+          "universe",
+          "signals",
+          "portfolio",
+          "rebalance",
+          "execution_policy"
+        ],
+        "title": "StrategyConfigV1",
+        "type": "object"
+      },
+      "UniverseConfig": {
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "const": "liquid_us_equities",
+            "title": "Kind",
+            "type": "string"
+          },
+          "min_history_sessions": {
+            "maximum": 2520,
+            "minimum": 252,
+            "title": "Min History Sessions",
+            "type": "integer"
+          },
+          "min_median_dollar_volume_usd": {
+            "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Min Median Dollar Volume Usd",
+            "type": "string"
+          },
+          "min_price_usd": {
+            "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Min Price Usd",
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "min_price_usd",
+          "min_median_dollar_volume_usd",
+          "min_history_sessions"
+        ],
+        "title": "UniverseConfig",
+        "type": "object"
+      },
+      "backend__domain__strategy__ExecutionPolicy": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "const": "us_eod_next_open_v1",
+            "title": "Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "title": "ExecutionPolicy",
+        "type": "object"
+      },
+      "backend__portfolio__execution__ExecutionPolicy": {
+        "additionalProperties": false,
+        "properties": {
+          "commission_usd": {
+            "default": "0.00",
+            "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Commission Usd",
+            "type": "string"
+          },
+          "id": {
+            "const": "us_eod_next_open_v1",
+            "default": "us_eod_next_open_v1",
+            "title": "Id",
+            "type": "string"
+          },
+          "slippage_fraction": {
+            "default": "0.001",
+            "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$",
+            "title": "Slippage Fraction",
+            "type": "string"
+          }
+        },
+        "title": "ExecutionPolicy",
+        "type": "object"
+      }
+    },
+    "additionalProperties": false,
+    "properties": {
+      "config_sha256": {
+        "pattern": "^[0-9a-f]{64}$",
+        "title": "Config Sha256",
+        "type": "string"
+      },
+      "created_at": {
+        "format": "date-time",
+        "pattern": "Z$",
+        "title": "Created At",
+        "type": "string"
+      },
+      "currency": {
+        "const": "USD",
+        "default": "USD",
+        "title": "Currency",
+        "type": "string"
+      },
+      "curve_artifact": {
+        "anyOf": [
+          {
+            "$ref": "#/$defs/ArtifactReference"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "data_status": {
+        "enum": [
+          "synthetic_fixture",
+          "research_market_data"
+        ],
+        "title": "Data Status",
+        "type": "string"
+      },
+      "engine_version": {
+        "title": "Engine Version",
+        "type": "string"
+      },
+      "error": {
+        "anyOf": [
+          {
+            "$ref": "#/$defs/ErrorDetail"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "id": {
+        "format": "uuid",
+        "title": "Id",
+        "type": "string"
+      },
+      "inputs": {
+        "$ref": "#/$defs/ExperimentRequest"
+      },
+      "job_id": {
+        "format": "uuid",
+        "title": "Job Id",
+        "type": "string"
+      },
+      "metrics": {
+        "anyOf": [
+          {
+            "$ref": "#/$defs/ExperimentMetrics"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "provider": {
+        "title": "Provider",
+        "type": "string"
+      },
+      "report": {
+        "anyOf": [
+          {
+            "$ref": "#/$defs/ExperimentReportSummaryV1"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "reproducibility_manifest": {
+        "anyOf": [
+          {
+            "$ref": "#/$defs/ArtifactReference"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "snapshot_sha256": {
+        "pattern": "^[0-9a-f]{64}$",
+        "title": "Snapshot Sha256",
+        "type": "string"
+      },
+      "status": {
+        "enum": [
+          "queued",
+          "running",
+          "cancel_requested",
+          "completed",
+          "failed",
+          "cancelled"
+        ],
+        "title": "Status",
+        "type": "string"
+      },
+      "strategy_config": {
+        "$ref": "#/$defs/StrategyConfigV1"
+      },
+      "trade_artifact": {
+        "anyOf": [
+          {
+            "$ref": "#/$defs/ArtifactReference"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "warnings": {
+        "items": {
+          "pattern": "^[A-Z][A-Z0-9_]*$",
+          "type": "string"
+        },
+        "title": "Warnings",
+        "type": "array"
+      }
+    },
+    "required": [
+      "id",
+      "job_id",
+      "status",
+      "inputs",
+      "config_sha256",
+      "snapshot_sha256",
+      "data_status",
+      "created_at",
+      "engine_version",
+      "metrics",
+      "curve_artifact",
+      "trade_artifact",
+      "reproducibility_manifest",
+      "warnings",
+      "error",
+      "provider",
+      "strategy_config",
+      "report"
+    ],
+    "title": "ExperimentDetailV1",
+    "type": "object"
+  },
+  "ExperimentDetailV1.validation": {
+    "$defs": {
+      "ArtifactReference": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "schema_version": {
+            "minimum": 1,
+            "title": "Schema Version",
+            "type": "integer"
+          },
+          "sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Sha256",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "sha256",
+          "schema_version"
+        ],
+        "title": "ArtifactReference",
+        "type": "object"
+      },
+      "ComparisonTerms": {
+        "additionalProperties": false,
+        "properties": {
+          "benchmark_asset_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "title": "Benchmark Asset Id",
+            "type": "string"
+          },
+          "calendar_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Calendar Sha256",
+            "type": "string"
+          },
+          "core_engine_version": {
+            "title": "Core Engine Version",
+            "type": "string"
+          },
+          "core_policy_version": {
+            "const": "walk_forward_v1",
+            "title": "Core Policy Version",
+            "type": "string"
+          },
+          "end_session_exclusive": {
+            "format": "date",
+            "title": "End Session Exclusive",
+            "type": "string"
+          },
+          "evaluation_split": {
+            "$ref": "#/$defs/EvaluationSplit"
+          },
+          "execution_policy": {
+            "$ref": "#/$defs/backend__portfolio__execution__ExecutionPolicy"
+          },
+          "holdout_start_session": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Holdout Start Session"
+          },
+          "initial_capital_usd": {
+            "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Initial Capital Usd",
+            "type": "string"
+          },
+          "reporting_engine_version": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Reporting Engine Version",
+            "type": "string"
+          },
+          "reporting_version": {
+            "const": "q12_v1",
+            "default": "q12_v1",
+            "title": "Reporting Version",
+            "type": "string"
+          },
+          "sessions": {
+            "items": {
+              "format": "date",
+              "type": "string"
+            },
+            "title": "Sessions",
+            "type": "array"
+          },
+          "snapshot_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Snapshot Sha256",
+            "type": "string"
+          },
+          "source_mode": {
+            "enum": [
+              "synthetic_fixture",
+              "research_market_data"
+            ],
+            "title": "Source Mode",
+            "type": "string"
+          },
+          "start_session": {
+            "format": "date",
+            "title": "Start Session",
+            "type": "string"
+          },
+          "universe_canonical_json": {
+            "title": "Universe Canonical Json",
+            "type": "string"
+          }
+        },
+        "required": [
+          "snapshot_sha256",
+          "calendar_sha256",
+          "core_engine_version",
+          "reporting_engine_version",
+          "core_policy_version",
+          "source_mode",
+          "sessions",
+          "start_session",
+          "end_session_exclusive",
+          "initial_capital_usd",
+          "universe_canonical_json",
+          "execution_policy",
+          "benchmark_asset_id",
+          "evaluation_split",
+          "holdout_start_session"
+        ],
+        "title": "ComparisonTerms",
+        "type": "object"
+      },
+      "ErrorDetail": {
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "enum": [
+              "VALIDATION_ERROR",
+              "NOT_FOUND",
+              "METHOD_NOT_ALLOWED",
+              "HTTP_ERROR",
+              "NOT_READY",
+              "STATE_CONFLICT",
+              "IDEMPOTENCY_CONFLICT",
+              "STALE_DATA",
+              "INSUFFICIENT_MARKET_DATA",
+              "LIMIT_EXCEEDED",
+              "PROVIDER_UNAVAILABLE",
+              "FORECAST_UNAVAILABLE",
+              "JOB_FAILED",
+              "INTERNAL_ERROR",
+              "WORKLOAD_LIMIT",
+              "RESOURCE_EXHAUSTED",
+              "TIME_LIMIT"
+            ],
+            "title": "Code",
+            "type": "string"
+          },
+          "correlation_id": {
+            "format": "uuid",
+            "title": "Correlation Id",
+            "type": "string"
+          },
+          "details": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "boolean"
+                },
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                }
+              ]
+            },
+            "title": "Details",
+            "type": "object"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "retryable": {
+            "title": "Retryable",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "code",
+          "message",
+          "details",
+          "retryable",
+          "correlation_id"
+        ],
+        "title": "ErrorDetail",
+        "type": "object"
+      },
+      "EvaluationSplit": {
+        "additionalProperties": false,
+        "properties": {
+          "holdout_fraction": {
+            "gt": 0,
+            "lt": 1,
+            "title": "Holdout Fraction",
+            "type": "number"
+          },
+          "kind": {
+            "const": "chronological",
+            "title": "Kind",
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "holdout_fraction"
+        ],
+        "title": "EvaluationSplit",
+        "type": "object"
+      },
+      "ExperimentBenchmarkSummaryV1": {
+        "additionalProperties": false,
+        "properties": {
+          "asset_id": {
+            "title": "Asset Id",
+            "type": "string"
+          },
+          "available": {
+            "title": "Available",
+            "type": "boolean"
+          },
+          "periods": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/MetricsPeriods"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "unavailable_reason": {
+            "anyOf": [
+              {
+                "pattern": "^[A-Z][A-Z0-9_]*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unavailable Reason"
+          },
+          "warnings": {
+            "items": {
+              "pattern": "^[A-Z][A-Z0-9_]*$",
+              "type": "string"
+            },
+            "title": "Warnings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "asset_id",
+          "available",
+          "unavailable_reason",
+          "periods",
+          "warnings"
+        ],
+        "title": "ExperimentBenchmarkSummaryV1",
+        "type": "object"
+      },
+      "ExperimentMetrics": {
+        "additionalProperties": false,
+        "properties": {
+          "annualized_return_fraction": {
+            "$ref": "#/$defs/MetricValue"
+          },
+          "annualized_volatility_fraction": {
+            "$ref": "#/$defs/MetricValue"
+          },
+          "cumulative_return_fraction": {
+            "$ref": "#/$defs/MetricValue"
+          },
+          "fees_usd": {
+            "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Fees Usd",
+            "type": "string"
+          },
+          "max_drawdown_fraction": {
+            "$ref": "#/$defs/MetricValue"
+          },
+          "sharpe_ratio": {
+            "$ref": "#/$defs/MetricValue"
+          },
+          "slippage_usd": {
+            "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Slippage Usd",
+            "type": "string"
+          },
+          "trade_count": {
+            "minimum": 0,
+            "title": "Trade Count",
+            "type": "integer"
+          },
+          "turnover_fraction": {
+            "$ref": "#/$defs/MetricValue"
+          }
+        },
+        "required": [
+          "cumulative_return_fraction",
+          "annualized_return_fraction",
+          "annualized_volatility_fraction",
+          "max_drawdown_fraction",
+          "turnover_fraction",
+          "sharpe_ratio",
+          "slippage_usd",
+          "fees_usd",
+          "trade_count"
+        ],
+        "title": "ExperimentMetrics",
+        "type": "object"
+      },
+      "ExperimentReportSummaryV1": {
+        "additionalProperties": false,
+        "properties": {
+          "benchmark": {
+            "$ref": "#/$defs/ExperimentBenchmarkSummaryV1"
+          },
+          "cash": {
+            "$ref": "#/$defs/MetricsPeriods"
+          },
+          "comparison": {
+            "$ref": "#/$defs/ComparisonTerms"
+          },
+          "comparison_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Comparison Sha256",
+            "type": "string"
+          },
+          "core_manifest_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Core Manifest Sha256",
+            "type": "string"
+          },
+          "portfolio": {
+            "$ref": "#/$defs/MetricsPeriods"
+          },
+          "reporting_engine_version": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Reporting Engine Version",
+            "type": "string"
+          },
+          "reporting_version": {
+            "const": "q12_v1",
+            "title": "Reporting Version",
+            "type": "string"
+          },
+          "warnings": {
+            "items": {
+              "pattern": "^[A-Z][A-Z0-9_]*$",
+              "type": "string"
+            },
+            "title": "Warnings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "reporting_version",
+          "core_manifest_sha256",
+          "reporting_engine_version",
+          "comparison",
+          "comparison_sha256",
+          "portfolio",
+          "benchmark",
+          "cash",
+          "warnings"
+        ],
+        "title": "ExperimentReportSummaryV1",
+        "type": "object"
+      },
+      "ExperimentRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "benchmark_asset_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "title": "Benchmark Asset Id",
+            "type": "string"
+          },
+          "end_session_exclusive": {
+            "format": "date",
+            "title": "End Session Exclusive",
+            "type": "string"
+          },
+          "evaluation_split": {
+            "$ref": "#/$defs/EvaluationSplit"
+          },
+          "execution_policy_id": {
+            "const": "us_eod_next_open_v1",
+            "title": "Execution Policy Id",
+            "type": "string"
+          },
+          "initial_capital_usd": {
+            "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Initial Capital Usd",
+            "type": "string"
+          },
+          "random_seed": {
+            "maximum": 18446744073709551615,
+            "minimum": 0,
+            "title": "Random Seed",
+            "type": "integer"
+          },
+          "snapshot_id": {
+            "format": "uuid",
+            "title": "Snapshot Id",
+            "type": "string"
+          },
+          "start_session": {
+            "format": "date",
+            "title": "Start Session",
+            "type": "string"
+          },
+          "strategy_version_id": {
+            "format": "uuid",
+            "title": "Strategy Version Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "strategy_version_id",
+          "snapshot_id",
+          "start_session",
+          "end_session_exclusive",
+          "initial_capital_usd",
+          "benchmark_asset_id",
+          "execution_policy_id",
+          "random_seed",
+          "evaluation_split"
+        ],
+        "title": "ExperimentRequest",
+        "type": "object"
+      },
+      "LowVolatilitySignalConfig": {
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "const": "low_volatility",
+            "title": "Kind",
+            "type": "string"
+          },
+          "require_positive_trend": {
+            "title": "Require Positive Trend",
+            "type": "boolean"
+          },
+          "trend_sma_sessions": {
+            "maximum": 2520,
+            "minimum": 1,
+            "title": "Trend Sma Sessions",
+            "type": "integer"
+          },
+          "volatility_sessions": {
+            "maximum": 2519,
+            "minimum": 2,
+            "title": "Volatility Sessions",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "volatility_sessions",
+          "trend_sma_sessions",
+          "require_positive_trend",
+          "kind"
+        ],
+        "title": "LowVolatilitySignalConfig",
+        "type": "object"
+      },
+      "MeanReversionSignalConfig": {
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "const": "mean_reversion",
+            "title": "Kind",
+            "type": "string"
+          },
+          "mean_reversion_sessions": {
+            "maximum": 2520,
+            "minimum": 2,
+            "title": "Mean Reversion Sessions",
+            "type": "integer"
+          },
+          "require_positive_trend": {
+            "title": "Require Positive Trend",
+            "type": "boolean"
+          },
+          "trend_sma_sessions": {
+            "maximum": 2520,
+            "minimum": 1,
+            "title": "Trend Sma Sessions",
+            "type": "integer"
+          },
+          "volatility_sessions": {
+            "maximum": 2519,
+            "minimum": 2,
+            "title": "Volatility Sessions",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "volatility_sessions",
+          "trend_sma_sessions",
+          "require_positive_trend",
+          "kind",
+          "mean_reversion_sessions"
+        ],
+        "title": "MeanReversionSignalConfig",
+        "type": "object"
+      },
+      "MetricValue": {
+        "additionalProperties": false,
+        "properties": {
+          "unavailable_reason": {
+            "anyOf": [
+              {
+                "pattern": "^[A-Z][A-Z0-9_]*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unavailable Reason"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value"
+          }
+        },
+        "required": [
+          "value",
+          "unavailable_reason"
+        ],
+        "title": "MetricValue",
+        "type": "object"
+      },
+      "MetricsPeriods": {
+        "additionalProperties": false,
+        "properties": {
+          "development": {
+            "$ref": "#/$defs/PeriodMetrics"
+          },
+          "holdout": {
+            "$ref": "#/$defs/PeriodMetrics"
+          },
+          "total": {
+            "$ref": "#/$defs/PeriodMetrics"
+          }
+        },
+        "required": [
+          "total",
+          "development",
+          "holdout"
+        ],
+        "title": "MetricsPeriods",
+        "type": "object"
+      },
+      "PeriodMetrics": {
+        "additionalProperties": false,
+        "properties": {
+          "daily_nav_observations": {
+            "title": "Daily Nav Observations",
+            "type": "integer"
+          },
+          "metrics": {
+            "$ref": "#/$defs/ExperimentMetrics"
+          },
+          "return_observations": {
+            "title": "Return Observations",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "daily_nav_observations",
+          "return_observations",
+          "metrics"
+        ],
+        "title": "PeriodMetrics",
+        "type": "object"
+      },
+      "PortfolioConfig": {
+        "additionalProperties": false,
+        "properties": {
+          "max_position_weight": {
+            "pattern": "^(0|1)(\\.[0-9]{1,6})?$",
+            "title": "Max Position Weight",
+            "type": "string"
+          },
+          "max_positions": {
+            "maximum": 100,
+            "minimum": 1,
+            "title": "Max Positions",
+            "type": "integer"
+          },
+          "max_sector_weight": {
+            "pattern": "^(0|1)(\\.[0-9]{1,6})?$",
+            "title": "Max Sector Weight",
+            "type": "string"
+          },
+          "min_cash_weight": {
+            "pattern": "^(0|1)(\\.[0-9]{1,6})?$",
+            "title": "Min Cash Weight",
+            "type": "string"
+          },
+          "min_trade_usd": {
+            "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Min Trade Usd",
+            "type": "string"
+          },
+          "rebalance_band_absolute_weight": {
+            "pattern": "^(0|1)(\\.[0-9]{1,6})?$",
+            "title": "Rebalance Band Absolute Weight",
+            "type": "string"
+          },
+          "weighting": {
+            "const": "inverse_volatility",
+            "title": "Weighting",
+            "type": "string"
+          }
+        },
+        "required": [
+          "max_positions",
+          "weighting",
+          "max_position_weight",
+          "max_sector_weight",
+          "min_cash_weight",
+          "min_trade_usd",
+          "rebalance_band_absolute_weight"
+        ],
+        "title": "PortfolioConfig",
+        "type": "object"
+      },
+      "RebalanceConfig": {
+        "additionalProperties": false,
+        "properties": {
+          "frequency": {
+            "const": "monthly",
+            "title": "Frequency",
+            "type": "string"
+          }
+        },
+        "required": [
+          "frequency"
+        ],
+        "title": "RebalanceConfig",
+        "type": "object"
+      },
+      "ScoreWeights": {
+        "additionalProperties": false,
+        "properties": {
+          "momentum_long": {
+            "maximum": 1,
+            "minimum": -1,
+            "multipleOf": 1e-06,
+            "title": "Momentum Long",
+            "type": "number"
+          },
+          "momentum_short": {
+            "maximum": 1,
+            "minimum": -1,
+            "multipleOf": 1e-06,
+            "title": "Momentum Short",
+            "type": "number"
+          },
+          "volatility_penalty": {
+            "maximum": 1,
+            "minimum": -1,
+            "multipleOf": 1e-06,
+            "title": "Volatility Penalty",
+            "type": "number"
+          }
+        },
+        "required": [
+          "momentum_long",
+          "momentum_short",
+          "volatility_penalty"
+        ],
+        "title": "ScoreWeights",
+        "type": "object"
+      },
+      "SignalConfig": {
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "const": "risk_adjusted_momentum",
+            "title": "Kind",
+            "type": "string"
+          },
+          "momentum_long_sessions": {
+            "maximum": 2519,
+            "minimum": 1,
+            "title": "Momentum Long Sessions",
+            "type": "integer"
+          },
+          "momentum_short_sessions": {
+            "maximum": 2519,
+            "minimum": 1,
+            "title": "Momentum Short Sessions",
+            "type": "integer"
+          },
+          "require_positive_trend": {
+            "title": "Require Positive Trend",
+            "type": "boolean"
+          },
+          "trend_sma_sessions": {
+            "maximum": 2520,
+            "minimum": 1,
+            "title": "Trend Sma Sessions",
+            "type": "integer"
+          },
+          "volatility_sessions": {
+            "maximum": 2519,
+            "minimum": 2,
+            "title": "Volatility Sessions",
+            "type": "integer"
+          },
+          "z_score_weights": {
+            "$ref": "#/$defs/ScoreWeights"
+          }
+        },
+        "required": [
+          "kind",
+          "momentum_long_sessions",
+          "momentum_short_sessions",
+          "volatility_sessions",
+          "trend_sma_sessions",
+          "require_positive_trend",
+          "z_score_weights"
+        ],
+        "title": "SignalConfig",
+        "type": "object"
+      },
+      "StrategyConfigV1": {
+        "additionalProperties": false,
+        "properties": {
+          "display_name": {
+            "title": "Display Name",
+            "type": "string"
+          },
+          "execution_policy": {
+            "$ref": "#/$defs/backend__domain__strategy__ExecutionPolicy"
+          },
+          "portfolio": {
+            "$ref": "#/$defs/PortfolioConfig"
+          },
+          "rebalance": {
+            "$ref": "#/$defs/RebalanceConfig"
+          },
+          "schema_version": {
+            "const": 1,
+            "title": "Schema Version",
+            "type": "integer"
+          },
+          "signals": {
+            "discriminator": {
+              "mapping": {
+                "low_volatility": "#/$defs/LowVolatilitySignalConfig",
+                "mean_reversion": "#/$defs/MeanReversionSignalConfig",
+                "risk_adjusted_momentum": "#/$defs/SignalConfig"
+              },
+              "propertyName": "kind"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/SignalConfig"
+              },
+              {
+                "$ref": "#/$defs/MeanReversionSignalConfig"
+              },
+              {
+                "$ref": "#/$defs/LowVolatilitySignalConfig"
+              }
+            ],
+            "title": "Signals"
+          },
+          "universe": {
+            "$ref": "#/$defs/UniverseConfig"
+          }
+        },
+        "required": [
+          "schema_version",
+          "display_name",
+          "universe",
+          "signals",
+          "portfolio",
+          "rebalance",
+          "execution_policy"
+        ],
+        "title": "StrategyConfigV1",
+        "type": "object"
+      },
+      "UniverseConfig": {
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "const": "liquid_us_equities",
+            "title": "Kind",
+            "type": "string"
+          },
+          "min_history_sessions": {
+            "maximum": 2520,
+            "minimum": 252,
+            "title": "Min History Sessions",
+            "type": "integer"
+          },
+          "min_median_dollar_volume_usd": {
+            "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Min Median Dollar Volume Usd",
+            "type": "string"
+          },
+          "min_price_usd": {
+            "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Min Price Usd",
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "min_price_usd",
+          "min_median_dollar_volume_usd",
+          "min_history_sessions"
+        ],
+        "title": "UniverseConfig",
+        "type": "object"
+      },
+      "backend__domain__strategy__ExecutionPolicy": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "const": "us_eod_next_open_v1",
+            "title": "Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "title": "ExecutionPolicy",
+        "type": "object"
+      },
+      "backend__portfolio__execution__ExecutionPolicy": {
+        "additionalProperties": false,
+        "properties": {
+          "commission_usd": {
+            "default": "0.00",
+            "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Commission Usd",
+            "type": "string"
+          },
+          "id": {
+            "const": "us_eod_next_open_v1",
+            "default": "us_eod_next_open_v1",
+            "title": "Id",
+            "type": "string"
+          },
+          "slippage_fraction": {
+            "default": "0.001",
+            "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$",
+            "title": "Slippage Fraction",
+            "type": "string"
+          }
+        },
+        "title": "ExecutionPolicy",
+        "type": "object"
+      }
+    },
+    "additionalProperties": false,
+    "properties": {
+      "config_sha256": {
+        "pattern": "^[0-9a-f]{64}$",
+        "title": "Config Sha256",
+        "type": "string"
+      },
+      "created_at": {
+        "format": "date-time",
+        "pattern": "Z$",
+        "title": "Created At",
+        "type": "string"
+      },
+      "currency": {
+        "const": "USD",
+        "default": "USD",
+        "title": "Currency",
+        "type": "string"
+      },
+      "curve_artifact": {
+        "anyOf": [
+          {
+            "$ref": "#/$defs/ArtifactReference"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "data_status": {
+        "enum": [
+          "synthetic_fixture",
+          "research_market_data"
+        ],
+        "title": "Data Status",
+        "type": "string"
+      },
+      "engine_version": {
+        "title": "Engine Version",
+        "type": "string"
+      },
+      "error": {
+        "anyOf": [
+          {
+            "$ref": "#/$defs/ErrorDetail"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "id": {
+        "format": "uuid",
+        "title": "Id",
+        "type": "string"
+      },
+      "inputs": {
+        "$ref": "#/$defs/ExperimentRequest"
+      },
+      "job_id": {
+        "format": "uuid",
+        "title": "Job Id",
+        "type": "string"
+      },
+      "metrics": {
+        "anyOf": [
+          {
+            "$ref": "#/$defs/ExperimentMetrics"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "provider": {
+        "title": "Provider",
+        "type": "string"
+      },
+      "report": {
+        "anyOf": [
+          {
+            "$ref": "#/$defs/ExperimentReportSummaryV1"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "reproducibility_manifest": {
+        "anyOf": [
+          {
+            "$ref": "#/$defs/ArtifactReference"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "snapshot_sha256": {
+        "pattern": "^[0-9a-f]{64}$",
+        "title": "Snapshot Sha256",
+        "type": "string"
+      },
+      "status": {
+        "enum": [
+          "queued",
+          "running",
+          "cancel_requested",
+          "completed",
+          "failed",
+          "cancelled"
+        ],
+        "title": "Status",
+        "type": "string"
+      },
+      "strategy_config": {
+        "$ref": "#/$defs/StrategyConfigV1"
+      },
+      "trade_artifact": {
+        "anyOf": [
+          {
+            "$ref": "#/$defs/ArtifactReference"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "warnings": {
+        "items": {
+          "pattern": "^[A-Z][A-Z0-9_]*$",
+          "type": "string"
+        },
+        "title": "Warnings",
+        "type": "array"
+      }
+    },
+    "required": [
+      "id",
+      "job_id",
+      "status",
+      "inputs",
+      "config_sha256",
+      "snapshot_sha256",
+      "data_status",
+      "created_at",
+      "engine_version",
+      "metrics",
+      "curve_artifact",
+      "trade_artifact",
+      "reproducibility_manifest",
+      "warnings",
+      "error",
+      "provider",
+      "strategy_config",
+      "report"
+    ],
+    "title": "ExperimentDetailV1",
+    "type": "object"
+  },
+  "ExperimentPageV1.serialization": {
+    "$defs": {
+      "ErrorDetail": {
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "enum": [
+              "VALIDATION_ERROR",
+              "NOT_FOUND",
+              "METHOD_NOT_ALLOWED",
+              "HTTP_ERROR",
+              "NOT_READY",
+              "STATE_CONFLICT",
+              "IDEMPOTENCY_CONFLICT",
+              "STALE_DATA",
+              "INSUFFICIENT_MARKET_DATA",
+              "LIMIT_EXCEEDED",
+              "PROVIDER_UNAVAILABLE",
+              "FORECAST_UNAVAILABLE",
+              "JOB_FAILED",
+              "INTERNAL_ERROR",
+              "WORKLOAD_LIMIT",
+              "RESOURCE_EXHAUSTED",
+              "TIME_LIMIT"
+            ],
+            "title": "Code",
+            "type": "string"
+          },
+          "correlation_id": {
+            "format": "uuid",
+            "title": "Correlation Id",
+            "type": "string"
+          },
+          "details": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "boolean"
+                },
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                }
+              ]
+            },
+            "title": "Details",
+            "type": "object"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "retryable": {
+            "title": "Retryable",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "code",
+          "message",
+          "details",
+          "retryable",
+          "correlation_id"
+        ],
+        "title": "ErrorDetail",
+        "type": "object"
+      },
+      "EvaluationSplit": {
+        "additionalProperties": false,
+        "properties": {
+          "holdout_fraction": {
+            "gt": 0,
+            "lt": 1,
+            "title": "Holdout Fraction",
+            "type": "number"
+          },
+          "kind": {
+            "const": "chronological",
+            "title": "Kind",
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "holdout_fraction"
+        ],
+        "title": "EvaluationSplit",
+        "type": "object"
+      },
+      "ExperimentRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "benchmark_asset_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "title": "Benchmark Asset Id",
+            "type": "string"
+          },
+          "end_session_exclusive": {
+            "format": "date",
+            "title": "End Session Exclusive",
+            "type": "string"
+          },
+          "evaluation_split": {
+            "$ref": "#/$defs/EvaluationSplit"
+          },
+          "execution_policy_id": {
+            "const": "us_eod_next_open_v1",
+            "title": "Execution Policy Id",
+            "type": "string"
+          },
+          "initial_capital_usd": {
+            "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Initial Capital Usd",
+            "type": "string"
+          },
+          "random_seed": {
+            "maximum": 18446744073709551615,
+            "minimum": 0,
+            "title": "Random Seed",
+            "type": "integer"
+          },
+          "snapshot_id": {
+            "format": "uuid",
+            "title": "Snapshot Id",
+            "type": "string"
+          },
+          "start_session": {
+            "format": "date",
+            "title": "Start Session",
+            "type": "string"
+          },
+          "strategy_version_id": {
+            "format": "uuid",
+            "title": "Strategy Version Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "strategy_version_id",
+          "snapshot_id",
+          "start_session",
+          "end_session_exclusive",
+          "initial_capital_usd",
+          "benchmark_asset_id",
+          "execution_policy_id",
+          "random_seed",
+          "evaluation_split"
+        ],
+        "title": "ExperimentRequest",
+        "type": "object"
+      },
+      "ExperimentSummaryV1": {
+        "additionalProperties": false,
+        "properties": {
+          "config_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Config Sha256",
+            "type": "string"
+          },
+          "created_at": {
+            "format": "date-time",
+            "pattern": "Z$",
+            "title": "Created At",
+            "type": "string"
+          },
+          "data_status": {
+            "enum": [
+              "synthetic_fixture",
+              "research_market_data"
+            ],
+            "title": "Data Status",
+            "type": "string"
+          },
+          "engine_version": {
+            "title": "Engine Version",
+            "type": "string"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/ErrorDetail"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "inputs": {
+            "$ref": "#/$defs/ExperimentRequest"
+          },
+          "job_id": {
+            "format": "uuid",
+            "title": "Job Id",
+            "type": "string"
+          },
+          "snapshot_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Snapshot Sha256",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "queued",
+              "running",
+              "cancel_requested",
+              "completed",
+              "failed",
+              "cancelled"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "job_id",
+          "status",
+          "inputs",
+          "config_sha256",
+          "snapshot_sha256",
+          "data_status",
+          "created_at",
+          "engine_version",
+          "error"
+        ],
+        "title": "ExperimentSummaryV1",
+        "type": "object"
+      }
+    },
+    "additionalProperties": false,
+    "properties": {
+      "items": {
+        "items": {
+          "$ref": "#/$defs/ExperimentSummaryV1"
+        },
+        "title": "Items",
+        "type": "array"
+      },
+      "next_cursor": {
+        "anyOf": [
+          {
+            "maxLength": 2048,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9_-]+$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Next Cursor"
+      }
+    },
+    "required": [
+      "items",
+      "next_cursor"
+    ],
+    "title": "ExperimentPageV1",
+    "type": "object"
+  },
+  "ExperimentPageV1.validation": {
+    "$defs": {
+      "ErrorDetail": {
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "enum": [
+              "VALIDATION_ERROR",
+              "NOT_FOUND",
+              "METHOD_NOT_ALLOWED",
+              "HTTP_ERROR",
+              "NOT_READY",
+              "STATE_CONFLICT",
+              "IDEMPOTENCY_CONFLICT",
+              "STALE_DATA",
+              "INSUFFICIENT_MARKET_DATA",
+              "LIMIT_EXCEEDED",
+              "PROVIDER_UNAVAILABLE",
+              "FORECAST_UNAVAILABLE",
+              "JOB_FAILED",
+              "INTERNAL_ERROR",
+              "WORKLOAD_LIMIT",
+              "RESOURCE_EXHAUSTED",
+              "TIME_LIMIT"
+            ],
+            "title": "Code",
+            "type": "string"
+          },
+          "correlation_id": {
+            "format": "uuid",
+            "title": "Correlation Id",
+            "type": "string"
+          },
+          "details": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "boolean"
+                },
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                }
+              ]
+            },
+            "title": "Details",
+            "type": "object"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "retryable": {
+            "title": "Retryable",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "code",
+          "message",
+          "details",
+          "retryable",
+          "correlation_id"
+        ],
+        "title": "ErrorDetail",
+        "type": "object"
+      },
+      "EvaluationSplit": {
+        "additionalProperties": false,
+        "properties": {
+          "holdout_fraction": {
+            "gt": 0,
+            "lt": 1,
+            "title": "Holdout Fraction",
+            "type": "number"
+          },
+          "kind": {
+            "const": "chronological",
+            "title": "Kind",
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "holdout_fraction"
+        ],
+        "title": "EvaluationSplit",
+        "type": "object"
+      },
+      "ExperimentRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "benchmark_asset_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "title": "Benchmark Asset Id",
+            "type": "string"
+          },
+          "end_session_exclusive": {
+            "format": "date",
+            "title": "End Session Exclusive",
+            "type": "string"
+          },
+          "evaluation_split": {
+            "$ref": "#/$defs/EvaluationSplit"
+          },
+          "execution_policy_id": {
+            "const": "us_eod_next_open_v1",
+            "title": "Execution Policy Id",
+            "type": "string"
+          },
+          "initial_capital_usd": {
+            "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Initial Capital Usd",
+            "type": "string"
+          },
+          "random_seed": {
+            "maximum": 18446744073709551615,
+            "minimum": 0,
+            "title": "Random Seed",
+            "type": "integer"
+          },
+          "snapshot_id": {
+            "format": "uuid",
+            "title": "Snapshot Id",
+            "type": "string"
+          },
+          "start_session": {
+            "format": "date",
+            "title": "Start Session",
+            "type": "string"
+          },
+          "strategy_version_id": {
+            "format": "uuid",
+            "title": "Strategy Version Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "strategy_version_id",
+          "snapshot_id",
+          "start_session",
+          "end_session_exclusive",
+          "initial_capital_usd",
+          "benchmark_asset_id",
+          "execution_policy_id",
+          "random_seed",
+          "evaluation_split"
+        ],
+        "title": "ExperimentRequest",
+        "type": "object"
+      },
+      "ExperimentSummaryV1": {
+        "additionalProperties": false,
+        "properties": {
+          "config_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Config Sha256",
+            "type": "string"
+          },
+          "created_at": {
+            "format": "date-time",
+            "pattern": "Z$",
+            "title": "Created At",
+            "type": "string"
+          },
+          "data_status": {
+            "enum": [
+              "synthetic_fixture",
+              "research_market_data"
+            ],
+            "title": "Data Status",
+            "type": "string"
+          },
+          "engine_version": {
+            "title": "Engine Version",
+            "type": "string"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/ErrorDetail"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "inputs": {
+            "$ref": "#/$defs/ExperimentRequest"
+          },
+          "job_id": {
+            "format": "uuid",
+            "title": "Job Id",
+            "type": "string"
+          },
+          "snapshot_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Snapshot Sha256",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "queued",
+              "running",
+              "cancel_requested",
+              "completed",
+              "failed",
+              "cancelled"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "job_id",
+          "status",
+          "inputs",
+          "config_sha256",
+          "snapshot_sha256",
+          "data_status",
+          "created_at",
+          "engine_version",
+          "error"
+        ],
+        "title": "ExperimentSummaryV1",
+        "type": "object"
+      }
+    },
+    "additionalProperties": false,
+    "properties": {
+      "items": {
+        "items": {
+          "$ref": "#/$defs/ExperimentSummaryV1"
+        },
+        "title": "Items",
+        "type": "array"
+      },
+      "next_cursor": {
+        "anyOf": [
+          {
+            "maxLength": 2048,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9_-]+$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Next Cursor"
+      }
+    },
+    "required": [
+      "items",
+      "next_cursor"
+    ],
+    "title": "ExperimentPageV1",
+    "type": "object"
+  },
+  "ExperimentReproducibilityV1.serialization": {
+    "$defs": {
+      "EvaluationSplit": {
+        "additionalProperties": false,
+        "properties": {
+          "holdout_fraction": {
+            "gt": 0,
+            "lt": 1,
+            "title": "Holdout Fraction",
+            "type": "number"
+          },
+          "kind": {
+            "const": "chronological",
+            "title": "Kind",
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "holdout_fraction"
+        ],
+        "title": "EvaluationSplit",
+        "type": "object"
+      },
+      "ExecutionPolicy": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "const": "us_eod_next_open_v1",
+            "title": "Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "title": "ExecutionPolicy",
+        "type": "object"
+      },
+      "ExperimentRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "benchmark_asset_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "title": "Benchmark Asset Id",
+            "type": "string"
+          },
+          "end_session_exclusive": {
+            "format": "date",
+            "title": "End Session Exclusive",
+            "type": "string"
+          },
+          "evaluation_split": {
+            "$ref": "#/$defs/EvaluationSplit"
+          },
+          "execution_policy_id": {
+            "const": "us_eod_next_open_v1",
+            "title": "Execution Policy Id",
+            "type": "string"
+          },
+          "initial_capital_usd": {
+            "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Initial Capital Usd",
+            "type": "string"
+          },
+          "random_seed": {
+            "maximum": 18446744073709551615,
+            "minimum": 0,
+            "title": "Random Seed",
+            "type": "integer"
+          },
+          "snapshot_id": {
+            "format": "uuid",
+            "title": "Snapshot Id",
+            "type": "string"
+          },
+          "start_session": {
+            "format": "date",
+            "title": "Start Session",
+            "type": "string"
+          },
+          "strategy_version_id": {
+            "format": "uuid",
+            "title": "Strategy Version Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "strategy_version_id",
+          "snapshot_id",
+          "start_session",
+          "end_session_exclusive",
+          "initial_capital_usd",
+          "benchmark_asset_id",
+          "execution_policy_id",
+          "random_seed",
+          "evaluation_split"
+        ],
+        "title": "ExperimentRequest",
+        "type": "object"
+      },
+      "LowVolatilitySignalConfig": {
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "const": "low_volatility",
+            "title": "Kind",
+            "type": "string"
+          },
+          "require_positive_trend": {
+            "title": "Require Positive Trend",
+            "type": "boolean"
+          },
+          "trend_sma_sessions": {
+            "maximum": 2520,
+            "minimum": 1,
+            "title": "Trend Sma Sessions",
+            "type": "integer"
+          },
+          "volatility_sessions": {
+            "maximum": 2519,
+            "minimum": 2,
+            "title": "Volatility Sessions",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "volatility_sessions",
+          "trend_sma_sessions",
+          "require_positive_trend",
+          "kind"
+        ],
+        "title": "LowVolatilitySignalConfig",
+        "type": "object"
+      },
+      "MeanReversionSignalConfig": {
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "const": "mean_reversion",
+            "title": "Kind",
+            "type": "string"
+          },
+          "mean_reversion_sessions": {
+            "maximum": 2520,
+            "minimum": 2,
+            "title": "Mean Reversion Sessions",
+            "type": "integer"
+          },
+          "require_positive_trend": {
+            "title": "Require Positive Trend",
+            "type": "boolean"
+          },
+          "trend_sma_sessions": {
+            "maximum": 2520,
+            "minimum": 1,
+            "title": "Trend Sma Sessions",
+            "type": "integer"
+          },
+          "volatility_sessions": {
+            "maximum": 2519,
+            "minimum": 2,
+            "title": "Volatility Sessions",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "volatility_sessions",
+          "trend_sma_sessions",
+          "require_positive_trend",
+          "kind",
+          "mean_reversion_sessions"
+        ],
+        "title": "MeanReversionSignalConfig",
+        "type": "object"
+      },
+      "PortfolioConfig": {
+        "additionalProperties": false,
+        "properties": {
+          "max_position_weight": {
+            "pattern": "^(0|1)(\\.[0-9]{1,6})?$",
+            "title": "Max Position Weight",
+            "type": "string"
+          },
+          "max_positions": {
+            "maximum": 100,
+            "minimum": 1,
+            "title": "Max Positions",
+            "type": "integer"
+          },
+          "max_sector_weight": {
+            "pattern": "^(0|1)(\\.[0-9]{1,6})?$",
+            "title": "Max Sector Weight",
+            "type": "string"
+          },
+          "min_cash_weight": {
+            "pattern": "^(0|1)(\\.[0-9]{1,6})?$",
+            "title": "Min Cash Weight",
+            "type": "string"
+          },
+          "min_trade_usd": {
+            "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Min Trade Usd",
+            "type": "string"
+          },
+          "rebalance_band_absolute_weight": {
+            "pattern": "^(0|1)(\\.[0-9]{1,6})?$",
+            "title": "Rebalance Band Absolute Weight",
+            "type": "string"
+          },
+          "weighting": {
+            "const": "inverse_volatility",
+            "title": "Weighting",
+            "type": "string"
+          }
+        },
+        "required": [
+          "max_positions",
+          "weighting",
+          "max_position_weight",
+          "max_sector_weight",
+          "min_cash_weight",
+          "min_trade_usd",
+          "rebalance_band_absolute_weight"
+        ],
+        "title": "PortfolioConfig",
+        "type": "object"
+      },
+      "RebalanceConfig": {
+        "additionalProperties": false,
+        "properties": {
+          "frequency": {
+            "const": "monthly",
+            "title": "Frequency",
+            "type": "string"
+          }
+        },
+        "required": [
+          "frequency"
+        ],
+        "title": "RebalanceConfig",
+        "type": "object"
+      },
+      "ScoreWeights": {
+        "additionalProperties": false,
+        "properties": {
+          "momentum_long": {
+            "maximum": 1,
+            "minimum": -1,
+            "multipleOf": 1e-06,
+            "title": "Momentum Long",
+            "type": "number"
+          },
+          "momentum_short": {
+            "maximum": 1,
+            "minimum": -1,
+            "multipleOf": 1e-06,
+            "title": "Momentum Short",
+            "type": "number"
+          },
+          "volatility_penalty": {
+            "maximum": 1,
+            "minimum": -1,
+            "multipleOf": 1e-06,
+            "title": "Volatility Penalty",
+            "type": "number"
+          }
+        },
+        "required": [
+          "momentum_long",
+          "momentum_short",
+          "volatility_penalty"
+        ],
+        "title": "ScoreWeights",
+        "type": "object"
+      },
+      "SignalConfig": {
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "const": "risk_adjusted_momentum",
+            "title": "Kind",
+            "type": "string"
+          },
+          "momentum_long_sessions": {
+            "maximum": 2519,
+            "minimum": 1,
+            "title": "Momentum Long Sessions",
+            "type": "integer"
+          },
+          "momentum_short_sessions": {
+            "maximum": 2519,
+            "minimum": 1,
+            "title": "Momentum Short Sessions",
+            "type": "integer"
+          },
+          "require_positive_trend": {
+            "title": "Require Positive Trend",
+            "type": "boolean"
+          },
+          "trend_sma_sessions": {
+            "maximum": 2520,
+            "minimum": 1,
+            "title": "Trend Sma Sessions",
+            "type": "integer"
+          },
+          "volatility_sessions": {
+            "maximum": 2519,
+            "minimum": 2,
+            "title": "Volatility Sessions",
+            "type": "integer"
+          },
+          "z_score_weights": {
+            "$ref": "#/$defs/ScoreWeights"
+          }
+        },
+        "required": [
+          "kind",
+          "momentum_long_sessions",
+          "momentum_short_sessions",
+          "volatility_sessions",
+          "trend_sma_sessions",
+          "require_positive_trend",
+          "z_score_weights"
+        ],
+        "title": "SignalConfig",
+        "type": "object"
+      },
+      "StrategyConfigV1": {
+        "additionalProperties": false,
+        "properties": {
+          "display_name": {
+            "title": "Display Name",
+            "type": "string"
+          },
+          "execution_policy": {
+            "$ref": "#/$defs/ExecutionPolicy"
+          },
+          "portfolio": {
+            "$ref": "#/$defs/PortfolioConfig"
+          },
+          "rebalance": {
+            "$ref": "#/$defs/RebalanceConfig"
+          },
+          "schema_version": {
+            "const": 1,
+            "title": "Schema Version",
+            "type": "integer"
+          },
+          "signals": {
+            "discriminator": {
+              "mapping": {
+                "low_volatility": "#/$defs/LowVolatilitySignalConfig",
+                "mean_reversion": "#/$defs/MeanReversionSignalConfig",
+                "risk_adjusted_momentum": "#/$defs/SignalConfig"
+              },
+              "propertyName": "kind"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/SignalConfig"
+              },
+              {
+                "$ref": "#/$defs/MeanReversionSignalConfig"
+              },
+              {
+                "$ref": "#/$defs/LowVolatilitySignalConfig"
+              }
+            ],
+            "title": "Signals"
+          },
+          "universe": {
+            "$ref": "#/$defs/UniverseConfig"
+          }
+        },
+        "required": [
+          "schema_version",
+          "display_name",
+          "universe",
+          "signals",
+          "portfolio",
+          "rebalance",
+          "execution_policy"
+        ],
+        "title": "StrategyConfigV1",
+        "type": "object"
+      },
+      "UniverseConfig": {
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "const": "liquid_us_equities",
+            "title": "Kind",
+            "type": "string"
+          },
+          "min_history_sessions": {
+            "maximum": 2520,
+            "minimum": 252,
+            "title": "Min History Sessions",
+            "type": "integer"
+          },
+          "min_median_dollar_volume_usd": {
+            "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Min Median Dollar Volume Usd",
+            "type": "string"
+          },
+          "min_price_usd": {
+            "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Min Price Usd",
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "min_price_usd",
+          "min_median_dollar_volume_usd",
+          "min_history_sessions"
+        ],
+        "title": "UniverseConfig",
+        "type": "object"
+      }
+    },
+    "additionalProperties": false,
+    "properties": {
+      "calendar_sha256": {
+        "pattern": "^[0-9a-f]{64}$",
+        "title": "Calendar Sha256",
+        "type": "string"
+      },
+      "config_sha256": {
+        "pattern": "^[0-9a-f]{64}$",
+        "title": "Config Sha256",
+        "type": "string"
+      },
+      "core_manifest_sha256": {
+        "pattern": "^[0-9a-f]{64}$",
+        "title": "Core Manifest Sha256",
+        "type": "string"
+      },
+      "core_policy_version": {
+        "const": "walk_forward_v1",
+        "title": "Core Policy Version",
+        "type": "string"
+      },
+      "decision_clock_policy": {
+        "const": "next_pinned_open_minus_one_hour",
+        "title": "Decision Clock Policy",
+        "type": "string"
+      },
+      "engine_version": {
+        "pattern": "^[0-9a-f]{64}$",
+        "title": "Engine Version",
+        "type": "string"
+      },
+      "inputs": {
+        "$ref": "#/$defs/ExperimentRequest"
+      },
+      "provider": {
+        "title": "Provider",
+        "type": "string"
+      },
+      "reporting_engine_version": {
+        "pattern": "^[0-9a-f]{64}$",
+        "title": "Reporting Engine Version",
+        "type": "string"
+      },
+      "reporting_version": {
+        "const": "q12_v1",
+        "title": "Reporting Version",
+        "type": "string"
+      },
+      "schema_version": {
+        "const": 1,
+        "default": 1,
+        "title": "Schema Version",
+        "type": "integer"
+      },
+      "snapshot_sha256": {
+        "pattern": "^[0-9a-f]{64}$",
+        "title": "Snapshot Sha256",
+        "type": "string"
+      },
+      "source_mode": {
+        "enum": [
+          "synthetic_fixture",
+          "research_market_data"
+        ],
+        "title": "Source Mode",
+        "type": "string"
+      },
+      "strategy_config": {
+        "$ref": "#/$defs/StrategyConfigV1"
+      },
+      "warnings": {
+        "items": {
+          "pattern": "^[A-Z][A-Z0-9_]*$",
+          "type": "string"
+        },
+        "title": "Warnings",
+        "type": "array"
+      }
+    },
+    "required": [
+      "inputs",
+      "strategy_config",
+      "config_sha256",
+      "snapshot_sha256",
+      "calendar_sha256",
+      "core_manifest_sha256",
+      "engine_version",
+      "reporting_engine_version",
+      "source_mode",
+      "provider",
+      "core_policy_version",
+      "reporting_version",
+      "decision_clock_policy",
+      "warnings"
+    ],
+    "title": "ExperimentReproducibilityV1",
+    "type": "object"
+  },
+  "ExperimentReproducibilityV1.validation": {
+    "$defs": {
+      "EvaluationSplit": {
+        "additionalProperties": false,
+        "properties": {
+          "holdout_fraction": {
+            "gt": 0,
+            "lt": 1,
+            "title": "Holdout Fraction",
+            "type": "number"
+          },
+          "kind": {
+            "const": "chronological",
+            "title": "Kind",
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "holdout_fraction"
+        ],
+        "title": "EvaluationSplit",
+        "type": "object"
+      },
+      "ExecutionPolicy": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "const": "us_eod_next_open_v1",
+            "title": "Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "title": "ExecutionPolicy",
+        "type": "object"
+      },
+      "ExperimentRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "benchmark_asset_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "title": "Benchmark Asset Id",
+            "type": "string"
+          },
+          "end_session_exclusive": {
+            "format": "date",
+            "title": "End Session Exclusive",
+            "type": "string"
+          },
+          "evaluation_split": {
+            "$ref": "#/$defs/EvaluationSplit"
+          },
+          "execution_policy_id": {
+            "const": "us_eod_next_open_v1",
+            "title": "Execution Policy Id",
+            "type": "string"
+          },
+          "initial_capital_usd": {
+            "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Initial Capital Usd",
+            "type": "string"
+          },
+          "random_seed": {
+            "maximum": 18446744073709551615,
+            "minimum": 0,
+            "title": "Random Seed",
+            "type": "integer"
+          },
+          "snapshot_id": {
+            "format": "uuid",
+            "title": "Snapshot Id",
+            "type": "string"
+          },
+          "start_session": {
+            "format": "date",
+            "title": "Start Session",
+            "type": "string"
+          },
+          "strategy_version_id": {
+            "format": "uuid",
+            "title": "Strategy Version Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "strategy_version_id",
+          "snapshot_id",
+          "start_session",
+          "end_session_exclusive",
+          "initial_capital_usd",
+          "benchmark_asset_id",
+          "execution_policy_id",
+          "random_seed",
+          "evaluation_split"
+        ],
+        "title": "ExperimentRequest",
+        "type": "object"
+      },
+      "LowVolatilitySignalConfig": {
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "const": "low_volatility",
+            "title": "Kind",
+            "type": "string"
+          },
+          "require_positive_trend": {
+            "title": "Require Positive Trend",
+            "type": "boolean"
+          },
+          "trend_sma_sessions": {
+            "maximum": 2520,
+            "minimum": 1,
+            "title": "Trend Sma Sessions",
+            "type": "integer"
+          },
+          "volatility_sessions": {
+            "maximum": 2519,
+            "minimum": 2,
+            "title": "Volatility Sessions",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "volatility_sessions",
+          "trend_sma_sessions",
+          "require_positive_trend",
+          "kind"
+        ],
+        "title": "LowVolatilitySignalConfig",
+        "type": "object"
+      },
+      "MeanReversionSignalConfig": {
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "const": "mean_reversion",
+            "title": "Kind",
+            "type": "string"
+          },
+          "mean_reversion_sessions": {
+            "maximum": 2520,
+            "minimum": 2,
+            "title": "Mean Reversion Sessions",
+            "type": "integer"
+          },
+          "require_positive_trend": {
+            "title": "Require Positive Trend",
+            "type": "boolean"
+          },
+          "trend_sma_sessions": {
+            "maximum": 2520,
+            "minimum": 1,
+            "title": "Trend Sma Sessions",
+            "type": "integer"
+          },
+          "volatility_sessions": {
+            "maximum": 2519,
+            "minimum": 2,
+            "title": "Volatility Sessions",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "volatility_sessions",
+          "trend_sma_sessions",
+          "require_positive_trend",
+          "kind",
+          "mean_reversion_sessions"
+        ],
+        "title": "MeanReversionSignalConfig",
+        "type": "object"
+      },
+      "PortfolioConfig": {
+        "additionalProperties": false,
+        "properties": {
+          "max_position_weight": {
+            "pattern": "^(0|1)(\\.[0-9]{1,6})?$",
+            "title": "Max Position Weight",
+            "type": "string"
+          },
+          "max_positions": {
+            "maximum": 100,
+            "minimum": 1,
+            "title": "Max Positions",
+            "type": "integer"
+          },
+          "max_sector_weight": {
+            "pattern": "^(0|1)(\\.[0-9]{1,6})?$",
+            "title": "Max Sector Weight",
+            "type": "string"
+          },
+          "min_cash_weight": {
+            "pattern": "^(0|1)(\\.[0-9]{1,6})?$",
+            "title": "Min Cash Weight",
+            "type": "string"
+          },
+          "min_trade_usd": {
+            "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Min Trade Usd",
+            "type": "string"
+          },
+          "rebalance_band_absolute_weight": {
+            "pattern": "^(0|1)(\\.[0-9]{1,6})?$",
+            "title": "Rebalance Band Absolute Weight",
+            "type": "string"
+          },
+          "weighting": {
+            "const": "inverse_volatility",
+            "title": "Weighting",
+            "type": "string"
+          }
+        },
+        "required": [
+          "max_positions",
+          "weighting",
+          "max_position_weight",
+          "max_sector_weight",
+          "min_cash_weight",
+          "min_trade_usd",
+          "rebalance_band_absolute_weight"
+        ],
+        "title": "PortfolioConfig",
+        "type": "object"
+      },
+      "RebalanceConfig": {
+        "additionalProperties": false,
+        "properties": {
+          "frequency": {
+            "const": "monthly",
+            "title": "Frequency",
+            "type": "string"
+          }
+        },
+        "required": [
+          "frequency"
+        ],
+        "title": "RebalanceConfig",
+        "type": "object"
+      },
+      "ScoreWeights": {
+        "additionalProperties": false,
+        "properties": {
+          "momentum_long": {
+            "maximum": 1,
+            "minimum": -1,
+            "multipleOf": 1e-06,
+            "title": "Momentum Long",
+            "type": "number"
+          },
+          "momentum_short": {
+            "maximum": 1,
+            "minimum": -1,
+            "multipleOf": 1e-06,
+            "title": "Momentum Short",
+            "type": "number"
+          },
+          "volatility_penalty": {
+            "maximum": 1,
+            "minimum": -1,
+            "multipleOf": 1e-06,
+            "title": "Volatility Penalty",
+            "type": "number"
+          }
+        },
+        "required": [
+          "momentum_long",
+          "momentum_short",
+          "volatility_penalty"
+        ],
+        "title": "ScoreWeights",
+        "type": "object"
+      },
+      "SignalConfig": {
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "const": "risk_adjusted_momentum",
+            "title": "Kind",
+            "type": "string"
+          },
+          "momentum_long_sessions": {
+            "maximum": 2519,
+            "minimum": 1,
+            "title": "Momentum Long Sessions",
+            "type": "integer"
+          },
+          "momentum_short_sessions": {
+            "maximum": 2519,
+            "minimum": 1,
+            "title": "Momentum Short Sessions",
+            "type": "integer"
+          },
+          "require_positive_trend": {
+            "title": "Require Positive Trend",
+            "type": "boolean"
+          },
+          "trend_sma_sessions": {
+            "maximum": 2520,
+            "minimum": 1,
+            "title": "Trend Sma Sessions",
+            "type": "integer"
+          },
+          "volatility_sessions": {
+            "maximum": 2519,
+            "minimum": 2,
+            "title": "Volatility Sessions",
+            "type": "integer"
+          },
+          "z_score_weights": {
+            "$ref": "#/$defs/ScoreWeights"
+          }
+        },
+        "required": [
+          "kind",
+          "momentum_long_sessions",
+          "momentum_short_sessions",
+          "volatility_sessions",
+          "trend_sma_sessions",
+          "require_positive_trend",
+          "z_score_weights"
+        ],
+        "title": "SignalConfig",
+        "type": "object"
+      },
+      "StrategyConfigV1": {
+        "additionalProperties": false,
+        "properties": {
+          "display_name": {
+            "title": "Display Name",
+            "type": "string"
+          },
+          "execution_policy": {
+            "$ref": "#/$defs/ExecutionPolicy"
+          },
+          "portfolio": {
+            "$ref": "#/$defs/PortfolioConfig"
+          },
+          "rebalance": {
+            "$ref": "#/$defs/RebalanceConfig"
+          },
+          "schema_version": {
+            "const": 1,
+            "title": "Schema Version",
+            "type": "integer"
+          },
+          "signals": {
+            "discriminator": {
+              "mapping": {
+                "low_volatility": "#/$defs/LowVolatilitySignalConfig",
+                "mean_reversion": "#/$defs/MeanReversionSignalConfig",
+                "risk_adjusted_momentum": "#/$defs/SignalConfig"
+              },
+              "propertyName": "kind"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/SignalConfig"
+              },
+              {
+                "$ref": "#/$defs/MeanReversionSignalConfig"
+              },
+              {
+                "$ref": "#/$defs/LowVolatilitySignalConfig"
+              }
+            ],
+            "title": "Signals"
+          },
+          "universe": {
+            "$ref": "#/$defs/UniverseConfig"
+          }
+        },
+        "required": [
+          "schema_version",
+          "display_name",
+          "universe",
+          "signals",
+          "portfolio",
+          "rebalance",
+          "execution_policy"
+        ],
+        "title": "StrategyConfigV1",
+        "type": "object"
+      },
+      "UniverseConfig": {
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "const": "liquid_us_equities",
+            "title": "Kind",
+            "type": "string"
+          },
+          "min_history_sessions": {
+            "maximum": 2520,
+            "minimum": 252,
+            "title": "Min History Sessions",
+            "type": "integer"
+          },
+          "min_median_dollar_volume_usd": {
+            "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Min Median Dollar Volume Usd",
+            "type": "string"
+          },
+          "min_price_usd": {
+            "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Min Price Usd",
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "min_price_usd",
+          "min_median_dollar_volume_usd",
+          "min_history_sessions"
+        ],
+        "title": "UniverseConfig",
+        "type": "object"
+      }
+    },
+    "additionalProperties": false,
+    "properties": {
+      "calendar_sha256": {
+        "pattern": "^[0-9a-f]{64}$",
+        "title": "Calendar Sha256",
+        "type": "string"
+      },
+      "config_sha256": {
+        "pattern": "^[0-9a-f]{64}$",
+        "title": "Config Sha256",
+        "type": "string"
+      },
+      "core_manifest_sha256": {
+        "pattern": "^[0-9a-f]{64}$",
+        "title": "Core Manifest Sha256",
+        "type": "string"
+      },
+      "core_policy_version": {
+        "const": "walk_forward_v1",
+        "title": "Core Policy Version",
+        "type": "string"
+      },
+      "decision_clock_policy": {
+        "const": "next_pinned_open_minus_one_hour",
+        "title": "Decision Clock Policy",
+        "type": "string"
+      },
+      "engine_version": {
+        "pattern": "^[0-9a-f]{64}$",
+        "title": "Engine Version",
+        "type": "string"
+      },
+      "inputs": {
+        "$ref": "#/$defs/ExperimentRequest"
+      },
+      "provider": {
+        "title": "Provider",
+        "type": "string"
+      },
+      "reporting_engine_version": {
+        "pattern": "^[0-9a-f]{64}$",
+        "title": "Reporting Engine Version",
+        "type": "string"
+      },
+      "reporting_version": {
+        "const": "q12_v1",
+        "title": "Reporting Version",
+        "type": "string"
+      },
+      "schema_version": {
+        "const": 1,
+        "default": 1,
+        "title": "Schema Version",
+        "type": "integer"
+      },
+      "snapshot_sha256": {
+        "pattern": "^[0-9a-f]{64}$",
+        "title": "Snapshot Sha256",
+        "type": "string"
+      },
+      "source_mode": {
+        "enum": [
+          "synthetic_fixture",
+          "research_market_data"
+        ],
+        "title": "Source Mode",
+        "type": "string"
+      },
+      "strategy_config": {
+        "$ref": "#/$defs/StrategyConfigV1"
+      },
+      "warnings": {
+        "items": {
+          "pattern": "^[A-Z][A-Z0-9_]*$",
+          "type": "string"
+        },
+        "title": "Warnings",
+        "type": "array"
+      }
+    },
+    "required": [
+      "inputs",
+      "strategy_config",
+      "config_sha256",
+      "snapshot_sha256",
+      "calendar_sha256",
+      "core_manifest_sha256",
+      "engine_version",
+      "reporting_engine_version",
+      "source_mode",
+      "provider",
+      "core_policy_version",
+      "reporting_version",
+      "decision_clock_policy",
+      "warnings"
+    ],
+    "title": "ExperimentReproducibilityV1",
+    "type": "object"
+  },
   "ExperimentRequest.serialization": {
     "$defs": {
       "EvaluationSplit": {
@@ -2415,6 +6169,2010 @@
       "error"
     ],
     "title": "ExperimentRunV1",
+    "type": "object"
+  },
+  "ExperimentSeriesPageV1.serialization": {
+    "$defs": {
+      "ExperimentCurvePointV1": {
+        "additionalProperties": false,
+        "properties": {
+          "benchmark_nav_usd": {
+            "anyOf": [
+              {
+                "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Benchmark Nav Usd"
+          },
+          "benchmark_unavailable_reason": {
+            "anyOf": [
+              {
+                "pattern": "^[A-Z][A-Z0-9_]*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Benchmark Unavailable Reason"
+          },
+          "cash_baseline_nav_usd": {
+            "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Cash Baseline Nav Usd",
+            "type": "string"
+          },
+          "cash_usd": {
+            "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Cash Usd",
+            "type": "string"
+          },
+          "cash_weight": {
+            "$ref": "#/$defs/WeightValue"
+          },
+          "currency": {
+            "const": "USD",
+            "default": "USD",
+            "title": "Currency",
+            "type": "string"
+          },
+          "drawdown_fraction": {
+            "$ref": "#/$defs/MetricValue"
+          },
+          "max_position_weight": {
+            "$ref": "#/$defs/WeightValue"
+          },
+          "phase": {
+            "enum": [
+              "development",
+              "holdout"
+            ],
+            "title": "Phase",
+            "type": "string"
+          },
+          "portfolio_nav_usd": {
+            "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Portfolio Nav Usd",
+            "type": "string"
+          },
+          "positions": {
+            "items": {
+              "$ref": "#/$defs/Position"
+            },
+            "title": "Positions",
+            "type": "array"
+          },
+          "session_date": {
+            "format": "date",
+            "title": "Session Date",
+            "type": "string"
+          }
+        },
+        "required": [
+          "session_date",
+          "phase",
+          "portfolio_nav_usd",
+          "cash_usd",
+          "positions",
+          "benchmark_nav_usd",
+          "benchmark_unavailable_reason",
+          "cash_baseline_nav_usd",
+          "drawdown_fraction",
+          "cash_weight",
+          "max_position_weight"
+        ],
+        "title": "ExperimentCurvePointV1",
+        "type": "object"
+      },
+      "MetricValue": {
+        "additionalProperties": false,
+        "properties": {
+          "unavailable_reason": {
+            "anyOf": [
+              {
+                "pattern": "^[A-Z][A-Z0-9_]*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unavailable Reason"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value"
+          }
+        },
+        "required": [
+          "value",
+          "unavailable_reason"
+        ],
+        "title": "MetricValue",
+        "type": "object"
+      },
+      "Position": {
+        "additionalProperties": false,
+        "properties": {
+          "asset_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "title": "Asset Id",
+            "type": "string"
+          },
+          "quantity": {
+            "pattern": "^(0|[1-9][0-9]{0,23})(\\.[0-9]{1,6})?$",
+            "title": "Quantity",
+            "type": "string"
+          },
+          "sector": {
+            "minLength": 1,
+            "title": "Sector",
+            "type": "string"
+          },
+          "total_basis_usd": {
+            "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Total Basis Usd",
+            "type": "string"
+          }
+        },
+        "required": [
+          "asset_id",
+          "sector",
+          "quantity",
+          "total_basis_usd"
+        ],
+        "title": "Position",
+        "type": "object"
+      },
+      "WeightValue": {
+        "additionalProperties": false,
+        "properties": {
+          "unavailable_reason": {
+            "anyOf": [
+              {
+                "pattern": "^[A-Z][A-Z0-9_]*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unavailable Reason"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value"
+          }
+        },
+        "required": [
+          "value",
+          "unavailable_reason"
+        ],
+        "title": "WeightValue",
+        "type": "object"
+      }
+    },
+    "additionalProperties": false,
+    "properties": {
+      "items": {
+        "items": {
+          "$ref": "#/$defs/ExperimentCurvePointV1"
+        },
+        "title": "Items",
+        "type": "array"
+      },
+      "next_cursor": {
+        "anyOf": [
+          {
+            "maxLength": 2048,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9_-]+$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Next Cursor"
+      }
+    },
+    "required": [
+      "items",
+      "next_cursor"
+    ],
+    "title": "ExperimentSeriesPageV1",
+    "type": "object"
+  },
+  "ExperimentSeriesPageV1.validation": {
+    "$defs": {
+      "ExperimentCurvePointV1": {
+        "additionalProperties": false,
+        "properties": {
+          "benchmark_nav_usd": {
+            "anyOf": [
+              {
+                "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Benchmark Nav Usd"
+          },
+          "benchmark_unavailable_reason": {
+            "anyOf": [
+              {
+                "pattern": "^[A-Z][A-Z0-9_]*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Benchmark Unavailable Reason"
+          },
+          "cash_baseline_nav_usd": {
+            "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Cash Baseline Nav Usd",
+            "type": "string"
+          },
+          "cash_usd": {
+            "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Cash Usd",
+            "type": "string"
+          },
+          "cash_weight": {
+            "$ref": "#/$defs/WeightValue"
+          },
+          "currency": {
+            "const": "USD",
+            "default": "USD",
+            "title": "Currency",
+            "type": "string"
+          },
+          "drawdown_fraction": {
+            "$ref": "#/$defs/MetricValue"
+          },
+          "max_position_weight": {
+            "$ref": "#/$defs/WeightValue"
+          },
+          "phase": {
+            "enum": [
+              "development",
+              "holdout"
+            ],
+            "title": "Phase",
+            "type": "string"
+          },
+          "portfolio_nav_usd": {
+            "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Portfolio Nav Usd",
+            "type": "string"
+          },
+          "positions": {
+            "items": {
+              "$ref": "#/$defs/Position"
+            },
+            "title": "Positions",
+            "type": "array"
+          },
+          "session_date": {
+            "format": "date",
+            "title": "Session Date",
+            "type": "string"
+          }
+        },
+        "required": [
+          "session_date",
+          "phase",
+          "portfolio_nav_usd",
+          "cash_usd",
+          "positions",
+          "benchmark_nav_usd",
+          "benchmark_unavailable_reason",
+          "cash_baseline_nav_usd",
+          "drawdown_fraction",
+          "cash_weight",
+          "max_position_weight"
+        ],
+        "title": "ExperimentCurvePointV1",
+        "type": "object"
+      },
+      "MetricValue": {
+        "additionalProperties": false,
+        "properties": {
+          "unavailable_reason": {
+            "anyOf": [
+              {
+                "pattern": "^[A-Z][A-Z0-9_]*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unavailable Reason"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value"
+          }
+        },
+        "required": [
+          "value",
+          "unavailable_reason"
+        ],
+        "title": "MetricValue",
+        "type": "object"
+      },
+      "Position": {
+        "additionalProperties": false,
+        "properties": {
+          "asset_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "title": "Asset Id",
+            "type": "string"
+          },
+          "quantity": {
+            "pattern": "^(0|[1-9][0-9]{0,23})(\\.[0-9]{1,6})?$",
+            "title": "Quantity",
+            "type": "string"
+          },
+          "sector": {
+            "minLength": 1,
+            "title": "Sector",
+            "type": "string"
+          },
+          "total_basis_usd": {
+            "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Total Basis Usd",
+            "type": "string"
+          }
+        },
+        "required": [
+          "asset_id",
+          "sector",
+          "quantity",
+          "total_basis_usd"
+        ],
+        "title": "Position",
+        "type": "object"
+      },
+      "WeightValue": {
+        "additionalProperties": false,
+        "properties": {
+          "unavailable_reason": {
+            "anyOf": [
+              {
+                "pattern": "^[A-Z][A-Z0-9_]*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unavailable Reason"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value"
+          }
+        },
+        "required": [
+          "value",
+          "unavailable_reason"
+        ],
+        "title": "WeightValue",
+        "type": "object"
+      }
+    },
+    "additionalProperties": false,
+    "properties": {
+      "items": {
+        "items": {
+          "$ref": "#/$defs/ExperimentCurvePointV1"
+        },
+        "title": "Items",
+        "type": "array"
+      },
+      "next_cursor": {
+        "anyOf": [
+          {
+            "maxLength": 2048,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9_-]+$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Next Cursor"
+      }
+    },
+    "required": [
+      "items",
+      "next_cursor"
+    ],
+    "title": "ExperimentSeriesPageV1",
+    "type": "object"
+  },
+  "ExperimentSummaryV1.serialization": {
+    "$defs": {
+      "ErrorDetail": {
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "enum": [
+              "VALIDATION_ERROR",
+              "NOT_FOUND",
+              "METHOD_NOT_ALLOWED",
+              "HTTP_ERROR",
+              "NOT_READY",
+              "STATE_CONFLICT",
+              "IDEMPOTENCY_CONFLICT",
+              "STALE_DATA",
+              "INSUFFICIENT_MARKET_DATA",
+              "LIMIT_EXCEEDED",
+              "PROVIDER_UNAVAILABLE",
+              "FORECAST_UNAVAILABLE",
+              "JOB_FAILED",
+              "INTERNAL_ERROR",
+              "WORKLOAD_LIMIT",
+              "RESOURCE_EXHAUSTED",
+              "TIME_LIMIT"
+            ],
+            "title": "Code",
+            "type": "string"
+          },
+          "correlation_id": {
+            "format": "uuid",
+            "title": "Correlation Id",
+            "type": "string"
+          },
+          "details": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "boolean"
+                },
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                }
+              ]
+            },
+            "title": "Details",
+            "type": "object"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "retryable": {
+            "title": "Retryable",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "code",
+          "message",
+          "details",
+          "retryable",
+          "correlation_id"
+        ],
+        "title": "ErrorDetail",
+        "type": "object"
+      },
+      "EvaluationSplit": {
+        "additionalProperties": false,
+        "properties": {
+          "holdout_fraction": {
+            "gt": 0,
+            "lt": 1,
+            "title": "Holdout Fraction",
+            "type": "number"
+          },
+          "kind": {
+            "const": "chronological",
+            "title": "Kind",
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "holdout_fraction"
+        ],
+        "title": "EvaluationSplit",
+        "type": "object"
+      },
+      "ExperimentRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "benchmark_asset_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "title": "Benchmark Asset Id",
+            "type": "string"
+          },
+          "end_session_exclusive": {
+            "format": "date",
+            "title": "End Session Exclusive",
+            "type": "string"
+          },
+          "evaluation_split": {
+            "$ref": "#/$defs/EvaluationSplit"
+          },
+          "execution_policy_id": {
+            "const": "us_eod_next_open_v1",
+            "title": "Execution Policy Id",
+            "type": "string"
+          },
+          "initial_capital_usd": {
+            "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Initial Capital Usd",
+            "type": "string"
+          },
+          "random_seed": {
+            "maximum": 18446744073709551615,
+            "minimum": 0,
+            "title": "Random Seed",
+            "type": "integer"
+          },
+          "snapshot_id": {
+            "format": "uuid",
+            "title": "Snapshot Id",
+            "type": "string"
+          },
+          "start_session": {
+            "format": "date",
+            "title": "Start Session",
+            "type": "string"
+          },
+          "strategy_version_id": {
+            "format": "uuid",
+            "title": "Strategy Version Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "strategy_version_id",
+          "snapshot_id",
+          "start_session",
+          "end_session_exclusive",
+          "initial_capital_usd",
+          "benchmark_asset_id",
+          "execution_policy_id",
+          "random_seed",
+          "evaluation_split"
+        ],
+        "title": "ExperimentRequest",
+        "type": "object"
+      }
+    },
+    "additionalProperties": false,
+    "properties": {
+      "config_sha256": {
+        "pattern": "^[0-9a-f]{64}$",
+        "title": "Config Sha256",
+        "type": "string"
+      },
+      "created_at": {
+        "format": "date-time",
+        "pattern": "Z$",
+        "title": "Created At",
+        "type": "string"
+      },
+      "data_status": {
+        "enum": [
+          "synthetic_fixture",
+          "research_market_data"
+        ],
+        "title": "Data Status",
+        "type": "string"
+      },
+      "engine_version": {
+        "title": "Engine Version",
+        "type": "string"
+      },
+      "error": {
+        "anyOf": [
+          {
+            "$ref": "#/$defs/ErrorDetail"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "id": {
+        "format": "uuid",
+        "title": "Id",
+        "type": "string"
+      },
+      "inputs": {
+        "$ref": "#/$defs/ExperimentRequest"
+      },
+      "job_id": {
+        "format": "uuid",
+        "title": "Job Id",
+        "type": "string"
+      },
+      "snapshot_sha256": {
+        "pattern": "^[0-9a-f]{64}$",
+        "title": "Snapshot Sha256",
+        "type": "string"
+      },
+      "status": {
+        "enum": [
+          "queued",
+          "running",
+          "cancel_requested",
+          "completed",
+          "failed",
+          "cancelled"
+        ],
+        "title": "Status",
+        "type": "string"
+      }
+    },
+    "required": [
+      "id",
+      "job_id",
+      "status",
+      "inputs",
+      "config_sha256",
+      "snapshot_sha256",
+      "data_status",
+      "created_at",
+      "engine_version",
+      "error"
+    ],
+    "title": "ExperimentSummaryV1",
+    "type": "object"
+  },
+  "ExperimentSummaryV1.validation": {
+    "$defs": {
+      "ErrorDetail": {
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "enum": [
+              "VALIDATION_ERROR",
+              "NOT_FOUND",
+              "METHOD_NOT_ALLOWED",
+              "HTTP_ERROR",
+              "NOT_READY",
+              "STATE_CONFLICT",
+              "IDEMPOTENCY_CONFLICT",
+              "STALE_DATA",
+              "INSUFFICIENT_MARKET_DATA",
+              "LIMIT_EXCEEDED",
+              "PROVIDER_UNAVAILABLE",
+              "FORECAST_UNAVAILABLE",
+              "JOB_FAILED",
+              "INTERNAL_ERROR",
+              "WORKLOAD_LIMIT",
+              "RESOURCE_EXHAUSTED",
+              "TIME_LIMIT"
+            ],
+            "title": "Code",
+            "type": "string"
+          },
+          "correlation_id": {
+            "format": "uuid",
+            "title": "Correlation Id",
+            "type": "string"
+          },
+          "details": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "boolean"
+                },
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                }
+              ]
+            },
+            "title": "Details",
+            "type": "object"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "retryable": {
+            "title": "Retryable",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "code",
+          "message",
+          "details",
+          "retryable",
+          "correlation_id"
+        ],
+        "title": "ErrorDetail",
+        "type": "object"
+      },
+      "EvaluationSplit": {
+        "additionalProperties": false,
+        "properties": {
+          "holdout_fraction": {
+            "gt": 0,
+            "lt": 1,
+            "title": "Holdout Fraction",
+            "type": "number"
+          },
+          "kind": {
+            "const": "chronological",
+            "title": "Kind",
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "holdout_fraction"
+        ],
+        "title": "EvaluationSplit",
+        "type": "object"
+      },
+      "ExperimentRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "benchmark_asset_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "title": "Benchmark Asset Id",
+            "type": "string"
+          },
+          "end_session_exclusive": {
+            "format": "date",
+            "title": "End Session Exclusive",
+            "type": "string"
+          },
+          "evaluation_split": {
+            "$ref": "#/$defs/EvaluationSplit"
+          },
+          "execution_policy_id": {
+            "const": "us_eod_next_open_v1",
+            "title": "Execution Policy Id",
+            "type": "string"
+          },
+          "initial_capital_usd": {
+            "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Initial Capital Usd",
+            "type": "string"
+          },
+          "random_seed": {
+            "maximum": 18446744073709551615,
+            "minimum": 0,
+            "title": "Random Seed",
+            "type": "integer"
+          },
+          "snapshot_id": {
+            "format": "uuid",
+            "title": "Snapshot Id",
+            "type": "string"
+          },
+          "start_session": {
+            "format": "date",
+            "title": "Start Session",
+            "type": "string"
+          },
+          "strategy_version_id": {
+            "format": "uuid",
+            "title": "Strategy Version Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "strategy_version_id",
+          "snapshot_id",
+          "start_session",
+          "end_session_exclusive",
+          "initial_capital_usd",
+          "benchmark_asset_id",
+          "execution_policy_id",
+          "random_seed",
+          "evaluation_split"
+        ],
+        "title": "ExperimentRequest",
+        "type": "object"
+      }
+    },
+    "additionalProperties": false,
+    "properties": {
+      "config_sha256": {
+        "pattern": "^[0-9a-f]{64}$",
+        "title": "Config Sha256",
+        "type": "string"
+      },
+      "created_at": {
+        "format": "date-time",
+        "pattern": "Z$",
+        "title": "Created At",
+        "type": "string"
+      },
+      "data_status": {
+        "enum": [
+          "synthetic_fixture",
+          "research_market_data"
+        ],
+        "title": "Data Status",
+        "type": "string"
+      },
+      "engine_version": {
+        "title": "Engine Version",
+        "type": "string"
+      },
+      "error": {
+        "anyOf": [
+          {
+            "$ref": "#/$defs/ErrorDetail"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "id": {
+        "format": "uuid",
+        "title": "Id",
+        "type": "string"
+      },
+      "inputs": {
+        "$ref": "#/$defs/ExperimentRequest"
+      },
+      "job_id": {
+        "format": "uuid",
+        "title": "Job Id",
+        "type": "string"
+      },
+      "snapshot_sha256": {
+        "pattern": "^[0-9a-f]{64}$",
+        "title": "Snapshot Sha256",
+        "type": "string"
+      },
+      "status": {
+        "enum": [
+          "queued",
+          "running",
+          "cancel_requested",
+          "completed",
+          "failed",
+          "cancelled"
+        ],
+        "title": "Status",
+        "type": "string"
+      }
+    },
+    "required": [
+      "id",
+      "job_id",
+      "status",
+      "inputs",
+      "config_sha256",
+      "snapshot_sha256",
+      "data_status",
+      "created_at",
+      "engine_version",
+      "error"
+    ],
+    "title": "ExperimentSummaryV1",
+    "type": "object"
+  },
+  "ExperimentTradesPageV1.serialization": {
+    "$defs": {
+      "AppliedAction": {
+        "additionalProperties": false,
+        "properties": {
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "payload_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Payload Sha256",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "payload_sha256"
+        ],
+        "title": "AppliedAction",
+        "type": "object"
+      },
+      "DividendEntitlement": {
+        "additionalProperties": false,
+        "properties": {
+          "asset_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "title": "Asset Id",
+            "type": "string"
+          },
+          "evidence_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Evidence Sha256",
+            "type": "string"
+          },
+          "ex_session": {
+            "format": "date",
+            "title": "Ex Session",
+            "type": "string"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "per_share": {
+            "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$",
+            "title": "Per Share",
+            "type": "string"
+          },
+          "quantity": {
+            "pattern": "^(0|[1-9][0-9]{0,23})(\\.[0-9]{1,6})?$",
+            "title": "Quantity",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "asset_id",
+          "ex_session",
+          "quantity",
+          "per_share",
+          "evidence_sha256"
+        ],
+        "title": "DividendEntitlement",
+        "type": "object"
+      },
+      "ExecutionContext": {
+        "additionalProperties": false,
+        "properties": {
+          "approved_at": {
+            "format": "date-time",
+            "pattern": "Z$",
+            "title": "Approved At",
+            "type": "string"
+          },
+          "calendar_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Calendar Sha256",
+            "type": "string"
+          },
+          "decision_cutoff": {
+            "format": "date-time",
+            "pattern": "Z$",
+            "title": "Decision Cutoff",
+            "type": "string"
+          },
+          "decision_session": {
+            "format": "date",
+            "title": "Decision Session",
+            "type": "string"
+          },
+          "engine_version": {
+            "minLength": 1,
+            "title": "Engine Version",
+            "type": "string"
+          },
+          "execution_mode": {
+            "enum": [
+              "current_paper",
+              "historical_replay"
+            ],
+            "title": "Execution Mode",
+            "type": "string"
+          },
+          "mode": {
+            "enum": [
+              "synthetic_fixture",
+              "research_market_data"
+            ],
+            "title": "Mode",
+            "type": "string"
+          },
+          "snapshot_id": {
+            "format": "uuid",
+            "title": "Snapshot Id",
+            "type": "string"
+          },
+          "snapshot_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Snapshot Sha256",
+            "type": "string"
+          }
+        },
+        "required": [
+          "snapshot_id",
+          "snapshot_sha256",
+          "calendar_sha256",
+          "mode",
+          "engine_version",
+          "execution_mode",
+          "decision_session",
+          "decision_cutoff",
+          "approved_at"
+        ],
+        "title": "ExecutionContext",
+        "type": "object"
+      },
+      "ExecutionPolicy": {
+        "additionalProperties": false,
+        "properties": {
+          "commission_usd": {
+            "default": "0.00",
+            "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Commission Usd",
+            "type": "string"
+          },
+          "id": {
+            "const": "us_eod_next_open_v1",
+            "default": "us_eod_next_open_v1",
+            "title": "Id",
+            "type": "string"
+          },
+          "slippage_fraction": {
+            "default": "0.001",
+            "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$",
+            "title": "Slippage Fraction",
+            "type": "string"
+          }
+        },
+        "title": "ExecutionPolicy",
+        "type": "object"
+      },
+      "ExperimentTradeV1": {
+        "additionalProperties": false,
+        "properties": {
+          "context": {
+            "$ref": "#/$defs/ExecutionContext"
+          },
+          "currency": {
+            "const": "USD",
+            "default": "USD",
+            "title": "Currency",
+            "type": "string"
+          },
+          "eligible_session": {
+            "$ref": "#/$defs/Session"
+          },
+          "fill": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/FillEffect"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "filled_quantity": {
+            "pattern": "^(0|[1-9][0-9]{0,23})(\\.[0-9]{1,6})?$",
+            "title": "Filled Quantity",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "order": {
+            "$ref": "#/$defs/OrderIntent"
+          },
+          "pending_quantity": {
+            "pattern": "^(0|[1-9][0-9]{0,23})(\\.[0-9]{1,6})?$",
+            "title": "Pending Quantity",
+            "type": "string"
+          },
+          "policy": {
+            "$ref": "#/$defs/ExecutionPolicy"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "pattern": "^[A-Z][A-Z0-9_]*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          },
+          "skipped_quantity": {
+            "pattern": "^(0|[1-9][0-9]{0,23})(\\.[0-9]{1,6})?$",
+            "title": "Skipped Quantity",
+            "type": "string"
+          },
+          "state_after": {
+            "$ref": "#/$defs/PortfolioState"
+          },
+          "status": {
+            "enum": [
+              "pending",
+              "skipped",
+              "filled",
+              "partially_filled"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "terminal": {
+            "title": "Terminal",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "order",
+          "context",
+          "policy",
+          "eligible_session",
+          "status",
+          "terminal",
+          "filled_quantity",
+          "pending_quantity",
+          "skipped_quantity",
+          "reason",
+          "fill",
+          "state_after",
+          "id"
+        ],
+        "title": "ExperimentTradeV1",
+        "type": "object"
+      },
+      "FillEffect": {
+        "additionalProperties": false,
+        "properties": {
+          "cash_delta_usd": {
+            "pattern": "^-?(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Cash Delta Usd",
+            "type": "string"
+          },
+          "commission_usd": {
+            "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Commission Usd",
+            "type": "string"
+          },
+          "evidence_available_at": {
+            "format": "date-time",
+            "pattern": "Z$",
+            "title": "Evidence Available At",
+            "type": "string"
+          },
+          "executed_price": {
+            "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$",
+            "title": "Executed Price",
+            "type": "string"
+          },
+          "execution_at": {
+            "format": "date-time",
+            "pattern": "Z$",
+            "title": "Execution At",
+            "type": "string"
+          },
+          "execution_session": {
+            "format": "date",
+            "title": "Execution Session",
+            "type": "string"
+          },
+          "gross_usd": {
+            "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Gross Usd",
+            "type": "string"
+          },
+          "proposed_at": {
+            "format": "date-time",
+            "pattern": "Z$",
+            "title": "Proposed At",
+            "type": "string"
+          },
+          "quantity": {
+            "pattern": "^(0|[1-9][0-9]{0,23})(\\.[0-9]{1,6})?$",
+            "title": "Quantity",
+            "type": "string"
+          },
+          "raw_price": {
+            "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$",
+            "title": "Raw Price",
+            "type": "string"
+          },
+          "realized_pnl_usd": {
+            "pattern": "^-?(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Realized Pnl Usd",
+            "type": "string"
+          },
+          "removed_basis_usd": {
+            "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Removed Basis Usd",
+            "type": "string"
+          },
+          "slippage_usd": {
+            "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Slippage Usd",
+            "type": "string"
+          }
+        },
+        "required": [
+          "raw_price",
+          "executed_price",
+          "quantity",
+          "gross_usd",
+          "commission_usd",
+          "slippage_usd",
+          "cash_delta_usd",
+          "removed_basis_usd",
+          "realized_pnl_usd",
+          "execution_session",
+          "execution_at",
+          "evidence_available_at",
+          "proposed_at"
+        ],
+        "title": "FillEffect",
+        "type": "object"
+      },
+      "OrderIntent": {
+        "additionalProperties": false,
+        "properties": {
+          "asset_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "title": "Asset Id",
+            "type": "string"
+          },
+          "key": {
+            "minLength": 1,
+            "title": "Key",
+            "type": "string"
+          },
+          "requested_quantity": {
+            "pattern": "^(0|[1-9][0-9]{0,23})(\\.[0-9]{1,6})?$",
+            "title": "Requested Quantity",
+            "type": "string"
+          },
+          "sector": {
+            "minLength": 1,
+            "title": "Sector",
+            "type": "string"
+          },
+          "side": {
+            "enum": [
+              "BUY",
+              "SELL"
+            ],
+            "title": "Side",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "asset_id",
+          "sector",
+          "side",
+          "requested_quantity"
+        ],
+        "title": "OrderIntent",
+        "type": "object"
+      },
+      "PortfolioState": {
+        "additionalProperties": false,
+        "properties": {
+          "applied_actions": {
+            "default": [],
+            "items": {
+              "$ref": "#/$defs/AppliedAction"
+            },
+            "title": "Applied Actions",
+            "type": "array"
+          },
+          "cash_usd": {
+            "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Cash Usd",
+            "type": "string"
+          },
+          "entitlements": {
+            "default": [],
+            "items": {
+              "$ref": "#/$defs/DividendEntitlement"
+            },
+            "title": "Entitlements",
+            "type": "array"
+          },
+          "positions": {
+            "items": {
+              "$ref": "#/$defs/Position"
+            },
+            "title": "Positions",
+            "type": "array"
+          }
+        },
+        "required": [
+          "cash_usd",
+          "positions"
+        ],
+        "title": "PortfolioState",
+        "type": "object"
+      },
+      "Position": {
+        "additionalProperties": false,
+        "properties": {
+          "asset_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "title": "Asset Id",
+            "type": "string"
+          },
+          "quantity": {
+            "pattern": "^(0|[1-9][0-9]{0,23})(\\.[0-9]{1,6})?$",
+            "title": "Quantity",
+            "type": "string"
+          },
+          "sector": {
+            "minLength": 1,
+            "title": "Sector",
+            "type": "string"
+          },
+          "total_basis_usd": {
+            "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Total Basis Usd",
+            "type": "string"
+          }
+        },
+        "required": [
+          "asset_id",
+          "sector",
+          "quantity",
+          "total_basis_usd"
+        ],
+        "title": "Position",
+        "type": "object"
+      },
+      "Session": {
+        "additionalProperties": false,
+        "properties": {
+          "close_at": {
+            "format": "date-time",
+            "pattern": "Z$",
+            "title": "Close At",
+            "type": "string"
+          },
+          "open_at": {
+            "format": "date-time",
+            "pattern": "Z$",
+            "title": "Open At",
+            "type": "string"
+          },
+          "session_date": {
+            "format": "date",
+            "title": "Session Date",
+            "type": "string"
+          }
+        },
+        "required": [
+          "session_date",
+          "open_at",
+          "close_at"
+        ],
+        "title": "Session",
+        "type": "object"
+      }
+    },
+    "additionalProperties": false,
+    "properties": {
+      "items": {
+        "items": {
+          "$ref": "#/$defs/ExperimentTradeV1"
+        },
+        "title": "Items",
+        "type": "array"
+      },
+      "next_cursor": {
+        "anyOf": [
+          {
+            "maxLength": 2048,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9_-]+$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Next Cursor"
+      }
+    },
+    "required": [
+      "items",
+      "next_cursor"
+    ],
+    "title": "ExperimentTradesPageV1",
+    "type": "object"
+  },
+  "ExperimentTradesPageV1.validation": {
+    "$defs": {
+      "AppliedAction": {
+        "additionalProperties": false,
+        "properties": {
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "payload_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Payload Sha256",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "payload_sha256"
+        ],
+        "title": "AppliedAction",
+        "type": "object"
+      },
+      "DividendEntitlement": {
+        "additionalProperties": false,
+        "properties": {
+          "asset_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "title": "Asset Id",
+            "type": "string"
+          },
+          "evidence_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Evidence Sha256",
+            "type": "string"
+          },
+          "ex_session": {
+            "format": "date",
+            "title": "Ex Session",
+            "type": "string"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "per_share": {
+            "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$",
+            "title": "Per Share",
+            "type": "string"
+          },
+          "quantity": {
+            "pattern": "^(0|[1-9][0-9]{0,23})(\\.[0-9]{1,6})?$",
+            "title": "Quantity",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "asset_id",
+          "ex_session",
+          "quantity",
+          "per_share",
+          "evidence_sha256"
+        ],
+        "title": "DividendEntitlement",
+        "type": "object"
+      },
+      "ExecutionContext": {
+        "additionalProperties": false,
+        "properties": {
+          "approved_at": {
+            "format": "date-time",
+            "pattern": "Z$",
+            "title": "Approved At",
+            "type": "string"
+          },
+          "calendar_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Calendar Sha256",
+            "type": "string"
+          },
+          "decision_cutoff": {
+            "format": "date-time",
+            "pattern": "Z$",
+            "title": "Decision Cutoff",
+            "type": "string"
+          },
+          "decision_session": {
+            "format": "date",
+            "title": "Decision Session",
+            "type": "string"
+          },
+          "engine_version": {
+            "minLength": 1,
+            "title": "Engine Version",
+            "type": "string"
+          },
+          "execution_mode": {
+            "enum": [
+              "current_paper",
+              "historical_replay"
+            ],
+            "title": "Execution Mode",
+            "type": "string"
+          },
+          "mode": {
+            "enum": [
+              "synthetic_fixture",
+              "research_market_data"
+            ],
+            "title": "Mode",
+            "type": "string"
+          },
+          "snapshot_id": {
+            "format": "uuid",
+            "title": "Snapshot Id",
+            "type": "string"
+          },
+          "snapshot_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Snapshot Sha256",
+            "type": "string"
+          }
+        },
+        "required": [
+          "snapshot_id",
+          "snapshot_sha256",
+          "calendar_sha256",
+          "mode",
+          "engine_version",
+          "execution_mode",
+          "decision_session",
+          "decision_cutoff",
+          "approved_at"
+        ],
+        "title": "ExecutionContext",
+        "type": "object"
+      },
+      "ExecutionPolicy": {
+        "additionalProperties": false,
+        "properties": {
+          "commission_usd": {
+            "default": "0.00",
+            "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Commission Usd",
+            "type": "string"
+          },
+          "id": {
+            "const": "us_eod_next_open_v1",
+            "default": "us_eod_next_open_v1",
+            "title": "Id",
+            "type": "string"
+          },
+          "slippage_fraction": {
+            "default": "0.001",
+            "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$",
+            "title": "Slippage Fraction",
+            "type": "string"
+          }
+        },
+        "title": "ExecutionPolicy",
+        "type": "object"
+      },
+      "ExperimentTradeV1": {
+        "additionalProperties": false,
+        "properties": {
+          "context": {
+            "$ref": "#/$defs/ExecutionContext"
+          },
+          "currency": {
+            "const": "USD",
+            "default": "USD",
+            "title": "Currency",
+            "type": "string"
+          },
+          "eligible_session": {
+            "$ref": "#/$defs/Session"
+          },
+          "fill": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/FillEffect"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "filled_quantity": {
+            "pattern": "^(0|[1-9][0-9]{0,23})(\\.[0-9]{1,6})?$",
+            "title": "Filled Quantity",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "order": {
+            "$ref": "#/$defs/OrderIntent"
+          },
+          "pending_quantity": {
+            "pattern": "^(0|[1-9][0-9]{0,23})(\\.[0-9]{1,6})?$",
+            "title": "Pending Quantity",
+            "type": "string"
+          },
+          "policy": {
+            "$ref": "#/$defs/ExecutionPolicy"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "pattern": "^[A-Z][A-Z0-9_]*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          },
+          "skipped_quantity": {
+            "pattern": "^(0|[1-9][0-9]{0,23})(\\.[0-9]{1,6})?$",
+            "title": "Skipped Quantity",
+            "type": "string"
+          },
+          "state_after": {
+            "$ref": "#/$defs/PortfolioState"
+          },
+          "status": {
+            "enum": [
+              "pending",
+              "skipped",
+              "filled",
+              "partially_filled"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "terminal": {
+            "title": "Terminal",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "order",
+          "context",
+          "policy",
+          "eligible_session",
+          "status",
+          "terminal",
+          "filled_quantity",
+          "pending_quantity",
+          "skipped_quantity",
+          "reason",
+          "fill",
+          "state_after",
+          "id"
+        ],
+        "title": "ExperimentTradeV1",
+        "type": "object"
+      },
+      "FillEffect": {
+        "additionalProperties": false,
+        "properties": {
+          "cash_delta_usd": {
+            "pattern": "^-?(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Cash Delta Usd",
+            "type": "string"
+          },
+          "commission_usd": {
+            "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Commission Usd",
+            "type": "string"
+          },
+          "evidence_available_at": {
+            "format": "date-time",
+            "pattern": "Z$",
+            "title": "Evidence Available At",
+            "type": "string"
+          },
+          "executed_price": {
+            "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$",
+            "title": "Executed Price",
+            "type": "string"
+          },
+          "execution_at": {
+            "format": "date-time",
+            "pattern": "Z$",
+            "title": "Execution At",
+            "type": "string"
+          },
+          "execution_session": {
+            "format": "date",
+            "title": "Execution Session",
+            "type": "string"
+          },
+          "gross_usd": {
+            "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Gross Usd",
+            "type": "string"
+          },
+          "proposed_at": {
+            "format": "date-time",
+            "pattern": "Z$",
+            "title": "Proposed At",
+            "type": "string"
+          },
+          "quantity": {
+            "pattern": "^(0|[1-9][0-9]{0,23})(\\.[0-9]{1,6})?$",
+            "title": "Quantity",
+            "type": "string"
+          },
+          "raw_price": {
+            "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$",
+            "title": "Raw Price",
+            "type": "string"
+          },
+          "realized_pnl_usd": {
+            "pattern": "^-?(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Realized Pnl Usd",
+            "type": "string"
+          },
+          "removed_basis_usd": {
+            "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Removed Basis Usd",
+            "type": "string"
+          },
+          "slippage_usd": {
+            "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Slippage Usd",
+            "type": "string"
+          }
+        },
+        "required": [
+          "raw_price",
+          "executed_price",
+          "quantity",
+          "gross_usd",
+          "commission_usd",
+          "slippage_usd",
+          "cash_delta_usd",
+          "removed_basis_usd",
+          "realized_pnl_usd",
+          "execution_session",
+          "execution_at",
+          "evidence_available_at",
+          "proposed_at"
+        ],
+        "title": "FillEffect",
+        "type": "object"
+      },
+      "OrderIntent": {
+        "additionalProperties": false,
+        "properties": {
+          "asset_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "title": "Asset Id",
+            "type": "string"
+          },
+          "key": {
+            "minLength": 1,
+            "title": "Key",
+            "type": "string"
+          },
+          "requested_quantity": {
+            "pattern": "^(0|[1-9][0-9]{0,23})(\\.[0-9]{1,6})?$",
+            "title": "Requested Quantity",
+            "type": "string"
+          },
+          "sector": {
+            "minLength": 1,
+            "title": "Sector",
+            "type": "string"
+          },
+          "side": {
+            "enum": [
+              "BUY",
+              "SELL"
+            ],
+            "title": "Side",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "asset_id",
+          "sector",
+          "side",
+          "requested_quantity"
+        ],
+        "title": "OrderIntent",
+        "type": "object"
+      },
+      "PortfolioState": {
+        "additionalProperties": false,
+        "properties": {
+          "applied_actions": {
+            "default": [],
+            "items": {
+              "$ref": "#/$defs/AppliedAction"
+            },
+            "title": "Applied Actions",
+            "type": "array"
+          },
+          "cash_usd": {
+            "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Cash Usd",
+            "type": "string"
+          },
+          "entitlements": {
+            "default": [],
+            "items": {
+              "$ref": "#/$defs/DividendEntitlement"
+            },
+            "title": "Entitlements",
+            "type": "array"
+          },
+          "positions": {
+            "items": {
+              "$ref": "#/$defs/Position"
+            },
+            "title": "Positions",
+            "type": "array"
+          }
+        },
+        "required": [
+          "cash_usd",
+          "positions"
+        ],
+        "title": "PortfolioState",
+        "type": "object"
+      },
+      "Position": {
+        "additionalProperties": false,
+        "properties": {
+          "asset_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "title": "Asset Id",
+            "type": "string"
+          },
+          "quantity": {
+            "pattern": "^(0|[1-9][0-9]{0,23})(\\.[0-9]{1,6})?$",
+            "title": "Quantity",
+            "type": "string"
+          },
+          "sector": {
+            "minLength": 1,
+            "title": "Sector",
+            "type": "string"
+          },
+          "total_basis_usd": {
+            "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Total Basis Usd",
+            "type": "string"
+          }
+        },
+        "required": [
+          "asset_id",
+          "sector",
+          "quantity",
+          "total_basis_usd"
+        ],
+        "title": "Position",
+        "type": "object"
+      },
+      "Session": {
+        "additionalProperties": false,
+        "properties": {
+          "close_at": {
+            "format": "date-time",
+            "pattern": "Z$",
+            "title": "Close At",
+            "type": "string"
+          },
+          "open_at": {
+            "format": "date-time",
+            "pattern": "Z$",
+            "title": "Open At",
+            "type": "string"
+          },
+          "session_date": {
+            "format": "date",
+            "title": "Session Date",
+            "type": "string"
+          }
+        },
+        "required": [
+          "session_date",
+          "open_at",
+          "close_at"
+        ],
+        "title": "Session",
+        "type": "object"
+      }
+    },
+    "additionalProperties": false,
+    "properties": {
+      "items": {
+        "items": {
+          "$ref": "#/$defs/ExperimentTradeV1"
+        },
+        "title": "Items",
+        "type": "array"
+      },
+      "next_cursor": {
+        "anyOf": [
+          {
+            "maxLength": 2048,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9_-]+$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Next Cursor"
+      }
+    },
+    "required": [
+      "items",
+      "next_cursor"
+    ],
+    "title": "ExperimentTradesPageV1",
     "type": "object"
   },
   "ForecastV1.serialization": {
@@ -3597,6 +9355,20 @@
       "fixture_metadata"
     ],
     "title": "HealthV1",
+    "type": "object"
+  },
+  "JobCancelRequest.serialization": {
+    "additionalProperties": false,
+    "description": "Explicit empty JSON command; extra fields are forbidden.",
+    "properties": {},
+    "title": "JobCancelRequest",
+    "type": "object"
+  },
+  "JobCancelRequest.validation": {
+    "additionalProperties": false,
+    "description": "Explicit empty JSON command; extra fields are forbidden.",
+    "properties": {},
+    "title": "JobCancelRequest",
     "type": "object"
   },
   "JobV1.serialization": {

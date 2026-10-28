@@ -1,0 +1,242 @@
+{
+  "basis": "Observed public API output from isolated Docker/browser verification; independent expected values remain in FIX-07 and the pre-authored metrics extension.",
+  "cancel": {
+    "accepted_http": 202,
+    "report": null,
+    "status": "cancelled"
+  },
+  "config_sha256": "10904787385cca66062bcb1b27d264799b3cc954ee7fed62a91d11339295d81b",
+  "core_manifest_sha256": "0f27ba554f83846138844207ace6099c0eebe75ab4cc3bf43ac0fc12ece6a080",
+  "cross_role_cursor_http": 422,
+  "daily_points": [
+    {
+      "benchmark_nav_usd": "1000.00",
+      "benchmark_unavailable_reason": null,
+      "cash_baseline_nav_usd": "1000.00",
+      "cash_usd": "1000.00",
+      "cash_weight": {
+        "unavailable_reason": null,
+        "value": "1"
+      },
+      "currency": "USD",
+      "drawdown_fraction": {
+        "unavailable_reason": null,
+        "value": 0
+      },
+      "max_position_weight": {
+        "unavailable_reason": null,
+        "value": "0"
+      },
+      "phase": "development",
+      "portfolio_nav_usd": "1000.00",
+      "positions": [],
+      "session_date": "2028-07-18"
+    },
+    {
+      "benchmark_nav_usd": "1000.23",
+      "benchmark_unavailable_reason": null,
+      "cash_baseline_nav_usd": "1000.00",
+      "cash_usd": "392.84",
+      "cash_weight": {
+        "unavailable_reason": null,
+        "value": "0.39307645396165125"
+      },
+      "currency": "USD",
+      "drawdown_fraction": {
+        "unavailable_reason": null,
+        "value": 0.0006
+      },
+      "max_position_weight": {
+        "unavailable_reason": null,
+        "value": "0.20639716999842103"
+      },
+      "phase": "development",
+      "portfolio_nav_usd": "999.40",
+      "positions": [
+        {
+          "asset_id": "SYN:AAA",
+          "quantity": "2.855103",
+          "sector": "Technology",
+          "total_basis_usd": "200.34"
+        },
+        {
+          "asset_id": "SYN:BBB",
+          "quantity": "2.855103",
+          "sector": "Technology",
+          "total_basis_usd": "200.34"
+        },
+        {
+          "asset_id": "SYN:CCC",
+          "quantity": "3.075030",
+          "sector": "Unknown",
+          "total_basis_usd": "206.48"
+        }
+      ],
+      "session_date": "2028-07-19"
+    },
+    {
+      "benchmark_nav_usd": "1000.45",
+      "benchmark_unavailable_reason": null,
+      "cash_baseline_nav_usd": "1000.00",
+      "cash_usd": "392.84",
+      "cash_weight": {
+        "unavailable_reason": null,
+        "value": "0.3953477283969298"
+      },
+      "currency": "USD",
+      "drawdown_fraction": {
+        "unavailable_reason": null,
+        "value": 0.00634
+      },
+      "max_position_weight": {
+        "unavailable_reason": null,
+        "value": "0.20156401524808204"
+      },
+      "phase": "development",
+      "portfolio_nav_usd": "993.66",
+      "positions": [
+        {
+          "asset_id": "SYN:AAA",
+          "quantity": "2.855103",
+          "sector": "Technology",
+          "total_basis_usd": "200.34"
+        },
+        {
+          "asset_id": "SYN:BBB",
+          "quantity": "2.855103",
+          "sector": "Technology",
+          "total_basis_usd": "200.34"
+        },
+        {
+          "asset_id": "SYN:CCC",
+          "quantity": "3.075030",
+          "sector": "Unknown",
+          "total_basis_usd": "206.48"
+        }
+      ],
+      "session_date": "2028-07-20"
+    },
+    {
+      "benchmark_nav_usd": "1000.68",
+      "benchmark_unavailable_reason": null,
+      "cash_baseline_nav_usd": "1000.00",
+      "cash_usd": "392.84",
+      "cash_weight": {
+        "unavailable_reason": null,
+        "value": "0.39275537064375515"
+      },
+      "currency": "USD",
+      "drawdown_fraction": {
+        "unavailable_reason": null,
+        "value": 0
+      },
+      "max_position_weight": {
+        "unavailable_reason": null,
+        "value": "0.20647452449535983"
+      },
+      "phase": "holdout",
+      "portfolio_nav_usd": "1000.22",
+      "positions": [
+        {
+          "asset_id": "SYN:AAA",
+          "quantity": "2.855103",
+          "sector": "Technology",
+          "total_basis_usd": "200.34"
+        },
+        {
+          "asset_id": "SYN:BBB",
+          "quantity": "2.855103",
+          "sector": "Technology",
+          "total_basis_usd": "200.34"
+        },
+        {
+          "asset_id": "SYN:CCC",
+          "quantity": "3.075030",
+          "sector": "Unknown",
+          "total_basis_usd": "206.48"
+        }
+      ],
+      "session_date": "2028-07-21"
+    }
+  ],
+  "engine_version": "188a7acd42eff6dc7c68975adbdbdeb29853dbb474f061301fd588e8dffa484e",
+  "inputs": {
+    "benchmark_asset_id": "SYN:SPY",
+    "end_session_exclusive": "2028-07-24",
+    "evaluation_split": {
+      "holdout_fraction": 0.25,
+      "kind": "chronological"
+    },
+    "execution_policy_id": "us_eod_next_open_v1",
+    "initial_capital_usd": "1000.00",
+    "random_seed": 42,
+    "snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+    "start_session": "2028-07-18",
+    "strategy_version_id": "22fd08a0-5d5c-5a74-b622-8afff87b25b3"
+  },
+  "label": "SYNTHETIC_DATA_ONLY",
+  "metrics": {
+    "annualized_return_fraction": {
+      "unavailable_reason": null,
+      "value": 0.018649741519960364
+    },
+    "annualized_volatility_fraction": {
+      "unavailable_reason": null,
+      "value": 0.09844077475005868
+    },
+    "cumulative_return_fraction": {
+      "unavailable_reason": null,
+      "value": 0.00022
+    },
+    "fees_usd": "0.00",
+    "max_drawdown_fraction": {
+      "unavailable_reason": null,
+      "value": 0.00634
+    },
+    "sharpe_ratio": {
+      "unavailable_reason": null,
+      "value": 0.22050227337002146
+    },
+    "slippage_usd": "0.61",
+    "trade_count": 3,
+    "turnover_fraction": {
+      "unavailable_reason": null,
+      "value": 0.6081817453321581
+    }
+  },
+  "references": {
+    "curve_artifact": {
+      "id": "4ef106dd-9d1e-58b3-b7ad-527d0b214779",
+      "schema_version": 1,
+      "sha256": "6c0f839d91646aee5de9edaced689f6de15603b6686bef5e60197eff1dbf454c"
+    },
+    "reproducibility_manifest": {
+      "id": "1bd2ca64-cb58-5bb4-ad94-56867752a2e0",
+      "schema_version": 1,
+      "sha256": "8ec3ee5fec47e968fd8c0b544b118055ed98ace53c350e19e0cf1462ec144e7f"
+    },
+    "trade_artifact": {
+      "id": "72ed3633-f9a3-5fd4-840a-8c9a58da4b6a",
+      "schema_version": 1,
+      "sha256": "cad30e4aa998a3a184145122a69d8c48692c8eab6fd2b9827d21b7bd3e4b4084"
+    }
+  },
+  "reporting_engine_version": "188a7acd42eff6dc7c68975adbdbdeb29853dbb474f061301fd588e8dffa484e",
+  "rerun": {
+    "distinct_ids": true,
+    "matching_artifacts": true
+  },
+  "smoke_project": "yams-smoke-c395ff94da4a",
+  "snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+  "terminal_cancel_http": 409,
+  "warnings": [
+    "BENCHMARK_ADJUSTED_TOTAL_RETURN_APPROXIMATION",
+    "BENCHMARK_DIVIDEND_RECOGNITION_DIFFERS",
+    "BENCHMARK_FRICTION_FREE_FULLY_INVESTED",
+    "BENCHMARK_INITIAL_CLOSE_DIFFERS_FROM_NEXT_OPEN",
+    "HOLDOUT_REPEATED_SELECTION_CAVEAT",
+    "INSUFFICIENT_HOLDOUT",
+    "SYNTHETIC_DATA_ONLY",
+    "ZERO_CASH_RETURN"
+  ]
+}

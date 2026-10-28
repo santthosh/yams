@@ -57,6 +57,26 @@ def _money(value: Fraction) -> str:
         return money(_decimal(value))
 
 
+def _drawdowns(curve: Sequence[Fraction]) -> tuple[Fraction, ...]:
+    peak = curve[0]
+    result = []
+    for value in curve:
+        peak = max(peak, value)
+        result.append(1 - value / peak)
+    return tuple(result)
+
+
+def drawdown_series(nav_usd: Sequence[str]) -> tuple[MetricValue, ...]:
+    """Shared Q12 path for chart artifacts; summary short-history rules remain separate."""
+    values = TypeAdapter(tuple[Money, ...]).validate_python(tuple(nav_usd))
+    if not values:
+        return ()
+    curve = tuple(Fraction(value) for value in values)
+    if curve[0] <= 0:
+        return tuple(unavailable("ZERO_START_NAV") for _ in curve)
+    return tuple(statistic(value) for value in _drawdowns(curve))
+
+
 def calculate_metrics(
     nav_usd: Sequence[str],
     *,
@@ -96,12 +116,7 @@ def calculate_metrics(
                     )
                 except (InvalidOperation, OverflowError):
                     annualized = unavailable("NUMERICAL_RANGE")
-            peak = curve[0]
-            largest = Fraction()
-            for value in curve:
-                peak = max(peak, value)
-                largest = max(largest, 1 - value / peak)
-            drawdown = statistic(largest)
+            drawdown = statistic(max(_drawdowns(curve)))
         if any(value == 0 for value in curve[:-1]):
             volatility = sharpe = unavailable("ZERO_RETURN_DENOMINATOR")
         elif n >= 2:

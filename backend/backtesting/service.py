@@ -1,8 +1,10 @@
 """Atomic internal core admission and lease-fenced immutable publication."""
 
 from dataclasses import dataclass
+from datetime import UTC, datetime
 from decimal import Decimal
 from pathlib import Path
+from typing import Literal
 from uuid import UUID, uuid4
 
 from sqlalchemy import Engine, select, text
@@ -10,6 +12,7 @@ from sqlalchemy.orm import Session
 
 from backend.backtesting.artifacts import publish_core, read_core
 from backend.backtesting.contracts import BacktestCorePayload
+from backend.backtesting.errors import BacktestFailure
 from backend.backtesting.runner import BacktestCoreResult, prepare_backtest
 from backend.backtesting.schedule import build_schedule
 from backend.domain.common import JobResult, JobV1
@@ -52,7 +55,18 @@ class CoreRun:
 
 
 def admit_core(engine: Engine, root: Path, request: ExperimentRequest) -> CoreAccepted:
-    """Internal service; public backtest/report transport remains #41."""
+    """Compatibility entry point for independently sealed internal cores."""
+    return admit_experiment(engine, root, request, kind="backtest_core")
+
+
+def admit_experiment(
+    engine: Engine,
+    root: Path,
+    request: ExperimentRequest,
+    *,
+    kind: Literal["backtest_core", "backtest"] = "backtest",
+) -> CoreAccepted:
+    """Pin all immutable inputs and queue the owning job in one transaction."""
     queue = Queue(engine)
     with Session(engine) as session, session.begin():
         version = session.get(StrategyVersion, request.strategy_version_id)
@@ -61,7 +75,18 @@ def admit_core(engine: Engine, root: Path, request: ExperimentRequest) -> CoreAc
             raise ValueError("NOT_FOUND")
         published = version_view(version)
         pinned = verified_snapshot(snapshot, root)
-        calendar, _ = prepare_backtest(pinned, request)
+        try:
+            calendar, schedule = prepare_backtest(pinned, request)
+        except BacktestFailure:
+            raise
+        except ValueError as error:
+            if str(error) == "WORKLOAD_LIMIT":
+                raise
+            raise ValueError("INVALID_EXPERIMENT_WINDOW") from None
+        if pinned.manifest.mode == "research_market_data" and decision_cutoff(
+            calendar, schedule.sessions[-1].session_date
+        ) > datetime.now(UTC):
+            raise ValueError("DECISION_CUTOFF_NOT_ELAPSED")
         identity = uuid4()
         payload = BacktestCorePayload(
             experiment_id=identity,
@@ -73,7 +98,7 @@ def admit_core(engine: Engine, root: Path, request: ExperimentRequest) -> CoreAc
             engine_version=engine_fingerprint(),
             config_canonical_json=published.config.canonical_bytes().decode(),
         )
-        job_id = queue._enqueue(session, "backtest_core", payload.model_dump(mode="json"), identity)
+        job_id = queue._enqueue(session, kind, payload.model_dump(mode="json"), identity)
         session.add(
             Experiment(
                 id=identity,

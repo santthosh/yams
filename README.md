@@ -8,7 +8,7 @@ The source checkout includes the 0.0.2 market repository, immutable snapshots an
 strategy registry, shared momentum/allocation engine, and asynchronous candidate
 inspection backed by PostgreSQL and a supervised worker. The synthetic Docker
 journey produces measured candidates, exclusions and feasible targets, with
-reproducible results retained through restart. Portfolio approval, backtesting and
+reproducible results retained through restart. Portfolio approval and
 forecasts remain with their later milestone owners; the shared execution kernel
 is available but does not itself post durable trades.
 
@@ -20,8 +20,10 @@ See the [strategy workflow](docs/operations/strategy-registry.md) and
 benchmark-only. The [Strategy Lab](docs/operations/strategy-lab.md) now browses
 saved versions, reviews supported parameter changes and explicitly publishes
 versions or named forks. Open `/lab` or `/lab/strategies`; originals remain
-inspectable. Historical experiment submission/reports and comparison remain with
-their owning issues.
+inspectable. The [experiment API](docs/operations/experiment-api.md) now submits
+bounded historical jobs and serves immutable summaries, windowed series and
+trade pages, with cancellation and restart persistence. Report UI and comparison
+remain with their owning issues.
 
 Download published bundles and platform evidence from [GitHub Releases](https://github.com/santthosh/yams/releases).
 Source implementation alone does not establish publication: use each release's
@@ -222,7 +224,9 @@ core persistence; see the [core handoff](docs/operations/backtest-core.md).
 [Q12 reporting](docs/operations/backtest-reporting.md) adds net metrics,
 development/holdout sections, aligned SPY/cash references and shared exposure
 calculations under the [reviewed methodology](docs/adr/0013-backtest-reporting-methodology.md).
-Public experiment/report transport remains owned by#41 and report UI by#74;
-internal core or report calculations are not a completed public experiment.
+The [public experiment API](docs/operations/experiment-api.md) composes core and
+report in one supervised job and publishes completion atomically; report UI
+remains owned by#74. Internal core calculations remain distinct from completed
+public experiments.
 The published0.0.2 installation remains unchanged. Tiingo data stays diagnostic-only
 until historical raw execution/action/publication/membership capabilities are verified.

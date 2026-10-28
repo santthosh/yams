@@ -21,9 +21,10 @@ from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
 
 from backend.backtesting.errors import SAFE_BACKTEST_REASONS, BacktestFailure
+from backend.backtesting.publication import seal_report
 from backend.backtesting.service import seal_core
 from backend.domain.common import ErrorCode
-from backend.jobs.handlers.backtest import backtest_core
+from backend.jobs.handlers.backtest import backtest, backtest_core
 from backend.jobs.handlers.evaluate_strategy import EvaluationFailure, evaluate_strategy
 from backend.jobs.handlers.refresh_market_data import refresh_market_data
 from backend.jobs.queue import Lease, Queue
@@ -114,7 +115,7 @@ def child_entry(
                 last_progress = percent
 
         value: int | str
-        if lease.kind == "backtest_core":
+        if lease.kind in {"backtest_core", "backtest"}:
             value = cast(CoreHandler, handler)(lease.payload, cancelled, report_progress)
         else:
             value = handler(lease.payload, cancelled)
@@ -205,11 +206,15 @@ class Worker:
             handler = partial(refresh_market_data, stage=stage)
         elif lease.kind == "evaluate_strategy":
             handler = partial(evaluate_strategy, root=self.artifact_root)
-        elif lease.kind == "backtest_core":
+        elif lease.kind in {"backtest_core", "backtest"}:
             staging = self.artifact_root / "experiment-staging"
             staging.mkdir(mode=0o700, parents=True, exist_ok=True)
             stage = staging / f"{lease.job_id}-{lease.token}"
-            handler = partial(backtest_core, root=self.artifact_root, stage=stage)
+            handler = partial(
+                backtest if lease.kind == "backtest" else backtest_core,
+                root=self.artifact_root,
+                stage=stage,
+            )
         context = mp.get_context("spawn")
         cancelled = context.Event()
         reader, writer = context.Pipe(duplex=False)
@@ -243,7 +248,7 @@ class Worker:
                     return
                 if incoming[0] == "progress":
                     if (
-                        lease.kind != "backtest_core"
+                        lease.kind not in {"backtest_core", "backtest"}
                         or type(incoming[1]) is not int
                         or not progress <= incoming[1] <= 99
                     ):
@@ -333,10 +338,13 @@ class Worker:
                         if not isinstance(message[1], str):
                             raise ValueError("Invalid diagnostic completion")
                         seal_evaluation(self.queue, lease, message[1])
-                    elif lease.kind == "backtest_core":
+                    elif lease.kind in {"backtest_core", "backtest"}:
                         if stage is None or not isinstance(message[1], str):
                             raise ValueError("Invalid core completion")
-                        seal_core(self.queue, lease, self.artifact_root, stage, message[1])
+                        if lease.kind == "backtest":
+                            seal_report(self.queue, lease, self.artifact_root, stage, message[1])
+                        else:
+                            seal_core(self.queue, lease, self.artifact_root, stage, message[1])
                     elif not self.queue.complete_diagnostic(lease, message[1]):
                         self.queue.acknowledge_cancel(lease)
                 except PublicationFenceError:

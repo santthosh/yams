@@ -155,7 +155,7 @@ def test_retry_classification_and_deadline_exhaustion(database: Engine) -> None:
     assert service.get(timeout).error.code == "TIME_LIMIT"  # type: ignore[union-attr]
 
 
-def test_job_get_is_read_only_and_public_cancel_remains_staged(database: Engine) -> None:
+def test_job_get_is_read_only_and_cancel_requires_explicit_json(database: Engine) -> None:
     service = queue(database)
     identity = service.enqueue("diagnostic", PAYLOAD, uuid4())
     before = service.get(identity)
@@ -166,7 +166,7 @@ def test_job_get_is_read_only_and_public_cancel_remains_staged(database: Engine)
         assert response.json()["status"] == "queued"
         assert response.json()["result"] is None
         assert client.get(f"/api/v1/jobs/{uuid4()}").status_code == 404
-        assert client.post(f"/api/v1/jobs/{identity}/cancel").status_code == 404
+        assert client.post(f"/api/v1/jobs/{identity}/cancel").status_code == 422
     assert service.get(identity) == before
 
 

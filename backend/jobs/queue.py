@@ -22,6 +22,10 @@ TERMINAL = {"completed", "failed", "cancelled"}
 TRANSIENT_CODES = {"PROVIDER_UNAVAILABLE"}
 
 
+class TerminalJobConflict(ValueError):
+    pass
+
+
 class IdempotencyConflict(ValueError):
     pass
 
@@ -428,7 +432,9 @@ class Queue:
         reason: str | None = None,
     ) -> bool:
         allowed_reasons = (
-            SAFE_BACKTEST_REASONS if lease.kind == "backtest_core" else SAFE_PROVIDER_REASONS
+            SAFE_BACKTEST_REASONS
+            if lease.kind in {"backtest_core", "backtest"}
+            else SAFE_PROVIDER_REASONS
         )
         if reason is not None and reason not in allowed_reasons:
             raise ValueError("Unsupported job failure reason")
@@ -461,13 +467,15 @@ class Queue:
             )
             return True
 
-    def cancel(self, identity: UUID) -> JobV1 | None:
+    def cancel(self, identity: UUID, *, reject_terminal: bool = False) -> JobV1 | None:
         with Session(self.engine) as session, session.begin():
             row = session.execute(
                 select(Job).where(Job.id == identity).with_for_update()
             ).scalar_one_or_none()
             if row is None:
                 return None
+            if reject_terminal and row.status in TERMINAL:
+                raise TerminalJobConflict("Job is already terminal")
             now = self.clock(session)
             if row.status not in TERMINAL and row.status != "cancel_requested":
                 row.cancel_requested_at = now

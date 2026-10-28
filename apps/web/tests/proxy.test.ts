@@ -355,3 +355,74 @@ it("publishes closed same-origin strategy paths and preserves safe conflict resp
   ).toBe(404);
   expect(fetcher).not.toHaveBeenCalled();
 });
+
+it("forwards experiment pages and same-origin cancellation through the closed routes", async () => {
+  const id = "11111111-1111-4111-8111-111111111111";
+  const fetcher = vi.fn(async () =>
+    Response.json({ items: [], next_cursor: null }),
+  );
+  for (const parts of [
+    ["experiments"],
+    ["experiments", id],
+    ["experiments", id, "series"],
+    ["experiments", id, "trades"],
+  ]) {
+    expect(
+      (await proxyApi(request(parts.join("/")), parts, fetcher)).status,
+    ).toBe(200);
+  }
+  const pages = ["experiments", id, "series"];
+  expect(
+    (
+      await proxyApi(
+        request(
+          `${pages.join("/")}?limit=2&start_session=2028-07-18&end_session_exclusive=2028-07-24`,
+        ),
+        pages,
+        fetcher,
+      )
+    ).status,
+  ).toBe(200);
+  expect(
+    (
+      await proxyApi(
+        request(`${pages.join("/")}?path=../../private`),
+        pages,
+        fetcher,
+      )
+    ).status,
+  ).toBe(404);
+  for (const parts of [["experiments"], ["jobs", id, "cancel"]]) {
+    const path = `http://web.test/api/v1/${parts.join("/")}`;
+    const post = (origin: string) =>
+      new Request(path, {
+        method: "POST",
+        headers: { origin, "Content-Type": "application/json" },
+        body: "{}",
+      });
+    expect(
+      (await proxyApi(post("http://external.test"), parts, fetcher)).status,
+    ).toBe(422);
+    expect(
+      (await proxyApi(post("http://web.test"), parts, fetcher)).status,
+    ).toBe(200);
+  }
+  expect(
+    (
+      await proxyApi(
+        request(`experiments/${id}/download`),
+        ["experiments", id, "download"],
+        fetcher,
+      )
+    ).status,
+  ).toBe(404);
+  expect(
+    (
+      await proxyApi(
+        request(`jobs/${id}/cancel`),
+        ["jobs", id, "cancel"],
+        fetcher,
+      )
+    ).status,
+  ).toBe(404);
+});

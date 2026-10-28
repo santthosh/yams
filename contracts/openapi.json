@@ -152,6 +152,26 @@
         "title": "AllocationTarget",
         "type": "object"
       },
+      "AppliedAction": {
+        "additionalProperties": false,
+        "properties": {
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "payload_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Payload Sha256",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "payload_sha256"
+        ],
+        "title": "AppliedAction",
+        "type": "object"
+      },
       "ArtifactReference": {
         "additionalProperties": false,
         "properties": {
@@ -471,6 +491,119 @@
         "title": "CandidateEvidence",
         "type": "object"
       },
+      "ComparisonTerms": {
+        "additionalProperties": false,
+        "properties": {
+          "benchmark_asset_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "title": "Benchmark Asset Id",
+            "type": "string"
+          },
+          "calendar_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Calendar Sha256",
+            "type": "string"
+          },
+          "core_engine_version": {
+            "title": "Core Engine Version",
+            "type": "string"
+          },
+          "core_policy_version": {
+            "const": "walk_forward_v1",
+            "title": "Core Policy Version",
+            "type": "string"
+          },
+          "end_session_exclusive": {
+            "format": "date",
+            "title": "End Session Exclusive",
+            "type": "string"
+          },
+          "evaluation_split": {
+            "$ref": "#/components/schemas/EvaluationSplit"
+          },
+          "execution_policy": {
+            "$ref": "#/components/schemas/backend__portfolio__execution__ExecutionPolicy"
+          },
+          "holdout_start_session": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Holdout Start Session"
+          },
+          "initial_capital_usd": {
+            "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Initial Capital Usd",
+            "type": "string"
+          },
+          "reporting_engine_version": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Reporting Engine Version",
+            "type": "string"
+          },
+          "reporting_version": {
+            "const": "q12_v1",
+            "default": "q12_v1",
+            "title": "Reporting Version",
+            "type": "string"
+          },
+          "sessions": {
+            "items": {
+              "format": "date",
+              "type": "string"
+            },
+            "title": "Sessions",
+            "type": "array"
+          },
+          "snapshot_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Snapshot Sha256",
+            "type": "string"
+          },
+          "source_mode": {
+            "enum": [
+              "synthetic_fixture",
+              "research_market_data"
+            ],
+            "title": "Source Mode",
+            "type": "string"
+          },
+          "start_session": {
+            "format": "date",
+            "title": "Start Session",
+            "type": "string"
+          },
+          "universe_canonical_json": {
+            "title": "Universe Canonical Json",
+            "type": "string"
+          }
+        },
+        "required": [
+          "snapshot_sha256",
+          "calendar_sha256",
+          "core_engine_version",
+          "reporting_engine_version",
+          "core_policy_version",
+          "source_mode",
+          "sessions",
+          "start_session",
+          "end_session_exclusive",
+          "initial_capital_usd",
+          "universe_canonical_json",
+          "execution_policy",
+          "benchmark_asset_id",
+          "evaluation_split",
+          "holdout_start_session"
+        ],
+        "title": "ComparisonTerms",
+        "type": "object"
+      },
       "DataDiagnosticEvidence": {
         "additionalProperties": false,
         "properties": {
@@ -590,6 +723,51 @@
           "freshness"
         ],
         "title": "DataHealthV1",
+        "type": "object"
+      },
+      "DividendEntitlement": {
+        "additionalProperties": false,
+        "properties": {
+          "asset_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "title": "Asset Id",
+            "type": "string"
+          },
+          "evidence_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Evidence Sha256",
+            "type": "string"
+          },
+          "ex_session": {
+            "format": "date",
+            "title": "Ex Session",
+            "type": "string"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "per_share": {
+            "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$",
+            "title": "Per Share",
+            "type": "string"
+          },
+          "quantity": {
+            "pattern": "^(0|[1-9][0-9]{0,23})(\\.[0-9]{1,6})?$",
+            "title": "Quantity",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "asset_id",
+          "ex_session",
+          "quantity",
+          "per_share",
+          "evidence_sha256"
+        ],
+        "title": "DividendEntitlement",
         "type": "object"
       },
       "ErrorDetail": {
@@ -880,19 +1058,403 @@
         "title": "EvaluationSplit",
         "type": "object"
       },
-      "ExecutionPolicy": {
+      "ExecutionContext": {
         "additionalProperties": false,
         "properties": {
-          "id": {
-            "const": "us_eod_next_open_v1",
-            "title": "Id",
+          "approved_at": {
+            "format": "date-time",
+            "pattern": "Z$",
+            "title": "Approved At",
+            "type": "string"
+          },
+          "calendar_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Calendar Sha256",
+            "type": "string"
+          },
+          "decision_cutoff": {
+            "format": "date-time",
+            "pattern": "Z$",
+            "title": "Decision Cutoff",
+            "type": "string"
+          },
+          "decision_session": {
+            "format": "date",
+            "title": "Decision Session",
+            "type": "string"
+          },
+          "engine_version": {
+            "minLength": 1,
+            "title": "Engine Version",
+            "type": "string"
+          },
+          "execution_mode": {
+            "enum": [
+              "current_paper",
+              "historical_replay"
+            ],
+            "title": "Execution Mode",
+            "type": "string"
+          },
+          "mode": {
+            "enum": [
+              "synthetic_fixture",
+              "research_market_data"
+            ],
+            "title": "Mode",
+            "type": "string"
+          },
+          "snapshot_id": {
+            "format": "uuid",
+            "title": "Snapshot Id",
+            "type": "string"
+          },
+          "snapshot_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Snapshot Sha256",
             "type": "string"
           }
         },
         "required": [
-          "id"
+          "snapshot_id",
+          "snapshot_sha256",
+          "calendar_sha256",
+          "mode",
+          "engine_version",
+          "execution_mode",
+          "decision_session",
+          "decision_cutoff",
+          "approved_at"
         ],
-        "title": "ExecutionPolicy",
+        "title": "ExecutionContext",
+        "type": "object"
+      },
+      "ExperimentAccepted": {
+        "additionalProperties": false,
+        "properties": {
+          "experiment_id": {
+            "format": "uuid",
+            "title": "Experiment Id",
+            "type": "string"
+          },
+          "job_id": {
+            "format": "uuid",
+            "title": "Job Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "experiment_id",
+          "job_id"
+        ],
+        "title": "ExperimentAccepted",
+        "type": "object"
+      },
+      "ExperimentBenchmarkSummaryV1": {
+        "additionalProperties": false,
+        "properties": {
+          "asset_id": {
+            "title": "Asset Id",
+            "type": "string"
+          },
+          "available": {
+            "title": "Available",
+            "type": "boolean"
+          },
+          "periods": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/MetricsPeriods"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "unavailable_reason": {
+            "anyOf": [
+              {
+                "pattern": "^[A-Z][A-Z0-9_]*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unavailable Reason"
+          },
+          "warnings": {
+            "items": {
+              "pattern": "^[A-Z][A-Z0-9_]*$",
+              "type": "string"
+            },
+            "title": "Warnings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "asset_id",
+          "available",
+          "unavailable_reason",
+          "periods",
+          "warnings"
+        ],
+        "title": "ExperimentBenchmarkSummaryV1",
+        "type": "object"
+      },
+      "ExperimentCurvePointV1": {
+        "additionalProperties": false,
+        "properties": {
+          "benchmark_nav_usd": {
+            "anyOf": [
+              {
+                "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Benchmark Nav Usd"
+          },
+          "benchmark_unavailable_reason": {
+            "anyOf": [
+              {
+                "pattern": "^[A-Z][A-Z0-9_]*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Benchmark Unavailable Reason"
+          },
+          "cash_baseline_nav_usd": {
+            "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Cash Baseline Nav Usd",
+            "type": "string"
+          },
+          "cash_usd": {
+            "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Cash Usd",
+            "type": "string"
+          },
+          "cash_weight": {
+            "$ref": "#/components/schemas/WeightValue"
+          },
+          "currency": {
+            "const": "USD",
+            "default": "USD",
+            "title": "Currency",
+            "type": "string"
+          },
+          "drawdown_fraction": {
+            "$ref": "#/components/schemas/MetricValue"
+          },
+          "max_position_weight": {
+            "$ref": "#/components/schemas/WeightValue"
+          },
+          "phase": {
+            "enum": [
+              "development",
+              "holdout"
+            ],
+            "title": "Phase",
+            "type": "string"
+          },
+          "portfolio_nav_usd": {
+            "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Portfolio Nav Usd",
+            "type": "string"
+          },
+          "positions": {
+            "items": {
+              "$ref": "#/components/schemas/Position"
+            },
+            "title": "Positions",
+            "type": "array"
+          },
+          "session_date": {
+            "format": "date",
+            "title": "Session Date",
+            "type": "string"
+          }
+        },
+        "required": [
+          "session_date",
+          "phase",
+          "portfolio_nav_usd",
+          "cash_usd",
+          "positions",
+          "benchmark_nav_usd",
+          "benchmark_unavailable_reason",
+          "cash_baseline_nav_usd",
+          "drawdown_fraction",
+          "cash_weight",
+          "max_position_weight"
+        ],
+        "title": "ExperimentCurvePointV1",
+        "type": "object"
+      },
+      "ExperimentDetailV1": {
+        "additionalProperties": false,
+        "properties": {
+          "config_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Config Sha256",
+            "type": "string"
+          },
+          "created_at": {
+            "format": "date-time",
+            "pattern": "Z$",
+            "title": "Created At",
+            "type": "string"
+          },
+          "currency": {
+            "const": "USD",
+            "default": "USD",
+            "title": "Currency",
+            "type": "string"
+          },
+          "curve_artifact": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ArtifactReference"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "data_status": {
+            "enum": [
+              "synthetic_fixture",
+              "research_market_data"
+            ],
+            "title": "Data Status",
+            "type": "string"
+          },
+          "engine_version": {
+            "title": "Engine Version",
+            "type": "string"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ErrorDetail"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "inputs": {
+            "$ref": "#/components/schemas/ExperimentRequest"
+          },
+          "job_id": {
+            "format": "uuid",
+            "title": "Job Id",
+            "type": "string"
+          },
+          "metrics": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ExperimentMetrics"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "provider": {
+            "title": "Provider",
+            "type": "string"
+          },
+          "report": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ExperimentReportSummaryV1"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "reproducibility_manifest": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ArtifactReference"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "snapshot_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Snapshot Sha256",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "queued",
+              "running",
+              "cancel_requested",
+              "completed",
+              "failed",
+              "cancelled"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "strategy_config": {
+            "$ref": "#/components/schemas/StrategyConfigV1"
+          },
+          "trade_artifact": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ArtifactReference"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "warnings": {
+            "items": {
+              "pattern": "^[A-Z][A-Z0-9_]*$",
+              "type": "string"
+            },
+            "title": "Warnings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "job_id",
+          "status",
+          "inputs",
+          "config_sha256",
+          "snapshot_sha256",
+          "data_status",
+          "created_at",
+          "engine_version",
+          "metrics",
+          "curve_artifact",
+          "trade_artifact",
+          "reproducibility_manifest",
+          "warnings",
+          "error",
+          "provider",
+          "strategy_config",
+          "report"
+        ],
+        "title": "ExperimentDetailV1",
         "type": "object"
       },
       "ExperimentMetrics": {
@@ -944,6 +1506,196 @@
           "trade_count"
         ],
         "title": "ExperimentMetrics",
+        "type": "object"
+      },
+      "ExperimentPageV1": {
+        "additionalProperties": false,
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ExperimentSummaryV1"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "maxLength": 2048,
+                "minLength": 1,
+                "pattern": "^[A-Za-z0-9_-]+$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          }
+        },
+        "required": [
+          "items",
+          "next_cursor"
+        ],
+        "title": "ExperimentPageV1",
+        "type": "object"
+      },
+      "ExperimentReportSummaryV1": {
+        "additionalProperties": false,
+        "properties": {
+          "benchmark": {
+            "$ref": "#/components/schemas/ExperimentBenchmarkSummaryV1"
+          },
+          "cash": {
+            "$ref": "#/components/schemas/MetricsPeriods"
+          },
+          "comparison": {
+            "$ref": "#/components/schemas/ComparisonTerms"
+          },
+          "comparison_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Comparison Sha256",
+            "type": "string"
+          },
+          "core_manifest_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Core Manifest Sha256",
+            "type": "string"
+          },
+          "portfolio": {
+            "$ref": "#/components/schemas/MetricsPeriods"
+          },
+          "reporting_engine_version": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Reporting Engine Version",
+            "type": "string"
+          },
+          "reporting_version": {
+            "const": "q12_v1",
+            "title": "Reporting Version",
+            "type": "string"
+          },
+          "warnings": {
+            "items": {
+              "pattern": "^[A-Z][A-Z0-9_]*$",
+              "type": "string"
+            },
+            "title": "Warnings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "reporting_version",
+          "core_manifest_sha256",
+          "reporting_engine_version",
+          "comparison",
+          "comparison_sha256",
+          "portfolio",
+          "benchmark",
+          "cash",
+          "warnings"
+        ],
+        "title": "ExperimentReportSummaryV1",
+        "type": "object"
+      },
+      "ExperimentReproducibilityV1": {
+        "additionalProperties": false,
+        "properties": {
+          "calendar_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Calendar Sha256",
+            "type": "string"
+          },
+          "config_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Config Sha256",
+            "type": "string"
+          },
+          "core_manifest_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Core Manifest Sha256",
+            "type": "string"
+          },
+          "core_policy_version": {
+            "const": "walk_forward_v1",
+            "title": "Core Policy Version",
+            "type": "string"
+          },
+          "decision_clock_policy": {
+            "const": "next_pinned_open_minus_one_hour",
+            "title": "Decision Clock Policy",
+            "type": "string"
+          },
+          "engine_version": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Engine Version",
+            "type": "string"
+          },
+          "inputs": {
+            "$ref": "#/components/schemas/ExperimentRequest"
+          },
+          "provider": {
+            "title": "Provider",
+            "type": "string"
+          },
+          "reporting_engine_version": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Reporting Engine Version",
+            "type": "string"
+          },
+          "reporting_version": {
+            "const": "q12_v1",
+            "title": "Reporting Version",
+            "type": "string"
+          },
+          "schema_version": {
+            "const": 1,
+            "default": 1,
+            "title": "Schema Version",
+            "type": "integer"
+          },
+          "snapshot_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Snapshot Sha256",
+            "type": "string"
+          },
+          "source_mode": {
+            "enum": [
+              "synthetic_fixture",
+              "research_market_data"
+            ],
+            "title": "Source Mode",
+            "type": "string"
+          },
+          "strategy_config": {
+            "$ref": "#/components/schemas/StrategyConfigV1"
+          },
+          "warnings": {
+            "items": {
+              "pattern": "^[A-Z][A-Z0-9_]*$",
+              "type": "string"
+            },
+            "title": "Warnings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "inputs",
+          "strategy_config",
+          "config_sha256",
+          "snapshot_sha256",
+          "calendar_sha256",
+          "core_manifest_sha256",
+          "engine_version",
+          "reporting_engine_version",
+          "source_mode",
+          "provider",
+          "core_policy_version",
+          "reporting_version",
+          "decision_clock_policy",
+          "warnings"
+        ],
+        "title": "ExperimentReproducibilityV1",
         "type": "object"
       },
       "ExperimentRequest": {
@@ -1144,6 +1896,251 @@
         "title": "ExperimentRunV1",
         "type": "object"
       },
+      "ExperimentSeriesPageV1": {
+        "additionalProperties": false,
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ExperimentCurvePointV1"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "maxLength": 2048,
+                "minLength": 1,
+                "pattern": "^[A-Za-z0-9_-]+$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          }
+        },
+        "required": [
+          "items",
+          "next_cursor"
+        ],
+        "title": "ExperimentSeriesPageV1",
+        "type": "object"
+      },
+      "ExperimentSummaryV1": {
+        "additionalProperties": false,
+        "properties": {
+          "config_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Config Sha256",
+            "type": "string"
+          },
+          "created_at": {
+            "format": "date-time",
+            "pattern": "Z$",
+            "title": "Created At",
+            "type": "string"
+          },
+          "data_status": {
+            "enum": [
+              "synthetic_fixture",
+              "research_market_data"
+            ],
+            "title": "Data Status",
+            "type": "string"
+          },
+          "engine_version": {
+            "title": "Engine Version",
+            "type": "string"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ErrorDetail"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "inputs": {
+            "$ref": "#/components/schemas/ExperimentRequest"
+          },
+          "job_id": {
+            "format": "uuid",
+            "title": "Job Id",
+            "type": "string"
+          },
+          "snapshot_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Snapshot Sha256",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "queued",
+              "running",
+              "cancel_requested",
+              "completed",
+              "failed",
+              "cancelled"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "job_id",
+          "status",
+          "inputs",
+          "config_sha256",
+          "snapshot_sha256",
+          "data_status",
+          "created_at",
+          "engine_version",
+          "error"
+        ],
+        "title": "ExperimentSummaryV1",
+        "type": "object"
+      },
+      "ExperimentTradeV1": {
+        "additionalProperties": false,
+        "properties": {
+          "context": {
+            "$ref": "#/components/schemas/ExecutionContext"
+          },
+          "currency": {
+            "const": "USD",
+            "default": "USD",
+            "title": "Currency",
+            "type": "string"
+          },
+          "eligible_session": {
+            "$ref": "#/components/schemas/Session"
+          },
+          "fill": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/FillEffect"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "filled_quantity": {
+            "pattern": "^(0|[1-9][0-9]{0,23})(\\.[0-9]{1,6})?$",
+            "title": "Filled Quantity",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "order": {
+            "$ref": "#/components/schemas/OrderIntent"
+          },
+          "pending_quantity": {
+            "pattern": "^(0|[1-9][0-9]{0,23})(\\.[0-9]{1,6})?$",
+            "title": "Pending Quantity",
+            "type": "string"
+          },
+          "policy": {
+            "$ref": "#/components/schemas/backend__portfolio__execution__ExecutionPolicy"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "pattern": "^[A-Z][A-Z0-9_]*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          },
+          "skipped_quantity": {
+            "pattern": "^(0|[1-9][0-9]{0,23})(\\.[0-9]{1,6})?$",
+            "title": "Skipped Quantity",
+            "type": "string"
+          },
+          "state_after": {
+            "$ref": "#/components/schemas/PortfolioState"
+          },
+          "status": {
+            "enum": [
+              "pending",
+              "skipped",
+              "filled",
+              "partially_filled"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "terminal": {
+            "title": "Terminal",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "order",
+          "context",
+          "policy",
+          "eligible_session",
+          "status",
+          "terminal",
+          "filled_quantity",
+          "pending_quantity",
+          "skipped_quantity",
+          "reason",
+          "fill",
+          "state_after",
+          "id"
+        ],
+        "title": "ExperimentTradeV1",
+        "type": "object"
+      },
+      "ExperimentTradesPageV1": {
+        "additionalProperties": false,
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ExperimentTradeV1"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "maxLength": 2048,
+                "minLength": 1,
+                "pattern": "^[A-Za-z0-9_-]+$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          }
+        },
+        "required": [
+          "items",
+          "next_cursor"
+        ],
+        "title": "ExperimentTradesPageV1",
+        "type": "object"
+      },
       "FeatureValue": {
         "additionalProperties": false,
         "properties": {
@@ -1206,6 +2203,96 @@
           "volatility"
         ],
         "title": "FeatureValues",
+        "type": "object"
+      },
+      "FillEffect": {
+        "additionalProperties": false,
+        "properties": {
+          "cash_delta_usd": {
+            "pattern": "^-?(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Cash Delta Usd",
+            "type": "string"
+          },
+          "commission_usd": {
+            "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Commission Usd",
+            "type": "string"
+          },
+          "evidence_available_at": {
+            "format": "date-time",
+            "pattern": "Z$",
+            "title": "Evidence Available At",
+            "type": "string"
+          },
+          "executed_price": {
+            "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$",
+            "title": "Executed Price",
+            "type": "string"
+          },
+          "execution_at": {
+            "format": "date-time",
+            "pattern": "Z$",
+            "title": "Execution At",
+            "type": "string"
+          },
+          "execution_session": {
+            "format": "date",
+            "title": "Execution Session",
+            "type": "string"
+          },
+          "gross_usd": {
+            "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Gross Usd",
+            "type": "string"
+          },
+          "proposed_at": {
+            "format": "date-time",
+            "pattern": "Z$",
+            "title": "Proposed At",
+            "type": "string"
+          },
+          "quantity": {
+            "pattern": "^(0|[1-9][0-9]{0,23})(\\.[0-9]{1,6})?$",
+            "title": "Quantity",
+            "type": "string"
+          },
+          "raw_price": {
+            "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$",
+            "title": "Raw Price",
+            "type": "string"
+          },
+          "realized_pnl_usd": {
+            "pattern": "^-?(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Realized Pnl Usd",
+            "type": "string"
+          },
+          "removed_basis_usd": {
+            "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Removed Basis Usd",
+            "type": "string"
+          },
+          "slippage_usd": {
+            "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Slippage Usd",
+            "type": "string"
+          }
+        },
+        "required": [
+          "raw_price",
+          "executed_price",
+          "quantity",
+          "gross_usd",
+          "commission_usd",
+          "slippage_usd",
+          "cash_delta_usd",
+          "removed_basis_usd",
+          "realized_pnl_usd",
+          "execution_session",
+          "execution_at",
+          "evidence_available_at",
+          "proposed_at"
+        ],
+        "title": "FillEffect",
         "type": "object"
       },
       "FixtureMetadata": {
@@ -1767,6 +2854,13 @@
         "title": "HealthV1",
         "type": "object"
       },
+      "JobCancelRequest": {
+        "additionalProperties": false,
+        "description": "Explicit empty JSON command; extra fields are forbidden.",
+        "properties": {},
+        "title": "JobCancelRequest",
+        "type": "object"
+      },
       "JobResult": {
         "additionalProperties": false,
         "properties": {
@@ -2258,6 +3352,27 @@
         "title": "MetricValue",
         "type": "object"
       },
+      "MetricsPeriods": {
+        "additionalProperties": false,
+        "properties": {
+          "development": {
+            "$ref": "#/components/schemas/PeriodMetrics"
+          },
+          "holdout": {
+            "$ref": "#/components/schemas/PeriodMetrics"
+          },
+          "total": {
+            "$ref": "#/components/schemas/PeriodMetrics"
+          }
+        },
+        "required": [
+          "total",
+          "development",
+          "holdout"
+        ],
+        "title": "MetricsPeriods",
+        "type": "object"
+      },
       "MissingSession": {
         "additionalProperties": false,
         "properties": {
@@ -2278,6 +3393,49 @@
           "session_date"
         ],
         "title": "MissingSession",
+        "type": "object"
+      },
+      "OrderIntent": {
+        "additionalProperties": false,
+        "properties": {
+          "asset_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "title": "Asset Id",
+            "type": "string"
+          },
+          "key": {
+            "minLength": 1,
+            "title": "Key",
+            "type": "string"
+          },
+          "requested_quantity": {
+            "pattern": "^(0|[1-9][0-9]{0,23})(\\.[0-9]{1,6})?$",
+            "title": "Requested Quantity",
+            "type": "string"
+          },
+          "sector": {
+            "minLength": 1,
+            "title": "Sector",
+            "type": "string"
+          },
+          "side": {
+            "enum": [
+              "BUY",
+              "SELL"
+            ],
+            "title": "Side",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "asset_id",
+          "sector",
+          "side",
+          "requested_quantity"
+        ],
+        "title": "OrderIntent",
         "type": "object"
       },
       "PageRequest": {
@@ -2613,6 +3771,29 @@
         "title": "PaperOrderV1",
         "type": "object"
       },
+      "PeriodMetrics": {
+        "additionalProperties": false,
+        "properties": {
+          "daily_nav_observations": {
+            "title": "Daily Nav Observations",
+            "type": "integer"
+          },
+          "metrics": {
+            "$ref": "#/components/schemas/ExperimentMetrics"
+          },
+          "return_observations": {
+            "title": "Return Observations",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "daily_nav_observations",
+          "return_observations",
+          "metrics"
+        ],
+        "title": "PeriodMetrics",
+        "type": "object"
+      },
       "PortfolioConfig": {
         "additionalProperties": false,
         "properties": {
@@ -2663,6 +3844,79 @@
           "rebalance_band_absolute_weight"
         ],
         "title": "PortfolioConfig",
+        "type": "object"
+      },
+      "PortfolioState": {
+        "additionalProperties": false,
+        "properties": {
+          "applied_actions": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/AppliedAction"
+            },
+            "title": "Applied Actions",
+            "type": "array"
+          },
+          "cash_usd": {
+            "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Cash Usd",
+            "type": "string"
+          },
+          "entitlements": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/DividendEntitlement"
+            },
+            "title": "Entitlements",
+            "type": "array"
+          },
+          "positions": {
+            "items": {
+              "$ref": "#/components/schemas/Position"
+            },
+            "title": "Positions",
+            "type": "array"
+          }
+        },
+        "required": [
+          "cash_usd",
+          "positions"
+        ],
+        "title": "PortfolioState",
+        "type": "object"
+      },
+      "Position": {
+        "additionalProperties": false,
+        "properties": {
+          "asset_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "title": "Asset Id",
+            "type": "string"
+          },
+          "quantity": {
+            "pattern": "^(0|[1-9][0-9]{0,23})(\\.[0-9]{1,6})?$",
+            "title": "Quantity",
+            "type": "string"
+          },
+          "sector": {
+            "minLength": 1,
+            "title": "Sector",
+            "type": "string"
+          },
+          "total_basis_usd": {
+            "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Total Basis Usd",
+            "type": "string"
+          }
+        },
+        "required": [
+          "asset_id",
+          "sector",
+          "quantity",
+          "total_basis_usd"
+        ],
+        "title": "Position",
         "type": "object"
       },
       "RNGMetadata": {
@@ -3848,7 +5102,7 @@
             "type": "string"
           },
           "execution_policy": {
-            "$ref": "#/components/schemas/ExecutionPolicy"
+            "$ref": "#/components/schemas/backend__domain__strategy__ExecutionPolicy"
           },
           "portfolio": {
             "$ref": "#/components/schemas/PortfolioConfig"
@@ -4455,6 +5709,41 @@
         "title": "ValidationError",
         "type": "object"
       },
+      "WeightValue": {
+        "additionalProperties": false,
+        "properties": {
+          "unavailable_reason": {
+            "anyOf": [
+              {
+                "pattern": "^[A-Z][A-Z0-9_]*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unavailable Reason"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value"
+          }
+        },
+        "required": [
+          "value",
+          "unavailable_reason"
+        ],
+        "title": "WeightValue",
+        "type": "object"
+      },
       "WorkspaceV1": {
         "additionalProperties": false,
         "properties": {
@@ -4492,6 +5781,46 @@
           "preferences"
         ],
         "title": "WorkspaceV1",
+        "type": "object"
+      },
+      "backend__domain__strategy__ExecutionPolicy": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "const": "us_eod_next_open_v1",
+            "title": "Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "title": "ExecutionPolicy",
+        "type": "object"
+      },
+      "backend__portfolio__execution__ExecutionPolicy": {
+        "additionalProperties": false,
+        "properties": {
+          "commission_usd": {
+            "default": "0.00",
+            "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Commission Usd",
+            "type": "string"
+          },
+          "id": {
+            "const": "us_eod_next_open_v1",
+            "default": "us_eod_next_open_v1",
+            "title": "Id",
+            "type": "string"
+          },
+          "slippage_fraction": {
+            "default": "0.001",
+            "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$",
+            "title": "Slippage Fraction",
+            "type": "string"
+          }
+        },
+        "title": "ExecutionPolicy",
         "type": "object"
       }
     }
@@ -4883,6 +6212,503 @@
         "summary": "Snapshots"
       }
     },
+    "/api/v1/experiments": {
+      "get": {
+        "operationId": "list_experiments_api_v1_experiments_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 25,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 2048,
+                  "minLength": 1,
+                  "pattern": "^[A-Za-z0-9_-]+$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Cursor"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExperimentPageV1"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "summary": "List Experiments"
+      },
+      "post": {
+        "operationId": "create_api_v1_experiments_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExperimentRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExperimentAccepted"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "summary": "Create"
+      }
+    },
+    "/api/v1/experiments/{experiment_id}": {
+      "get": {
+        "operationId": "read_api_v1_experiments__experiment_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "experiment_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Experiment Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExperimentDetailV1"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "summary": "Read"
+      }
+    },
+    "/api/v1/experiments/{experiment_id}/series": {
+      "get": {
+        "operationId": "series_api_v1_experiments__experiment_id__series_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "experiment_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Experiment Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 25,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 2048,
+                  "minLength": 1,
+                  "pattern": "^[A-Za-z0-9_-]+$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Cursor"
+            }
+          },
+          {
+            "in": "query",
+            "name": "start_session",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Start Session"
+            }
+          },
+          {
+            "in": "query",
+            "name": "end_session_exclusive",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "End Session Exclusive"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExperimentSeriesPageV1"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "summary": "Series"
+      }
+    },
+    "/api/v1/experiments/{experiment_id}/trades": {
+      "get": {
+        "operationId": "trades_api_v1_experiments__experiment_id__trades_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "experiment_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Experiment Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 25,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 2048,
+                  "minLength": 1,
+                  "pattern": "^[A-Za-z0-9_-]+$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Cursor"
+            }
+          },
+          {
+            "in": "query",
+            "name": "start_session",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Start Session"
+            }
+          },
+          {
+            "in": "query",
+            "name": "end_session_exclusive",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "End Session Exclusive"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExperimentTradesPageV1"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "summary": "Trades"
+      }
+    },
     "/api/v1/health": {
       "get": {
         "operationId": "health_api_v1_health_get",
@@ -4969,6 +6795,86 @@
           }
         },
         "summary": "Get Job"
+      }
+    },
+    "/api/v1/jobs/{job_id}/cancel": {
+      "post": {
+        "operationId": "cancel_job_api_v1_jobs__job_id__cancel_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Job Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/JobCancelRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobV1"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "summary": "Cancel Job"
       }
     },
     "/api/v1/strategies": {
