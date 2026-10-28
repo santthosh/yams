@@ -19,12 +19,12 @@
     {% if rec.status == 'ready' and rec.summary_action == 'HOLD' %}<span class="tag">no trades</span>{% else %}<span class="tag {{ rec.status }}">{{ rec.status }}</span>{% endif %}
     <span class="small muted">&nbsp;Created {{ rec.created_at[:16]|replace('T', ' ') }} UTC · prices as of {{ rec.data_as_of }} close ({{ rec.data_source }})</span>
     <h1>{{ rec.summary }}</h1>
-    <p class="ink2 small">{{ rec.regime_text }}</p>
+    <p class="ink2 small">{{ rec.regime_text }}{{ tip('regime') }}</p>
     <div class="tiles four" style="margin-top:14px">
       <div class="card tile"><div class="label">Portfolio value</div><div class="value">{{ rec.portfolio_value|money }}</div><div class="sub">at the {{ rec.data_as_of }} close</div></div>
-      <div class="card tile"><div class="label">Trades</div><div class="value">{{ n_trades }}</div><div class="sub">{{ rec.actions|length - n_trades }} held as is</div></div>
-      <div class="card tile"><div class="label">Est. trading cost</div><div class="value">{{ rec.est_total_cost|money }}</div><div class="sub">{{ strategy.slippage_bps|int }} bps slippage</div></div>
-      <div class="card tile"><div class="label">90-day median</div>
+      <div class="card tile"><div class="label">Trades{{ tip('trades') }}</div><div class="value">{{ n_trades }}</div><div class="sub">{{ rec.actions|length - n_trades }} held as is</div></div>
+      <div class="card tile"><div class="label">Est. trading cost{{ tip('est_cost') }}</div><div class="value">{{ rec.est_total_cost|money }}</div><div class="sub">{{ strategy.slippage_bps|int }} bps slippage</div></div>
+      <div class="card tile"><div class="label">90-day median{{ tip('median_90', 'right') }}</div>
         {% if f.status == 'available' %}<div class="value {{ 'pos' if f.proposed.median_return > 0 else 'neg' }}">{{ f.proposed.median_return|pct(1, true) }}</div>
         <div class="sub">{{ f.proposed.prob_loss|pct(0) }} chance of a loss</div>
         {% else %}<div class="value">—</div><div class="sub">forecast unavailable</div>{% endif %}</div>
@@ -61,7 +61,7 @@
     <span class="small muted">{{ rec.n_eligible }} of {{ rec.n_universe }} S&amp;P 500 stocks passed the filters</span></div>
   {% if rec.positions %}
   <div class="card table-wrap"><table>
-    <thead><tr><th>Stock</th><th class="num">Target</th><th class="num">6-mo</th><th class="num">3-mo</th><th class="num">Volatility</th><th class="num">Rank</th><th>Why this position</th></tr></thead>
+    <thead><tr><th>Stock</th><th class="num">Target{{ tip('target', 'right') }}</th><th class="num">6-mo{{ tip('m126', 'right') }}</th><th class="num">3-mo{{ tip('m63', 'right') }}</th><th class="num">Volatility{{ tip('volatility', 'right') }}</th><th class="num">Rank{{ tip('rank', 'right') }}</th><th>Why this position</th></tr></thead>
     <tbody>
     {% for p in rec.positions %}
       <tr><td><span class="tick">{{ p.ticker }}</span><span class="co">{{ p.name }} · {{ p.sector }}</span></td>
@@ -88,7 +88,7 @@
   <div class="section-head"><h2><span class="num-badge">2</span>Trades to get there</h2>
     <span class="small muted">Est. cost {{ rec.est_total_cost|money }}</span></div>
   <div class="card table-wrap"><table>
-    <thead><tr><th>Action</th><th>Stock</th><th class="num">Now</th><th class="num">Target</th><th class="num">Shares</th><th class="num">Amount</th><th>Reason</th></tr></thead>
+    <thead><tr><th>Action{{ tip('action', 'left') }}</th><th>Stock</th><th class="num">Now{{ tip('now', 'right') }}</th><th class="num">Target{{ tip('target', 'right') }}</th><th class="num">Shares</th><th class="num">Amount</th><th>Reason</th></tr></thead>
     <tbody>
     {% for a in rec.actions %}
       <tr><td><span class="tag {{ a.action }}">{{ a.action }}</span></td><td class="tick">{{ a.ticker }}</td>
@@ -129,7 +129,7 @@
       {% endfor %}
     </div>
     <div class="table-wrap" style="margin-top:18px"><table>
-      <thead><tr><th></th><th class="num">Median</th><th class="num">Bad case (P10)</th><th class="num">Good case (P90)</th><th class="num">Chance of a loss</th><th class="num">Median ending value</th></tr></thead>
+      <thead><tr><th></th><th class="num">Median{{ tip('median_90', 'right') }}</th><th class="num">Bad case (P10){{ tip('p10', 'right') }}</th><th class="num">Good case (P90){{ tip('p90', 'right') }}</th><th class="num">Chance of a loss{{ tip('prob_loss', 'right') }}</th><th class="num">Median ending value{{ tip('median_ending', 'right') }}</th></tr></thead>
       <tbody>
         <tr><td><strong>Apply these trades</strong></td><td class="num"><strong>{{ f.proposed.median_return|pct(1, true) }}</strong></td>
           <td class="num">{{ f.proposed.p10_return|pct(1, true) }}</td><td class="num">{{ f.proposed.p90_return|pct(1, true) }}</td>

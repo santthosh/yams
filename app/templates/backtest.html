@@ -19,13 +19,13 @@
 <div class="card pad" style="margin-top:12px"><p class="ink2" style="margin:0">{{ verdict }}</p></div>
 
 <div class="tiles four" style="margin-top:16px">
-  <div class="card tile"><div class="label">Ending value</div><div class="value">{{ s.ending_value|money }}</div>
+  <div class="card tile"><div class="label">Ending value{{ tip('ending_value', 'left') }}</div><div class="value">{{ s.ending_value|money }}</div>
     <div class="sub">SPY {{ b.ending_value|money }} · from {{ bt.initial_cash|money }}</div></div>
-  <div class="card tile"><div class="label">Annual return</div><div class="value {{ 'pos' if s.cagr > 0 else 'neg' }}">{{ s.cagr|pct(1, true) }}</div>
+  <div class="card tile"><div class="label">Annual return{{ tip('cagr') }}</div><div class="value {{ 'pos' if s.cagr > 0 else 'neg' }}">{{ s.cagr|pct(1, true) }}</div>
     <div class="sub">SPY {{ b.cagr|pct(1, true) }}</div></div>
-  <div class="card tile"><div class="label">Worst drop</div><div class="value neg">{{ s.max_drawdown|pct }}</div>
+  <div class="card tile"><div class="label">Worst drop{{ tip('drawdown') }}</div><div class="value neg">{{ s.max_drawdown|pct }}</div>
     <div class="sub">SPY {{ b.max_drawdown|pct }}</div></div>
-  <div class="card tile"><div class="label">Sharpe ratio</div><div class="value">{{ '%.2f'|format(s.sharpe) }}</div>
+  <div class="card tile"><div class="label">Sharpe ratio{{ tip('sharpe', 'right') }}</div><div class="value">{{ '%.2f'|format(s.sharpe) }}</div>
     <div class="sub">SPY {{ '%.2f'|format(b.sharpe) }} · higher is better</div></div>
 </div>
 
@@ -36,7 +36,7 @@
 </section>
 
 <section class="section">
-  <div class="section-head"><h2>Drawdown</h2><span class="small muted">How far each portfolio sat below its previous peak</span></div>
+  <div class="section-head"><h2>Drawdown{{ tip('drawdown', 'left') }}</h2><span class="small muted">How far each portfolio sat below its previous peak</span></div>
   <div class="card pad"><div class="chart-box short"><canvas id="dd" aria-label="Drawdown over time, strategy vs SPY"></canvas></div></div>
 </section>
 
@@ -46,26 +46,26 @@
     <div class="card table-wrap"><table>
       <thead><tr><th>Metric</th><th class="num">Strategy</th><th class="num">SPY buy &amp; hold</th></tr></thead>
       <tbody>
-        <tr><td>Ending value (from {{ bt.initial_cash|money }})</td><td class="num">{{ s.ending_value|money }}</td><td class="num">{{ b.ending_value|money }}</td></tr>
-        <tr><td>Total return</td><td class="num">{{ s.total_return|pct(1, true) }}</td><td class="num">{{ b.total_return|pct(1, true) }}</td></tr>
-        <tr><td>Annualized return (CAGR)</td><td class="num">{{ s.cagr|pct(1, true) }}</td><td class="num">{{ b.cagr|pct(1, true) }}</td></tr>
-        <tr><td>Annualized volatility</td><td class="num">{{ s.volatility|pct }}</td><td class="num">{{ b.volatility|pct }}</td></tr>
-        <tr><td>Sharpe ratio (risk-free = 0)</td><td class="num">{{ '%.2f'|format(s.sharpe) }}</td><td class="num">{{ '%.2f'|format(b.sharpe) }}</td></tr>
-        <tr><td>Worst peak-to-trough drop</td><td class="num">{{ s.max_drawdown|pct }}</td><td class="num">{{ b.max_drawdown|pct }}</td></tr>
-        <tr><td>Trades</td><td class="num">{{ s.trades }}</td><td class="num">{{ b.trades }}</td></tr>
-        <tr><td>Trading costs paid</td><td class="num">{{ s.costs|money }}</td><td class="num">{{ b.costs|money }}</td></tr>
-        <tr><td>Average turnover per rebalance</td><td class="num">{{ s.avg_turnover|pct(0) }}</td><td class="num">—</td></tr>
+        <tr><td>Ending value (from {{ bt.initial_cash|money }}){{ tip('ending_value', 'left') }}</td><td class="num">{{ s.ending_value|money }}</td><td class="num">{{ b.ending_value|money }}</td></tr>
+        <tr><td>Total return{{ tip('total_return', 'left') }}</td><td class="num">{{ s.total_return|pct(1, true) }}</td><td class="num">{{ b.total_return|pct(1, true) }}</td></tr>
+        <tr><td>Annualized return (CAGR){{ tip('cagr', 'left') }}</td><td class="num">{{ s.cagr|pct(1, true) }}</td><td class="num">{{ b.cagr|pct(1, true) }}</td></tr>
+        <tr><td>Annualized volatility{{ tip('ann_vol', 'left') }}</td><td class="num">{{ s.volatility|pct }}</td><td class="num">{{ b.volatility|pct }}</td></tr>
+        <tr><td>Sharpe ratio (risk-free = 0){{ tip('sharpe', 'left') }}</td><td class="num">{{ '%.2f'|format(s.sharpe) }}</td><td class="num">{{ '%.2f'|format(b.sharpe) }}</td></tr>
+        <tr><td>Worst peak-to-trough drop (max drawdown){{ tip('drawdown', 'left') }}</td><td class="num">{{ s.max_drawdown|pct }}</td><td class="num">{{ b.max_drawdown|pct }}</td></tr>
+        <tr><td>Trades{{ tip('bt_trades', 'left') }}</td><td class="num">{{ s.trades }}</td><td class="num">{{ b.trades }}</td></tr>
+        <tr><td>Trading costs paid{{ tip('bt_costs', 'left') }}</td><td class="num">{{ s.costs|money }}</td><td class="num">{{ b.costs|money }}</td></tr>
+        <tr><td>Average turnover per rebalance{{ tip('turnover', 'left') }}</td><td class="num">{{ s.avg_turnover|pct(0) }}</td><td class="num">—</td></tr>
       </tbody>
     </table></div>
   </div>
   <div>
     <div class="section-head"><h2>How it was run</h2></div>
     <div class="card pad"><ul class="notes">
-      <li>{{ bt.rebalances }} monthly rebalances, starting with {{ bt.initial_cash|money }} (your portfolio's starting cash).</li>
+      <li>{{ bt.rebalances }} monthly rebalances{{ tip('rebalance') }}, starting with {{ bt.initial_cash|money }} (your portfolio's starting cash).</li>
       <li>At each month-end close the same engine used for live recommendations picks targets using only data up to that day. Orders fill at the <strong>next session's open</strong> with {{ strategy.slippage_bps|int }} bps slippage, with the same {{ (strategy.rebalance_band * 100)|int }}-point rebalance band, $5 minimum trade, caps and cash rules.</li>
       <li>SPY benchmark: bought once with the same capital, date and slippage, then held.</li>
       <li>Prices are Yahoo's split- and dividend-adjusted prices, so dividends are treated as reinvested.</li>
-      {% for w in bt.warnings %}<li><strong>{{ w.split(':')[0]|replace('_', ' ')|title }}:</strong>{{ w.split(':', 1)[1] }}.{% if w.startswith('SURVIVORSHIP') %} Stocks that were dropped from the index (often after falling) are missing, so results are flattered; more so the earlier the start.{% endif %}</li>{% endfor %}
+      {% for w in bt.warnings %}<li><strong>{{ w.split(':')[0]|replace('_', ' ')|title }}{{ tip('survivorship') if w.startswith('SURVIVORSHIP') }}:</strong>{{ w.split(':', 1)[1] }}.{% if w.startswith('SURVIVORSHIP') %} Stocks that were dropped from the index (often after falling) are missing, so results are flattered; more so the earlier the start.{% endif %}</li>{% endfor %}
       <li>Parameters were fixed before running this test, not tuned to it. Past performance does not guarantee future results.</li>
     </ul></div>
   </div>

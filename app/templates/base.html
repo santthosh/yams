@@ -21,7 +21,7 @@
     <div class="status">
       <span class="chip paper" title="No real money or broker is involved">Paper money</span>
       <span class="chip {{ 'stale' if status.stale }}" title="Fetched {{ status.fetched_at }} · source: {{ status.source }}">
-        <span class="dot"></span>Prices as of {{ status.as_of }} close{% if status.stale %} · stale{% endif %}
+        <span class="dot"></span>Prices as of {{ status.as_of }} close{% if status.stale %} · stale{% endif %}{{ tip('data_as_of', 'right') }}
       </span>
       <form class="inline" method="post" action="/ui/refresh"
             onsubmit="this.querySelector('button').disabled=true;this.querySelector('button').textContent='Refreshing… ~1 min'">

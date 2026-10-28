@@ -207,3 +207,18 @@ details.settings[open] summary::before { content: "▾ "; }
   color: var(--accent-soft-ink); display: grid; place-items: center; font-size: 22px; font-weight: 700; }
 
 footer { color: var(--muted); font-size: 12px; text-align: center; padding: 24px 16px 32px; }
+
+/* ---------- tooltips: ? next to a metric, definition on hover / focus / tap */
+.tip { position: relative; display: inline-grid; place-items: center; width: 15px; height: 15px; margin-left: 5px;
+  border-radius: 50%; border: 1px solid var(--line-strong); color: var(--muted); font-size: 10px; font-weight: 700;
+  line-height: 1; cursor: help; vertical-align: 1px; text-transform: none; letter-spacing: 0; user-select: none; }
+.tip:hover, .tip:focus { color: var(--accent); border-color: var(--accent); outline: none; }
+.tip::after { content: attr(data-tip); position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%);
+  width: max-content; max-width: 280px; padding: 10px 12px; border-radius: 10px; background: var(--ink); color: var(--surface);
+  font-size: 12.5px; font-weight: 500; line-height: 1.45; text-align: left; white-space: normal;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, .18); opacity: 0; pointer-events: none; transition: opacity .12s; z-index: 30; }
+.tip-right::after { left: auto; right: -8px; transform: none; }
+.tip-left::after { left: -8px; transform: none; }
+.tip:hover::after, .tip:focus::after { opacity: 1; }
+th .tip { margin-left: 4px; }
+th .tip::after { bottom: auto; top: calc(100% + 8px); }  /* stay inside scrolling table wrappers */

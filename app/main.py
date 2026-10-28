@@ -17,6 +17,7 @@ from pydantic import BaseModel, Field
 
 from app import data, service
 from app.backtest import start_bounds
+from app.glossary import tip
 from app.config import DB_PATH, ROOT, STRATEGY
 from app.ledger import Ledger
 from app.service import AppError
@@ -52,7 +53,7 @@ def _pct(x, digits=1, signed=False):
 
 
 templates.env.filters.update(money=_money, pct=_pct)
-templates.env.globals.update(strategy=STRATEGY)
+templates.env.globals.update(strategy=STRATEGY, tip=tip)
 
 
 def md() -> data.MarketData:

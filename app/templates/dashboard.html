@@ -8,13 +8,13 @@
 <section class="hero">
   <div class="card hero-main">
     <div>
-      <div class="eyebrow">Paper portfolio value</div>
+      <div class="eyebrow">Paper portfolio value{{ tip('total_value', 'left') }}</div>
       <div class="hero-figure">{{ v.total|money }}</div>
       <div class="delta-row">
         {% if live %}
-        <span><strong class="{{ 'pos' if live.day_change > 0 else ('neg' if live.day_change < 0) }}">{{ live.day_change|money(true) }} ({{ live.day_return|pct(2, true) }})</strong> <span class="muted">today</span></span>
+        <span><strong class="{{ 'pos' if live.day_change > 0 else ('neg' if live.day_change < 0) }}">{{ live.day_change|money(true) }} ({{ live.day_return|pct(2, true) }})</strong> <span class="muted">today</span>{{ tip('today') }}</span>
         {% endif %}
-        <span><strong class="{{ 'pos' if v.pnl and v.pnl > 0 else ('neg' if v.pnl and v.pnl < 0) }}">{{ v.pnl|money(true) }} ({{ v.return|pct(1, true) }})</strong> <span class="muted">since start ({{ p.initial_cash|money }})</span></span>
+        <span><strong class="{{ 'pos' if v.pnl and v.pnl > 0 else ('neg' if v.pnl and v.pnl < 0) }}">{{ v.pnl|money(true) }} ({{ v.return|pct(1, true) }})</strong> <span class="muted">since start ({{ p.initial_cash|money }})</span>{{ tip('since_start') }}</span>
       </div>
     </div>
     <div class="small muted">
@@ -23,13 +23,13 @@
     </div>
   </div>
   <div class="tiles">
-    <div class="card tile"><div class="label">Invested</div><div class="value">{{ invested|money }}</div>
+    <div class="card tile"><div class="label">Invested{{ tip('invested', 'left') }}</div><div class="value">{{ invested|money }}</div>
       <div class="sub">{{ p.holdings|length }} stock{{ '' if p.holdings|length == 1 else 's' }}</div></div>
-    <div class="card tile"><div class="label">Cash</div><div class="value">{{ p.cash|money }}</div>
+    <div class="card tile"><div class="label">Cash{{ tip('cash', 'right') }}</div><div class="value">{{ p.cash|money }}</div>
       <div class="sub">{{ v.cash_weight|pct }} of portfolio · earns 0%</div></div>
-    <div class="card tile"><div class="label">SPY since start</div><div class="value">{{ v.spy_return|pct(1, true) }}</div>
+    <div class="card tile"><div class="label">SPY since start{{ tip('spy_since_start', 'left') }}</div><div class="value">{{ v.spy_return|pct(1, true) }}</div>
       <div class="sub">{% if live %}{{ live.spy_day_return|pct(2, true) }} today · {% endif %}from {{ p.start_as_of }}</div></div>
-    <div class="card tile"><div class="label">You vs SPY</div>
+    <div class="card tile"><div class="label">You vs SPY{{ tip('vs_spy', 'right') }}</div>
       {% set edge = (v.return - v.spy_return) if v.return is not none and v.spy_return is not none else none %}
       <div class="value {{ 'pos' if edge and edge > 0 else ('neg' if edge and edge < 0) }}">{{ edge|pct(1, true) }}</div>
       <div class="sub">percentage points since start</div></div>
@@ -68,7 +68,7 @@
     {% if p.holdings %}<span class="small muted">Weights at {{ 'live' if live else p.valued_as_of ~ ' closing' }} prices</span>{% endif %}</div>
   {% if p.holdings %}
   <div class="card table-wrap"><table>
-    <thead><tr><th>Stock</th><th class="num">Shares</th><th class="num">Price</th>{% if live %}<th class="num">Today</th>{% endif %}<th class="num">Value</th><th class="num">Weight</th><th>Why we hold it</th></tr></thead>
+    <thead><tr><th>Stock</th><th class="num">Shares</th><th class="num">Price{{ tip('price', 'right') }}</th>{% if live %}<th class="num">Today{{ tip('today', 'right') }}</th>{% endif %}<th class="num">Value</th><th class="num">Weight{{ tip('weight', 'right') }}</th><th>Why we hold it</th></tr></thead>
     <tbody>
     {% for h in p.holdings %}
       {% set q = live.prices[h.ticker] if live else h %}

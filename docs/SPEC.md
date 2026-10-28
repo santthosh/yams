@@ -273,6 +273,8 @@ Errors are returned as `{"error": {"code": "...", "message": "..."}}`.
 
 ## 11. UI (three pages, server-rendered)
 
+Every metric label carries a **?** tooltip with a plain-English definition from `app/glossary.py` (hover, focus or tap).
+
 A persistent header shows **YAMS · Paper only · Data as of 2026-10-27 (live)**, the
 `Refresh data` button, and links to *Dashboard* and *Backtest*.
 

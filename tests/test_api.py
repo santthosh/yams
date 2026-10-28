@@ -137,3 +137,14 @@ def test_backtest_start_date(client):
     page = client.get("/backtest", params={"start": "2024-06-03"})
     assert page.status_code == 200 and 'value="2024-06-03"' in page.text
     assert "Start date must look like" in client.get("/backtest", params={"start": "nope"}).text
+
+
+def test_every_metric_tooltip_is_defined_and_used(client):
+    from pathlib import Path
+
+    from app.glossary import GLOSSARY
+
+    templates = "".join(p.read_text() for p in Path("app/templates").glob("*.html"))
+    assert [k for k in GLOSSARY if f"tip('{k}'" not in templates] == []
+    page = client.get("/backtest").text
+    assert 'class="tip' in page and "How far the portfolio fell from its previous high" in page
