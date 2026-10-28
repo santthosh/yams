@@ -75,7 +75,8 @@ def upgrade() -> None:
             FOREIGN KEY (recommendation_id, portfolio_id, strategy_version_id, snapshot_id)
                 REFERENCES recommendation(id, portfolio_id, strategy_version_id, snapshot_id) ON
                     DELETE RESTRICT,
-            CHECK (status NOT IN ('filled', 'cancelled', 'rejected') OR terminal)
+            CHECK (status NOT IN ('filled', 'cancelled', 'rejected') OR terminal),
+            CHECK (status NOT IN ('cancelled', 'rejected') OR reason IS NOT NULL)
         );
         CREATE UNIQUE INDEX one_active_paper_batch ON paper_order_batch (portfolio_id) WHERE NOT
             terminal;

@@ -1142,3 +1142,28 @@ def test_negative_cash_correction_is_blocked_without_unexplained_funding(databas
         assert connection.execute(
             text("SELECT delta_usd FROM cash_ledger_entry WHERE event_id=:id"), {"id": paid}
         ).scalar_one() == Decimal("1000.00")
+
+
+def test_fully_rejected_batch_preserves_domain_required_reason(database: Engine) -> None:
+    from backend.portfolio.ledger import post_order, read_portfolio
+    from backend.tests.portfolio.test_execution import at, calendar
+
+    identity, order = seed_batch(database, cash="1.00")
+    assert (
+        post_order(
+            database,
+            order,
+            calendar=calendar(),
+            market=evidence_for(database, order),
+            observed_at=at(4),
+        )
+        is not None
+    )
+    assert read_portfolio(database, identity).state == PortfolioState(cash_usd="1.00", positions=())
+    with database.connect() as connection:
+        status, terminal, reason = connection.execute(
+            text("SELECT status,terminal,reason FROM paper_order_batch")
+        ).one()
+        assert (status, terminal) == ("rejected", True)
+        assert reason == "BELOW_MIN_TRADE"
+        assert connection.execute(text("SELECT count(*) FROM paper_fill")).scalar_one() == 0

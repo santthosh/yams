@@ -687,6 +687,14 @@ def post_order(
             )
         elif any(item.filled_quantity > 0 for item in orders):
             batch.status = "partially_filled"
+        batch.reason = next(
+            (
+                item.reason
+                for item in sorted(orders, key=lambda item: item.ordinal)
+                if item.reason is not None and item.status != "filled"
+            ),
+            None,
+        )
         session.flush()
         return event.id
 
