@@ -83,8 +83,12 @@ def main() -> None:
         assert health["status"] == "ready"
         workspace = get("workspace")
         strategies = get("strategies")
-        assert len(strategies["items"]) == 1 and strategies["next_cursor"] is None
-        default_version = strategies["items"][0]["published_version"]
+        assert len(strategies["items"]) == 3 and strategies["next_cursor"] is None
+        default_version = next(
+            row["published_version"]
+            for row in strategies["items"]
+            if row["template_key"] == "risk_adjusted_momentum_v1"
+        )
         assert default_version["status"] == "published"
         assert default_version["config_sha256"] == (
             "2093c63d190815eba052508d6d42d8ae0c93400cf777602d2c5f759627f43f21"
@@ -213,7 +217,7 @@ def main() -> None:
             publication["appended"]["body"],
         ]
         strategies = get("strategies")
-        assert len(strategies["items"]) == 2
+        assert len(strategies["items"]) == 4
         evidence["strategy_publication"] = publication
         evidence["checks"].append(
             "real browser same-origin strategy creation, immutable append, conflict and pagination"
@@ -223,7 +227,14 @@ def main() -> None:
             for path in sorted(destination.glob("candidate-runs-*.json"))
             for row in json.loads(path.read_text())
         ]
-        assert len(evaluations) == 6
+        assert len(evaluations) == 10
+        for kind in ("mean_reversion", "low_volatility"):
+            matching = [
+                row for row in evaluations if row["strategy_config"]["signals"]["kind"] == kind
+            ]
+            assert (
+                len(matching) == 2 and matching[0]["result_sha256"] == matching[1]["result_sha256"]
+            )
         evidence["strategy_evaluations"] = evaluations
         evidence["checks"].append(
             "real browser candidate/target reruns and cash-only cases via supervised worker"

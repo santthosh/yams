@@ -92,6 +92,27 @@ class SignalConfig(Contract):
         return self
 
 
+class AlternativeSignalConfig(Contract):
+    volatility_sessions: Annotated[int, Field(strict=True, ge=2, le=2519)]
+    trend_sma_sessions: Annotated[int, Field(strict=True, ge=1, le=2520)]
+    require_positive_trend: StrictBool
+
+
+class MeanReversionSignalConfig(AlternativeSignalConfig):
+    kind: Literal["mean_reversion"]
+    mean_reversion_sessions: Annotated[int, Field(strict=True, ge=2, le=2520)]
+
+
+class LowVolatilitySignalConfig(AlternativeSignalConfig):
+    kind: Literal["low_volatility"]
+
+
+StrategySignals = Annotated[
+    SignalConfig | MeanReversionSignalConfig | LowVolatilitySignalConfig,
+    Field(discriminator="kind"),
+]
+
+
 class PortfolioConfig(Contract):
     max_positions: Annotated[int, Field(strict=True, ge=1, le=100)]
     weighting: Literal["inverse_volatility"]
@@ -122,7 +143,7 @@ class StrategyConfigV1(Contract):
     schema_version: Literal[1]
     display_name: Annotated[str, Field(strict=True)]
     universe: UniverseConfig
-    signals: SignalConfig
+    signals: StrategySignals
     portfolio: PortfolioConfig
     rebalance: RebalanceConfig
     execution_policy: ExecutionPolicy
@@ -147,13 +168,14 @@ class StrategyConfigV1(Contract):
     @model_validator(mode="after")
     def enough_history(self) -> Self:
         signals = self.signals
-        required = max(
-            signals.momentum_long_sessions + 1,
-            signals.momentum_short_sessions + 1,
-            signals.volatility_sessions + 1,
-            signals.trend_sma_sessions,
-            20,
-        )
+        windows = [signals.volatility_sessions + 1, signals.trend_sma_sessions, 20]
+        if isinstance(signals, SignalConfig):
+            windows.extend(
+                [signals.momentum_long_sessions + 1, signals.momentum_short_sessions + 1]
+            )
+        elif isinstance(signals, MeanReversionSignalConfig):
+            windows.append(signals.mean_reversion_sessions)
+        required = max(windows)
         if self.universe.min_history_sessions < required:
             raise ValueError("History does not cover every required lookback")
         return self

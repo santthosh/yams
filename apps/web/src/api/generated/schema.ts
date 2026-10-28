@@ -493,7 +493,12 @@ export interface components {
       asset_id: string;
       /** Eligible */
       eligible: boolean;
-      features: components["schemas"]["FeatureValues"] | null;
+      /** Features */
+      features:
+        | components["schemas"]["FeatureValues"]
+        | components["schemas"]["MeanReversionFeatures"]
+        | components["schemas"]["LowVolatilityFeatures"]
+        | null;
       /** Input Sha256 */
       input_sha256: string;
       /** Median Dollar Volume */
@@ -504,7 +509,12 @@ export interface components {
       raw_close: string | null;
       /** Reasons */
       reasons: string[];
-      scoring: components["schemas"]["ScoreEvidence"] | null;
+      /** Scoring */
+      scoring:
+        | components["schemas"]["ScoreEvidence"]
+        | components["schemas"]["MeanReversionScore"]
+        | components["schemas"]["LowVolatilityScore"]
+        | null;
       /** Sector */
       sector: string | null;
       /** Trend Sma */
@@ -926,6 +936,42 @@ export interface components {
        */
       status: "alive";
     };
+    /** LowVolatilityFeatures */
+    LowVolatilityFeatures: {
+      /**
+       * Kind
+       * @constant
+       */
+      kind: "low_volatility";
+      /** Volatility */
+      volatility: number;
+    };
+    /** LowVolatilityScore */
+    LowVolatilityScore: {
+      /**
+       * Kind
+       * @constant
+       */
+      kind: "low_volatility";
+      /** Score */
+      score: number;
+      /** Volatility Z */
+      volatility_z: number;
+    };
+    /** LowVolatilitySignalConfig */
+    LowVolatilitySignalConfig: {
+      /**
+       * @description discriminator enum property added by openapi-typescript
+       * @enum {string}
+       */
+      kind: "low_volatility";
+      /** Require Positive Trend */
+      require_positive_trend: boolean;
+      /** Trend Sma Sessions */
+      trend_sma_sessions: number;
+      /** Volatility Sessions */
+      volatility_sessions: number;
+    };
     /** MarketBarV1 */
     MarketBarV1: {
       /** Adjusted Close */
@@ -985,6 +1031,48 @@ export interface components {
       volume: number;
       /** Volume Basis */
       volume_basis: string;
+    };
+    /** MeanReversionFeatures */
+    MeanReversionFeatures: {
+      /**
+       * Kind
+       * @constant
+       */
+      kind: "mean_reversion";
+      /** Mean Reversion Distance */
+      mean_reversion_distance: number;
+      /** Mean Reversion Sma */
+      mean_reversion_sma: string;
+      /** Volatility */
+      volatility: number;
+    };
+    /** MeanReversionScore */
+    MeanReversionScore: {
+      /**
+       * Kind
+       * @constant
+       */
+      kind: "mean_reversion";
+      /** Mean Reversion Z */
+      mean_reversion_z: number;
+      /** Score */
+      score: number;
+    };
+    /** MeanReversionSignalConfig */
+    MeanReversionSignalConfig: {
+      /**
+       * @description discriminator enum property added by openapi-typescript
+       * @enum {string}
+       */
+      kind: "mean_reversion";
+      /** Mean Reversion Sessions */
+      mean_reversion_sessions: number;
+      /** Require Positive Trend */
+      require_positive_trend: boolean;
+      /** Trend Sma Sessions */
+      trend_sma_sessions: number;
+      /** Volatility Sessions */
+      volatility_sessions: number;
     };
     /** MetricValue */
     MetricValue: {
@@ -1469,8 +1557,8 @@ export interface components {
     /** SignalConfig */
     SignalConfig: {
       /**
-       * Kind
-       * @constant
+       * @description discriminator enum property added by openapi-typescript
+       * @enum {string}
        */
       kind: "risk_adjusted_momentum";
       /** Momentum Long Sessions */
@@ -1642,7 +1730,11 @@ export interface components {
        * @constant
        */
       schema_version: 1;
-      signals: components["schemas"]["SignalConfig"];
+      /** Signals */
+      signals:
+        | components["schemas"]["SignalConfig"]
+        | components["schemas"]["MeanReversionSignalConfig"]
+        | components["schemas"]["LowVolatilitySignalConfig"];
       universe: components["schemas"]["UniverseConfig"];
     };
     /** StrategyCreateRequest */

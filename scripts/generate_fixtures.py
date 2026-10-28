@@ -282,6 +282,9 @@ def generate() -> dict[str, bytes]:
     config = (ROOT / "scripts/fixture_strategy.canonical.json").read_bytes().rstrip(b"\n")
     output["fix-01/strategy.canonical.json"] = config
     output["fix-01/strategy.sha256"] = digest(config).encode() + b"\n"
+    # Independent authored alternative-family vectors; no production math imports.
+    for path in sorted((ROOT / "scripts/template_oracles").glob("*.json")):
+        output[f"template_extensions/{path.name}"] = path.read_bytes()
     rng = np.random.Generator(np.random.PCG64(SEED))
     initial_state = rng.bit_generator.state
     starts = rng.integers(0, 248, size=(5000, 13), dtype=np.int64, endpoint=False)

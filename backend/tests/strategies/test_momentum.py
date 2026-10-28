@@ -7,7 +7,7 @@ from pathlib import Path
 from backend.domain.strategy import StrategyConfigV1
 from backend.market_data.files import PinnedSnapshot
 from backend.market_data.repository import MarketRepository
-from backend.strategies.momentum import MomentumEvaluation, evaluate_momentum
+from backend.strategies.momentum import MomentumEvaluation, ScoreEvidence, evaluate_momentum
 
 ROOT = Path(__file__).resolve().parents[3] / "data/fixtures"
 
@@ -114,6 +114,7 @@ def test_independent_two_asset_score_contributions(tmp_path: Path) -> None:
         # Rising path: .60 + .25 - .15 = .70; flat path has the opposite score.
         score = rows["SYN:AAA"].scoring
         assert score is not None
+        assert isinstance(score, ScoreEvidence)
         assert score.momentum_long_contribution == pytest.approx(0.60, abs=1e-12)
         assert score.momentum_short_contribution == pytest.approx(0.25, abs=1e-12)
         assert score.volatility_contribution == pytest.approx(-0.15, abs=1e-12)

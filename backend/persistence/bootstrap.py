@@ -11,7 +11,7 @@ from sqlalchemy.dialects.postgresql import insert
 
 from backend.persistence.database import Settings, database_engine
 from backend.persistence.models.workspace import LocalWorkspace
-from backend.strategies.registry import seed_default
+from backend.strategies.registry import seed_templates
 
 MIGRATIONS = Path(__file__).parent / "migrations"
 
@@ -47,7 +47,7 @@ def bootstrap(engine: Engine, migrations: Path = MIGRATIONS) -> UUID:
             .on_conflict_do_nothing(index_elements=["singleton"])
         )
         identity = connection.execute(select(LocalWorkspace.id)).scalar_one()
-        seed_default(connection, identity)
+        seed_templates(connection, identity)
         return identity
 
 

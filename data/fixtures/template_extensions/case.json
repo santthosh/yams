@@ -1,0 +1,95 @@
+{
+  "as_of_session": "2028-07-18",
+  "derivation": "Independent Decimal60: AAA/BBB P_i=50+i/20; CCC P_i=50+i/25+(-1)^i. SMA20 indices382..401; VOL60 returns342..401 uses61 closes341..401, mean then sample denominator59 times252. Population z over AAA/BBB/CCC; MR z(distance), lowvol -z(vol). Default caps freeze all three at.2, Technology total.4, cash.4. Explicit top2 probe changes only max_positions=2, yielding.2 each and.6 cash.",
+  "extends": [
+    "FIX-01",
+    "FIX-02"
+  ],
+  "families": {
+    "low_volatility": {
+      "config_sha256": "133492a4ad378dff7e0ef2b96e3d6efe9f5a55fc3c286b440a32cb6a4c76fdcf",
+      "default_cash": "0.4",
+      "default_targets": {
+        "SYN:AAA": "0.2",
+        "SYN:BBB": "0.2",
+        "SYN:CCC": "0.2"
+      },
+      "ranks": [
+        "SYN:AAA",
+        "SYN:BBB",
+        "SYN:CCC"
+      ],
+      "scores": {
+        "SYN:AAA": "0.707106781186547524400844362104849039284835937688474036588337",
+        "SYN:BBB": "0.707106781186547524400844362104849039284835937688474036588337",
+        "SYN:CCC": "-1.41421356237309504880168872420969807856967187537694807317668"
+      },
+      "top_two_cash": "0.6",
+      "top_two_selected": [
+        "SYN:AAA",
+        "SYN:BBB"
+      ],
+      "top_two_targets": {
+        "SYN:AAA": "0.2",
+        "SYN:BBB": "0.2"
+      }
+    },
+    "mean_reversion": {
+      "config_sha256": "10904787385cca66062bcb1b27d264799b3cc954ee7fed62a91d11339295d81b",
+      "default_cash": "0.4",
+      "default_targets": {
+        "SYN:AAA": "0.2",
+        "SYN:BBB": "0.2",
+        "SYN:CCC": "0.2"
+      },
+      "ranks": [
+        "SYN:CCC",
+        "SYN:AAA",
+        "SYN:BBB"
+      ],
+      "scores": {
+        "SYN:AAA": "-0.707106781186547524400844362104849039284835937688474036588338",
+        "SYN:BBB": "-0.707106781186547524400844362104849039284835937688474036588338",
+        "SYN:CCC": "1.41421356237309504880168872420969807856967187537694807317668"
+      },
+      "top_two_cash": "0.6",
+      "top_two_selected": [
+        "SYN:CCC",
+        "SYN:AAA"
+      ],
+      "top_two_targets": {
+        "SYN:AAA": "0.2",
+        "SYN:CCC": "0.2"
+      }
+    }
+  },
+  "label": "SYNTHETIC_DATA_ONLY",
+  "measurements": {
+    "SYN:AAA": {
+      "mean_reversion_distance": "-0.00682716492993172835070068271649299317283507006827164929932",
+      "mean_reversion_sma": "69.575",
+      "volatility": "0.000147546106603894468426594673368875739840477025451503936993630"
+    },
+    "SYN:BBB": {
+      "mean_reversion_distance": "-0.00682716492993172835070068271649299317283507006827164929932",
+      "mean_reversion_sma": "69.575",
+      "volatility": "0.000147546106603894468426594673368875739840477025451503936993630"
+    },
+    "SYN:CCC": {
+      "mean_reversion_distance": "0.009442583003350593968930855924459335973195248248553152604325",
+      "mean_reversion_sma": "65.66",
+      "volatility": "0.493910688048208224807256310504646680099436505702257147391007"
+    }
+  },
+  "missing_reason": "MISSING_HISTORY",
+  "schema_version": 1,
+  "session_index": 401,
+  "snapshot": "../snapshot/manifest.json",
+  "tolerances": {
+    "statistics_absolute": "0.000000000001",
+    "weights_absolute": "0.00000001"
+  },
+  "window_first_index": 150,
+  "window_length": 252,
+  "zero_reason": "ZERO_VOLATILITY"
+}

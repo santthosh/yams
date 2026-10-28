@@ -5,7 +5,7 @@ from datetime import UTC, datetime
 from importlib.resources import files
 from uuid import NAMESPACE_URL, UUID, uuid4, uuid5
 
-from sqlalchemy import Connection, Engine, select, text
+from sqlalchemy import Connection, Engine, func, select, text
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
@@ -236,3 +236,93 @@ def publish_version(
         session.flush()
         result = version_view(version)
     return result
+
+
+ALTERNATIVE_CONFIG_HASHES = {
+    "mean_reversion": "10904787385cca66062bcb1b27d264799b3cc954ee7fed62a91d11339295d81b",
+    "low_volatility": "133492a4ad378dff7e0ef2b96e3d6efe9f5a55fc3c286b440a32cb6a4c76fdcf",
+}
+
+
+def template_config(kind: str) -> StrategyConfigV1:
+    if kind not in ALTERNATIVE_CONFIG_HASHES:
+        raise ValueError("Unsupported alternative template")
+    config = StrategyConfigV1.from_json(
+        files("backend.strategies").joinpath(f"default_{kind}.json").read_bytes()
+    )
+    if config.signals.kind != kind or config.config_hash() != ALTERNATIVE_CONFIG_HASHES[kind]:
+        raise ValueError("Packaged template differs from its ratified independent configuration")
+    return config
+
+
+def template_strategy_id(kind: str) -> UUID:
+    if kind not in ALTERNATIVE_CONFIG_HASHES:
+        raise ValueError("Unsupported alternative template")
+    return uuid5(NAMESPACE_URL, f"https://yams.local/strategies/{kind.replace('_', '-')}")
+
+
+def seed_templates(connection: Connection, workspace_id: UUID) -> None:
+    """One atomic bootstrap owns all seeds; never rename a user's conflicting identity."""
+    configs = [template_config(kind) for kind in sorted(ALTERNATIVE_CONFIG_HASHES)]
+    seed_default(connection, workspace_id)
+    for config in configs:
+        kind = config.signals.kind
+        identity = template_strategy_id(kind)
+        version_id = uuid5(identity, "1")
+        key = f"{kind}_v1"
+        now = datetime.now(UTC)
+        # Same advisory transaction lock as bootstrap/seed_default is held. A
+        # concurrent ordinary create is still protected by the DB name constraint.
+        existing = connection.execute(select(Strategy.id).where(Strategy.id == identity)).scalar()
+        if existing is None:
+            count = connection.execute(select(func.count()).select_from(Strategy)).scalar_one()
+            for number in range(count + 2):
+                name = (
+                    config.display_name
+                    if number == 0
+                    else f"{config.display_name} (template {number})"
+                )
+                inserted = connection.execute(
+                    insert(Strategy)
+                    .values(
+                        id=identity,
+                        workspace_id=workspace_id,
+                        name=name,
+                        name_key=strategy_name(name).casefold(),
+                        template_key=key,
+                        created_at=now,
+                    )
+                    .on_conflict_do_nothing(constraint="uq_strategy_name")
+                    .returning(Strategy.id)
+                ).scalar()
+                if inserted is not None:
+                    break
+            else:
+                raise ValueError("Unable to reserve a compatible template identity")
+            connection.execute(
+                insert(StrategyVersion).values(
+                    id=version_id,
+                    strategy_id=identity,
+                    version=1,
+                    status="published",
+                    config=json.loads(config.canonical_bytes()),
+                    config_sha256=config.config_hash(),
+                    published_at=now,
+                )
+            )
+        with Session(bind=connection) as session:
+            row = session.get(Strategy, identity)
+            version = session.get(StrategyVersion, version_id)
+            if (
+                row is None
+                or version is None
+                or row.workspace_id != workspace_id
+                or row.template_key != key
+                or row.name_key != strategy_name(row.name).casefold()
+                or version.strategy_id != identity
+                or version.version != 1
+                or version_view(version).config.canonical_bytes() != config.canonical_bytes()
+            ):
+                raise ValueError(
+                    "Existing template identity or immutable configuration is incompatible"
+                )

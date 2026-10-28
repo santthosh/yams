@@ -32,15 +32,15 @@ def test_concurrent_seed_and_immutable_default(database: Engine) -> None:
     with ThreadPoolExecutor(max_workers=4) as executor:
         list(executor.map(seed, range(4)))
     assert registry.list_strategies(database) == first
-    default = first.items[0]
+    default = next(row for row in first.items if row.id == registry.DEFAULT_STRATEGY_ID)
     assert default.id == registry.DEFAULT_STRATEGY_ID and default.is_template
     assert default.template_key == registry.DEFAULT_TEMPLATE_KEY
     assert default.published_version.id == registry.DEFAULT_VERSION_ID
     assert default.published_version.version == 1
     assert default.published_version.config_sha256 == registry.DEFAULT_CONFIG_SHA256
     with Session(database) as session:
-        assert len(session.scalars(select(Strategy)).all()) == 1
-        assert len(session.scalars(select(StrategyVersion)).all()) == 1
+        assert len(session.scalars(select(Strategy)).all()) == 3
+        assert len(session.scalars(select(StrategyVersion)).all()) == 3
     for sql in ["UPDATE strategy_version SET version=2", "DELETE FROM strategy_version"]:
         with pytest.raises(DBAPIError), database.begin() as connection:
             connection.execute(text(sql))
@@ -81,7 +81,7 @@ def add_strategy(
 
 def test_pagination_errors_and_no_execution_side_effects(database: Engine) -> None:
     workspace = bootstrap(database)
-    identities = {registry.DEFAULT_STRATEGY_ID}
+    identities = {row.id for row in registry.list_strategies(database).items}
     identities |= {add_strategy(database, workspace, name) for name in ["Custom A", "Custom B"]}
     with TestClient(
         create_app(Settings(database.url.render_as_string(hide_password=False)))
@@ -99,9 +99,9 @@ def test_pagination_errors_and_no_execution_side_effects(database: Engine) -> No
             cursor = page["next_cursor"]
             if cursor is None:
                 break
-        assert len(found) == 3 and set(found) == identities and found == sorted(found)
+        assert len(found) == 5 and set(found) == identities and found == sorted(found)
         assert client.get(f"/api/v1/strategies?cursor={uuid4()}").status_code == 422
-        assert len(client.get("/api/v1/strategies?limit=100").json()["items"]) == 3
+        assert len(client.get("/api/v1/strategies?limit=100").json()["items"]) == 5
     with database.connect() as connection:
         assert connection.execute(text("SELECT count(*) FROM job")).scalar_one() == 0
     assert "portfolio" not in inspect(database).get_table_names()

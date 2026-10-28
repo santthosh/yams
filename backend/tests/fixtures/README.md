@@ -34,3 +34,15 @@ FIX-08 includes 5,000 × 13 non-circular PCG64 block starts as little-endian int
 Cash is exact cents with HALF_EVEN; quantities are exact through six decimals. Complete weights tolerate absolute1e-8; small statistical oracles absolute1e-12; full float64 forecast paths follow ADR-006 absolute/relative1e-10, with indices and provenance exact. Decimal60-digit calculations independently supplied the full-feature, annualization and constant-vector scalar literals; tests cross-check them with standard-library arithmetic. No production engine exists in this PR.
 
 Mutation controls currently demonstrate that changed bytes fail regeneration, altered artifacts change snapshot identity, a future-aware calculation disagrees with FIX-02, duplicate accounting disagrees with FIX-04, and inclusive-open comparison disagrees with FIX-06. Other named mutations are handoffs for future consumers, not claimed passing execution tests. PostgreSQL restart, atomic publication, DuckDB reads, real queue recovery and UI/offline Compose verification remain with their owning issues.
+
+
+## Alternative template extensions (#38)
+
+`template_extensions/` adds independent mean-reversion/low-volatility canonical
+config vectors and a full252-session as-of probe extending FIX-01/02 at index401.
+Authored sources are `scripts/template_oracles/`; generator copies/indexes their
+bytes without calling the engine. Existing snapshot and FIX-01–10 artifacts stay
+byte-identical; only the suite index and new files change. The case records exact
+Decimal60 derivations, scalar/rank/cap/cash expectations and tolerances. See
+[template operations](../../../docs/operations/strategy-templates.md) and
+[reviewed worked probes](../../../docs/verification/37-templates/README.md).
