@@ -1,26 +1,49 @@
-# YAMS — Yet Another Market Simulator
+<div align="center">
 
-*Invest fake. Learn real.* A web app that runs a **paper-money** stock portfolio (default $1,000) and tells you what
-to do next. It scores the S&P 500, builds a risk-capped portfolio, backtests the same rules against SPY, forecasts
-90 days ahead, and explains every position in plain English. No real money and no broker: every order and fill is simulated.
+# YAMS · Yet Another Market Simulator
 
-This is a **scoped-down proof of concept** (~4 h) of the larger design in [`docs/archive/`](docs/archive/). The build
-spec is [`docs/SPEC.md`](docs/SPEC.md). See [Scope and tradeoffs](#scope-and-tradeoffs) for what was cut.
+**Invest fake. Learn real.**
 
-## Run it
+A paper-money stock portfolio that tells you what to buy, why, and what might happen next.
 
-From the repository root (needs Docker):
+![Python](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-server--rendered-009688?logo=fastapi&logoColor=white)
+![SQLite](https://img.shields.io/badge/SQLite-ledger-003B57?logo=sqlite&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-one_command-2496ED?logo=docker&logoColor=white)
+![Tests](https://img.shields.io/badge/tests-29_passing-2ea44f?logo=pytest&logoColor=white)
+![Money](https://img.shields.io/badge/money-paper_only-f5a623)
+![Status](https://img.shields.io/badge/status-proof_of_concept-lightgrey)
+
+</div>
+
+---
+
+Start with $1,000 of fake money. YAMS scores the S&P 500, builds a capped portfolio, backtests the rules against SPY,
+forecasts 90 days ahead, and explains every pick in plain English. No broker, no real trades.
+
+> **Proof of concept** (~4 h) of the larger design in [`docs/archive/`](docs/archive/).
+> Build spec: [`docs/SPEC.md`](docs/SPEC.md). What was cut: [Tradeoffs](#tradeoffs).
+
+## Quick start
 
 ```bash
-docker compose up --build          # → http://localhost:8000
+docker compose up --build        # → http://localhost:8000
 ```
 
-No API keys are needed. The app starts offline from a committed Yahoo Finance snapshot in `data/sample/`.
-Portfolio state lives in a Docker volume, so it survives `docker compose restart` and `down`/`up`;
-`docker compose down -v` wipes it. Without Docker (needs [uv](https://docs.astral.sh/uv/)):
-`uv sync && uv run uvicorn app.main:app --port 8000`. Tests: `uv run pytest` (29 tests, no network).
+- Works offline. A Yahoo Finance snapshot ships in `data/sample/`. No API keys.
+- Your portfolio is kept in a Docker volume. It survives restarts; `docker compose down -v` wipes it.
 
-## Use it
+<details>
+<summary>Without Docker (needs <a href="https://docs.astral.sh/uv/">uv</a>)</summary>
+
+```bash
+uv sync
+uv run uvicorn app.main:app --port 8000
+uv run pytest                    # 29 tests, no network
+```
+</details>
+
+## How to use it
 
 ```mermaid
 flowchart LR
@@ -33,38 +56,52 @@ flowchart LR
   W -->|after next close| R
 ```
 
-1. **Portfolio:** a *next step* card always shows what to do: get prices → get a recommendation → review and apply.
-   While the market is open, holdings are valued at live Yahoo prices with today's change (for display only).
-   Every metric has a **?** that explains it in plain English.
-2. **Recommendation:** the summary and the **Apply paper trades** box are at the top. Below them: the proposed
-   portfolio with a reason for each stock, the trades, the 90-day forecast (bad, middle and good case; apply vs keep; a day-by-day fan chart),
-   the 3-year track record, and close calls that just missed.
-3. **Refresh data** after the close (~1 min, needs internet), then check again. It proposes *changes* to what you
-   hold and leaves small drifts alone.
-4. **Backtest:** pick any start date; see metrics, value and drawdown charts vs SPY, and the assumptions.
+| Page | What you get |
+|---|---|
+| **Portfolio** | Holdings, value vs SPY, and a *next step* card. Live prices while the market is open (display only). |
+| **Recommendation** | Apply button up top. Then: picks with reasons, trades, 90-day forecast (range bars + fan chart, apply vs keep), track record, close calls. |
+| **Backtest** | Pick a start date. Metrics, value and drawdown charts vs SPY, assumptions. |
 
-JSON API: `GET /api/status`, `GET /api/portfolio`, `POST /api/recommendations`, `POST /api/recommendations/{id}/apply`,
-`GET /api/backtest?start=YYYY-MM-DD`, `POST /api/data/refresh`, `POST /api/portfolio/reset`.
+- Every metric has a **?** with a plain-English explanation.
+- **Refresh data** after the market closes (~1 min, needs internet).
+- Recommendations propose *changes* to what you hold. Small drifts are left alone.
 
-## How it decides (fixed in advance, not tuned to the backtest)
+<details>
+<summary>JSON API</summary>
 
-Risk-adjusted momentum: own the S&P 500 stocks that have risen most steadily, capped and diversified, and move to
-cash when the market turns down. Rationale, rules and weaknesses: [`docs/STRATEGY.md`](docs/STRATEGY.md).
+| Method | Path |
+|---|---|
+| `GET` | `/api/status` |
+| `GET` | `/api/portfolio` |
+| `POST` | `/api/recommendations` |
+| `POST` | `/api/recommendations/{id}/apply` |
+| `GET` | `/api/backtest?start=YYYY-MM-DD` |
+| `POST` | `/api/data/refresh` |
+| `POST` | `/api/portfolio/reset` |
+</details>
+
+## How it picks stocks
+
+**Risk-adjusted momentum:** own the S&P 500 stocks that rose most steadily, spread out and capped. Go to cash when the
+market turns down. Rules were fixed before any backtest. Full rationale: [`docs/STRATEGY.md`](docs/STRATEGY.md).
 
 | Step | Rule |
 |---|---|
-| Universe and filters | Today's S&P 500 (Wikipedia). ≥1 year of prices, price ≥ $5, ≥ $10M daily dollar volume, above 200-day average |
+| Filter | Today's S&P 500. ≥ 1 year of prices, ≥ $5, ≥ $10M traded per day, above 200-day average |
 | Score | `0.60·z(6-mo return) + 0.25·z(3-mo return) − 0.15·z(volatility)` |
-| Portfolio | Top 8 (max 3 per sector), inverse-volatility weights, **≤20% per stock, ≤40% per sector, ≥5% cash** |
-| Risk-off | SPY below its 200-day average → **≥50% cash** |
-| Frictions | 10 bps slippage; skip trades < $5 or < 2 points of drift; fractional shares |
-| Backtest | Monthly walk-forward, decide at the close, fill at the **next open**; same engine code as live |
-| Forecast | 5-day block bootstrap of the last year, 2,000 paths, 90 days; each stock's mean return set to SPY's |
+| Build | Top 8, max 3 per sector. Calmer stocks get more weight. **≤ 20% per stock, ≤ 40% per sector, ≥ 5% cash** |
+| Risk-off | SPY below its 200-day average → **≥ 50% cash** |
+| Costs | 0.10% slippage per trade. Skip trades under $5 or under 2 points of drift. Fractional shares |
+| Backtest | Monthly. Decide at the close, fill at the **next open**. Same engine as live |
+| Forecast | 2,000 simulated 90-day futures from the last year, in 5-day blocks. Each stock's trend reset to SPY's |
 
-## Tech and architecture
+**Backtest on the bundled data (3 years, $1,000):** strategy **$4,700** vs SPY **$1,900**. Worst drop **−33%** vs **−19%**.
+Inflated by survivorship bias. Treat it as an upper bound.
 
-Python 3.12 · FastAPI · Jinja2 (server-rendered) · Chart.js (vendored) · pandas/NumPy · yfinance · SQLite · pytest · Docker.
-One process, no build step, no external services.
+## Architecture
+
+Python 3.12 · FastAPI · Jinja2 · Chart.js · pandas/NumPy · yfinance · SQLite · pytest · Docker.
+One process. No build step. No external services.
 
 ```mermaid
 flowchart LR
@@ -82,25 +119,34 @@ flowchart LR
   D -.Refresh data.-> Y{{Yahoo Finance<br/>+ Wikipedia S&P 500}}
 ```
 
-Money uses `Decimal`; holdings and cash are derived from the trade ledger. A recommendation applies **once** and is
-rejected (409) if the portfolio or the data changed since it was made.
+- Money is `Decimal`. Holdings and cash come from the trade ledger.
+- A recommendation applies **once**. It's rejected (409) if your portfolio or the data changed since.
+- Refresh fails safely: if a held stock or SPY can't download, the old data stays.
 
-## Scope and tradeoffs
+## Tradeoffs
 
-| Chose | Instead of (full design) | Why / cost |
+| Chose | Instead of | Cost |
 |---|---|---|
-| One process, SQLite, server-rendered pages | Postgres, worker, Next.js | Runs anywhere with one command; no scale or multi-user |
-| Click to evaluate | Scheduled daily evaluation | Simpler and deterministic; "ongoing" only when you click |
-| Today's S&P 500 list in the backtest | Point-in-time membership | No extra data source; **survivorship bias flatters results** (treat as an upper bound) |
-| Caps, cash buffer, trend switch | Stop-losses, volatility targeting | Easy to explain; worst drop (−33%) is deeper than SPY's (−19%) |
-| Prices, sectors, market trend | Fundamentals, earnings, news | Free and reliable; less context |
-| Bootstrap scenario forecast | Calibrated, back-tested forecasts | Honest ranges; not validated against outcomes |
-| Fills at the last close (live) | Pending next-open orders | No order state; the backtest still uses next-open fills |
-| yfinance + committed snapshot | Licensed market data | Free, works offline; unofficial, personal-use terms, 9 MB in the repo |
-| One portfolio and strategy | Strategy Lab, Arena, multiple portfolios | Out of scope for a POC |
+| One process, SQLite, server pages | Postgres, worker, Next.js | No scale, single user |
+| Click to evaluate | Scheduled daily runs | "Ongoing" only when you click |
+| Today's S&P 500 in the backtest | Historical index membership | **Survivorship bias flatters results** |
+| Caps, cash buffer, trend switch | Stop-losses, volatility targeting | Worst drop (−33%) deeper than SPY's (−19%) |
+| Prices, sectors, market trend | Fundamentals, earnings, news | Less context |
+| Bootstrap forecast | Forecasts checked against outcomes | Ranges are honest but unvalidated |
+| Live fills at last close | Pending next-open orders | Simpler; the backtest still uses next-open |
+| yfinance + 9 MB snapshot | Licensed data | Unofficial, personal-use terms |
+| One portfolio, one strategy | Strategy Lab, Arena, many portfolios | Out of scope |
 
-How the POC grows into the full design, with diagrams of both: [`docs/FUTURE.md`](docs/FUTURE.md).
+How the POC grows into the full design: [`docs/FUTURE.md`](docs/FUTURE.md).
 
-Also: adjusted prices treat dividends as reinvested; cash earns 0%; live intraday prices never feed decisions
-(`YAMS_LIVE_QUOTES=0` turns them off); a refresh fails safely, keeping old data, if a held stock or SPY can't be
-downloaded. Regenerate the sample with `uv run python scripts/make_sample.py`. **Not investment advice.**
+<details>
+<summary>Small print</summary>
+
+- Prices are split- and dividend-adjusted, so dividends count as reinvested. Cash earns 0%.
+- Live intraday prices are display-only and never drive decisions. `YAMS_LIVE_QUOTES=0` turns them off.
+- Regenerate the sample snapshot: `uv run python scripts/make_sample.py`.
+</details>
+
+---
+
+<div align="center"><sub>Paper money only. Not investment advice.</sub></div>
