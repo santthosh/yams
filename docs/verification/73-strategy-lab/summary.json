@@ -1,0 +1,65 @@
+{
+  "label": "SYNTHETIC_DATA_ONLY",
+  "project": "yams-smoke-a6642bfdb30a",
+  "passed": true,
+  "publication_action": "keyboard Enter in named-fork field followed by explicit append button",
+  "records": [
+    {
+      "viewport": 360,
+      "kind": "mean_reversion",
+      "strategy_id": "5c8d124b-977c-4925-ae22-46421d6be954",
+      "versions": [
+        {
+          "id": "8047737a-205b-40e2-9696-3eebfffc4669",
+          "ordinal": 1,
+          "config_sha256": "c267b01c7447f8013d51d60af7dcb1f24738bbee1755f1aac28cc4d120493d2a",
+          "position_cap": "0.15",
+          "cash_floor": "0.05"
+        },
+        {
+          "id": "9bcadd1c-0267-4bd3-b548-2a33c048c5e4",
+          "ordinal": 2,
+          "config_sha256": "b74492cf22e689d8e8418cccf0efaa414d670d7682b2abd418f0c0a6dc32d1e0",
+          "position_cap": "0.15",
+          "cash_floor": "0.1"
+        }
+      ],
+      "history_sha256": "01b673c6b16e3c7f2057c3f0a07e5882a7bcc922f61dd8d0b5a6470df902c3e1"
+    },
+    {
+      "viewport": 1280,
+      "kind": "low_volatility",
+      "strategy_id": "35a4ccf3-8c3a-4f03-9229-1c99f28ae8f1",
+      "versions": [
+        {
+          "id": "90b90bc3-92e1-405f-9d04-c7bf087bdfe1",
+          "ordinal": 1,
+          "config_sha256": "ce67d338dd9f79f62e32eb434e1b2c3e22be1826926f1dbf7de7c18a4ef68ee2",
+          "position_cap": "0.15",
+          "cash_floor": "0.05"
+        },
+        {
+          "id": "52d73f74-6f7b-480f-b0be-8606cd208762",
+          "ordinal": 2,
+          "config_sha256": "c302159667f99176bdda69f75451780e5bf01185eac6d6705db514e5c1a4e974",
+          "position_cap": "0.15",
+          "cash_floor": "0.1"
+        }
+      ],
+      "history_sha256": "8b6604ef0c1bbc99d70465374c7fd779ad69f4a4af669e9b17cf1b598147500b"
+    }
+  ],
+  "checks": [
+    "clean boot and real same-origin API readiness",
+    "real persisted diagnostic job completed by bounded worker",
+    "warm-up plus three diagnostic batches with concurrent API/DB reads",
+    "real Docker browser Dashboard/Settings/job at both widths",
+    "real browser same-origin strategy creation, immutable append, conflict and pagination",
+    "real browser candidate/target reruns and cash-only cases via supervised worker",
+    "API and worker external routing blocked",
+    "restart preserves workspace, job, fixtures and artifact hash",
+    "rebuild/recreate preserves named-volume state",
+    "actual private ports and aggregate 4 CPU/4.5 GiB caps",
+    "failed migration blocks application startup; repair preserves workspace"
+  ]
+}

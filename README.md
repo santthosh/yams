@@ -17,7 +17,10 @@ version publication/history APIs over the existing registry, plus the ratified
 mean-reversion and low-volatility templates through the shared diagnostic worker.
 See the [strategy workflow](docs/operations/strategy-registry.md) and
 [template rules/limits](docs/operations/strategy-templates.md). SPY remains
-benchmark-only; the authoring UI and historical experiment services remain with
+benchmark-only. The [Strategy Lab](docs/operations/strategy-lab.md) now browses
+saved versions, reviews supported parameter changes and explicitly publishes
+versions or named forks. Open `/lab` or `/lab/strategies`; originals remain
+inspectable. Historical experiment submission/reports and comparison remain with
 their owning issues.
 
 Download published bundles and platform evidence from [GitHub Releases](https://github.com/santthosh/yams/releases).

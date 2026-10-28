@@ -217,7 +217,12 @@ def main() -> None:
             publication["appended"]["body"],
         ]
         strategies = get("strategies")
-        assert len(strategies["items"]) == 4
+        assert len(strategies["items"]) == 6
+        editor_versions = {
+            json.loads(path.read_text())["fork"]["id"]: json.loads(path.read_text())["history"]
+            for path in destination.glob("strategy-editor-*.json")
+        }
+        assert len(editor_versions) == 2
         evidence["strategy_publication"] = publication
         evidence["checks"].append(
             "real browser same-origin strategy creation, immutable append, conflict and pagination"
@@ -265,6 +270,8 @@ def main() -> None:
         assert get("workspace") == workspace
         assert get("strategies") == strategies
         assert get(f"strategies/{strategy_id}/versions") == versions
+        for editor_id, history in editor_versions.items():
+            assert get(f"strategies/{editor_id}/versions") == history
         for saved in evaluations:
             assert get(f"strategy-evaluations/{saved['id']}") == saved
         assert get("health")["fixture_metadata"] == health["fixture_metadata"]
@@ -281,6 +288,8 @@ def main() -> None:
         assert get("workspace") == workspace
         assert get("strategies") == strategies
         assert get(f"strategies/{strategy_id}/versions") == versions
+        for editor_id, history in editor_versions.items():
+            assert get(f"strategies/{editor_id}/versions") == history
         for saved in evaluations:
             assert get(f"strategy-evaluations/{saved['id']}") == saved
         assert (

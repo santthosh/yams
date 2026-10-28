@@ -14,7 +14,8 @@ function Navigation() {
       {[
         { path: "/", name: "Dashboard", mark: "01" },
         { path: "/lab/candidates", name: "Candidate inspection", mark: "02" },
-        { path: "/settings", name: "Settings & data", mark: "03" },
+        { path: "/lab/strategies", name: "Strategy Lab", mark: "03" },
+        { path: "/settings", name: "Settings & data", mark: "04" },
       ].map((item) => (
         <Link
           key={item.path}
@@ -73,7 +74,10 @@ export function Shell({ children }: { children: ReactNode }) {
           <Navigation />
         </details>
         <div className="context-bar">
-          {pathname === "/settings/data" || pathname === "/lab/candidates" ? (
+          {pathname === "/lab/strategies" ? (
+            <span>Strategy rules · No market data required</span>
+          ) : pathname === "/settings/data" ||
+            pathname === "/lab/candidates" ? (
             <span>Dataset coverage · Selected source below</span>
           ) : (
             <DataProvenanceBadge

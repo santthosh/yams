@@ -214,6 +214,95 @@ try {
       });
       runs.push(sealed);
     }
+    await page.goto(`${origin}/lab/strategies`);
+    const family = width === 360 ? "Mean Reversion" : "Low Volatility";
+    await page
+      .getByRole("button", { name: `Inspect ${family}`, exact: true })
+      .click();
+    const cap = page.getByLabel("Position cap (fraction)", { exact: true });
+    await cap.waitFor();
+    assert.equal(await cap.inputValue(), "0.2");
+    await cap.fill("0.15");
+    await page
+      .getByLabel("New strategy name", { exact: true })
+      .fill(`Synthetic UI fork ${width}`);
+    const creation = page.waitForResponse(
+      (response) =>
+        response.url() === `${origin}/api/v1/strategies` &&
+        response.request().method() === "POST",
+    );
+    await page.getByLabel("New strategy name", { exact: true }).press("Enter");
+    const createdResponse = await creation;
+    assert.equal(createdResponse.status(), 201);
+    const fork = await createdResponse.json();
+    assert.equal(
+      fork.published_version.config.portfolio.max_position_weight,
+      "0.15",
+    );
+    assert.equal(
+      fork.published_version.config.signals.kind,
+      width === 360 ? "mean_reversion" : "low_volatility",
+    );
+    const cash = page.getByLabel("Cash floor (fraction)", { exact: true });
+    await page.waitForFunction(
+      () =>
+        !document.querySelector('input[name="portfolio.min_cash_weight"]')
+          .disabled,
+    );
+    await cash.fill("0.10");
+    const append = page.waitForResponse(
+      (response) =>
+        response.url() === `${origin}/api/v1/strategies/${fork.id}/versions` &&
+        response.request().method() === "POST",
+    );
+    await page
+      .getByRole("button", { name: "Publish new version", exact: true })
+      .click();
+    const appendedResponse = await append;
+    assert.equal(appendedResponse.status(), 201);
+    const version = await appendedResponse.json();
+    assert.equal(version.version, 2);
+    assert.notEqual(version.id, fork.published_version.id);
+    assert.equal(version.config.portfolio.min_cash_weight, "0.1");
+    await page.waitForFunction(
+      () =>
+        document.querySelector('input[name="portfolio.min_cash_weight"]')
+          ?.value === "0.1",
+    );
+    await page
+      .getByText("See published rules and identity", { exact: true })
+      .click();
+    await page.screenshot({
+      path: path.join(destination, `strategy-editor-${width}.png`),
+      fullPage: true,
+    });
+    await page
+      .getByLabel(/Source version/)
+      .selectOption(fork.published_version.id);
+    await page.waitForFunction(
+      () =>
+        document.querySelector('input[name="portfolio.min_cash_weight"]')
+          ?.value === "0.05",
+    );
+    assert.equal(await cash.inputValue(), "0.05");
+    await page
+      .getByRole("button", { name: `Inspect ${family}`, exact: true })
+      .click();
+    await page.waitForFunction(
+      () =>
+        document.querySelector('input[name="portfolio.max_position_weight"]')
+          ?.value === "0.2",
+    );
+    const response = await page.request.get(
+      `${origin}/api/v1/strategies/${fork.id}/versions`,
+    );
+    assert.equal(response.status(), 200);
+    const history = await response.json();
+    assert.deepEqual(history.items, [fork.published_version, version]);
+    fs.writeFileSync(
+      path.join(destination, `strategy-editor-${width}.json`),
+      JSON.stringify({ fork, version, history }, null, 2) + "\n",
+    );
     fs.writeFileSync(
       path.join(destination, `candidate-runs-${width}.json`),
       JSON.stringify(runs, null, 2) + "\n",
