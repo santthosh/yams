@@ -101,6 +101,23 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/strategies": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Strategies */
+    get: operations["strategies_api_v1_strategies_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/v1/workspace": {
     parameters: {
       query?: never;
@@ -851,6 +868,13 @@ export interface components {
       /** Next Cursor */
       next_cursor: string | null;
     };
+    /** Page[StrategyV1] */
+    Page_StrategyV1_: {
+      /** Items */
+      items: components["schemas"]["StrategyV1"][];
+      /** Next Cursor */
+      next_cursor: string | null;
+    };
     /** PaperOrderBatchV1 */
     PaperOrderBatchV1: {
       /**
@@ -1400,6 +1424,54 @@ export interface components {
       signals: components["schemas"]["SignalConfig"];
       universe: components["schemas"]["UniverseConfig"];
     };
+    /** StrategyV1 */
+    StrategyV1: {
+      /**
+       * Created At
+       * Format: date-time
+       */
+      created_at: string;
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /** Is Template */
+      is_template: boolean;
+      /** Name */
+      name: string;
+      published_version: components["schemas"]["StrategyVersionV1"];
+      /** Template Key */
+      template_key: string | null;
+    };
+    /** StrategyVersionV1 */
+    StrategyVersionV1: {
+      config: components["schemas"]["StrategyConfigV1"];
+      /** Config Sha256 */
+      config_sha256: string;
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /**
+       * Published At
+       * Format: date-time
+       */
+      published_at: string;
+      /**
+       * Status
+       * @constant
+       */
+      status: "published";
+      /**
+       * Strategy Id
+       * Format: uuid
+       */
+      strategy_id: string;
+      /** Version */
+      version: number;
+    };
     /** TargetWeight */
     TargetWeight: {
       /** Asset Id */
@@ -1774,6 +1846,47 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+      /** @description Service Unavailable */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+    };
+  };
+  strategies_api_v1_strategies_get: {
+    parameters: {
+      query?: {
+        limit?: number;
+        cursor?: string | null;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Page_StrategyV1_"];
+        };
+      };
+      /** @description Unprocessable Content */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
         };
       };
       /** @description Service Unavailable */

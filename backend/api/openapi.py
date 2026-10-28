@@ -17,11 +17,14 @@ from backend.domain.forecast import ForecastV1
 from backend.domain.market import AssetV1, MarketBarV1, SnapshotManifestV1
 from backend.domain.orders import PaperOrderBatchV1
 from backend.domain.recommendation import RecommendationV1
+from backend.domain.registry import StrategyV1, StrategyVersionV1
 from backend.domain.strategy import StrategyConfigV1
 from backend.domain.workspace import HealthV1, WorkspaceV1
 
 MODELS: tuple[type[BaseModel], ...] = (
     StrategyConfigV1,
+    StrategyV1,
+    StrategyVersionV1,
     SnapshotV1,
     DataHealthV1,
     AssetPageV1,

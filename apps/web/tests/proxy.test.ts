@@ -9,6 +9,31 @@ const request = (path: string, method = "GET") =>
     headers: { authorization: "private", cookie: "private" },
   });
 describe("same-origin proxy boundary", () => {
+  it("forwards registry pagination and rejects unsupported operations", async () => {
+    vi.stubEnv("API_INTERNAL_ORIGIN", "http://api:8000");
+    const fetcher = vi.fn(async (input) => {
+      expect(String(input)).toBe("http://api:8000/api/v1/strategies?limit=25");
+      return Response.json({ items: [], next_cursor: null });
+    });
+    expect(
+      (await proxyApi(request("strategies?limit=25"), ["strategies"], fetcher))
+        .status,
+    ).toBe(200);
+    expect(
+      (
+        await proxyApi(
+          request("strategies?url=http://outside.test"),
+          ["strategies"],
+          fetcher,
+        )
+      ).status,
+    ).toBe(404);
+    expect(
+      (await proxyApi(request("strategies", "POST"), ["strategies"], fetcher))
+        .status,
+    ).toBe(405);
+    expect(fetcher).toHaveBeenCalledTimes(1);
+  });
   it("uses only the configured private origin and strips incoming credentials", async () => {
     vi.stubEnv("API_INTERNAL_ORIGIN", "http://api:8000");
     const fetcher = vi.fn(async (input, init) => {

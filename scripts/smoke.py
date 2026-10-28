@@ -82,6 +82,15 @@ def main() -> None:
         health = get("health")
         assert health["status"] == "ready"
         workspace = get("workspace")
+        strategies = get("strategies")
+        assert len(strategies["items"]) == 1 and strategies["next_cursor"] is None
+        default_version = strategies["items"][0]["published_version"]
+        assert default_version["status"] == "published"
+        assert default_version["config_sha256"] == (
+            "2093c63d190815eba052508d6d42d8ae0c93400cf777602d2c5f759627f43f21"
+        )
+        assert default_version["config"]["portfolio"]["max_position_weight"] == "0.2"
+        evidence["default_strategy"] = strategies
         evidence["workspace"] = workspace
         evidence["fixture_metadata"] = health["fixture_metadata"]
         evidence["checks"].append("clean boot and real same-origin API readiness")
@@ -220,6 +229,7 @@ def main() -> None:
         compose("up", "-d", "--wait", "--wait-timeout", "120", "--pull", "never", "--no-build")
         address = web_address()
         assert get("workspace") == workspace
+        assert get("strategies") == strategies
         assert get("health")["fixture_metadata"] == health["fixture_metadata"]
         assert get(f"jobs/{job}")["status"] == "completed"
         actual = python(
@@ -232,6 +242,7 @@ def main() -> None:
         compose("up", "--build", "--force-recreate", "-d", "--wait", "--wait-timeout", "120")
         address = web_address()
         assert get("workspace") == workspace
+        assert get("strategies") == strategies
         assert (
             python(
                 "from pathlib import Path; import hashlib; "

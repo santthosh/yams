@@ -315,7 +315,20 @@ A route listed here is a planned contract, not a claim that 0.0.1 implements it.
 
 A completed result includes `decision_cutoff_utc`, mode/warnings, eligible candidates with feature values/contributions and deterministic ranks, rejected candidates with reasons, complete `target_weights`, `cash_target_weight`, constraint evidence and a reproducibility manifest (config/snapshot hashes and engine build). Serialization follows §1; weights plus cash sum to one within `1e-8`. Empty eligible universe is a completed result with `target_weights=[]`, `cash_target_weight="1.00"` and exclusion evidence. Repeated requests may have different IDs, but identical pinned inputs and engine version reproduce financial results. The flow performs no portfolio, recommendation, forecast, order, cash or holdings writes.
 
-### 6.2 Staged operations
+### 6.2 Implemented default strategy registry (0.0.2, #71)
+
+`GET /strategies` accepts `limit` (default25, 1–100) and an optional existing
+strategy UUID `cursor`. It returns `Page[StrategyV1]` ordered by ascending strategy
+UUID, with nullable `next_cursor`. Unknown/malformed cursors return422. Each item
+contains `id`, `name`, `is_template`, nullable `template_key`, `created_at` and its
+latest immutable `published_version` (`id`, `strategy_id`, positive `version`,
+`status="published"`, complete `config`, canonical `config_sha256`, `published_at`).
+Reads validate stored config/hash and return503 NOT_READY on unavailable or corrupt
+storage. Empty pages are valid and do not seed data. Mutation APIs remain staged to
+0.0.3. [Registry operations](operations/strategy-registry.md) records seed identity,
+schema ownership and verification.
+
+### 6.3 Staged operations
 
 [ADR-008](adr/0008-lifecycle-api-additions.md#deferred-lifecycle-contracts-and-handoffs) assigns dismiss, pending-order cancellation, idempotency recovery, Arena lifecycle, settings, backup and export contracts to owning issues. Each owner defines exact transport and tests before exposing an action. In 0.0.1, workspace/health expose labeled fixture metadata rather than fabricated later resources. Public job cancellation remains staged to 0.0.3 even though its internal queue service exists earlier.
 
