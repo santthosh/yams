@@ -4,7 +4,7 @@ Yet Another Market Simulator is a local, single-user paper research workspace. I
 
 ## Current state
 
-The source checkout includes the 0.0.2 market repository, immutable snapshots and
+The source checkout includes the market repository, immutable snapshots and
 strategy registry, shared momentum/allocation engine, and asynchronous candidate
 inspection backed by PostgreSQL and a supervised worker. The synthetic Docker
 journey produces measured candidates, exclusions and feasible targets, with
@@ -12,7 +12,7 @@ reproducible results retained through restart. Portfolio approval and
 forecasts remain with their later milestone owners; the shared execution kernel
 is available but does not itself post durable trades.
 
-Development toward 0.0.3 also adds named strategy creation, detail and immutable
+The 0.0.3 Strategy Lab increment adds named strategy creation, detail and immutable
 version publication/history APIs over the existing registry, plus the ratified
 mean-reversion and low-volatility templates through the shared diagnostic worker.
 See the [strategy workflow](docs/operations/strategy-registry.md) and

@@ -5835,7 +5835,7 @@
   "info": {
     "description": "Only paths listed here are implemented. Components include versioned contracts for later feature owners; their presence does not activate endpoints.",
     "title": "YAMS",
-    "version": "0.0.2"
+    "version": "0.0.3"
   },
   "openapi": "3.1.0",
   "paths": {
