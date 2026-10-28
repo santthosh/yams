@@ -2768,9 +2768,13 @@
                 "$ref": "#/components/schemas/ResearchConfig"
               },
               {
+                "$ref": "#/components/schemas/TiingoResearchConfigV1"
+              },
+              {
                 "type": "null"
               }
-            ]
+            ],
+            "title": "Research Config"
           },
           "schema_version": {
             "const": 1,
@@ -4056,6 +4060,64 @@
           "reason_codes"
         ],
         "title": "TargetWeight",
+        "type": "object"
+      },
+      "TiingoResearchConfigV1": {
+        "additionalProperties": false,
+        "properties": {
+          "as_of_session": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "As Of Session"
+          },
+          "history_sessions": {
+            "default": 400,
+            "maximum": 2000.0,
+            "minimum": 252.0,
+            "title": "History Sessions",
+            "type": "integer"
+          },
+          "max_assets": {
+            "default": 20,
+            "maximum": 20.0,
+            "minimum": 1.0,
+            "title": "Max Assets",
+            "type": "integer"
+          },
+          "provider": {
+            "const": "tiingo_eod",
+            "title": "Provider",
+            "type": "string"
+          },
+          "rights_reference": {
+            "const": "https://www.tiingo.com/documentation/",
+            "default": "https://www.tiingo.com/documentation/",
+            "title": "Rights Reference",
+            "type": "string"
+          },
+          "rights_verified_local_use": {
+            "title": "Rights Verified Local Use",
+            "type": "boolean"
+          },
+          "schema_version": {
+            "const": 1,
+            "title": "Schema Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "schema_version",
+          "provider",
+          "rights_verified_local_use"
+        ],
+        "title": "TiingoResearchConfigV1",
         "type": "object"
       },
       "UniverseConfig": {

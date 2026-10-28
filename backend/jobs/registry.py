@@ -8,6 +8,7 @@ from pydantic import Field, field_validator, model_validator
 from backend.domain.evaluation import StrategyEvaluationPayload
 from backend.domain.types import Contract, Hash256, SourceMode
 from backend.market_data.research_config import ResearchConfig
+from backend.market_data.tiingo_config import TiingoResearchConfigV1
 
 
 class JobLimits(Contract):
@@ -60,7 +61,7 @@ class RefreshPayload(Contract):
     schema_version: Literal[1]
     source_mode: SourceMode
     expected_manifest_hash: Hash256 | None = None
-    research_config: ResearchConfig | None = None
+    research_config: ResearchConfig | TiingoResearchConfigV1 | None = None
 
     @model_validator(mode="after")
     def mode_inputs(self) -> Self:

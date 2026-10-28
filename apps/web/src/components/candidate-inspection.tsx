@@ -573,6 +573,15 @@ export function CandidateInspection() {
             )}
           </p>
         )}
+        {mode === "research_market_data" && (
+          <p className="notice">
+            Research evaluations require an elapsed decision cutoff: one hour
+            before the next pinned trading session opens. Only evidence observed
+            by that cutoff is eligible. Downloading historical prices cannot
+            backdate their availability. Targets are diagnostics only; no orders
+            or holdings change.
+          </p>
+        )}
         <form
           onSubmit={(event) => void submit(event)}
           className="inspection-form"

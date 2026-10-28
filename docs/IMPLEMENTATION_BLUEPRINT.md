@@ -54,9 +54,9 @@ Data refresh fetches → validates → normalizes → writes temp Parquet → co
 |---|---|
 | Exchange | U.S. primary equity calendar; sessions in America/New_York |
 | Stored timestamps | RFC3339 UTC `Z`; `session_date` separately |
-| Decision cutoff | After the complete and validated closing bar for session **T** is available |
+| Decision cutoff | **One hour before the immediate next pinned session opens**, at or after T close; require complete validated evidence and actual calendar lookahead (approved Q17 / ADR-001) |
 | Evidence | Only facts with `available_at <= decision_cutoff` (no future features) |
-| Fill | **First eligible session opening after BOTH T close and operator approval** (normally T+1 if approved before that open); never same-bar close from a close-derived signal |
+| Fill | **First eligible session opening strictly after BOTH the decision cutoff and operator approval** (normally T+1 if approved before that open); never same-bar close from a close-derived signal |
 | Open unavailable | `PENDING_DATA` or `UNFILLED`, not guessed execution |
 | Price series | Adjusted-close for continuous return/feature computation; raw/unadjusted opening price for synthetic executions |
 | Shares | Long-only; fractional units at most **6 decimal places**, truncate buys conservatively |
@@ -122,7 +122,7 @@ Skip candidates with missing/nonfinite inputs; record filters and quality flags.
 
 ## 7. Backtesting methodology (0.0.3)
 
-**Algorithm:** for each portfolio rebalance session T, compute candidates and targets using snapshot evidence available at T close; schedule and fill orders at eligible T+1 open; apply actions and value through time; rebalance monthly using exchange session calendar. Use same strategies, allocation, order planner, corporate-action policy, and fill simulator as ongoing paper accounts. For unavailable bars, record a skip/error according to a documented gap policy—never invent fills.
+**Algorithm:** for each portfolio rebalance session T, pin ADR-001's approved cutoff (the next scheduled opening minus one hour) and compute candidates and targets using only evidence available by that cutoff. Simulated historical approval equals that cutoff; schedule and fill orders at the first eligible opening strictly after both cutoff and approval; apply actions and value through time; rebalance monthly using exchange session calendar. Use same strategies, allocation, order planner, corporate-action policy, and fill simulator as ongoing paper accounts. For unavailable bars, record a skip/error according to a documented gap policy—never invent fills.
 
 **DEFAULT evaluation windows:** request at least 4 years of daily data when available: ~1 year warmup for 252-session features, ~2 years exploratory development and ~1 year untouched holdout. Shorter windows are permitted but flagged (`INSUFFICIENT_HOLDOUT`, `LIMITED_WARMUP`) and must not imply validated performance. An out-of-sample period can be used once for final evaluation but must not automatically drive parameter search. Repeated human selection across holdout runs must be indicated as a caveat.
 

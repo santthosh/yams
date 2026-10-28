@@ -1,0 +1,13 @@
+# Explicit opt-in for user-owned, local-only research acquisition.
+# Default compose.yaml remains offline; credentials reach only the worker.
+services:
+  worker:
+    environment:
+      TIINGO_API_TOKEN: ${TIINGO_API_TOKEN:?Set TIINGO_API_TOKEN in your local .env}
+    networks:
+      - private
+      - research-egress
+networks:
+  research-egress:
+    driver: bridge
+    internal: false

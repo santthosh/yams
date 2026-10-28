@@ -16,7 +16,7 @@ def refresh_market_data(payload: dict[str, Any], cancelled: Event, *, stage: Pat
     config = RefreshPayload.model_validate(payload)
     if config.source_mode == "research_market_data":
         assert config.research_config is not None
-        pinned = acquire_research_snapshot(config.research_config)
+        pinned = acquire_research_snapshot(config.research_config, cancelled=cancelled.is_set)
     else:
         assert config.expected_manifest_hash is not None
         pinned = PinnedSnapshot.open(
