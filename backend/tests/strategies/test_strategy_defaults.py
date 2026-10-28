@@ -57,4 +57,4 @@ def test_name_normalization_and_unavailable_api() -> None:
         assert response.status_code == 503 and response.json()["error"]["code"] == "NOT_READY"
         assert client.get("/api/v1/strategies?limit=101").status_code == 422
         assert client.get("/api/v1/strategies?cursor=not-uuid").status_code == 422
-        assert client.post("/api/v1/strategies", json={}).status_code == 405
+        assert client.post("/api/v1/strategies", json={}).status_code == 422

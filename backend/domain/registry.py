@@ -1,4 +1,4 @@
-"""Read-only registry metadata, separate from immutable strategy configuration."""
+"""Registry metadata and publication requests, separate from immutable strategy configuration."""
 
 import unicodedata
 from typing import Annotated, Literal
@@ -39,3 +39,8 @@ class StrategyV1(Contract):
     template_key: StrictStr | None
     created_at: UTCTimestamp
     published_version: StrategyVersionV1
+
+
+class StrategyCreateRequest(Contract):
+    name: StrategyName
+    config: StrategyConfigV1

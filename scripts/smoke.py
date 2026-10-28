@@ -205,6 +205,19 @@ def main() -> None:
             check=True,
         )
         evidence["checks"].append("real Docker browser Dashboard/Settings/job at both widths")
+        publication = json.loads((destination / "strategy-publication.json").read_text())
+        strategy_id = publication["created"]["body"]["id"]
+        versions = get(f"strategies/{strategy_id}/versions")
+        assert versions["items"] == [
+            publication["created"]["body"]["published_version"],
+            publication["appended"]["body"],
+        ]
+        strategies = get("strategies")
+        assert len(strategies["items"]) == 2
+        evidence["strategy_publication"] = publication
+        evidence["checks"].append(
+            "real browser same-origin strategy creation, immutable append, conflict and pagination"
+        )
         evaluations = [
             row
             for path in sorted(destination.glob("candidate-runs-*.json"))
@@ -240,6 +253,7 @@ def main() -> None:
         address = web_address()
         assert get("workspace") == workspace
         assert get("strategies") == strategies
+        assert get(f"strategies/{strategy_id}/versions") == versions
         for saved in evaluations:
             assert get(f"strategy-evaluations/{saved['id']}") == saved
         assert get("health")["fixture_metadata"] == health["fixture_metadata"]
@@ -255,6 +269,7 @@ def main() -> None:
         address = web_address()
         assert get("workspace") == workspace
         assert get("strategies") == strategies
+        assert get(f"strategies/{strategy_id}/versions") == versions
         for saved in evaluations:
             assert get(f"strategy-evaluations/{saved['id']}") == saved
         assert (
