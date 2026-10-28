@@ -72,11 +72,15 @@ export function Shell({ children }: { children: ReactNode }) {
           <Navigation />
         </details>
         <div className="context-bar">
-          <DataProvenanceBadge
-            mode={fixture ? "synthetic_fixture" : null}
-            asOf={fixture?.last_session ?? null}
-            freshness={fixture ? "fixture" : "unavailable"}
-          />
+          {pathname === "/settings/data" ? (
+            <span>Dataset coverage · Selected source below</span>
+          ) : (
+            <DataProvenanceBadge
+              mode={fixture ? "synthetic_fixture" : null}
+              asOf={fixture?.last_session ?? null}
+              freshness={fixture ? "fixture" : "unavailable"}
+            />
+          )}
           <Link className="job-link" href="/settings#job-status">
             {job
               ? `Last checked job: ${job.status.replaceAll("_", " ")}`

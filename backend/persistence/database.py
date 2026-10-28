@@ -11,12 +11,14 @@ from sqlalchemy.engine import make_url
 @dataclass(frozen=True)
 class Settings:
     database_url: str | None = field(default=None, repr=False)
+    artifact_root: Path = field(default=Path("/artifacts"), kw_only=True)
     fixture_root: Path = Path(__file__).resolve().parents[2] / "data/fixtures"
 
     @classmethod
     def from_environment(cls) -> "Settings":
         return cls(
             database_url=os.environ.get("DATABASE_URL"),
+            artifact_root=Path(os.environ.get("YAMS_ARTIFACT_ROOT", "/artifacts")),
             fixture_root=Path(os.environ.get("YAMS_FIXTURE_ROOT", str(cls.fixture_root))),
         )
 

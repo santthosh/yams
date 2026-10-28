@@ -29,6 +29,79 @@
         "title": "ActionEvidence",
         "type": "object"
       },
+      "Alias": {
+        "additionalProperties": false,
+        "properties": {
+          "asset_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "title": "Asset Id",
+            "type": "string"
+          },
+          "available_at": {
+            "format": "date-time",
+            "pattern": "Z$",
+            "title": "Available At",
+            "type": "string"
+          },
+          "effective_from": {
+            "format": "date",
+            "title": "Effective From",
+            "type": "string"
+          },
+          "effective_to_exclusive": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Effective To Exclusive"
+          },
+          "ingested_at": {
+            "format": "date-time",
+            "pattern": "Z$",
+            "title": "Ingested At",
+            "type": "string"
+          },
+          "provider": {
+            "minLength": 1,
+            "title": "Provider",
+            "type": "string"
+          },
+          "provider_id": {
+            "minLength": 1,
+            "title": "Provider Id",
+            "type": "string"
+          },
+          "symbol": {
+            "minLength": 1,
+            "title": "Symbol",
+            "type": "string"
+          },
+          "venue": {
+            "pattern": "^[A-Z0-9]{4}$",
+            "title": "Venue",
+            "type": "string"
+          }
+        },
+        "required": [
+          "asset_id",
+          "available_at",
+          "ingested_at",
+          "effective_from",
+          "effective_to_exclusive",
+          "venue",
+          "symbol",
+          "provider",
+          "provider_id"
+        ],
+        "title": "Alias",
+        "type": "object"
+      },
       "ArtifactReference": {
         "additionalProperties": false,
         "properties": {
@@ -54,6 +127,92 @@
           "schema_version"
         ],
         "title": "ArtifactReference",
+        "type": "object"
+      },
+      "AssetContext": {
+        "additionalProperties": false,
+        "properties": {
+          "aliases": {
+            "items": {
+              "$ref": "#/components/schemas/Alias"
+            },
+            "title": "Aliases",
+            "type": "array"
+          },
+          "fundamentals": {
+            "items": {
+              "$ref": "#/components/schemas/Fundamental"
+            },
+            "title": "Fundamentals",
+            "type": "array"
+          },
+          "schema_version": {
+            "const": 2,
+            "title": "Schema Version",
+            "type": "integer"
+          },
+          "sectors": {
+            "items": {
+              "$ref": "#/components/schemas/Sector"
+            },
+            "title": "Sectors",
+            "type": "array"
+          }
+        },
+        "required": [
+          "schema_version",
+          "aliases",
+          "sectors",
+          "fundamentals"
+        ],
+        "title": "AssetContext",
+        "type": "object"
+      },
+      "AssetPageV1": {
+        "additionalProperties": false,
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/AssetV1"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "mode": {
+            "enum": [
+              "synthetic_fixture",
+              "research_market_data"
+            ],
+            "title": "Mode",
+            "type": "string"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "maxLength": 2048,
+                "minLength": 1,
+                "pattern": "^[A-Za-z0-9_-]+$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          },
+          "snapshot_id": {
+            "format": "uuid",
+            "title": "Snapshot Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "items",
+          "next_cursor",
+          "snapshot_id",
+          "mode"
+        ],
+        "title": "AssetPageV1",
         "type": "object"
       },
       "AssetV1": {
@@ -114,6 +273,68 @@
           "provider_id"
         ],
         "title": "AssetV1",
+        "type": "object"
+      },
+      "Calendar": {
+        "additionalProperties": false,
+        "properties": {
+          "generator_version": {
+            "minLength": 1,
+            "title": "Generator Version",
+            "type": "string"
+          },
+          "id": {
+            "minLength": 1,
+            "title": "Id",
+            "type": "string"
+          },
+          "label": {
+            "minLength": 1,
+            "title": "Label",
+            "type": "string"
+          },
+          "limitations": {
+            "items": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "title": "Limitations",
+            "type": "array"
+          },
+          "schema_version": {
+            "const": 1,
+            "title": "Schema Version",
+            "type": "integer"
+          },
+          "sessions": {
+            "items": {
+              "$ref": "#/components/schemas/Session"
+            },
+            "title": "Sessions",
+            "type": "array"
+          },
+          "timezone": {
+            "const": "America/New_York",
+            "title": "Timezone",
+            "type": "string"
+          },
+          "timezone_rules_version": {
+            "minLength": 1,
+            "title": "Timezone Rules Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "schema_version",
+          "label",
+          "id",
+          "timezone",
+          "generator_version",
+          "timezone_rules_version",
+          "limitations",
+          "sessions"
+        ],
+        "title": "Calendar",
         "type": "object"
       },
       "CalendarReference": {
@@ -198,6 +419,83 @@
           "contributions"
         ],
         "title": "CandidateEvidence",
+        "type": "object"
+      },
+      "DataHealthV1": {
+        "additionalProperties": false,
+        "properties": {
+          "checked_at": {
+            "format": "date-time",
+            "pattern": "Z$",
+            "title": "Checked At",
+            "type": "string"
+          },
+          "current_snapshot": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SnapshotV1"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "freshness": {
+            "enum": [
+              "synthetic",
+              "unknown",
+              "refresh_failed"
+            ],
+            "title": "Freshness",
+            "type": "string"
+          },
+          "latest_job": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/JobV1"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "mode": {
+            "enum": [
+              "synthetic_fixture",
+              "research_market_data"
+            ],
+            "title": "Mode",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "empty",
+              "ready",
+              "refreshing",
+              "failed"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "warnings": {
+            "items": {
+              "pattern": "^[A-Z][A-Z0-9_]*$",
+              "type": "string"
+            },
+            "title": "Warnings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "mode",
+          "checked_at",
+          "status",
+          "current_snapshot",
+          "latest_job",
+          "warnings",
+          "freshness"
+        ],
+        "title": "DataHealthV1",
         "type": "object"
       },
       "ErrorDetail": {
@@ -1052,6 +1350,60 @@
         "title": "ForecastWeight",
         "type": "object"
       },
+      "Fundamental": {
+        "additionalProperties": false,
+        "properties": {
+          "asset_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "title": "Asset Id",
+            "type": "string"
+          },
+          "available_at": {
+            "format": "date-time",
+            "pattern": "Z$",
+            "title": "Available At",
+            "type": "string"
+          },
+          "ingested_at": {
+            "format": "date-time",
+            "pattern": "Z$",
+            "title": "Ingested At",
+            "type": "string"
+          },
+          "metric": {
+            "minLength": 1,
+            "title": "Metric",
+            "type": "string"
+          },
+          "period_end": {
+            "format": "date",
+            "title": "Period End",
+            "type": "string"
+          },
+          "provider": {
+            "minLength": 1,
+            "title": "Provider",
+            "type": "string"
+          },
+          "value": {
+            "pattern": "^-?(0|[1-9][0-9]*)(\\.[0-9]+)?$",
+            "title": "Value",
+            "type": "string"
+          }
+        },
+        "required": [
+          "asset_id",
+          "available_at",
+          "ingested_at",
+          "metric",
+          "period_end",
+          "value",
+          "provider"
+        ],
+        "title": "Fundamental",
+        "type": "object"
+      },
       "HTTPValidationError": {
         "properties": {
           "detail": {
@@ -1478,6 +1830,38 @@
           }
         },
         "title": "PageRequest",
+        "type": "object"
+      },
+      "Page_SnapshotV1_": {
+        "additionalProperties": false,
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/SnapshotV1"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "maxLength": 2048,
+                "minLength": 1,
+                "pattern": "^[A-Za-z0-9_-]+$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          }
+        },
+        "required": [
+          "items",
+          "next_cursor"
+        ],
+        "title": "Page[SnapshotV1]",
         "type": "object"
       },
       "PaperOrderBatchV1": {
@@ -2046,6 +2430,145 @@
         "title": "RecommendedAction",
         "type": "object"
       },
+      "RefreshPayload": {
+        "additionalProperties": false,
+        "properties": {
+          "expected_manifest_hash": {
+            "anyOf": [
+              {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expected Manifest Hash"
+          },
+          "research_config": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ResearchConfig"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "schema_version": {
+            "const": 1,
+            "title": "Schema Version",
+            "type": "integer"
+          },
+          "source_mode": {
+            "enum": [
+              "synthetic_fixture",
+              "research_market_data"
+            ],
+            "title": "Source Mode",
+            "type": "string"
+          }
+        },
+        "required": [
+          "schema_version",
+          "source_mode"
+        ],
+        "title": "RefreshPayload",
+        "type": "object"
+      },
+      "ResearchConfig": {
+        "additionalProperties": false,
+        "properties": {
+          "adapter_version": {
+            "const": "yfinance_1.7.0_normalization_1",
+            "title": "Adapter Version",
+            "type": "string"
+          },
+          "assets": {
+            "items": {
+              "$ref": "#/components/schemas/AssetV1"
+            },
+            "maxItems": 1000,
+            "minItems": 1,
+            "title": "Assets",
+            "type": "array"
+          },
+          "calendar": {
+            "$ref": "#/components/schemas/Calendar"
+          },
+          "context": {
+            "$ref": "#/components/schemas/AssetContext"
+          },
+          "directory_kind": {
+            "enum": [
+              "nasdaqlisted",
+              "otherlisted"
+            ],
+            "title": "Directory Kind",
+            "type": "string"
+          },
+          "directory_reference": {
+            "minLength": 1,
+            "title": "Directory Reference",
+            "type": "string"
+          },
+          "exchange_codes": {
+            "items": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "minItems": 1,
+            "title": "Exchange Codes",
+            "type": "array"
+          },
+          "first_session": {
+            "format": "date",
+            "title": "First Session",
+            "type": "string"
+          },
+          "last_session": {
+            "format": "date",
+            "title": "Last Session",
+            "type": "string"
+          },
+          "rights_reference": {
+            "minLength": 1,
+            "title": "Rights Reference",
+            "type": "string"
+          },
+          "rights_verified_local_use": {
+            "title": "Rights Verified Local Use",
+            "type": "boolean"
+          },
+          "schema_version": {
+            "const": 1,
+            "title": "Schema Version",
+            "type": "integer"
+          },
+          "selection_rule_reference": {
+            "minLength": 1,
+            "title": "Selection Rule Reference",
+            "type": "string"
+          }
+        },
+        "required": [
+          "schema_version",
+          "rights_verified_local_use",
+          "rights_reference",
+          "directory_reference",
+          "directory_kind",
+          "adapter_version",
+          "first_session",
+          "last_session",
+          "calendar",
+          "assets",
+          "context",
+          "exchange_codes",
+          "selection_rule_reference"
+        ],
+        "title": "ResearchConfig",
+        "type": "object"
+      },
       "ScoreWeights": {
         "additionalProperties": false,
         "properties": {
@@ -2077,6 +2600,96 @@
           "volatility_penalty"
         ],
         "title": "ScoreWeights",
+        "type": "object"
+      },
+      "Sector": {
+        "additionalProperties": false,
+        "properties": {
+          "asset_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "title": "Asset Id",
+            "type": "string"
+          },
+          "available_at": {
+            "format": "date-time",
+            "pattern": "Z$",
+            "title": "Available At",
+            "type": "string"
+          },
+          "effective_from": {
+            "format": "date",
+            "title": "Effective From",
+            "type": "string"
+          },
+          "effective_to_exclusive": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Effective To Exclusive"
+          },
+          "ingested_at": {
+            "format": "date-time",
+            "pattern": "Z$",
+            "title": "Ingested At",
+            "type": "string"
+          },
+          "provider": {
+            "minLength": 1,
+            "title": "Provider",
+            "type": "string"
+          },
+          "sector": {
+            "minLength": 1,
+            "title": "Sector",
+            "type": "string"
+          }
+        },
+        "required": [
+          "asset_id",
+          "available_at",
+          "ingested_at",
+          "effective_from",
+          "effective_to_exclusive",
+          "sector",
+          "provider"
+        ],
+        "title": "Sector",
+        "type": "object"
+      },
+      "Session": {
+        "additionalProperties": false,
+        "properties": {
+          "close_at": {
+            "format": "date-time",
+            "pattern": "Z$",
+            "title": "Close At",
+            "type": "string"
+          },
+          "open_at": {
+            "format": "date-time",
+            "pattern": "Z$",
+            "title": "Open At",
+            "type": "string"
+          },
+          "session_date": {
+            "format": "date",
+            "title": "Session Date",
+            "type": "string"
+          }
+        },
+        "required": [
+          "session_date",
+          "open_at",
+          "close_at"
+        ],
+        "title": "Session",
         "type": "object"
       },
       "SignalConfig": {
@@ -2435,6 +3048,90 @@
         "title": "SnapshotSource",
         "type": "object"
       },
+      "SnapshotV1": {
+        "additionalProperties": false,
+        "properties": {
+          "asset_count": {
+            "minimum": 0,
+            "title": "Asset Count",
+            "type": "integer"
+          },
+          "coverage": {
+            "$ref": "#/components/schemas/SnapshotCoverage"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "latest_completed_session": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latest Completed Session"
+          },
+          "manifest_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Manifest Sha256",
+            "type": "string"
+          },
+          "mode": {
+            "enum": [
+              "synthetic_fixture",
+              "research_market_data"
+            ],
+            "title": "Mode",
+            "type": "string"
+          },
+          "provider": {
+            "title": "Provider",
+            "type": "string"
+          },
+          "published_at": {
+            "format": "date-time",
+            "pattern": "Z$",
+            "title": "Published At",
+            "type": "string"
+          },
+          "quality": {
+            "enum": [
+              "usable",
+              "usable_with_warnings",
+              "blocked"
+            ],
+            "title": "Quality",
+            "type": "string"
+          },
+          "warnings": {
+            "items": {
+              "pattern": "^[A-Z][A-Z0-9_]*$",
+              "type": "string"
+            },
+            "title": "Warnings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "provider",
+          "mode",
+          "latest_completed_session",
+          "published_at",
+          "quality",
+          "warnings",
+          "asset_count",
+          "manifest_sha256",
+          "coverage"
+        ],
+        "title": "SnapshotV1",
+        "type": "object"
+      },
       "StrategyConfigV1": {
         "additionalProperties": false,
         "properties": {
@@ -2629,6 +3326,386 @@
   },
   "openapi": "3.1.0",
   "paths": {
+    "/api/v1/data/assets": {
+      "get": {
+        "operationId": "assets_api_v1_data_assets_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "mode",
+            "required": true,
+            "schema": {
+              "enum": [
+                "synthetic_fixture",
+                "research_market_data"
+              ],
+              "title": "Mode",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "snapshot_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Snapshot Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "query",
+            "required": false,
+            "schema": {
+              "default": "",
+              "maxLength": 120,
+              "title": "Query",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 25,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 2048,
+                  "minLength": 1,
+                  "pattern": "^[A-Za-z0-9_-]+$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Cursor"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssetPageV1"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "summary": "Assets"
+      }
+    },
+    "/api/v1/data/health": {
+      "get": {
+        "operationId": "health_api_v1_data_health_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "mode",
+            "required": true,
+            "schema": {
+              "enum": [
+                "synthetic_fixture",
+                "research_market_data"
+              ],
+              "title": "Mode",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataHealthV1"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "summary": "Health"
+      }
+    },
+    "/api/v1/data/refresh": {
+      "post": {
+        "operationId": "refresh_api_v1_data_refresh_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Idempotency-Key",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefreshPayload"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobV1"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "summary": "Refresh"
+      }
+    },
+    "/api/v1/data/snapshots": {
+      "get": {
+        "operationId": "snapshots_api_v1_data_snapshots_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "mode",
+            "required": true,
+            "schema": {
+              "enum": [
+                "synthetic_fixture",
+                "research_market_data"
+              ],
+              "title": "Mode",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 25,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Cursor"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_SnapshotV1_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "summary": "Snapshots"
+      }
+    },
     "/api/v1/health": {
       "get": {
         "operationId": "health_api_v1_health_get",

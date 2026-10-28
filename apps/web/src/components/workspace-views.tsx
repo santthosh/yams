@@ -160,6 +160,7 @@ export function SettingsView() {
         <div>
           <p className="eyebrow">LOCAL BY DESIGN</p>
           <h1>Settings & data</h1>
+          <Link href="/settings/data">Manage market data and snapshots →</Link>
           <p>A clear view of your workspace and its evidence.</p>
         </div>
         <Button

@@ -127,6 +127,10 @@ def test_openapi_does_not_activate_future_handlers() -> None:
         "/api/v1/health",
         "/api/v1/workspace",
         "/api/v1/jobs/{job_id}",
+        "/api/v1/data/snapshots",
+        "/api/v1/data/refresh",
+        "/api/v1/data/assets",
+        "/api/v1/data/health",
     }
     components = schema["components"]["schemas"]
     for name in (

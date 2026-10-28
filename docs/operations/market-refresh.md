@@ -67,3 +67,27 @@ Verification commands: `make lint`, `make typecheck`, `make test`, `make build`,
 Offline tests cover the actual bounded worker, database restart, immutable rows,
 lease expiry, digest contention, no-clobber publication, valid/corrupt orphans and blocked
 snapshot pointer preservation. A live provider diagnostic is optional and not an offline CI gate.
+
+## Settings / Data and discovery API
+
+Open Settings → Manage market data and snapshots (`/settings/data`). Choose the source
+explicitly. The sample refresh pins the committed fixture hash; advanced research refresh
+accepts the closed configuration above. Queue admission requires a UUID idempotency key;
+the browser retains it after an uncertain network result. The page polls persisted job
+status, retains prior same-mode coverage on failure and never offers public cancellation.
+Research coverage is not labeled fresh. A blocked inspection snapshot can appear in the
+catalog but never becomes the usable current pointer. Empty research mode has no sample
+price fallback. Asset search reads the selected immutable inventory and reports empty results.
+
+Reads: `GET /api/v1/data/snapshots?mode=...`, `/data/health?mode=...` and
+`/data/assets?mode=...&snapshot_id=...&query=...` (all under `/api/v1`). Pagination defaults
+to 25 and caps at 100. Asset cursors bind the source mode, snapshot and query. Snapshot
+cursors use the final UUID of the previous page. Invalid inputs return typed 422 errors;
+missing/source-mismatched snapshots return 404; database or artifact-integrity failure returns
+503 with no filesystem/provider secrets. Files are verified before the catalog returns data.
+
+`POST /api/v1/data/refresh` returns 202 `JobV1`; send `Idempotency-Key` with the body
+above. Exact retries reuse the job and changed inputs return 409. Browser traffic stays
+same-origin: the Next.js proxy forwards only implemented data paths/query keys and bounded
+JSON refresh requests. It strips incoming credentials and requires a same-origin POST.
+No arbitrary provider URL is accepted by these routes.

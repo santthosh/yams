@@ -1,4 +1,72 @@
 export interface paths {
+  "/api/v1/data/assets": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Assets */
+    get: operations["assets_api_v1_data_assets_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/data/health": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Health */
+    get: operations["health_api_v1_data_health_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/data/refresh": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Refresh */
+    post: operations["refresh_api_v1_data_refresh_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/data/snapshots": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Snapshots */
+    get: operations["snapshots_api_v1_data_snapshots_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/v1/health": {
     parameters: {
       query?: never;
@@ -81,6 +149,36 @@ export interface components {
       /** Position Cap */
       position_cap: string | null;
     };
+    /** Alias */
+    Alias: {
+      /** Asset Id */
+      asset_id: string;
+      /**
+       * Available At
+       * Format: date-time
+       */
+      available_at: string;
+      /**
+       * Effective From
+       * Format: date
+       */
+      effective_from: string;
+      /** Effective To Exclusive */
+      effective_to_exclusive: string | null;
+      /**
+       * Ingested At
+       * Format: date-time
+       */
+      ingested_at: string;
+      /** Provider */
+      provider: string;
+      /** Provider Id */
+      provider_id: string;
+      /** Symbol */
+      symbol: string;
+      /** Venue */
+      venue: string;
+    };
     /** ArtifactReference */
     ArtifactReference: {
       /**
@@ -92,6 +190,37 @@ export interface components {
       schema_version: number;
       /** Sha256 */
       sha256: string;
+    };
+    /** AssetContext */
+    AssetContext: {
+      /** Aliases */
+      aliases: components["schemas"]["Alias"][];
+      /** Fundamentals */
+      fundamentals: components["schemas"]["Fundamental"][];
+      /**
+       * Schema Version
+       * @constant
+       */
+      schema_version: 2;
+      /** Sectors */
+      sectors: components["schemas"]["Sector"][];
+    };
+    /** AssetPageV1 */
+    AssetPageV1: {
+      /** Items */
+      items: components["schemas"]["AssetV1"][];
+      /**
+       * Mode
+       * @enum {string}
+       */
+      mode: "synthetic_fixture" | "research_market_data";
+      /** Next Cursor */
+      next_cursor: string | null;
+      /**
+       * Snapshot Id
+       * Format: uuid
+       */
+      snapshot_id: string;
     };
     /** AssetV1 */
     AssetV1: {
@@ -117,6 +246,31 @@ export interface components {
       symbol: string;
       /** Venue */
       venue: string;
+    };
+    /** Calendar */
+    Calendar: {
+      /** Generator Version */
+      generator_version: string;
+      /** Id */
+      id: string;
+      /** Label */
+      label: string;
+      /** Limitations */
+      limitations: string[];
+      /**
+       * Schema Version
+       * @constant
+       */
+      schema_version: 1;
+      /** Sessions */
+      sessions: components["schemas"]["Session"][];
+      /**
+       * Timezone
+       * @constant
+       */
+      timezone: "America/New_York";
+      /** Timezone Rules Version */
+      timezone_rules_version: string;
     };
     /** CalendarReference */
     CalendarReference: {
@@ -144,6 +298,33 @@ export interface components {
       features: components["schemas"]["FeatureValue"][];
       /** Score */
       score: number | null;
+    };
+    /** DataHealthV1 */
+    DataHealthV1: {
+      /**
+       * Checked At
+       * Format: date-time
+       */
+      checked_at: string;
+      current_snapshot: components["schemas"]["SnapshotV1"] | null;
+      /**
+       * Freshness
+       * @enum {string}
+       */
+      freshness: "synthetic" | "unknown" | "refresh_failed";
+      latest_job: components["schemas"]["JobV1"] | null;
+      /**
+       * Mode
+       * @enum {string}
+       */
+      mode: "synthetic_fixture" | "research_market_data";
+      /**
+       * Status
+       * @enum {string}
+       */
+      status: "empty" | "ready" | "refreshing" | "failed";
+      /** Warnings */
+      warnings: string[];
     };
     /** ErrorDetail */
     ErrorDetail: {
@@ -456,6 +637,32 @@ export interface components {
       /** Weight */
       weight: string;
     };
+    /** Fundamental */
+    Fundamental: {
+      /** Asset Id */
+      asset_id: string;
+      /**
+       * Available At
+       * Format: date-time
+       */
+      available_at: string;
+      /**
+       * Ingested At
+       * Format: date-time
+       */
+      ingested_at: string;
+      /** Metric */
+      metric: string;
+      /**
+       * Period End
+       * Format: date
+       */
+      period_end: string;
+      /** Provider */
+      provider: string;
+      /** Value */
+      value: string;
+    };
     /** HTTPValidationError */
     HTTPValidationError: {
       /** Detail */
@@ -636,6 +843,13 @@ export interface components {
        * @default 25
        */
       limit: number;
+    };
+    /** Page[SnapshotV1] */
+    Page_SnapshotV1_: {
+      /** Items */
+      items: components["schemas"]["SnapshotV1"][];
+      /** Next Cursor */
+      next_cursor: string | null;
     };
     /** PaperOrderBatchV1 */
     PaperOrderBatchV1: {
@@ -896,6 +1110,64 @@ export interface components {
       /** Target Weight */
       target_weight: string;
     };
+    /** RefreshPayload */
+    RefreshPayload: {
+      /** Expected Manifest Hash */
+      expected_manifest_hash?: string | null;
+      research_config?: components["schemas"]["ResearchConfig"] | null;
+      /**
+       * Schema Version
+       * @constant
+       */
+      schema_version: 1;
+      /**
+       * Source Mode
+       * @enum {string}
+       */
+      source_mode: "synthetic_fixture" | "research_market_data";
+    };
+    /** ResearchConfig */
+    ResearchConfig: {
+      /**
+       * Adapter Version
+       * @constant
+       */
+      adapter_version: "yfinance_1.7.0_normalization_1";
+      /** Assets */
+      assets: components["schemas"]["AssetV1"][];
+      calendar: components["schemas"]["Calendar"];
+      context: components["schemas"]["AssetContext"];
+      /**
+       * Directory Kind
+       * @enum {string}
+       */
+      directory_kind: "nasdaqlisted" | "otherlisted";
+      /** Directory Reference */
+      directory_reference: string;
+      /** Exchange Codes */
+      exchange_codes: string[];
+      /**
+       * First Session
+       * Format: date
+       */
+      first_session: string;
+      /**
+       * Last Session
+       * Format: date
+       */
+      last_session: string;
+      /** Rights Reference */
+      rights_reference: string;
+      /** Rights Verified Local Use */
+      rights_verified_local_use: boolean;
+      /**
+       * Schema Version
+       * @constant
+       */
+      schema_version: 1;
+      /** Selection Rule Reference */
+      selection_rule_reference: string;
+    };
     /** ScoreWeights */
     ScoreWeights: {
       /** Momentum Long */
@@ -904,6 +1176,50 @@ export interface components {
       momentum_short: number;
       /** Volatility Penalty */
       volatility_penalty: number;
+    };
+    /** Sector */
+    Sector: {
+      /** Asset Id */
+      asset_id: string;
+      /**
+       * Available At
+       * Format: date-time
+       */
+      available_at: string;
+      /**
+       * Effective From
+       * Format: date
+       */
+      effective_from: string;
+      /** Effective To Exclusive */
+      effective_to_exclusive: string | null;
+      /**
+       * Ingested At
+       * Format: date-time
+       */
+      ingested_at: string;
+      /** Provider */
+      provider: string;
+      /** Sector */
+      sector: string;
+    };
+    /** Session */
+    Session: {
+      /**
+       * Close At
+       * Format: date-time
+       */
+      close_at: string;
+      /**
+       * Open At
+       * Format: date-time
+       */
+      open_at: string;
+      /**
+       * Session Date
+       * Format: date
+       */
+      session_date: string;
     };
     /** SignalConfig */
     SignalConfig: {
@@ -1035,6 +1351,40 @@ export interface components {
        */
       rights_status: "synthetic_owned" | "verified_local_use" | "unverified";
     };
+    /** SnapshotV1 */
+    SnapshotV1: {
+      /** Asset Count */
+      asset_count: number;
+      coverage: components["schemas"]["SnapshotCoverage"];
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /** Latest Completed Session */
+      latest_completed_session: string | null;
+      /** Manifest Sha256 */
+      manifest_sha256: string;
+      /**
+       * Mode
+       * @enum {string}
+       */
+      mode: "synthetic_fixture" | "research_market_data";
+      /** Provider */
+      provider: string;
+      /**
+       * Published At
+       * Format: date-time
+       */
+      published_at: string;
+      /**
+       * Quality
+       * @enum {string}
+       */
+      quality: "usable" | "usable_with_warnings" | "blocked";
+      /** Warnings */
+      warnings: string[];
+    };
     /** StrategyConfigV1 */
     StrategyConfigV1: {
       /** Display Name */
@@ -1117,6 +1467,248 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+  assets_api_v1_data_assets_get: {
+    parameters: {
+      query: {
+        mode: "synthetic_fixture" | "research_market_data";
+        snapshot_id: string;
+        query?: string;
+        limit?: number;
+        cursor?: string | null;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AssetPageV1"];
+        };
+      };
+      /** @description Not Found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Conflict */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Unprocessable Content */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Service Unavailable */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+    };
+  };
+  health_api_v1_data_health_get: {
+    parameters: {
+      query: {
+        mode: "synthetic_fixture" | "research_market_data";
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["DataHealthV1"];
+        };
+      };
+      /** @description Not Found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Conflict */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Unprocessable Content */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Service Unavailable */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+    };
+  };
+  refresh_api_v1_data_refresh_post: {
+    parameters: {
+      query?: never;
+      header: {
+        "Idempotency-Key": string;
+      };
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["RefreshPayload"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      202: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["JobV1"];
+        };
+      };
+      /** @description Not Found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Conflict */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Unprocessable Content */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Service Unavailable */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+    };
+  };
+  snapshots_api_v1_data_snapshots_get: {
+    parameters: {
+      query: {
+        mode: "synthetic_fixture" | "research_market_data";
+        limit?: number;
+        cursor?: string | null;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Page_SnapshotV1_"];
+        };
+      };
+      /** @description Not Found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Conflict */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Unprocessable Content */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Service Unavailable */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+    };
+  };
   health_api_v1_health_get: {
     parameters: {
       query?: never;

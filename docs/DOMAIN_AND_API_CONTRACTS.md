@@ -139,6 +139,33 @@ Other `signals.kind` values become supported only with documented operator contr
 
 `quality ∈ {usable, usable_with_warnings, blocked}`; `mode ∈ {synthetic_fixture, research_market_data}`. Actual manifests always store a valid 64-character SHA-256 digest; the placeholder above is explanatory. The snapshot points to actual immutable Parquet assets and an independent universe manifest.
 
+### Implemented data discovery (0.0.2, #31)
+
+All data reads require explicit `mode=synthetic_fixture|research_market_data`.
+`GET /data/snapshots` lists registered, hash-verified snapshots using descending
+publication time/UUID pagination (default 25, maximum 100); its cursor is the final
+UUID on the preceding page and must belong to the same mode. Filesystem orphans
+never appear. `GET /data/assets` requires a snapshot UUID and returns its static
+inventory, with optional symbol/asset-ID substring `query` (maximum 120 characters).
+Its opaque cursor binds snapshot, mode and query; discovery is not a historical
+eligibility or valuation calculation. Missing/mode-mismatched snapshots return 404;
+invalid modes, cursors and limits return the common 422 envelope.
+
+`POST /data/refresh` requires a UUID `Idempotency-Key` and returns 202 `JobV1`.
+Use the closed `RefreshPayload`: fixture mode pins `expected_manifest_hash`;
+research mode supplies the closed `research_config` instead. Exact retries reuse
+the durable job; changed inputs with the same key return 409. Browser proxy accepts
+only same-origin JSON, caps input at 1 MiB and forwards no user credentials. Public
+cancellation remains unavailable until #41.
+
+`GET /data/health` returns `DataHealthV1`: checked time, source mode, persisted
+usable current snapshot, latest same-mode refresh job and safe warnings. Status is
+empty/ready/refreshing/failed. Failed refresh retains the last valid snapshot and
+reports `freshness=refresh_failed`; research freshness remains unknown, while fixture
+coverage is explicitly synthetic. Registration time is not market availability.
+Integrity/database failures return 503 without exposing filesystem paths or secrets.
+Snapshot lists may include blocked inspection data; these do not become current.
+
 **Experiment request** (`POST /experiments`, return `202`):
 
 ```json
