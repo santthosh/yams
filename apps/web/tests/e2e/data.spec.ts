@@ -11,6 +11,7 @@ test("data coverage, search, failure retention and source isolation", async ({
     data: { mode: "ready" },
   });
   let failed = false;
+  let healthReads = 0;
   let historyUnavailable = false;
   const snapshot = {
     id: "11111111-1111-4111-8111-111111111111",
@@ -33,7 +34,31 @@ test("data coverage, search, failure retention and source isolation", async ({
   };
   await page.route("**/api/v1/data/**", async (route) => {
     const url = new URL(route.request().url());
+    if (url.pathname.endsWith("/refresh")) {
+      await route.fulfill({
+        status: 422,
+        json: { error: { code: "VALIDATION_ERROR" } },
+      });
+      return;
+    }
+    if (
+      url.pathname.endsWith("/assets") &&
+      url.searchParams.get("query") === "gone"
+    ) {
+      await route.fulfill({
+        status: 404,
+        json: { error: { code: "NOT_FOUND" } },
+      });
+      return;
+    }
     const research = url.searchParams.get("mode") === "research_market_data";
+    if (url.pathname.endsWith("/health") && healthReads++ === 0) {
+      await route.fulfill({
+        status: 503,
+        json: { error: { code: "NOT_READY" } },
+      });
+      return;
+    }
     if (url.pathname.endsWith("/snapshots") && historyUnavailable) {
       await route.fulfill({
         status: 503,
@@ -101,11 +126,19 @@ test("data coverage, search, failure retention and source isolation", async ({
     page.getByRole("heading", { name: "Market data", exact: true }),
   ).toBeVisible();
   await expect(page.getByText("authored_synthetic_test")).toBeVisible();
+  expect(healthReads).toBeGreaterThanOrEqual(2);
   await expect(page.getByText("AAA · XNYS", { exact: false })).toBeVisible();
   await page.getByLabel("Symbol or asset ID").fill("missing");
   await page.getByRole("button", { name: "Search assets" }).click();
   await expect(
     page.getByRole("heading", { name: "No matching assets" }),
+  ).toBeVisible();
+  await page.getByLabel("Symbol or asset ID").fill("gone");
+  await page.getByRole("button", { name: "Search assets" }).click();
+  await expect(
+    page.getByText(
+      "The selected snapshot is no longer available. Reload data status and choose an available source.",
+    ),
   ).toBeVisible();
   failed = true;
   await page.getByRole("button", { name: "Reload data status" }).click();
@@ -147,6 +180,23 @@ test("data coverage, search, failure retention and source isolation", async ({
   await expect(
     page.getByRole("button", { name: "Refresh selected source" }),
   ).toBeDisabled();
+  await page
+    .getByText("Research source configuration", { exact: true })
+    .click();
+  await page.getByLabel("Validated research configuration (JSON)").fill("{");
+  await page.getByRole("button", { name: "Refresh selected source" }).click();
+  await expect(
+    page.getByText(
+      "Research configuration is not valid JSON. Correct it before submitting.",
+    ),
+  ).toBeVisible();
+  await page.getByLabel("Validated research configuration (JSON)").fill("{}");
+  await page.getByRole("button", { name: "Refresh selected source" }).click();
+  await expect(
+    page.getByText(
+      "Refresh inputs do not match the data contract. Check the selected source configuration.",
+    ),
+  ).toBeVisible();
   await page.screenshot({
     path: info.outputPath("data-research-empty.png"),
     fullPage: true,

@@ -30,6 +30,7 @@ export function DataSettings() {
   useEffect(() => {
     const controller = new AbortController();
     let timer: ReturnType<typeof setTimeout>;
+    let failures = 0;
     const client = createApiClient(window.location.origin, (input, init) =>
       fetch(input, { ...init, signal: controller.signal }),
     );
@@ -45,6 +46,7 @@ export function DataSettings() {
         const list =
           listResult.status === "fulfilled" ? listResult.value : null;
         if (!status?.data) throw new Error("unavailable");
+        failures = 0;
         setHealth(status.data);
         if (status.data.latest_job) setJob(status.data.latest_job);
         if (list?.data) setSnapshots(list.data.items);
@@ -61,10 +63,18 @@ export function DataSettings() {
         )
           timer = setTimeout(() => void load(), 2000);
       } catch {
-        if (!controller.signal.aborted)
-          setError(
-            "Data status is unavailable. Previously loaded data may be out of date.",
-          );
+        if (!controller.signal.aborted) {
+          failures += 1;
+          if (failures <= 3) {
+            setError(
+              `Data status is unavailable. Retrying (${failures}/3); previously loaded data may be out of date.`,
+            );
+            timer = setTimeout(() => void load(), 1000 * 2 ** failures);
+          } else
+            setError(
+              "Automatic status updates stopped after repeated failures. Previously loaded data may be out of date. Use Reload data status to try again.",
+            );
+        }
       }
     }
     void load();
@@ -93,7 +103,15 @@ export function DataSettings() {
           },
         });
         if (controller.signal.aborted) return;
-        if (!response.data) throw new Error("unavailable");
+        if (!response.data) {
+          if (response.response.status === 404) {
+            setAssetError(
+              "The selected snapshot is no longer available. Reload data status and choose an available source.",
+            );
+            return;
+          }
+          throw new Error("unavailable");
+        }
         setAssets(response.data);
         setAssetScope(JSON.stringify([mode, inspectedId, search]));
         setAssetError("");
@@ -111,6 +129,17 @@ export function DataSettings() {
     setBusy(true);
     setError("");
     try {
+      let researchConfig: S["RefreshPayload"]["research_config"];
+      if (mode === "research_market_data") {
+        try {
+          researchConfig = JSON.parse(research);
+        } catch {
+          setError(
+            "Research configuration is not valid JSON. Correct it before submitting.",
+          );
+          return;
+        }
+      }
       const body: S["RefreshPayload"] =
         mode === "synthetic_fixture"
           ? {
@@ -122,7 +151,7 @@ export function DataSettings() {
           : {
               schema_version: 1,
               source_mode: mode,
-              research_config: JSON.parse(research),
+              research_config: researchConfig,
             };
       const serialized = JSON.stringify(body);
       if (refreshIdentity.current?.payload !== serialized)
@@ -139,7 +168,16 @@ export function DataSettings() {
           },
         },
       );
-      if (!response.data) throw new Error("unavailable");
+      if (!response.data) {
+        setError(
+          response.response.status === 422
+            ? "Refresh inputs do not match the data contract. Check the selected source configuration."
+            : response.response.status === 409
+              ? "This refresh key conflicts with an earlier request. Reload data status before starting another refresh."
+              : "Refresh admission is unavailable. Check local services, then retry with the same request identity.",
+        );
+        return;
+      }
       refreshIdentity.current = null;
       workspace.setJob(response.data);
       setRevision((value) => value + 1);

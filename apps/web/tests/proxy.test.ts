@@ -189,3 +189,32 @@ it("compares refresh Origin with the browser-facing Host behind Docker port mapp
   );
   expect(fetcher).toHaveBeenCalledTimes(1);
 });
+
+it("rejects oversized refresh bodies and missing request keys before upstream access", async () => {
+  const fetcher = vi.fn();
+  const headers = {
+    origin: "http://web.test",
+    "Content-Type": "application/json",
+    "Idempotency-Key": "11111111-1111-4111-8111-111111111111",
+  };
+  const large = new Request("http://web.test/api/v1/data/refresh", {
+    method: "POST",
+    headers,
+    body: new Uint8Array(1024 * 1024 + 1),
+  });
+  expect((await proxyApi(large, ["data", "refresh"], fetcher)).status).toBe(
+    413,
+  );
+  const missing = new Request("http://web.test/api/v1/data/refresh", {
+    method: "POST",
+    headers: {
+      origin: headers.origin,
+      "Content-Type": headers["Content-Type"],
+    },
+    body: "{}",
+  });
+  expect((await proxyApi(missing, ["data", "refresh"], fetcher)).status).toBe(
+    422,
+  );
+  expect(fetcher).not.toHaveBeenCalled();
+});
