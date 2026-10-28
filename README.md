@@ -112,3 +112,5 @@ requests at three seconds. Failures carry safe correlation IDs.
 [Web-shell handoff and verification](docs/verification/24-web-shell/README.md)
 describes components, fixtures, browser evidence and the boundary between these
 transport tests and #25's integrated Docker/persistence journey.
+
+The [pinned market repository](docs/MARKET_REPOSITORY.md) documents immutable Parquet reads, temporal evidence, quality exclusions and the filesystem publication handoff for milestone 0.0.2.

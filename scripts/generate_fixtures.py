@@ -3,11 +3,13 @@
 import argparse
 import hashlib
 import json
+import tempfile
 from datetime import UTC, date, datetime, timedelta
 from decimal import Decimal
 from pathlib import Path
 from uuid import NAMESPACE_URL, uuid5
 
+import duckdb
 import numpy as np
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -58,6 +60,36 @@ def price(asset: str, index: int) -> str:
     return format(value, ".3f")
 
 
+def parquet_bars(rows: list[dict[str, object]]) -> bytes:
+    """Pinned writer over authored rows; does not derive any expected financial value."""
+    with tempfile.TemporaryDirectory(prefix="yams-fixture-parquet-") as directory:
+        path = Path(directory) / "bars.parquet"
+        with duckdb.connect(config={"threads": 1}) as connection:
+            connection.execute(
+                "CREATE TABLE bars(asset_id VARCHAR, session_date DATE, "
+                "available_at TIMESTAMPTZ, ingested_at TIMESTAMPTZ, payload VARCHAR)"
+            )
+            connection.executemany(
+                "INSERT INTO bars VALUES (?, ?, ?, ?, ?)",
+                [
+                    (
+                        row["asset_id"],
+                        row["session_date"],
+                        row["available_at"],
+                        row["ingested_at"],
+                        encoded(row).decode(),
+                    )
+                    for row in rows
+                ],
+            )
+            connection.execute(
+                "COPY (SELECT * FROM bars ORDER BY asset_id, session_date) TO ? "
+                "(FORMAT PARQUET, COMPRESSION ZSTD, ROW_GROUP_SIZE 2048)",
+                [str(path)],
+            )
+        return path.read_bytes()
+
+
 def generate() -> dict[str, bytes]:
     output: dict[str, bytes] = {}
     sessions = schedule()
@@ -73,7 +105,7 @@ def generate() -> dict[str, bytes]:
         ],
         "sessions": sessions,
     }
-    bars = []
+    bars: list[dict[str, object]] = []
     for asset in ASSETS:
         for index, session in enumerate(sessions):
             close = price(asset, index)
@@ -123,7 +155,8 @@ def generate() -> dict[str, bytes]:
         "label": "SYNTHETIC_DATA_ONLY",
         "seed": SEED,
         "generator": "scripts/generate_fixtures.py",
-        "generator_version": "1",
+        "generator_version": "2",
+        "parquet_writer": "duckdb_2.0.0_zstd_rowgroup2048_threads1",
         "randomness": "bars use exact Decimal formulas; forecast probe uses pinned PCG64 seed42",
         "rights": "Repository-authored synthetic data; no downloaded market data.",
         "price_formula": {
@@ -145,15 +178,41 @@ def generate() -> dict[str, bytes]:
                 "effective_from": sessions[0]["session_date"],
                 "effective_to_exclusive": "2031-01-01",
                 "available_at": "2026-12-31T00:00:00Z",
+                "ingested_at": "2026-12-31T00:00:00Z",
                 "timing_status": "synthetic_known",
             }
             for asset in ASSETS
         ],
     }
+    temporal = {
+        "effective_from": sessions[0]["session_date"],
+        "effective_to_exclusive": "2031-01-01",
+        "available_at": "2026-12-31T00:00:00Z",
+        "ingested_at": "2026-12-31T00:00:00Z",
+    }
+    context = {
+        "schema_version": 2,
+        "aliases": [
+            {
+                **temporal,
+                **{
+                    key: asset[key]
+                    for key in ("asset_id", "venue", "symbol", "provider", "provider_id")
+                },
+            }
+            for asset in assets
+        ],
+        "sectors": [
+            {**temporal, **{key: asset[key] for key in ("asset_id", "sector", "provider")}}
+            for asset in assets
+        ],
+        "fundamentals": [],
+    }
     artifacts: list[dict[str, object]] = []
     for name, role, value, count in (
         ("assets", "assets", assets, len(assets)),
         ("bars", "bars", bars, len(bars)),
+        ("asset_context", "assets", context, len(assets) * 2),
         ("calendar", "calendar", calendar, len(sessions)),
         ("provenance", "provenance", provenance, None),
         ("universe", "universe", universe, len(assets)),
@@ -161,12 +220,19 @@ def generate() -> dict[str, bytes]:
     ):
         content = encoded(value)
         output[f"snapshot/{name}.json"] = content
+        filename = f"{name}.json"
+        if name == "bars":
+            # JSON remains an independently inspectable fixture input; the runtime
+            # manifest pins only the exact Parquet representation of those rows.
+            content = parquet_bars(bars)
+            filename = "bars.parquet"
+            output[f"snapshot/{filename}"] = content
         artifacts.append(
             {
-                "path": f"{name}.json",
+                "path": filename,
                 "role": role,
-                "format": "json",
-                "schema_version": 1,
+                "format": "parquet" if name == "bars" else "json",
+                "schema_version": 2 if name == "asset_context" else 1,
                 "sha256": digest(content),
                 "size_bytes": len(content),
                 "row_count": count,
@@ -246,7 +312,8 @@ def generate() -> dict[str, bytes]:
             "schema_version": 1,
             "label": "SYNTHETIC_DATA_ONLY",
             "seed": SEED,
-            "generator_version": "1",
+            "generator_version": "2",
+            "parquet_writer": "duckdb_2.0.0_zstd_rowgroup2048_threads1",
             "snapshot_sha256": snapshot_hash,
             "snapshot_id": str(uuid5(NAMESPACE_URL, "urn:yams:dataset:sha256:" + snapshot_hash)),
             "files": {
