@@ -1,17 +1,23 @@
 # Installing and upgrading YAMS releases
 
-YAMS 0.0.2 is a **candidate diagnostics prerelease**, preceding the complete 0.0.5
-core product. It adds immutable market snapshots, source discovery/refresh,
-published strategy versions, shared momentum ranking and feasible target-weight
-diagnostics. The offline fixture journey is clearly labeled synthetic. Optional
-personal-use Tiingo acquisition requires the operator's own token and terms;
-source data remains local. Complete corporate-action accounting, backtests,
-forecasts and durable paper accounts/orders/fills remain unavailable. No real
-money or brokerage is involved. See `RESEARCH.md` for the optional source workflow.
+YAMS 0.0.3 is a **Strategy Lab and historical-experiments prerelease**, preceding
+the complete 0.0.5 core product. It includes immutable strategy publication,
+momentum/mean-reversion/low-volatility templates, reproducible walk-forward jobs,
+separate development/holdout metrics, aligned SPY/cash references, immutable reports
+and fair comparison with controlled one-rule challenges. The complete offline
+editor→fork→run→report→challenge→compare journey uses labeled synthetic data.
+It is research evidence, not investment performance or a forecast.
 
-The existing 0.0.1 release remains an immutable foundation with its original
-installation assets and capabilities; its filename compatibility note appears below.
-A milestone name alone does not establish that a release has been published.
+Market snapshots, candidate diagnostics and optional personal-use Tiingo acquisition
+remain available. Provider acquisition requires the operator's own token and terms;
+source data remains local. Current real feeds lack historical raw/action/publication/
+membership evidence for the accounting engine and remain diagnostic-only. Forecasts
+and durable paper accounts/orders/fills are unavailable. No real money or brokerage
+is involved. See `RESEARCH.md` for the optional source workflow.
+
+Existing 0.0.1 and 0.0.2 releases remain immutable with their original capabilities and
+assets. A milestone name or candidate workflow alone does not establish publication;
+use the exact release's tag, source SHA, immutable image digests and native evidence.
 
 ## Fresh installation
 
@@ -45,6 +51,36 @@ provider or registry access. Startup migrates/seeds without resetting data.
 `docker compose down` stops services and preserves database/artifact volumes.
 Do not use `down --volumes` for normal operation or upgrades.
 
+## First Strategy Lab journey
+
+Open `/lab/strategies`, inspect a template and publish a named fork or new immutable
+version. **Run selected version** opens `/lab/experiments` with that version pinned.
+Choose the synthetic snapshot, a covered half-open window, positive synthetic USD
+capital, SPY and chronological holdout split. The default window reserves a covered
+session for next-open lookahead; the backend validates actual calendar/workload.
+Current costs are readonly 10bps adverse slippage per side and zero commission.
+
+Follow the queued job into its report. Inspect full/development/holdout metrics,
+original-date charts/exact tables, trade evidence and source/method limits. Reruns
+create new identities and preserve the exact canonical request, including full-range
+uint64 seeds. Cancellation is cooperative and publishes no partial financial report.
+
+At `/lab/compare`, select 2–4 completed experiments. Exact incompatible settings
+block metric ranking and curves. **Rerun all with reference settings** creates
+explicit comparable requests; different universe rules or older engines can still
+require compatible versions/new runs. Only matching completed backend comparison
+fingerprints establish alignment. **Change one rule** publishes a maximum-position-
+weight copy before submitting its run. Source and target remain inspectable through
+the shareable comparison link and stored configurations; no parent-version database
+relation is claimed. Other edits belong in the full editor.
+
+Repeated parameter tuning or holdout selection weakens independent validation.
+SPY is an adjusted-close, fully invested friction-free approximation; strategy raw
+execution and dividend timing differ. Missing benchmark points stay unavailable.
+Scheduled work runs only while Docker is active. Backtests do not post durable
+paper holdings/fills, and neither backtests nor later scenario models guarantee
+future outcomes.
+
 ## Backup before upgrading
 
 Keep the existing Compose manifest, `.env`, exact image digests and backups
@@ -68,6 +104,14 @@ The 0.0.1 → 0.0.2 upgrade adds snapshot publication, immutable strategy versio
 diagnostic-evaluation tables. Startup applies Alembic migrations in order and
 preserves the workspace and existing artifacts; it never resets either store.
 The default strategy is seeded immutably. Back up both durable stores first.
+
+The 0.0.2→0.0.3 upgrade adds immutable experiment/core/report tables and reviewed
+alternative-family seeds. Existing workspace, snapshots, strategy versions,
+diagnostic results and artifacts are preserved. The original momentum template
+remains unchanged. No paper portfolio or trade is created by migration or boot.
+Back up both stores before upgrading; new images may write schemas older images
+cannot read. Existing results pin their original engine; use explicit common-setting
+reruns rather than treating different engine builds as directly comparable.
 Older images must not be run against a newer schema as an assumed rollback.
 
 Read the new release's migration notes. Download/verify its assets separately,

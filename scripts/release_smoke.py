@@ -200,9 +200,93 @@ def main() -> None:
             evidence["checks"].append(
                 "native real-worker candidate rerun hashes and explicit cash-only results"
             )
+            original_strategies = get("strategies")
+            assert len(original_strategies["items"]) == 6
+            for script in (
+                "experiment-browser.mjs",
+                "experiment-ui-browser.mjs",
+                "comparison-browser.mjs",
+            ):
+                subprocess.run(
+                    ["pnpm", "--filter", "@yams/web", "exec", "node", "tests/" + script],
+                    cwd=ROOT,
+                    env=browser_env,
+                    check=True,
+                )
+            public_runs = json.loads((destination / "experiment-public.json").read_text())
+            ui_runs = json.loads((destination / "experiment-ui.json").read_text())
+            for record in ui_runs["records"]:
+                for role in ("original", "rerun", "cancelled", "fork_run"):
+                    if role + "_raw_json" in record:
+                        record[role] = json.loads(record.pop(role + "_raw_json"))
+                        assert record[role]["inputs"] == json.loads(
+                            record[role]["inputs_canonical_json"]
+                        )
+            comparisons = json.loads((destination / "comparison-ui.json").read_text())
+            for record in comparisons["records"]:
+                for role in ("source", "challenge", "mismatched"):
+                    record[role] = json.loads(record.pop(role + "_raw_json"))
+                    assert record[role]["inputs"] == json.loads(
+                        record[role]["inputs_canonical_json"]
+                    )
+                record["common"] = [json.loads(raw) for raw in record.pop("common_raw_json")]
+                for saved in record["common"]:
+                    assert saved["inputs"] == json.loads(saved["inputs_canonical_json"])
+            evidence.update(
+                public_experiments=public_runs, experiment_ui=ui_runs, comparison_ui=comparisons
+            )
+            strategies = get("strategies")
+            original_ids = {row["id"] for row in original_strategies["items"]}
+            assert [
+                row for row in strategies["items"] if row["id"] in original_ids
+            ] == original_strategies["items"]
+            challenges = [row for row in strategies["items"] if row["id"] not in original_ids]
+            assert len(strategies["items"]) == 8 and len(challenges) == 2
+            assert {row["published_version"]["id"] for row in challenges} == {
+                record["challenge"]["inputs"]["strategy_version_id"]
+                for record in comparisons["records"]
+            }
+            challenge_versions = {
+                row["id"]: get(f"strategies/{row['id']}/versions") for row in challenges
+            }
+            for row in challenges:
+                assert challenge_versions[row["id"]]["items"] == [row["published_version"]]
+            evidence["checks"].append(
+                "native real editor/version/experiment/report/challenge/fair-comparison journey, "
+                "exact uint64 seeds, backend fingerprints, keyboard/Axe/tables "
+                "and immutable originals"
+            )
+
+            def verify_reports() -> None:
+                for record in public_runs["runs"]:
+                    identity = record["run"]["id"]
+                    assert get(f"experiments/{identity}") == record["run"]
+                    assert get(f"experiments/{identity}/series?limit=2") == record["first"]
+                    assert get(f"experiments/{identity}/trades") == record["trades"]
+                assert (
+                    get(f"experiments/{public_runs['cancelled']['id']}") == public_runs["cancelled"]
+                )
+                for record in ui_runs["records"]:
+                    for role in ("original", "rerun", "cancelled", "fork_run"):
+                        if role in record:
+                            assert get(f"experiments/{record[role]['id']}") == record[role]
+                for record in comparisons["records"]:
+                    for saved in [
+                        record["source"],
+                        record["challenge"],
+                        record["mismatched"],
+                        *record["common"],
+                    ]:
+                        assert get(f"experiments/{saved['id']}") == saved
+                for identity, history in challenge_versions.items():
+                    assert get(f"strategies/{identity}/versions") == history
+
+            verify_reports()
             run("down")
             run("up", "-d", "--wait", "--wait-timeout", "120", "--pull", "never")
             assert get("workspace")["id"] == workspace["id"]
+            verify_reports()
+            assert get("strategies") == strategies
             assert get(f"strategies/{strategy_id}/versions") == versions
             for editor_id, history in editor_versions.items():
                 assert get(f"strategies/{editor_id}/versions") == history
@@ -223,7 +307,9 @@ def main() -> None:
                 if name != "web"
             )
             evidence["checks"].append(
-                "cached restart preserves workspace/job/artifact with only loopback web published"
+                "cached restart preserves workspace/job/artifact, exact experiment reports "
+                "and challenge "
+                "versions with only loopback web published"
             )
             evidence["passed"] = True
         finally:

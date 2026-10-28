@@ -245,6 +245,19 @@ def release_summary(version: str) -> tuple[str, str]:
             "or durable paper accounts/orders/fills are included. Real source data is not "
             "redistributed; complete corporate-action accounting remains unsupported.",
         )
+    if version == "0.0.3":
+        return (
+            "Strategy Lab and historical experiments",
+            "Local paper-only research prerelease: immutable strategy versions, momentum/"
+            "mean-reversion/low-volatility templates, bounded walk-forward experiments, "
+            "separate development/holdout metrics, aligned SPY/cash comparisons and "
+            "controlled one-rule challenges. Historical accounting examples use explicitly "
+            "labeled synthetic data; real provider acquisition remains diagnostic-only. "
+            "Download all assets, verify SHA256SUMS and follow INSTALL.md. Native amd64 "
+            "and arm64 packaged installations verify the actual editor/worker/report/"
+            "comparison journey and retained state. No forecasts or durable paper accounts/"
+            "orders/fills are included; no real money or brokerage is involved.",
+        )
     return (
         "local paper research prerelease",
         "Local paper-only research prerelease. Download all assets, verify SHA256SUMS "
