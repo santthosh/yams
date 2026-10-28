@@ -11,6 +11,7 @@ test("data coverage, search, failure retention and source isolation", async ({
     data: { mode: "ready" },
   });
   let failed = false;
+  let historyUnavailable = false;
   const snapshot = {
     id: "11111111-1111-4111-8111-111111111111",
     provider: "authored_synthetic_test",
@@ -33,6 +34,13 @@ test("data coverage, search, failure retention and source isolation", async ({
   await page.route("**/api/v1/data/**", async (route) => {
     const url = new URL(route.request().url());
     const research = url.searchParams.get("mode") === "research_market_data";
+    if (url.pathname.endsWith("/snapshots") && historyUnavailable) {
+      await route.fulfill({
+        status: 503,
+        json: { error: { code: "NOT_READY" } },
+      });
+      return;
+    }
     let body: unknown;
     if (url.pathname.endsWith("/health"))
       body = {
@@ -123,6 +131,14 @@ test("data coverage, search, failure retention and source isolation", async ({
     path: info.outputPath("data-stale.png"),
     fullPage: true,
   });
+  historyUnavailable = true;
+  await page.getByRole("button", { name: "Reload data status" }).click();
+  await expect(
+    page.getByText(
+      "Snapshot history is unavailable. Current coverage is independently verified below.",
+    ),
+  ).toBeVisible();
+  await expect(page.getByText("authored_synthetic_test")).toBeVisible();
   await page.getByLabel("Source mode").selectOption("research_market_data");
   await expect(
     page.getByRole("heading", { name: "No registered snapshot" }),

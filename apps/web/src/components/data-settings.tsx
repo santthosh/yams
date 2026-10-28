@@ -35,16 +35,24 @@ export function DataSettings() {
     );
     async function load() {
       try {
-        const [status, list] = await Promise.all([
+        const [statusResult, listResult] = await Promise.allSettled([
           client.GET("/api/v1/data/health", { params: { query: { mode } } }),
           client.GET("/api/v1/data/snapshots", { params: { query: { mode } } }),
         ]);
         if (controller.signal.aborted) return;
-        if (!status.data || !list.data) throw new Error("unavailable");
+        const status =
+          statusResult.status === "fulfilled" ? statusResult.value : null;
+        const list =
+          listResult.status === "fulfilled" ? listResult.value : null;
+        if (!status?.data) throw new Error("unavailable");
         setHealth(status.data);
         if (status.data.latest_job) setJob(status.data.latest_job);
-        setSnapshots(list.data.items);
-        setError("");
+        if (list?.data) setSnapshots(list.data.items);
+        setError(
+          list?.data
+            ? ""
+            : "Snapshot history is unavailable. Current coverage is independently verified below.",
+        );
         if (
           status.data.latest_job &&
           ["queued", "running", "cancel_requested"].includes(

@@ -1,5 +1,6 @@
 """Registered metadata only; never discover filesystem orphans as current data."""
 
+import logging
 from pathlib import Path
 from uuid import UUID
 
@@ -13,6 +14,8 @@ from backend.domain.types import SourceMode
 from backend.market_data.files import PinnedSnapshot, SnapshotIntegrityError
 from backend.persistence.models.snapshot import DatasetSnapshot
 
+logger = logging.getLogger(__name__)
+
 
 def verified_snapshot(row: DatasetSnapshot, artifact_root: Path) -> PinnedSnapshot:
     pinned = PinnedSnapshot.open(artifact_root / "snapshots" / row.manifest_hash, row.manifest_hash)
@@ -25,7 +28,11 @@ def verified_snapshot(row: DatasetSnapshot, artifact_root: Path) -> PinnedSnapsh
 
 
 def snapshot_envelope(row: DatasetSnapshot, root: Path) -> SnapshotV1:
-    manifest = verified_snapshot(row, root).manifest
+    try:
+        manifest = verified_snapshot(row, root).manifest
+    except SnapshotIntegrityError:
+        logger.warning("Snapshot integrity check failed snapshot_id=%s", row.id)
+        raise
     return SnapshotV1(
         id=row.id,
         provider=manifest.source.provider,
