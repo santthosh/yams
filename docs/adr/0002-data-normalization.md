@@ -47,3 +47,6 @@ These are authored inputs, not downloaded observations. #21 materializes them; #
 ## Handoff and limits
 
 #18 owns immutable manifests and capability lineage; #20 owns versioned schemas; #21 owns executable synthetic fixtures; #29/#30 own later provider/universe implementation; #65 owns stronger historical/free-source coverage. Foundation ships contracts and offline metadata, not a claim that external research data now meets this contract. Runtime, provider-access and redistribution checks have not been run by this documentation decision.
+
+
+Approved #29 decision (2026-10-27): flag and exclude unexplained one-session adjusted-close moves strictly greater than 50% in either direction. Exactly ±50% remains within this guard. Compare consecutive pinned calendar sessions with visible evidence using Decimal arithmetic; do not fill gaps or infer price repairs. A split alone does not explain a jump in an already adjusted series.

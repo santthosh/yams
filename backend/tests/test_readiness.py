@@ -48,7 +48,7 @@ def test_fixture_metadata_checks_complete_artifacts(tmp_path: Path) -> None:
 
     shutil.copytree(Settings.fixture_root / "snapshot", tmp_path / "snapshot")
     assert fixture_metadata(tmp_path).asset_count == 5
-    bars = tmp_path / "snapshot/bars.json"
+    bars = tmp_path / "snapshot/bars.parquet"
     bars.write_bytes(bars.read_bytes() + b" ")
     with pytest.raises(ValueError, match="integrity"):
         fixture_metadata(tmp_path)
