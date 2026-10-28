@@ -16,7 +16,8 @@ function Navigation() {
         { path: "/lab/candidates", name: "Candidate inspection", mark: "02" },
         { path: "/lab/strategies", name: "Strategy Lab", mark: "03" },
         { path: "/lab/experiments", name: "Experiments", mark: "04" },
-        { path: "/settings", name: "Settings & data", mark: "05" },
+        { path: "/lab/compare", name: "Compare experiments", mark: "05" },
+        { path: "/settings", name: "Settings & data", mark: "06" },
       ].map((item) => (
         <Link
           key={item.path}
@@ -83,7 +84,8 @@ export function Shell({ children }: { children: ReactNode }) {
             <span>Strategy rules · No market data required</span>
           ) : pathname === "/settings/data" ||
             pathname === "/lab/candidates" ||
-            pathname.startsWith("/lab/experiments") ? (
+            pathname.startsWith("/lab/experiments") ||
+            pathname === "/lab/compare" ? (
             <span>Dataset coverage · Selected source below</span>
           ) : (
             <DataProvenanceBadge

@@ -786,7 +786,10 @@ export function ExperimentReport({ id }: { id: string }) {
             <code>{id}</code>
           </p>
         </div>
-        <Link href="/lab/experiments">Create or browse experiments</Link>
+        <div>
+          <Link href="/lab/experiments">Create or browse experiments</Link> ·{" "}
+          <Link href="/lab/compare">Compare completed reports</Link>
+        </div>
       </div>
       {error && (
         <p role="alert" className="notice notice-error">

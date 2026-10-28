@@ -25,8 +25,10 @@ bounded historical jobs and serves immutable summaries, windowed series and
 trade pages, with cancellation and restart persistence. The
 [experiment builder and report](docs/operations/experiment-lab.md) now exposes that
 journey at `/lab/experiments`: select immutable inputs, inspect metrics/charts and
-exact tables, cancel work or rerun without changing the original. Comparison
-remains with its owning issue.
+exact tables, cancel work or rerun without changing the original.
+[Comparison and controlled challenges](docs/operations/experiment-comparison.md)
+at `/lab/compare` inspect 2–4 completed reports, flag incompatible assumptions,
+create explicit fair reruns and preserve one-rule forks with their original evidence.
 
 Download published bundles and platform evidence from [GitHub Releases](https://github.com/santthosh/yams/releases).
 Source implementation alone does not establish publication: use each release's
@@ -222,7 +224,7 @@ action accounting, historical publication evidence and paper execution remain
 unsupported; no order or holding changes occur in Candidate inspection. Credentials
 do not authorize redistribution of cached source data.
 
-Source for planned0.0.3 includes the shared backtest core and immutable internal
+Source for planned 0.0.3 includes the shared backtest core and immutable internal
 core persistence; see the [core handoff](docs/operations/backtest-core.md).
 [Q12 reporting](docs/operations/backtest-reporting.md) adds net metrics,
 development/holdout sections, aligned SPY/cash references and shared exposure
@@ -230,7 +232,9 @@ calculations under the [reviewed methodology](docs/adr/0013-backtest-reporting-m
 The [public experiment API](docs/operations/experiment-api.md) composes core and
 report in one supervised job and publishes completion atomically. The
 [experiment UI](docs/operations/experiment-lab.md) uses its generated client,
-backend metrics and exact canonical rerun inputs. Internal core calculations
+backend metrics and exact canonical rerun inputs. The comparison UI checks stored
+alignment fingerprints and keeps original configurations/results inspectable.
+Internal core calculations
 remain distinct from completed public experiments.
 The published0.0.2 installation remains unchanged. Tiingo data stays diagnostic-only
 until historical raw execution/action/publication/membership capabilities are verified.

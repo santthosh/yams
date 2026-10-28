@@ -1,0 +1,427 @@
+{
+  "label": "SYNTHETIC_DATA_ONLY",
+  "docker_project": "yams-smoke-ab9ea25a6333",
+  "checks": [
+    "clean boot and real same-origin API readiness",
+    "real persisted diagnostic job completed by bounded worker",
+    "warm-up plus three diagnostic batches with concurrent API/DB reads",
+    "real Docker browser Dashboard/Settings/job at both widths",
+    "real browser same-origin strategy creation, immutable append, conflict and pagination",
+    "real browser candidate/target reruns and cash-only cases via supervised worker",
+    "real browser public experiment rerun, pages, cancellation and fingerprints",
+    "real mobile/desktop experiment form, charts/tables/Axe, exact uint64 rerun, original preservation and cancellation",
+    "real mobile/desktop aligned and mismatched comparison, one-rule challenge, shared-setting exact-seed reruns and immutable source evidence",
+    "internal core admission, actual supervised next-open replay and sealed artifact",
+    "worker-side Q12 metrics, aligned SPY/cash, continuing holdout and exposure",
+    "API and worker external routing blocked",
+    "restart preserves workspace, job, fixtures and artifact hash",
+    "rebuild/recreate preserves named-volume state",
+    "actual private ports and aggregate 4 CPU/4.5 GiB caps",
+    "failed migration blocks application startup; repair preserves workspace"
+  ],
+  "passed": true,
+  "records": [
+    {
+      "width": 360,
+      "comparison_path": "/lab/compare?ids=07505130-7ff7-4c4e-8bc5-1c31e78c8668,c7bc6cca-2ce0-4aad-8298-bdbcbebdff56",
+      "source": {
+        "id": "07505130-7ff7-4c4e-8bc5-1c31e78c8668",
+        "status": "completed",
+        "provider": "yams_synthetic_v1",
+        "data_status": "synthetic_fixture",
+        "inputs_canonical_json": "{\"benchmark_asset_id\":\"SYN:SPY\",\"end_session_exclusive\":\"2028-07-24\",\"evaluation_split\":{\"holdout_fraction\":0.25,\"kind\":\"chronological\"},\"execution_policy_id\":\"us_eod_next_open_v1\",\"initial_capital_usd\":\"1000.00\",\"random_seed\":42,\"snapshot_id\":\"5c223992-90ec-59a7-a1e7-7889b76cacea\",\"start_session\":\"2028-07-18\",\"strategy_version_id\":\"22fd08a0-5d5c-5a74-b622-8afff87b25b3\"}",
+        "config_sha256": "10904787385cca66062bcb1b27d264799b3cc954ee7fed62a91d11339295d81b",
+        "snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+        "random_seed": 42,
+        "max_position_weight": "0.2",
+        "comparison_sha256": "e7fd76a4ca39cef8f5cbd590a1a92d9565a9df055c239a3ee6fddcdc619d1e73",
+        "cumulative_return_fraction": {
+          "value": 0.00022,
+          "unavailable_reason": null
+        },
+        "max_drawdown_fraction": {
+          "value": 0.00634,
+          "unavailable_reason": null
+        },
+        "fees_usd": "0.00",
+        "slippage_usd": "0.61",
+        "artifacts": {
+          "curve_artifact": {
+            "id": "4ef106dd-9d1e-58b3-b7ad-527d0b214779",
+            "sha256": "6c0f839d91646aee5de9edaced689f6de15603b6686bef5e60197eff1dbf454c",
+            "schema_version": 1
+          },
+          "trade_artifact": {
+            "id": "123ee482-9e91-516b-ae4e-0dbb470de30f",
+            "sha256": "a45df2ada1b87423fa8d367b9a9904348ea52def552f7ba75910fb4967e58cb4",
+            "schema_version": 1
+          },
+          "reproducibility_manifest": {
+            "id": "e6607243-07c8-570a-a11d-4c19d67c79e4",
+            "sha256": "937563e6373e119ed5895fd2a6d94073a8a01d7a7e0c40f618732c4ab431df3b",
+            "schema_version": 1
+          }
+        }
+      },
+      "challenge": {
+        "id": "c7bc6cca-2ce0-4aad-8298-bdbcbebdff56",
+        "status": "completed",
+        "provider": "yams_synthetic_v1",
+        "data_status": "synthetic_fixture",
+        "inputs_canonical_json": "{\"benchmark_asset_id\":\"SYN:SPY\",\"end_session_exclusive\":\"2028-07-24\",\"evaluation_split\":{\"holdout_fraction\":0.25,\"kind\":\"chronological\"},\"execution_policy_id\":\"us_eod_next_open_v1\",\"initial_capital_usd\":\"1000.00\",\"random_seed\":42,\"snapshot_id\":\"5c223992-90ec-59a7-a1e7-7889b76cacea\",\"start_session\":\"2028-07-18\",\"strategy_version_id\":\"9b2b45b2-9c02-4941-949b-1bf9ec5cc552\"}",
+        "config_sha256": "d3c62182d60250971ea82fc1ee0f257f9936e4e2d8f57ac769eb3af227774bba",
+        "snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+        "random_seed": 42,
+        "max_position_weight": "0.1",
+        "comparison_sha256": "e7fd76a4ca39cef8f5cbd590a1a92d9565a9df055c239a3ee6fddcdc619d1e73",
+        "cumulative_return_fraction": {
+          "value": 0.00011,
+          "unavailable_reason": null
+        },
+        "max_drawdown_fraction": {
+          "value": 0.00317,
+          "unavailable_reason": null
+        },
+        "fees_usd": "0.00",
+        "slippage_usd": "0.30",
+        "artifacts": {
+          "curve_artifact": {
+            "id": "2ee2489f-ff43-5462-97c7-4f3d57b14b11",
+            "sha256": "cc347d70c3eea76371a5b7407eca59f11f814b5834db2515e08a20290ad89df2",
+            "schema_version": 1
+          },
+          "trade_artifact": {
+            "id": "53fafe7d-60dd-572d-b762-f6dcae0391f9",
+            "sha256": "b27998616b3dcac3d42dc8a650a76b419ee6deceafd2ce755d77f19686379b47",
+            "schema_version": 1
+          },
+          "reproducibility_manifest": {
+            "id": "13ee67f9-7f71-5994-b428-31a05003cb54",
+            "sha256": "2efadc517be9837faf49deec52fe5b8756aae0ee5dbf46444a25c324f28bc558",
+            "schema_version": 1
+          }
+        }
+      },
+      "mismatched": {
+        "id": "b1981572-6658-473b-95ca-651c9eac7a26",
+        "status": "completed",
+        "provider": "yams_synthetic_v1",
+        "data_status": "synthetic_fixture",
+        "inputs_canonical_json": "{\"benchmark_asset_id\":\"SYN:SPY\",\"end_session_exclusive\":\"2028-07-24\",\"evaluation_split\":{\"holdout_fraction\":0.25,\"kind\":\"chronological\"},\"execution_policy_id\":\"us_eod_next_open_v1\",\"initial_capital_usd\":\"2000.00\",\"random_seed\":42,\"snapshot_id\":\"5c223992-90ec-59a7-a1e7-7889b76cacea\",\"start_session\":\"2028-07-18\",\"strategy_version_id\":\"22fd08a0-5d5c-5a74-b622-8afff87b25b3\"}",
+        "config_sha256": "10904787385cca66062bcb1b27d264799b3cc954ee7fed62a91d11339295d81b",
+        "snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+        "random_seed": 42,
+        "max_position_weight": "0.2",
+        "comparison_sha256": "93060431f4c4d95535c349df094af66afe6a8e2a0ec97e047815269cf3916cb8",
+        "cumulative_return_fraction": {
+          "value": 0.000205,
+          "unavailable_reason": null
+        },
+        "max_drawdown_fraction": {
+          "value": 0.006355,
+          "unavailable_reason": null
+        },
+        "fees_usd": "0.00",
+        "slippage_usd": "1.21",
+        "artifacts": {
+          "curve_artifact": {
+            "id": "48cf3340-5eda-5e5d-b322-15bbc5d46db6",
+            "sha256": "f580780a9b1ed76c70bcbd7fa33183fd0f162b1adaf6e565ccd5e36bdd6da03a",
+            "schema_version": 1
+          },
+          "trade_artifact": {
+            "id": "4baada1b-c2d4-5f8f-8355-1b40d2dcb6b0",
+            "sha256": "2cb9c89471d7c32bb1ec0b5fa98c27ee4adc9a23e7d4db6ee6874ab5e9a58238",
+            "schema_version": 1
+          },
+          "reproducibility_manifest": {
+            "id": "55b7a75e-5d9f-572a-b585-745f483d328c",
+            "sha256": "2c0e710e0bc83c0f506bde5167fae6678ee0539aa9ebd9ec2c6686755f55ee4c",
+            "schema_version": 1
+          }
+        }
+      },
+      "common": [
+        {
+          "id": "2315305f-ca94-48ca-8e3d-67ac33e0b77e",
+          "status": "completed",
+          "provider": "yams_synthetic_v1",
+          "data_status": "synthetic_fixture",
+          "inputs_canonical_json": "{\"benchmark_asset_id\":\"SYN:SPY\",\"end_session_exclusive\":\"2028-07-24\",\"evaluation_split\":{\"holdout_fraction\":0.25,\"kind\":\"chronological\"},\"execution_policy_id\":\"us_eod_next_open_v1\",\"initial_capital_usd\":\"1000.00\",\"random_seed\":42,\"snapshot_id\":\"5c223992-90ec-59a7-a1e7-7889b76cacea\",\"start_session\":\"2028-07-18\",\"strategy_version_id\":\"22fd08a0-5d5c-5a74-b622-8afff87b25b3\"}",
+          "config_sha256": "10904787385cca66062bcb1b27d264799b3cc954ee7fed62a91d11339295d81b",
+          "snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+          "random_seed": 42,
+          "max_position_weight": "0.2",
+          "comparison_sha256": "e7fd76a4ca39cef8f5cbd590a1a92d9565a9df055c239a3ee6fddcdc619d1e73",
+          "cumulative_return_fraction": {
+            "value": 0.00022,
+            "unavailable_reason": null
+          },
+          "max_drawdown_fraction": {
+            "value": 0.00634,
+            "unavailable_reason": null
+          },
+          "fees_usd": "0.00",
+          "slippage_usd": "0.61",
+          "artifacts": {
+            "curve_artifact": {
+              "id": "4ef106dd-9d1e-58b3-b7ad-527d0b214779",
+              "sha256": "6c0f839d91646aee5de9edaced689f6de15603b6686bef5e60197eff1dbf454c",
+              "schema_version": 1
+            },
+            "trade_artifact": {
+              "id": "123ee482-9e91-516b-ae4e-0dbb470de30f",
+              "sha256": "a45df2ada1b87423fa8d367b9a9904348ea52def552f7ba75910fb4967e58cb4",
+              "schema_version": 1
+            },
+            "reproducibility_manifest": {
+              "id": "e6607243-07c8-570a-a11d-4c19d67c79e4",
+              "sha256": "937563e6373e119ed5895fd2a6d94073a8a01d7a7e0c40f618732c4ab431df3b",
+              "schema_version": 1
+            }
+          }
+        },
+        {
+          "id": "87e0c0a3-2a5f-4fbd-9a3b-a79e33defecb",
+          "status": "completed",
+          "provider": "yams_synthetic_v1",
+          "data_status": "synthetic_fixture",
+          "inputs_canonical_json": "{\"benchmark_asset_id\":\"SYN:SPY\",\"end_session_exclusive\":\"2028-07-24\",\"evaluation_split\":{\"holdout_fraction\":0.25,\"kind\":\"chronological\"},\"execution_policy_id\":\"us_eod_next_open_v1\",\"initial_capital_usd\":\"1000.00\",\"random_seed\":42,\"snapshot_id\":\"5c223992-90ec-59a7-a1e7-7889b76cacea\",\"start_session\":\"2028-07-18\",\"strategy_version_id\":\"22fd08a0-5d5c-5a74-b622-8afff87b25b3\"}",
+          "config_sha256": "10904787385cca66062bcb1b27d264799b3cc954ee7fed62a91d11339295d81b",
+          "snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+          "random_seed": 42,
+          "max_position_weight": "0.2",
+          "comparison_sha256": "e7fd76a4ca39cef8f5cbd590a1a92d9565a9df055c239a3ee6fddcdc619d1e73",
+          "cumulative_return_fraction": {
+            "value": 0.00022,
+            "unavailable_reason": null
+          },
+          "max_drawdown_fraction": {
+            "value": 0.00634,
+            "unavailable_reason": null
+          },
+          "fees_usd": "0.00",
+          "slippage_usd": "0.61",
+          "artifacts": {
+            "curve_artifact": {
+              "id": "4ef106dd-9d1e-58b3-b7ad-527d0b214779",
+              "sha256": "6c0f839d91646aee5de9edaced689f6de15603b6686bef5e60197eff1dbf454c",
+              "schema_version": 1
+            },
+            "trade_artifact": {
+              "id": "123ee482-9e91-516b-ae4e-0dbb470de30f",
+              "sha256": "a45df2ada1b87423fa8d367b9a9904348ea52def552f7ba75910fb4967e58cb4",
+              "schema_version": 1
+            },
+            "reproducibility_manifest": {
+              "id": "e6607243-07c8-570a-a11d-4c19d67c79e4",
+              "sha256": "937563e6373e119ed5895fd2a6d94073a8a01d7a7e0c40f618732c4ab431df3b",
+              "schema_version": 1
+            }
+          }
+        }
+      ]
+    },
+    {
+      "width": 1280,
+      "comparison_path": "/lab/compare?ids=853c7c92-0631-4803-95c5-8202f82d2bab,9bda59e8-f06d-47d1-92c2-aa89b082e759",
+      "source": {
+        "id": "853c7c92-0631-4803-95c5-8202f82d2bab",
+        "status": "completed",
+        "provider": "yams_synthetic_v1",
+        "data_status": "synthetic_fixture",
+        "inputs_canonical_json": "{\"benchmark_asset_id\":\"SYN:SPY\",\"end_session_exclusive\":\"2028-07-24\",\"evaluation_split\":{\"holdout_fraction\":0.25,\"kind\":\"chronological\"},\"execution_policy_id\":\"us_eod_next_open_v1\",\"initial_capital_usd\":\"1000.00\",\"random_seed\":18446744073709551615,\"snapshot_id\":\"5c223992-90ec-59a7-a1e7-7889b76cacea\",\"start_session\":\"2028-07-18\",\"strategy_version_id\":\"22fd08a0-5d5c-5a74-b622-8afff87b25b3\"}",
+        "config_sha256": "10904787385cca66062bcb1b27d264799b3cc954ee7fed62a91d11339295d81b",
+        "snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+        "random_seed": 18446744073709551615,
+        "max_position_weight": "0.2",
+        "comparison_sha256": "e7fd76a4ca39cef8f5cbd590a1a92d9565a9df055c239a3ee6fddcdc619d1e73",
+        "cumulative_return_fraction": {
+          "value": 0.00022,
+          "unavailable_reason": null
+        },
+        "max_drawdown_fraction": {
+          "value": 0.00634,
+          "unavailable_reason": null
+        },
+        "fees_usd": "0.00",
+        "slippage_usd": "0.61",
+        "artifacts": {
+          "curve_artifact": {
+            "id": "4ef106dd-9d1e-58b3-b7ad-527d0b214779",
+            "sha256": "6c0f839d91646aee5de9edaced689f6de15603b6686bef5e60197eff1dbf454c",
+            "schema_version": 1
+          },
+          "trade_artifact": {
+            "id": "123ee482-9e91-516b-ae4e-0dbb470de30f",
+            "sha256": "a45df2ada1b87423fa8d367b9a9904348ea52def552f7ba75910fb4967e58cb4",
+            "schema_version": 1
+          },
+          "reproducibility_manifest": {
+            "id": "446d3fa3-7949-5317-81cd-b0e1fb3fc258",
+            "sha256": "845dc28d1192d5e23bc385e11ea9df44231dd68334b874d1372dc778d6b3c327",
+            "schema_version": 1
+          }
+        }
+      },
+      "challenge": {
+        "id": "9bda59e8-f06d-47d1-92c2-aa89b082e759",
+        "status": "completed",
+        "provider": "yams_synthetic_v1",
+        "data_status": "synthetic_fixture",
+        "inputs_canonical_json": "{\"benchmark_asset_id\":\"SYN:SPY\",\"end_session_exclusive\":\"2028-07-24\",\"evaluation_split\":{\"holdout_fraction\":0.25,\"kind\":\"chronological\"},\"execution_policy_id\":\"us_eod_next_open_v1\",\"initial_capital_usd\":\"1000.00\",\"random_seed\":18446744073709551615,\"snapshot_id\":\"5c223992-90ec-59a7-a1e7-7889b76cacea\",\"start_session\":\"2028-07-18\",\"strategy_version_id\":\"ffdfdc3b-5dbb-438a-a698-e375d080ad17\"}",
+        "config_sha256": "d3c62182d60250971ea82fc1ee0f257f9936e4e2d8f57ac769eb3af227774bba",
+        "snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+        "random_seed": 18446744073709551615,
+        "max_position_weight": "0.1",
+        "comparison_sha256": "e7fd76a4ca39cef8f5cbd590a1a92d9565a9df055c239a3ee6fddcdc619d1e73",
+        "cumulative_return_fraction": {
+          "value": 0.00011,
+          "unavailable_reason": null
+        },
+        "max_drawdown_fraction": {
+          "value": 0.00317,
+          "unavailable_reason": null
+        },
+        "fees_usd": "0.00",
+        "slippage_usd": "0.30",
+        "artifacts": {
+          "curve_artifact": {
+            "id": "2ee2489f-ff43-5462-97c7-4f3d57b14b11",
+            "sha256": "cc347d70c3eea76371a5b7407eca59f11f814b5834db2515e08a20290ad89df2",
+            "schema_version": 1
+          },
+          "trade_artifact": {
+            "id": "53fafe7d-60dd-572d-b762-f6dcae0391f9",
+            "sha256": "b27998616b3dcac3d42dc8a650a76b419ee6deceafd2ce755d77f19686379b47",
+            "schema_version": 1
+          },
+          "reproducibility_manifest": {
+            "id": "52992868-2a46-5ad6-b384-c20b89785fc2",
+            "sha256": "57b7e9abffa499482f165d397dade4cc26c0232c8bee95360cab542d120060de",
+            "schema_version": 1
+          }
+        }
+      },
+      "mismatched": {
+        "id": "d8d2fce2-41b9-429a-85af-26a668c786bd",
+        "status": "completed",
+        "provider": "yams_synthetic_v1",
+        "data_status": "synthetic_fixture",
+        "inputs_canonical_json": "{\"benchmark_asset_id\":\"SYN:SPY\",\"end_session_exclusive\":\"2028-07-24\",\"evaluation_split\":{\"holdout_fraction\":0.25,\"kind\":\"chronological\"},\"execution_policy_id\":\"us_eod_next_open_v1\",\"initial_capital_usd\":\"2000.00\",\"random_seed\":18446744073709551615,\"snapshot_id\":\"5c223992-90ec-59a7-a1e7-7889b76cacea\",\"start_session\":\"2028-07-18\",\"strategy_version_id\":\"22fd08a0-5d5c-5a74-b622-8afff87b25b3\"}",
+        "config_sha256": "10904787385cca66062bcb1b27d264799b3cc954ee7fed62a91d11339295d81b",
+        "snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+        "random_seed": 18446744073709551615,
+        "max_position_weight": "0.2",
+        "comparison_sha256": "93060431f4c4d95535c349df094af66afe6a8e2a0ec97e047815269cf3916cb8",
+        "cumulative_return_fraction": {
+          "value": 0.000205,
+          "unavailable_reason": null
+        },
+        "max_drawdown_fraction": {
+          "value": 0.006355,
+          "unavailable_reason": null
+        },
+        "fees_usd": "0.00",
+        "slippage_usd": "1.21",
+        "artifacts": {
+          "curve_artifact": {
+            "id": "48cf3340-5eda-5e5d-b322-15bbc5d46db6",
+            "sha256": "f580780a9b1ed76c70bcbd7fa33183fd0f162b1adaf6e565ccd5e36bdd6da03a",
+            "schema_version": 1
+          },
+          "trade_artifact": {
+            "id": "4baada1b-c2d4-5f8f-8355-1b40d2dcb6b0",
+            "sha256": "2cb9c89471d7c32bb1ec0b5fa98c27ee4adc9a23e7d4db6ee6874ab5e9a58238",
+            "schema_version": 1
+          },
+          "reproducibility_manifest": {
+            "id": "ef0e98fb-68e8-5d74-b105-4c256119ef5c",
+            "sha256": "920131c734131f20154aa4ee9546b0402302653fa735828b4bb550e0ec93b980",
+            "schema_version": 1
+          }
+        }
+      },
+      "common": [
+        {
+          "id": "99fde03d-e72f-4dbe-b4bf-0fbdbf759b6f",
+          "status": "completed",
+          "provider": "yams_synthetic_v1",
+          "data_status": "synthetic_fixture",
+          "inputs_canonical_json": "{\"benchmark_asset_id\":\"SYN:SPY\",\"end_session_exclusive\":\"2028-07-24\",\"evaluation_split\":{\"holdout_fraction\":0.25,\"kind\":\"chronological\"},\"execution_policy_id\":\"us_eod_next_open_v1\",\"initial_capital_usd\":\"1000.00\",\"random_seed\":18446744073709551615,\"snapshot_id\":\"5c223992-90ec-59a7-a1e7-7889b76cacea\",\"start_session\":\"2028-07-18\",\"strategy_version_id\":\"22fd08a0-5d5c-5a74-b622-8afff87b25b3\"}",
+          "config_sha256": "10904787385cca66062bcb1b27d264799b3cc954ee7fed62a91d11339295d81b",
+          "snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+          "random_seed": 18446744073709551615,
+          "max_position_weight": "0.2",
+          "comparison_sha256": "e7fd76a4ca39cef8f5cbd590a1a92d9565a9df055c239a3ee6fddcdc619d1e73",
+          "cumulative_return_fraction": {
+            "value": 0.00022,
+            "unavailable_reason": null
+          },
+          "max_drawdown_fraction": {
+            "value": 0.00634,
+            "unavailable_reason": null
+          },
+          "fees_usd": "0.00",
+          "slippage_usd": "0.61",
+          "artifacts": {
+            "curve_artifact": {
+              "id": "4ef106dd-9d1e-58b3-b7ad-527d0b214779",
+              "sha256": "6c0f839d91646aee5de9edaced689f6de15603b6686bef5e60197eff1dbf454c",
+              "schema_version": 1
+            },
+            "trade_artifact": {
+              "id": "123ee482-9e91-516b-ae4e-0dbb470de30f",
+              "sha256": "a45df2ada1b87423fa8d367b9a9904348ea52def552f7ba75910fb4967e58cb4",
+              "schema_version": 1
+            },
+            "reproducibility_manifest": {
+              "id": "446d3fa3-7949-5317-81cd-b0e1fb3fc258",
+              "sha256": "845dc28d1192d5e23bc385e11ea9df44231dd68334b874d1372dc778d6b3c327",
+              "schema_version": 1
+            }
+          }
+        },
+        {
+          "id": "2d4cac57-2cd8-445c-adcb-6ef910cbff87",
+          "status": "completed",
+          "provider": "yams_synthetic_v1",
+          "data_status": "synthetic_fixture",
+          "inputs_canonical_json": "{\"benchmark_asset_id\":\"SYN:SPY\",\"end_session_exclusive\":\"2028-07-24\",\"evaluation_split\":{\"holdout_fraction\":0.25,\"kind\":\"chronological\"},\"execution_policy_id\":\"us_eod_next_open_v1\",\"initial_capital_usd\":\"1000.00\",\"random_seed\":18446744073709551615,\"snapshot_id\":\"5c223992-90ec-59a7-a1e7-7889b76cacea\",\"start_session\":\"2028-07-18\",\"strategy_version_id\":\"22fd08a0-5d5c-5a74-b622-8afff87b25b3\"}",
+          "config_sha256": "10904787385cca66062bcb1b27d264799b3cc954ee7fed62a91d11339295d81b",
+          "snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+          "random_seed": 18446744073709551615,
+          "max_position_weight": "0.2",
+          "comparison_sha256": "e7fd76a4ca39cef8f5cbd590a1a92d9565a9df055c239a3ee6fddcdc619d1e73",
+          "cumulative_return_fraction": {
+            "value": 0.00022,
+            "unavailable_reason": null
+          },
+          "max_drawdown_fraction": {
+            "value": 0.00634,
+            "unavailable_reason": null
+          },
+          "fees_usd": "0.00",
+          "slippage_usd": "0.61",
+          "artifacts": {
+            "curve_artifact": {
+              "id": "4ef106dd-9d1e-58b3-b7ad-527d0b214779",
+              "sha256": "6c0f839d91646aee5de9edaced689f6de15603b6686bef5e60197eff1dbf454c",
+              "schema_version": 1
+            },
+            "trade_artifact": {
+              "id": "123ee482-9e91-516b-ae4e-0dbb470de30f",
+              "sha256": "a45df2ada1b87423fa8d367b9a9904348ea52def552f7ba75910fb4967e58cb4",
+              "schema_version": 1
+            },
+            "reproducibility_manifest": {
+              "id": "446d3fa3-7949-5317-81cd-b0e1fb3fc258",
+              "sha256": "845dc28d1192d5e23bc385e11ea9df44231dd68334b874d1372dc778d6b3c327",
+              "schema_version": 1
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

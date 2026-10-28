@@ -981,3 +981,46 @@ input::placeholder {
 .experiment-report > .card {
   margin-top: 20px;
 }
+
+.comparison-page code,
+.comparison-page pre,
+.comparison-page label {
+  overflow-wrap: anywhere;
+}
+.comparison-page pre {
+  white-space: pre-wrap;
+  max-height: 28rem;
+  overflow: auto;
+}
+.comparison-page details {
+  margin-block: 1rem;
+}
+.comparison-page .strategy-check {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  margin-block: 0.75rem;
+}
+.comparison-page .strategy-check input {
+  flex: 0 0 24px;
+  margin-top: 0.25rem;
+}
+.comparison-chart {
+  min-width: 0;
+  width: 100%;
+  min-height: 400px;
+}
+
+.comparison-settings {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+  margin-block: 1.5rem;
+}
+.comparison-settings dt {
+  font-weight: 600;
+}
+.comparison-settings dd {
+  margin: 0.35rem 0 0;
+  overflow-wrap: anywhere;
+}
