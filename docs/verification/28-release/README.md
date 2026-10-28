@@ -15,11 +15,12 @@ publishing. Main branch CI/review protections remain active.
 
 ## Local checks
 
-`make lint typecheck test contracts-check fixtures-check` passed: 159 Python tests,
+`make lint typecheck test contracts-check fixtures-check` passed: 160 Python tests,
 42 web tests, strict Python/TypeScript checks, unchanged generated contracts and
-23 deterministic synthetic fixture files. Five release tests cover exact main CI,
+23 deterministic synthetic fixture files. Six release tests cover exact main CI,
 duplicate/conflicting versions, immutable image references, both native platform
-evidence requirements and a real disposable Git branch outside main history.
+evidence requirements, a real disposable Git branch outside main history and
+interrupted draft recovery with conflicting-asset rejection.
 
 The packaged Compose renderer was checked with explicitly dummy digest inputs and
 `docker compose config --quiet`; it contains no builds, fixed volume/network names,
