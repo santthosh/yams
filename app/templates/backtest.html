@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Backtest{% endblock %}
+{% block content %}
+{% set s = bt.metrics.strategy %}{% set b = bt.metrics.benchmark %}
+<h1>Backtest: would these rules have made money?</h1>
+<div class="panel"><p style="margin:0">{{ verdict }}</p></div>
+
+<h2>Results</h2>
+<div class="table-wrap"><table>
+  <thead><tr><th>Metric</th><th class="num">Strategy</th><th class="num">SPY buy &amp; hold</th></tr></thead>
+  <tbody>
+    <tr><td>Ending value (from {{ bt.initial_cash|money }})</td><td class="num">{{ s.ending_value|money }}</td><td class="num">{{ b.ending_value|money }}</td></tr>
+    <tr><td>Total return</td><td class="num">{{ s.total_return|pct(1, true) }}</td><td class="num">{{ b.total_return|pct(1, true) }}</td></tr>
+    <tr><td>Annualized return (CAGR)</td><td class="num">{{ s.cagr|pct(1, true) }}</td><td class="num">{{ b.cagr|pct(1, true) }}</td></tr>
+    <tr><td>Annualized volatility</td><td class="num">{{ s.volatility|pct }}</td><td class="num">{{ b.volatility|pct }}</td></tr>
+    <tr><td>Sharpe ratio (risk-free = 0)</td><td class="num">{{ '%.2f'|format(s.sharpe) }}</td><td class="num">{{ '%.2f'|format(b.sharpe) }}</td></tr>
+    <tr><td>Worst peak-to-trough drop</td><td class="num">{{ s.max_drawdown|pct }}</td><td class="num">{{ b.max_drawdown|pct }}</td></tr>
+    <tr><td>Trades</td><td class="num">{{ s.trades }}</td><td class="num">{{ b.trades }}</td></tr>
+    <tr><td>Trading costs paid</td><td class="num">{{ s.costs|money }}</td><td class="num">{{ b.costs|money }}</td></tr>
+    <tr><td>Average turnover per rebalance</td><td class="num">{{ s.avg_turnover|pct(0) }}</td><td class="num">—</td></tr>
+  </tbody>
+</table></div>
+
+<h2>Portfolio value</h2>
+<div class="panel"><div class="chart-box"><canvas id="equity"></canvas></div></div>
+<h2>Drawdown (drop from previous peak)</h2>
+<div class="panel"><div class="chart-box"><canvas id="dd"></canvas></div></div>
+
+<h2>How it was run</h2>
+<ul class="small">
+  <li>Window {{ bt.start }} → {{ bt.end }}, {{ bt.rebalances }} monthly rebalances, starting with {{ bt.initial_cash|money }} (your portfolio's starting cash).</li>
+  <li>At each month-end close the same engine used for live recommendations picks targets using only data up to that day; orders fill at the <strong>next session's open</strong> with {{ strategy.slippage_bps|int }} bps slippage. Same rebalance band ({{ (strategy.rebalance_band * 100)|int }} pts), $5 minimum trade, caps and cash rules.</li>
+  <li>SPY benchmark: bought once with the same capital, date and slippage, then held.</li>
+  <li>Prices are Yahoo's split/dividend-adjusted prices, so dividends are treated as reinvested.</li>
+  {% for w in bt.warnings %}<li><strong>{{ w.split(':')[0]|replace('_', ' ')|title }}:</strong>{{ w.split(':', 1)[1] }}. Stocks that were dropped from the index (often after falling) are missing, so results are flattered.</li>{% endfor %}
+  <li>Parameters were fixed before running this test, not tuned to it. Past performance does not guarantee future results.</li>
+</ul>
+
+<script>
+const dates = {{ bt.dates|tojson }}, eq = {{ bt.equity|tojson }}, bm = {{ bt.benchmark|tojson }};
+const dd = a => { let m = -Infinity; return a.map(v => { m = Math.max(m, v); return +(100 * (v / m - 1)).toFixed(2); }); };
+const opts = y => ({ maintainAspectRatio: false, interaction: { mode: 'index', intersect: false },
+  scales: { x: { ticks: { maxTicksLimit: 10 } }, y: { title: { display: true, text: y } } } });
+new Chart(document.getElementById('equity'), { type: 'line', data: { labels: dates, datasets: [
+  { label: 'Strategy', data: eq, borderWidth: 2, pointRadius: 0, borderColor: '#2f5bd3' },
+  { label: 'SPY buy & hold', data: bm, borderWidth: 2, pointRadius: 0, borderColor: '#9a9a9a', borderDash: [6, 4] } ] },
+  options: opts('Portfolio value ($)') });
+new Chart(document.getElementById('dd'), { type: 'line', data: { labels: dates, datasets: [
+  { label: 'Strategy', data: dd(eq), borderWidth: 2, pointRadius: 0, borderColor: '#2f5bd3' },
+  { label: 'SPY buy & hold', data: dd(bm), borderWidth: 2, pointRadius: 0, borderColor: '#9a9a9a', borderDash: [6, 4] } ] },
+  options: opts('Drawdown (%)') });
+</script>
+{% endblock %}

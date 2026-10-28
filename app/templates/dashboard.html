@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<h1>Your paper portfolio</h1>
+<div class="cards">
+  <div class="card"><div class="label">Total value</div><div class="value">{{ p.total|money }}</div>
+    <div class="small muted">valued at {{ p.valued_as_of }} close</div></div>
+  <div class="card"><div class="label">Cash</div><div class="value">{{ p.cash|money }}</div>
+    <div class="small muted">{{ p.cash_weight|pct }} of portfolio</div></div>
+  <div class="card"><div class="label">Profit / loss</div>
+    <div class="value {{ 'pos' if p.pnl and p.pnl > 0 else ('neg' if p.pnl and p.pnl < 0) }}">{{ p.pnl|money(true) }}</div>
+    <div class="small muted">{{ p.return|pct(1, true) }} on {{ p.initial_cash|money }} starting cash</div></div>
+  <div class="card"><div class="label">SPY over same period</div><div class="value">{{ p.spy_return|pct(1, true) }}</div>
+    <div class="small muted">since {{ p.start_as_of }} (portfolio start)</div></div>
+</div>
+{% if p.unavailable %}<div class="warn">Value unavailable — no price for {{ p.unavailable|join(', ') }}. Refresh data.</div>{% endif %}
+
+<div class="panel">
+  <form method="post" action="/ui/recommend"
+        onsubmit="this.querySelector('button').disabled=true;this.querySelector('button').textContent='Analysing 500 stocks…'">
+    <button class="big" type="submit">Get recommendation</button>
+    <span class="muted small" style="margin-left:10px">Scores the S&amp;P 500, builds a target portfolio, backtests the rules and forecasts 90 days.</span>
+  </form>
+</div>
+
+<h2>Holdings</h2>
+{% if p.holdings %}
+<div class="table-wrap"><table>
+  <thead><tr><th>Stock</th><th>Sector</th><th class="num">Shares</th><th class="num">Price</th><th class="num">Value</th><th class="num">Weight</th><th>Why we hold it</th></tr></thead>
+  <tbody>
+  {% for h in p.holdings %}
+    <tr><td><strong>{{ h.ticker }}</strong><br><span class="small muted">{{ h.name }}</span></td>
+      <td class="small">{{ h.sector }}</td>
+      <td class="num">{{ '%.4f'|format(h.qty) }}</td><td class="num">{{ h.price|money }}</td>
+      <td class="num">{{ h.value|money }}</td><td class="num">{{ h.weight|pct }}</td>
+      <td class="small">{{ h.reason or '—' }}</td></tr>
+  {% endfor %}
+    <tr><td><strong>Cash</strong></td><td></td><td></td><td></td><td class="num">{{ p.cash|money }}</td><td class="num">{{ p.cash_weight|pct }}</td><td class="small muted">Uninvested paper cash (earns 0%).</td></tr>
+  </tbody>
+</table></div>
+{% else %}
+<div class="panel">{{ p.cash|money }} cash, no positions yet. Click <strong>Get recommendation</strong> to see what the strategy would buy.</div>
+{% endif %}
+
+<div class="grid2">
+  <div>
+    <h2>Recent simulated trades</h2>
+    {% if trades %}
+    <div class="table-wrap"><table>
+      <thead><tr><th>When (UTC)</th><th>Side</th><th>Stock</th><th class="num">Shares</th><th class="num">Fill price</th><th class="num">Cost</th></tr></thead>
+      <tbody>{% for t in trades %}
+        <tr><td class="small">{{ t.created_at[:16]|replace('T', ' ') }}</td><td><span class="tag {{ t.side }}">{{ t.side }}</span></td>
+          <td>{{ t.ticker }}</td><td class="num">{{ t.qty }}</td><td class="num">${{ t.price }}</td><td class="num">${{ t.cost }}</td></tr>
+      {% endfor %}</tbody></table></div>
+    {% else %}<p class="muted">No trades yet.</p>{% endif %}
+  </div>
+  <div>
+    <h2>Past recommendations</h2>
+    {% if recs %}
+    <div class="table-wrap"><table>
+      <thead><tr><th>Created (UTC)</th><th>Data as of</th><th>Summary</th><th>Status</th></tr></thead>
+      <tbody>{% for r in recs %}
+        <tr><td class="small"><a href="/recommendations/{{ r.id }}">{{ r.created_at[:16]|replace('T', ' ') }}</a></td>
+          <td class="small">{{ r.data_as_of }}</td><td class="small">{{ r.summary }}</td><td><span class="tag">{{ r.status }}</span></td></tr>
+      {% endfor %}</tbody></table></div>
+    {% else %}<p class="muted">None yet.</p>{% endif %}
+  </div>
+</div>
+
+<h2>Reset portfolio</h2>
+<div class="panel">
+  <form method="post" action="/ui/reset">
+    <label>Starting paper cash $ <input type="number" name="initial_cash" value="1000" min="100" max="10000000" step="0.01" required></label>
+    <button class="secondary" type="submit">Reset (deletes trades and recommendations)</button>
+  </form>
+</div>
+{% endblock %}

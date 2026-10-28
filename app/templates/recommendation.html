@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% block title %}Recommendation{% endblock %}
+{% block content %}
+{% set f = rec.forecast %}
+<h1>Recommendation <span class="tag">{{ rec.status }}</span></h1>
+<p class="muted small">Created {{ rec.created_at[:19]|replace('T', ' ') }} UTC · data as of {{ rec.data_as_of }} ({{ rec.data_source }}) · portfolio value {{ rec.portfolio_value|money }}</p>
+{% if stale %}<div class="warn">This recommendation is out of date: the portfolio or market data changed since it was made. <form class="inline" method="post" action="/ui/recommend"><button class="secondary" type="submit">Get a new one</button></form></div>{% endif %}
+
+<div class="panel">
+  <div style="font-size:19px;font-weight:700">{{ rec.summary }}</div>
+  <p>{{ rec.regime_text }}</p>
+  <p class="small muted">{{ rec.n_eligible }} of {{ rec.n_universe }} S&amp;P 500 stocks passed the filters. Estimated trading cost: {{ rec.est_total_cost|money }} ({{ strategy.slippage_bps|int }} bps slippage per trade).</p>
+</div>
+
+<h2><span class="step">1</span>Proposed portfolio</h2>
+{% if rec.positions %}
+<div class="table-wrap"><table>
+  <thead><tr><th>Stock</th><th class="num">Target</th><th class="num">6-mo</th><th class="num">3-mo</th><th class="num">Volatility</th><th class="num">Rank</th><th>Why this position</th></tr></thead>
+  <tbody>
+  {% for p in rec.positions %}
+    <tr><td><strong>{{ p.ticker }}</strong><br><span class="small muted">{{ p.name }} · {{ p.sector }}</span></td>
+      <td class="num"><strong>{{ p.weight|pct }}</strong>{% if p.capped %}<br><span class="tag">{{ p.capped }} cap</span>{% endif %}</td>
+      <td class="num">{{ p.m126|pct(0, true) }}</td><td class="num">{{ p.m63|pct(0, true) }}</td>
+      <td class="num">{{ p.vol60|pct(0) }}</td><td class="num">#{{ p.rank }}<br><span class="small muted">score {{ '%.2f'|format(p.score) }}</span></td>
+      <td class="small">{{ p.explanation }}</td></tr>
+  {% endfor %}
+    <tr><td><strong>Cash</strong></td><td class="num"><strong>{{ rec.cash_target_weight|pct }}</strong></td><td colspan="5" class="small muted">Cash reserve ({{ 'risk-off market' if rec.regime == 'risk_off' else 'minimum buffer' }}{% if rec.cash_target_weight > (0.5 if rec.regime == 'risk_off' else 0.05) + 0.0001 %}, plus weight the caps could not place{% endif %}).</td></tr>
+  </tbody>
+</table></div>
+<p class="small muted">Sector mix:
+  {% for s, w in rec.sector_weights.items() %}{{ s }} {{ w|pct(0) }}{% if not loop.last %} · {% endif %}{% endfor %}
+  · Cash {{ rec.cash_target_weight|pct(0) }}. Score = 0.60×z(6-mo return) + 0.25×z(3-mo return) − 0.15×z(volatility).</p>
+{% else %}
+<div class="panel">No stock passed the filters, so the target is 100% cash.</div>
+{% endif %}
+
+<h2><span class="step">2</span>Trades to get there</h2>
+<div class="table-wrap"><table>
+  <thead><tr><th>Action</th><th>Stock</th><th class="num">Now</th><th class="num">Target</th><th class="num">Shares</th><th class="num">Amount</th><th>Reason</th></tr></thead>
+  <tbody>
+  {% for a in rec.actions %}
+    <tr><td><span class="tag {{ a.action }}">{{ a.action }}</span></td><td><strong>{{ a.ticker }}</strong></td>
+      <td class="num">{{ a.current_weight|pct }}</td><td class="num">{{ a.target_weight|pct }}</td>
+      <td class="num">{{ a.qty if a.side != 'HOLD' else '—' }}</td>
+      <td class="num">{{ a.notional|money if a.side != 'HOLD' else '—' }}</td>
+      <td class="small">{{ a.explanation }}</td></tr>
+  {% else %}<tr><td colspan="7" class="muted">Nothing to trade.</td></tr>{% endfor %}
+  </tbody>
+</table></div>
+
+<h2><span class="step">3</span>What could happen in the next {{ f.horizon_calendar_days }} days</h2>
+{% if f.status == 'available' %}
+<div class="table-wrap"><table>
+  <thead><tr><th></th><th class="num">Median return</th><th class="num">Bad case (P10)</th><th class="num">Good case (P90)</th><th class="num">Chance of a loss</th><th class="num">Median ending value</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Apply these trades</strong></td><td class="num"><strong>{{ f.proposed.median_return|pct(1, true) }}</strong></td>
+      <td class="num">{{ f.proposed.p10_return|pct(1, true) }}</td><td class="num">{{ f.proposed.p90_return|pct(1, true) }}</td>
+      <td class="num">{{ f.proposed.prob_loss|pct(0) }}</td><td class="num"><strong>{{ f.proposed.median_ending_value|money }}</strong></td></tr>
+    <tr><td>Keep current holdings</td><td class="num">{{ f.hold.median_return|pct(1, true) }}</td>
+      <td class="num">{{ f.hold.p10_return|pct(1, true) }}</td><td class="num">{{ f.hold.p90_return|pct(1, true) }}</td>
+      <td class="num">{{ f.hold.prob_loss|pct(0) }}</td><td class="num">{{ f.hold.median_ending_value|money }}</td></tr>
+  </tbody>
+</table></div>
+<p class="small">Difference (apply − keep), median: <strong>{{ f.delta_median_return|pct(1, true) }}</strong> ({{ f.delta_median_value|money(true) }}), after {{ f.trade_cost|money }} estimated trading cost.</p>
+<p class="small muted">{{ caption }} {{ f.paths }} paths, seed {{ f.seed }}; both portfolios use the same simulated paths. Cash earns 0%.</p>
+{% else %}
+<div class="warn">Forecast unavailable — {{ f.reason }} No number is shown rather than a made-up one.</div>
+{% endif %}
+
+<h2><span class="step">4</span>Would these rules have made money before?</h2>
+<div class="panel">
+  <p>{{ rec.backtest.verdict }}</p>
+  <div class="chart-box"><canvas id="mini"></canvas></div>
+  <p class="small"><a href="/backtest">Full backtest: metrics, drawdowns and assumptions →</a></p>
+</div>
+
+<h2><span class="step">5</span>Close calls</h2>
+{% if rec.runners_up %}
+<ul class="small">{% for r in rec.runners_up %}<li><strong>{{ r.ticker }}</strong> ({{ r.name }}): not held because {{ r.why }}.</li>{% endfor %}</ul>
+{% endif %}
+<p class="small muted">Excluded by filters:
+  {% for code, n in rec.excluded.items() %}{{ n }} {{ code|replace('_', ' ')|lower }}{% if not loop.last %} · {% endif %}{% endfor %}</p>
+
+<h2><span class="step">6</span>Apply paper trades</h2>
+<div class="panel">
+  {% if rec.status == 'applied' %}
+    <p>These trades were applied to the paper portfolio. <a href="/">See holdings →</a></p>
+  {% else %}
+  <form method="post" action="/ui/recommendations/{{ rec.id }}/apply"
+        onsubmit="this.querySelector('button').disabled=true">
+    <p class="small">Simulated fills at the {{ rec.data_as_of }} close, ±{{ strategy.slippage_bps|int }} bps slippage. Sells execute first; buys are trimmed if cash runs short. No real money or broker is involved.</p>
+    <label><input type="checkbox" name="confirm" value="yes" required {{ 'disabled' if stale }}> I understand these are simulated paper trades.</label><br><br>
+    <button type="submit" {{ 'disabled' if stale or rec.summary_action == 'HOLD' }}>Apply paper trades</button>
+    {% if rec.summary_action == 'HOLD' %}<span class="small muted">Nothing to trade.</span>{% endif %}
+  </form>
+  {% endif %}
+</div>
+
+<script>
+new Chart(document.getElementById('mini'), {
+  type: 'line',
+  data: { labels: {{ rec.backtest.dates|tojson }}, datasets: [
+    { label: 'Strategy', data: {{ rec.backtest.equity|tojson }}, borderWidth: 2, pointRadius: 0, borderColor: '#2f5bd3' },
+    { label: 'SPY buy & hold', data: {{ rec.backtest.benchmark|tojson }}, borderWidth: 2, pointRadius: 0, borderColor: '#9a9a9a', borderDash: [6, 4] } ] },
+  options: { maintainAspectRatio: false, interaction: { mode: 'index', intersect: false },
+    scales: { x: { ticks: { maxTicksLimit: 8 } }, y: { title: { display: true, text: 'Portfolio value ($)' } } } }
+});
+</script>
+{% endblock %}
