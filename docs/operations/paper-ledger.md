@@ -75,7 +75,10 @@ provider/event identities distinguish distributions from refreshed observations.
 A split preserves total basis. Dividend entitlement is persisted on the effective
 session even when payable recognition is pending, and survives a subsequent sale.
 A due payment credits that captured quantity once; repeated deliveries return the
-original payment. Revised economic evidence requires an explicit correction.
+original payment. Revised economic evidence requires an explicit correction. A previously absent
+payable date may be learned from verified source evidence; that observation is
+retained without early cash. Changing an already known payable date requires
+explicit reconciliation, including before the original payment posts.
 An active batch needing a split adjustment is blocked for reevaluation rather
 than silently changing its authorized share quantities.
 

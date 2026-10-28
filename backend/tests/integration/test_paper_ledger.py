@@ -942,3 +942,74 @@ def test_competing_buys_never_spend_cash_twice(database: Engine) -> None:
         assert connection.execute(
             text("SELECT status,terminal FROM paper_order WHERE id=:id"), {"id": second}
         ).one() == ("rejected", True)
+
+
+def test_revised_unpaid_entitlement_cannot_accelerate_payment(database: Engine) -> None:
+    from backend.portfolio.ledger import post_action, post_order, reconcile
+    from backend.tests.portfolio.test_execution import action, at, calendar
+
+    identity, order = seed_batch(database)
+    market = evidence_for(database, order)
+    post_order(database, order, calendar=calendar(), market=market, observed_at=at(4))
+    original = action("dividend")
+    assert (
+        post_action(
+            database,
+            identity,
+            snapshot_id=market.snapshot_id,
+            action=original,
+            calendar=calendar(),
+            session_date=date(2030, 1, 8),
+            observed_at=at(8),
+            live=True,
+        )
+        is not None
+    )
+    before = reconcile(database, identity)
+    revised = original.model_copy(update={"payable_session": date(2030, 1, 9)})
+    with pytest.raises(ValueError, match="explicit correction"):
+        post_action(
+            database,
+            identity,
+            snapshot_id=market.snapshot_id,
+            action=revised,
+            calendar=calendar(),
+            session_date=date(2030, 1, 9),
+            observed_at=at(9),
+            live=True,
+        )
+    assert reconcile(database, identity) == before
+
+
+def test_missing_payable_date_can_be_learned_once_without_early_cash(database: Engine) -> None:
+    from backend.portfolio.ledger import post_action, post_order, reconcile
+    from backend.tests.portfolio.test_execution import action, at, calendar
+
+    identity, order = seed_batch(database)
+    market = evidence_for(database, order)
+    post_order(database, order, calendar=calendar(), market=market, observed_at=at(4))
+    unavailable = action("dividend", payable_session=None)
+
+    def post(source: CorporateAction, day: int) -> UUID | None:
+        return post_action(
+            database,
+            identity,
+            snapshot_id=market.snapshot_id,
+            action=source,
+            calendar=calendar(),
+            session_date=date(2030, 1, day),
+            observed_at=at(day),
+            live=True,
+        )
+
+    assert post(unavailable, 8) is not None
+    before = reconcile(database, identity)
+    learned = action("dividend")
+    assert post(learned, 9) is None
+    assert reconcile(database, identity) == before
+    # Learning the initially absent date is supported. Once observed, moving it
+    # earlier is a substantive revision even though no payment has posted yet.
+    with pytest.raises(ValueError, match="explicit correction"):
+        post(learned.model_copy(update={"payable_session": date(2030, 1, 9)}), 9)
+    assert post(learned, 15) is not None
+    assert reconcile(database, identity).state.cash_usd == "802.30"

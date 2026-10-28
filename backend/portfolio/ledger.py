@@ -715,6 +715,26 @@ def post_action(
         before = _check_projection(session, account)
         if account.status == "closed":
             raise LedgerConflict("Paper portfolio is closed")
+        if action.kind == "dividend":
+            # Persisted source history distinguishes learning a previously absent
+            # payable date (supported) from changing a known date (correction).
+            for original in session.scalars(
+                select(ActionEvidence).where(
+                    ActionEvidence.portfolio_id == identity,
+                    ActionEvidence.source_key == source_key,
+                )
+            ):
+                prior = CorporateAction.model_validate(original.payload)
+                if prior.payable_session is not None and original.payload_sha256 != fingerprint:
+                    raise LedgerConflict("Revised dividend evidence requires explicit correction")
+                if (
+                    prior.payable_session is None
+                    and action_hash(
+                        prior.model_copy(update={"payable_session": action.payable_session})
+                    )
+                    != fingerprint
+                ):
+                    raise LedgerConflict("Revised dividend evidence requires explicit correction")
         needs_capture = action.kind == "split" or not any(
             item.key == source_key for item in before.entitlements
         )
@@ -743,6 +763,32 @@ def post_action(
             calendar=calendar,
         )
         if result.state_after == before:
+            if (
+                action.kind == "dividend"
+                and action.payable_session is not None
+                and result.status == "pending"
+                and any(item.key == source_key for item in before.entitlements)
+                and session.scalar(
+                    select(ActionEvidence.id).where(
+                        ActionEvidence.portfolio_id == identity,
+                        ActionEvidence.source_key == source_key,
+                        ActionEvidence.payload_sha256 == fingerprint,
+                    )
+                )
+                is None
+            ):
+                # A reliable payable date can arrive before payment is due. Keep
+                # that observation immutable so a later refresh cannot move it.
+                session.add(
+                    ActionEvidence(
+                        id=uuid5(identity, "action:" + fingerprint + digest(source_key)),
+                        portfolio_id=identity,
+                        source_key=source_key,
+                        payload_sha256=fingerprint,
+                        payload=action.model_dump(mode="json"),
+                        recorded_at=timestamp,
+                    )
+                )
             if result.status == "already_applied":
                 posted = session.scalar(
                     select(LedgerEvent.id)
