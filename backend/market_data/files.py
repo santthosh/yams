@@ -62,6 +62,24 @@ def _read(root: int, relative: str, limit: int) -> bytes:
         os.close(directory)
 
 
+def read_contained_file(root: Path, relative: str, limit: int) -> bytes:
+    """Descriptor-pinned bounded reads shared by immutable evidence stores.
+
+    Never follow symlinks or read multiply linked/non-regular files. The caller
+    supplies a server-owned relative path and a limit no greater than64MiB.
+    """
+    if type(limit) is not int or not 0 <= limit <= 64 * 1024 * 1024:
+        raise SnapshotIntegrityError("Invalid artifact read budget")
+    try:
+        descriptor = _directory(root)
+        try:
+            return _read(descriptor, relative, limit)
+        finally:
+            os.close(descriptor)
+    except OSError as error:
+        raise SnapshotIntegrityError("Artifact unavailable or invalid") from error
+
+
 @dataclass(frozen=True)
 class PinnedSnapshot:
     manifest: SnapshotManifestV1

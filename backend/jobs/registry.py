@@ -5,6 +5,7 @@ from typing import Annotated, Literal, Self
 
 from pydantic import Field, field_validator, model_validator
 
+from backend.backtesting.contracts import BacktestCorePayload
 from backend.domain.evaluation import StrategyEvaluationPayload
 from backend.domain.types import Contract, Hash256, SourceMode
 from backend.market_data.research_config import ResearchConfig
@@ -75,7 +76,9 @@ class RefreshPayload(Contract):
 
 def validate_payload(
     kind: str, payload: object
-) -> DiagnosticPayload | RefreshPayload | StrategyEvaluationPayload:
+) -> DiagnosticPayload | RefreshPayload | StrategyEvaluationPayload | BacktestCorePayload:
+    if kind == "backtest_core":
+        return BacktestCorePayload.model_validate(payload)
     if kind == "diagnostic":
         return DiagnosticPayload.model_validate(payload)
     if kind == "refresh_market_data":

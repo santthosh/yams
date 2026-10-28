@@ -220,7 +220,7 @@ do not authorize redistribution of cached source data.
 Backtest core implementation for0.0.3 is tracked in#39; see the
 [internal engine handoff](docs/operations/backtest-core.md). The proposed
 [walk-forward conventions](docs/adr/0012-walk-forward-core.md) document exact
-session boundaries, strict missing-data failures and shared accounting. This
-source work does not add a public experiment endpoint or change the published
+session boundaries, strict missing-data failures and shared accounting. Internal core admission, immutable artifacts and supervised persistence are
+described in that handoff. This source work does not add a public experiment endpoint or change the published
 0.0.2 installation. Tiingo data remains diagnostic-only until historical raw
 execution/action/publication/membership capabilities are verified.

@@ -93,6 +93,8 @@ def test_fresh_repeat_and_concurrent_bootstrap_preserves_identity_and_preference
         "strategy_version",
         "strategy_evaluation",
         "strategy_evaluation_result",
+        "experiment",
+        "experiment_core",
     }
     with database.connect() as connection:
         assert connection.execute(text("SELECT count(*) FROM local_workspace")).scalar_one() == 1

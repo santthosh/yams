@@ -1,6 +1,7 @@
 # ADR-012: Deterministic walk-forward event boundaries
 
-- Status: Proposed in the #39 core PR; accepted when that reviewed PR merges.
+- Status: Core conventions accepted by PR #120. The persistence/job amendment
+  is proposed in the #39 storage PR and accepted when that reviewed PR merges.
 - Scope: FR-08/FR-09, milestone0.0.3, policy `walk_forward_v1`.
 - Owners: #39 core/persistence, #40 report metrics/benchmark, #41 public transport.
 
@@ -82,6 +83,36 @@ ADR-004. A sealed core is input to #40, not a completed public experiment. #41 m
 preserve `ExperimentRunV1`'s complete metrics plus three sealed-artifact invariant;
 no placeholder metrics, success-shaped partial artifacts or public endpoint is
 introduced by the core phase. Cancellation/failure cannot seal a core result.
+
+## Internal persistence and job boundary (#39 phase2b)
+
+Register a closed internal `backtest_core` job, distinct from the later complete
+`backtest` report job. Queue hashes pin the entire request as canonical JSON text
+(similar to canonical strategy text): a finite holdout statistic must not require
+binary-float hashing or relax the no-float cash policy. Request/config identities,
+calendar, source, engine build, policy and seed remain inspectable.
+
+`0005_experiments` creates immutable experiment admissions and sealed core
+identities. Bulk daily/decision/trade evidence lives in bounded, hash-verified
+files, not one database row per price/curve sample. A child stages private output;
+only the supervisor, under digest lock and a current uncancelled attempt token,
+can publish durable files and atomically register the seal/job completion. Check
+ownership/deadline before and after filesystem publication. A crash after rename
+may leave an unregistered orphan, never a completed experiment. A fresh verified
+recomputation may reuse identical orphan bytes; do not adopt arbitrary directories.
+Cancelled/failed/expired attempts cannot register complete outputs.
+
+Core progress is bounded, monotone within each attempt and capped below100 until sealing; supervisor
+heartbeats persist it. Retries retain the original input and approval policy;
+changed queued engine builds fail safely. Completed old evidence stays readable.
+
+This internal completion does not satisfy `ExperimentRunV1`. #40 consumes the
+verified core for metrics/benchmarks; #41 must orchestrate and atomically seal a
+complete report with every required metric/reference before exposing a public
+completed experiment. Reuse this experiment aggregate and financial functions;
+any report storage extension needs its own additive revision, not a reused0005
+or mutation of historical inputs/core seals. No public core submission/report
+endpoint is added here.
 
 ## Independent example and verification
 

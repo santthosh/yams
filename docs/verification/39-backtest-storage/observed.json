@@ -1,0 +1,73 @@
+{
+  "label": "SYNTHETIC_DATA_ONLY",
+  "purpose": "Observed Docker replay evidence; expected values remain the independently authored core-case.json.",
+  "project": "yams-smoke-350867fcadf1",
+  "checks_passed": 12,
+  "manifest_sha256": "1221d41bdec261f3b6f9aa2c2ede673829519a1001f5b6d8516b05a3413e4358",
+  "engine_version": "2313145febb6ab8a995f32d9be2454a43c09438597ad32d5d936db79698191b9",
+  "snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+  "config_sha256": "10904787385cca66062bcb1b27d264799b3cc954ee7fed62a91d11339295d81b",
+  "calendar_sha256": "e3d2312d54e172d7aada8239f296eecf38c6038d66b5a203c5c5690ede82d660",
+  "inputs": {
+    "strategy_version_id": "22fd08a0-5d5c-5a74-b622-8afff87b25b3",
+    "snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+    "start_session": "2028-07-18",
+    "end_session_exclusive": "2028-07-24",
+    "initial_capital_usd": "1000.00",
+    "benchmark_asset_id": "SYN:SPY",
+    "execution_policy_id": "us_eod_next_open_v1",
+    "random_seed": 42,
+    "evaluation_split": {
+      "kind": "chronological",
+      "holdout_fraction": 0.25
+    }
+  },
+  "holdout_start_session": "2028-07-21",
+  "points": [
+    {
+      "session_date": "2028-07-18",
+      "phase": "development",
+      "nav_usd": "1000.00",
+      "cash_usd": "1000.00"
+    },
+    {
+      "session_date": "2028-07-19",
+      "phase": "development",
+      "nav_usd": "999.40",
+      "cash_usd": "392.84"
+    },
+    {
+      "session_date": "2028-07-20",
+      "phase": "development",
+      "nav_usd": "993.66",
+      "cash_usd": "392.84"
+    },
+    {
+      "session_date": "2028-07-21",
+      "phase": "holdout",
+      "nav_usd": "1000.22",
+      "cash_usd": "392.84"
+    }
+  ],
+  "fills": [
+    {
+      "asset_id": "SYN:AAA",
+      "quantity": "2.855103",
+      "execution_session": "2028-07-19",
+      "gross_usd": "200.34"
+    },
+    {
+      "asset_id": "SYN:BBB",
+      "quantity": "2.855103",
+      "execution_session": "2028-07-19",
+      "gross_usd": "200.34"
+    },
+    {
+      "asset_id": "SYN:CCC",
+      "quantity": "3.075030",
+      "execution_session": "2028-07-19",
+      "gross_usd": "206.48"
+    }
+  ],
+  "retained_through_restart_and_rebuild": true
+}
