@@ -21,10 +21,10 @@ from backend.persistence.database import Settings, database_engine
 from backend.persistence.readiness import read_workspace, readiness
 from backend.strategies.registry import (
     create_strategy,
-    default_config,
     list_strategies,
     list_versions,
     publish_version,
+    template_config,
 )
 
 pytestmark = pytest.mark.integration
@@ -181,9 +181,10 @@ def test_prepare_real_container_restart() -> None:
             )
         Path("/evidence/workspace.json").write_text(json.dumps({"id": str(identity)}))
         fork = create_strategy(
-            engine, StrategyCreateRequest(name="Restart fork", config=default_config())
+            engine,
+            StrategyCreateRequest(name="Restart fork", config=template_config("mean_reversion")),
         )
-        publish_version(engine, fork.id, default_config())
+        publish_version(engine, fork.id, template_config("mean_reversion"))
         Path("/evidence/strategy-versions.json").write_text(
             list_versions(engine, fork.id).model_dump_json()
         )

@@ -179,7 +179,18 @@ def main() -> None:
                 for path in sorted(destination.glob("candidate-runs-*.json"))
                 for row in json.loads(path.read_text())
             ]
-            assert len(evaluations) == 6
+            assert len(evaluations) == 10
+            for kind in ("mean_reversion", "low_volatility"):
+                matching = [
+                    row for row in evaluations if row["strategy_config"]["signals"]["kind"] == kind
+                ]
+                assert (
+                    len(matching) == 2
+                    and matching[0]["result_sha256"] == matching[1]["result_sha256"]
+                )
+            publication = json.loads((destination / "strategy-publication.json").read_text())
+            strategy_id = publication["created"]["body"]["id"]
+            versions = get(f"strategies/{strategy_id}/versions")
             evidence["strategy_evaluations"] = evaluations
             evidence["checks"].append(
                 "native real-worker candidate rerun hashes and explicit cash-only results"
@@ -187,6 +198,7 @@ def main() -> None:
             run("down")
             run("up", "-d", "--wait", "--wait-timeout", "120", "--pull", "never")
             assert get("workspace")["id"] == workspace["id"]
+            assert get(f"strategies/{strategy_id}/versions") == versions
             assert get(f"jobs/{job}")["status"] == "completed"
             for saved in evaluations:
                 assert get(f"strategy-evaluations/{saved['id']}") == saved

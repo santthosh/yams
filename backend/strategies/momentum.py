@@ -3,12 +3,12 @@
 import hashlib
 import math
 from datetime import date, datetime
-from typing import Annotated, Literal
+from typing import Annotated, Literal, Self
 from uuid import UUID
 
-from pydantic import Field
+from pydantic import Field, model_validator
 
-from backend.domain.strategy import StrategyConfigV1
+from backend.domain.strategy import MeanReversionSignalConfig, SignalConfig, StrategyConfigV1
 from backend.domain.types import (
     Contract,
     FiniteNumber,
@@ -21,8 +21,11 @@ from backend.domain.types import (
 from backend.market_data.files import PinnedSnapshot
 from backend.market_data.models import Calendar
 from backend.market_data.repository import MarketRepository, MarketView
+from backend.strategies import low_volatility, mean_reversion
 from backend.strategies.eligibility import eligible_universe
 from backend.strategies.features import population_zscores, sample_log_volatility, window_momentum
+from backend.strategies.low_volatility import LowVolatilityFeatures, LowVolatilityScore
+from backend.strategies.mean_reversion import MeanReversionFeatures, MeanReversionScore
 
 
 class FeatureValues(Contract):
@@ -51,9 +54,25 @@ class CandidateEvidence(Contract):
     median_dollar_volume: str | None
     trend_sma: str | None
     input_sha256: Hash256
-    features: FeatureValues | None
-    scoring: ScoreEvidence | None
+    features: FeatureValues | MeanReversionFeatures | LowVolatilityFeatures | None
+    scoring: ScoreEvidence | MeanReversionScore | LowVolatilityScore | None
     rank: int | None
+
+    @model_validator(mode="after")
+    def matching_family(self) -> Self:
+        pairs = (
+            (FeatureValues, ScoreEvidence),
+            (MeanReversionFeatures, MeanReversionScore),
+            (LowVolatilityFeatures, LowVolatilityScore),
+        )
+        if (self.features is None) != (self.scoring is None):
+            raise ValueError("Measured features and scoring must be present together")
+        if self.features is not None and not any(
+            isinstance(self.features, feature) and isinstance(self.scoring, score)
+            for feature, score in pairs
+        ):
+            raise ValueError("Candidate feature and score families disagree")
+        return self
 
 
 class DataDiagnosticEvidence(Contract):
@@ -79,45 +98,78 @@ class MomentumEvaluation(Contract):
     data_diagnostics: tuple[DataDiagnosticEvidence, ...]
 
 
-def evaluate_momentum(
+def evaluate_strategy(
     view: MarketView, calendar: Calendar, config: StrategyConfigV1, *, engine_version: str
 ) -> MomentumEvaluation:
+    config = StrategyConfigV1.from_json(config.canonical_bytes())
+    signals = config.signals
     eligibility = eligible_universe(view, calendar, config)
-    features: dict[str, FeatureValues] = {}
+    features: dict[str, FeatureValues | MeanReversionFeatures | LowVolatilityFeatures] = {}
     failed = set()
     for item in eligibility:
         if not item.eligible:
             continue
         closes = [bar.adjusted_close for bar in item.window]
         try:
-            features[item.asset_id] = FeatureValues(
-                momentum_long=window_momentum(closes, config.signals.momentum_long_sessions),
-                momentum_short=window_momentum(closes, config.signals.momentum_short_sessions),
-                volatility=sample_log_volatility(closes, config.signals.volatility_sessions),
-            )
+            if isinstance(signals, SignalConfig):
+                features[item.asset_id] = FeatureValues(
+                    momentum_long=window_momentum(closes, signals.momentum_long_sessions),
+                    momentum_short=window_momentum(closes, signals.momentum_short_sessions),
+                    volatility=sample_log_volatility(closes, signals.volatility_sessions),
+                )
+            elif isinstance(signals, MeanReversionSignalConfig):
+                features[item.asset_id] = mean_reversion.measure(closes, signals)
+            else:
+                features[item.asset_id] = low_volatility.measure(closes, signals)
         except (ValueError, ArithmeticError):
             failed.add(item.asset_id)
     ids = sorted(features)
-    long_z = population_zscores([features[identity].momentum_long for identity in ids])
-    short_z = population_zscores([features[identity].momentum_short for identity in ids])
-    vol_z = population_zscores([features[identity].volatility for identity in ids])
-    weights = config.signals.z_score_weights
-    scoring = {}
-    for identity, long, short, volatility in zip(ids, long_z, short_z, vol_z, strict=True):
-        contributions = (
-            long * float(weights.momentum_long),
-            short * float(weights.momentum_short),
-            volatility * float(weights.volatility_penalty),
+    scoring: dict[str, ScoreEvidence | MeanReversionScore | LowVolatilityScore] = {}
+    if isinstance(signals, SignalConfig):
+        momentum_features = {}
+        for identity in ids:
+            momentum_value = features[identity]
+            if not isinstance(momentum_value, FeatureValues):
+                raise ValueError("Momentum feature family mismatch")
+            momentum_features[identity] = momentum_value
+        long_z = population_zscores([momentum_features[identity].momentum_long for identity in ids])
+        short_z = population_zscores(
+            [momentum_features[identity].momentum_short for identity in ids]
         )
-        scoring[identity] = ScoreEvidence(
-            momentum_long_z=long,
-            momentum_short_z=short,
-            volatility_z=volatility,
-            momentum_long_contribution=contributions[0],
-            momentum_short_contribution=contributions[1],
-            volatility_contribution=contributions[2],
-            score=math.fsum(contributions),
-        )
+        vol_z = population_zscores([features[identity].volatility for identity in ids])
+        weights = signals.z_score_weights
+        for identity, long, short, volatility in zip(ids, long_z, short_z, vol_z, strict=True):
+            contributions = (
+                long * float(weights.momentum_long),
+                short * float(weights.momentum_short),
+                volatility * float(weights.volatility_penalty),
+            )
+            scoring[identity] = ScoreEvidence(
+                momentum_long_z=long,
+                momentum_short_z=short,
+                volatility_z=volatility,
+                momentum_long_contribution=contributions[0],
+                momentum_short_contribution=contributions[1],
+                volatility_contribution=contributions[2],
+                score=math.fsum(contributions),
+            )
+    elif isinstance(signals, MeanReversionSignalConfig):
+        distances = []
+        for identity in ids:
+            reversion_value = features[identity]
+            if not isinstance(reversion_value, MeanReversionFeatures):
+                raise ValueError("Mean-reversion feature family mismatch")
+            distances.append(reversion_value.mean_reversion_distance)
+        for identity, z_score in zip(ids, population_zscores(distances), strict=True):
+            scoring[identity] = MeanReversionScore(
+                kind="mean_reversion", mean_reversion_z=z_score, score=z_score
+            )
+    else:
+        vol_z = population_zscores([features[identity].volatility for identity in ids])
+        for identity, z_score in zip(ids, vol_z, strict=True):
+            scoring[identity] = LowVolatilityScore(
+                kind="low_volatility", volatility_z=z_score, score=-z_score
+            )
     ordered = sorted(ids, key=lambda identity: (-scoring[identity].score, identity))
     ranks = {identity: index + 1 for index, identity in enumerate(ordered)}
     selected = tuple(identity for identity in ordered if features[identity].volatility > 0)[
@@ -175,6 +227,15 @@ def evaluate_momentum(
     )
 
 
+def evaluate_momentum(
+    view: MarketView, calendar: Calendar, config: StrategyConfigV1, *, engine_version: str
+) -> MomentumEvaluation:
+    """Compatibility entry point; never silently reinterpret an alternative kind."""
+    if not isinstance(config.signals, SignalConfig):
+        raise ValueError("Momentum evaluation requires a momentum config")
+    return evaluate_strategy(view, calendar, config, engine_version=engine_version)
+
+
 def evaluate_snapshot(
     snapshot: PinnedSnapshot,
     config: StrategyConfigV1,
@@ -187,4 +248,4 @@ def evaluate_snapshot(
     """Preferred entry point: one verified snapshot owns both bars and calendar."""
     with MarketRepository(snapshot) as repository:
         view = repository.as_of(cutoff, session_date, live=live)
-        return evaluate_momentum(view, repository.calendar, config, engine_version=engine_version)
+        return evaluate_strategy(view, repository.calendar, config, engine_version=engine_version)

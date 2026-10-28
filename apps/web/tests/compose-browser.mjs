@@ -143,6 +143,77 @@ try {
       path: path.join(destination, `candidates-${width}.png`),
       fullPage: true,
     });
+    for (const [kind, label] of [
+      ["mean_reversion", "Mean Reversion"],
+      ["low_volatility", "Low Volatility"],
+    ]) {
+      await page
+        .getByLabel("Strategy version")
+        .selectOption({ label: `${label} · version 1` });
+      await page.getByLabel("As-of session").fill("2028-07-18");
+      const accepted = page.waitForResponse(
+        (response) =>
+          response.url() === `${origin}/api/v1/strategy-evaluations` &&
+          response.request().method() === "POST",
+      );
+      await evaluate.click();
+      const admission = await accepted;
+      assert.equal(admission.status(), 202);
+      const { evaluation_id } = await admission.json();
+      await page.waitForURL(`**evaluation=${evaluation_id}*`);
+      await page
+        .getByText(
+          kind === "mean_reversion"
+            ? /Mean reversion ranks distance below/
+            : /Low volatility ranks lower historical volatility/,
+        )
+        .waitFor({ timeout: 60000 });
+      const response = await page.request.get(
+        `${origin}/api/v1/strategy-evaluations/${evaluation_id}`,
+      );
+      assert.equal(response.status(), 200);
+      const sealed = await response.json();
+      assert.equal(sealed.status, "completed");
+      assert.equal(sealed.strategy_config.signals.kind, kind);
+      const oracle = JSON.parse(
+        fs.readFileSync(
+          new URL(
+            "../../../data/fixtures/template_extensions/case.json",
+            import.meta.url,
+          ),
+          "utf8",
+        ),
+      );
+      assert.deepEqual(sealed.result.selected_ids, oracle.families[kind].ranks);
+      assert.equal(
+        sealed.result.cash_target_weight,
+        oracle.families[kind].default_cash,
+      );
+      for (const row of sealed.result.candidates.filter(
+        (row) => row.features !== null,
+      )) {
+        assert.equal(row.features.kind, kind);
+        assert(!("momentum_long" in row.features));
+      }
+      assert.equal(
+        await page
+          .getByRole("columnheader", { name: "Long momentum", exact: true })
+          .count(),
+        0,
+      );
+      if (kind === "mean_reversion")
+        await page
+          .getByRole("columnheader", {
+            name: "Distance below moving average",
+            exact: true,
+          })
+          .waitFor();
+      await page.screenshot({
+        path: path.join(destination, `candidates-${kind}-${width}.png`),
+        fullPage: true,
+      });
+      runs.push(sealed);
+    }
     fs.writeFileSync(
       path.join(destination, `candidate-runs-${width}.json`),
       JSON.stringify(runs, null, 2) + "\n",

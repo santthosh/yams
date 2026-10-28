@@ -1,0 +1,82 @@
+{
+  "label": "SYNTHETIC_DATA_ONLY",
+  "project": "yams-smoke-526851b95e26",
+  "passed": true,
+  "evaluations": 10,
+  "families": {
+    "mean_reversion": {
+      "as_of_session": "2028-07-18",
+      "selected_ids": [
+        "SYN:CCC",
+        "SYN:AAA",
+        "SYN:BBB"
+      ],
+      "result_sha256": "6b5dab6bfdbd0c37751212c1861a66dff086298f27731dfbccdc2a0ac466ea3d",
+      "cash_target_weight": "0.4",
+      "config_sha256": "10904787385cca66062bcb1b27d264799b3cc954ee7fed62a91d11339295d81b",
+      "engine_version": "57dc77070a3c638f31757f052854741b6c5383d9920751b10bec15d2fe0c2d53",
+      "mobile_desktop_equal": true,
+      "target_weights": [
+        {
+          "asset_id": "SYN:AAA",
+          "sector": "Technology",
+          "weight": "0.2"
+        },
+        {
+          "asset_id": "SYN:BBB",
+          "sector": "Technology",
+          "weight": "0.2"
+        },
+        {
+          "asset_id": "SYN:CCC",
+          "sector": "Unknown",
+          "weight": "0.2"
+        }
+      ]
+    },
+    "low_volatility": {
+      "as_of_session": "2028-07-18",
+      "selected_ids": [
+        "SYN:AAA",
+        "SYN:BBB",
+        "SYN:CCC"
+      ],
+      "result_sha256": "05b60660216e1cd8108feac9d3cd4f6e8baac4b56e6866dee24fb628ea4bd4c7",
+      "cash_target_weight": "0.4",
+      "config_sha256": "133492a4ad378dff7e0ef2b96e3d6efe9f5a55fc3c286b440a32cb6a4c76fdcf",
+      "engine_version": "57dc77070a3c638f31757f052854741b6c5383d9920751b10bec15d2fe0c2d53",
+      "mobile_desktop_equal": true,
+      "target_weights": [
+        {
+          "asset_id": "SYN:AAA",
+          "sector": "Technology",
+          "weight": "0.2"
+        },
+        {
+          "asset_id": "SYN:BBB",
+          "sector": "Technology",
+          "weight": "0.2"
+        },
+        {
+          "asset_id": "SYN:CCC",
+          "sector": "Unknown",
+          "weight": "0.2"
+        }
+      ]
+    }
+  },
+  "checks": [
+    "clean boot and real same-origin API readiness",
+    "real persisted diagnostic job completed by bounded worker",
+    "warm-up plus three diagnostic batches with concurrent API/DB reads",
+    "real Docker browser Dashboard/Settings/job at both widths",
+    "real browser same-origin strategy creation, immutable append, conflict and pagination",
+    "real browser candidate/target reruns and cash-only cases via supervised worker",
+    "API and worker external routing blocked",
+    "restart preserves workspace, job, fixtures and artifact hash",
+    "rebuild/recreate preserves named-volume state",
+    "actual private ports and aggregate 4 CPU/4.5 GiB caps",
+    "failed migration blocks application startup; repair preserves workspace"
+  ],
+  "existing_fixture_bytes_preserved": 24
+}

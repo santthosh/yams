@@ -118,7 +118,7 @@ Required foreign key and unique constraints: `strategy_version(strategy_id, vers
 Other `signals.kind` values become supported only with documented operator contracts and golden fixtures. Never evaluate user/LLM-submitted code.
 
 [ADR-011](adr/0011-strategy-templates.md) defines Q07's0.0.3 extension contract,
-with runtime schema/client support owned by #38. `signals` becomes a closed union
+implemented by #38 with synchronized runtime schema/client support. `signals` is a closed union
 keyed by `kind`; complete existing momentum fields/canonical bytes/hash stay
 unchanged. `mean_reversion` requires exactly `kind`, strict integer
 `mean_reversion_sessions` (2–2520), `volatility_sessions` (2–2519),
@@ -130,9 +130,9 @@ publication never silently supplies omitted values. Shared config objects and
 schema_version1 remain unchanged. History must cover all actual family windows,
 including volatility+1 and20 liquidity closes; cross-family fields are rejected.
 
-These supported kinds activate only when #38's validated models, dispatcher,
-independent canonical/feature fixtures and generated contracts land together.
-Until then the actual generated schema correctly accepts only momentum. There is
+These supported kinds are activated together by #38's validated models, dispatcher,
+independent canonical/feature fixtures and generated contracts. The published
+0.0.2 bundle remains momentum-only; source additions do not move its immutable tag. There is
 no passive/SPY kind. Config publication still validates syntax independently of
 market-data availability, and immutable old versions keep their original meaning.
 Family feature/score evidence must reflect the pinned kind without invented
