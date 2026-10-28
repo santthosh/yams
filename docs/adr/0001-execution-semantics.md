@@ -39,6 +39,15 @@ Raw execution/ledger prices and adjusted feature-return prices have separate rol
 
 ## Independent fixture traces and verification
 
+Implementation handoff (#35): [shared paper execution kernel](../operations/paper-execution-kernel.md)
+documents the executable pure interfaces and numerical boundaries. Decimal precision
+expands with input length; buys divide/quantize downward to6dp and postings use
+explicit half-even cents. Hypothetical quote/preview transitions have no execution
+timestamp and cannot create spendable proceeds. Corporate-action processing requires
+the pinned session opening to have arrived; an exactly unrepresentable split remains
+pending rather than inventing fractional-share rounding or cash-in-lieu. Durable
+posting/recovery remains #44/#46, with action-before-trade chronology owned by consumers.
+
 The times below are **synthetic fixture schedule inputs**, not claims about an actual exchange's historical calendar. Expected results are hand-derived, never produced by the implementation under test.
 
 | Fixture | Inputs / action | Required result |
