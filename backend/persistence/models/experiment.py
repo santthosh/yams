@@ -35,3 +35,14 @@ class ExperimentCore(Base):
     manifest_sha256: Mapped[str] = mapped_column(String(64), nullable=False)
     attempt_token: Mapped[UUID] = mapped_column(nullable=False)
     completed_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+
+
+class ExperimentReport(Base):
+    __tablename__ = "experiment_report"
+
+    experiment_id: Mapped[UUID] = mapped_column(
+        ForeignKey("experiment.id", ondelete="RESTRICT"), primary_key=True
+    )
+    manifest_sha256: Mapped[str] = mapped_column(String(64), nullable=False)
+    attempt_token: Mapped[UUID] = mapped_column(nullable=False)
+    completed_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)

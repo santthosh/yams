@@ -127,6 +127,11 @@ def test_openapi_does_not_activate_future_handlers() -> None:
         "/api/v1/health",
         "/api/v1/workspace",
         "/api/v1/jobs/{job_id}",
+        "/api/v1/jobs/{job_id}/cancel",
+        "/api/v1/experiments",
+        "/api/v1/experiments/{experiment_id}",
+        "/api/v1/experiments/{experiment_id}/series",
+        "/api/v1/experiments/{experiment_id}/trades",
         "/api/v1/data/snapshots",
         "/api/v1/data/refresh",
         "/api/v1/data/assets",
@@ -147,3 +152,24 @@ def test_openapi_does_not_activate_future_handlers() -> None:
     ):
         assert name in components
     assert TestClient(app).get("/api/v1/forecasts/anything").status_code == 404
+
+
+def test_experiment_schema_keeps_exact_uint64_seed_and_no_dangling_refs() -> None:
+    schema = create_app().openapi()
+    components = schema["components"]["schemas"]
+    assert (
+        components["ExperimentRequest"]["properties"]["random_seed"]["maximum"]
+        == 18446744073709551615
+    )
+
+    def references(value: object) -> None:
+        if isinstance(value, dict):
+            if "$ref" in value:
+                assert value["$ref"].rsplit("/", 1)[-1] in components
+            for nested in value.values():
+                references(nested)
+        elif isinstance(value, list):
+            for nested in value:
+                references(nested)
+
+    references(schema)

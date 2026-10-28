@@ -67,6 +67,75 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/experiments": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List Experiments */
+    get: operations["list_experiments_api_v1_experiments_get"];
+    put?: never;
+    /** Create */
+    post: operations["create_api_v1_experiments_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/experiments/{experiment_id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Read */
+    get: operations["read_api_v1_experiments__experiment_id__get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/experiments/{experiment_id}/series": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Series */
+    get: operations["series_api_v1_experiments__experiment_id__series_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/experiments/{experiment_id}/trades": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Trades */
+    get: operations["trades_api_v1_experiments__experiment_id__trades_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/v1/health": {
     parameters: {
       query?: never;
@@ -95,6 +164,23 @@ export interface paths {
     get: operations["get_job_api_v1_jobs__job_id__get"];
     put?: never;
     post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/jobs/{job_id}/cancel": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Cancel Job */
+    post: operations["cancel_job_api_v1_jobs__job_id__cancel_post"];
     delete?: never;
     options?: never;
     head?: never;
@@ -282,6 +368,13 @@ export interface components {
       /** Weight */
       weight: string;
     };
+    /** AppliedAction */
+    AppliedAction: {
+      /** Key */
+      key: string;
+      /** Payload Sha256 */
+      payload_sha256: string;
+    };
     /** ArtifactReference */
     ArtifactReference: {
       /**
@@ -402,6 +495,55 @@ export interface components {
       /** Score */
       score: number | null;
     };
+    /** ComparisonTerms */
+    ComparisonTerms: {
+      /** Benchmark Asset Id */
+      benchmark_asset_id: string;
+      /** Calendar Sha256 */
+      calendar_sha256: string;
+      /** Core Engine Version */
+      core_engine_version: string;
+      /**
+       * Core Policy Version
+       * @constant
+       */
+      core_policy_version: "walk_forward_v1";
+      /**
+       * End Session Exclusive
+       * Format: date
+       */
+      end_session_exclusive: string;
+      evaluation_split: components["schemas"]["EvaluationSplit"];
+      execution_policy: components["schemas"]["backend__portfolio__execution__ExecutionPolicy"];
+      /** Holdout Start Session */
+      holdout_start_session: string | null;
+      /** Initial Capital Usd */
+      initial_capital_usd: string;
+      /** Reporting Engine Version */
+      reporting_engine_version: string;
+      /**
+       * Reporting Version
+       * @default q12_v1
+       * @constant
+       */
+      reporting_version: "q12_v1";
+      /** Sessions */
+      sessions: string[];
+      /** Snapshot Sha256 */
+      snapshot_sha256: string;
+      /**
+       * Source Mode
+       * @enum {string}
+       */
+      source_mode: "synthetic_fixture" | "research_market_data";
+      /**
+       * Start Session
+       * Format: date
+       */
+      start_session: string;
+      /** Universe Canonical Json */
+      universe_canonical_json: string;
+    };
     /** DataDiagnosticEvidence */
     DataDiagnosticEvidence: {
       /** Asset Id */
@@ -439,6 +581,24 @@ export interface components {
       status: "empty" | "ready" | "refreshing" | "failed";
       /** Warnings */
       warnings: string[];
+    };
+    /** DividendEntitlement */
+    DividendEntitlement: {
+      /** Asset Id */
+      asset_id: string;
+      /** Evidence Sha256 */
+      evidence_sha256: string;
+      /**
+       * Ex Session
+       * Format: date
+       */
+      ex_session: string;
+      /** Key */
+      key: string;
+      /** Per Share */
+      per_share: string;
+      /** Quantity */
+      quantity: string;
     };
     /** ErrorDetail */
     ErrorDetail: {
@@ -551,13 +711,162 @@ export interface components {
        */
       kind: "chronological";
     };
-    /** ExecutionPolicy */
-    ExecutionPolicy: {
+    /** ExecutionContext */
+    ExecutionContext: {
       /**
-       * Id
+       * Approved At
+       * Format: date-time
+       */
+      approved_at: string;
+      /** Calendar Sha256 */
+      calendar_sha256: string;
+      /**
+       * Decision Cutoff
+       * Format: date-time
+       */
+      decision_cutoff: string;
+      /**
+       * Decision Session
+       * Format: date
+       */
+      decision_session: string;
+      /** Engine Version */
+      engine_version: string;
+      /**
+       * Execution Mode
+       * @enum {string}
+       */
+      execution_mode: "current_paper" | "historical_replay";
+      /**
+       * Mode
+       * @enum {string}
+       */
+      mode: "synthetic_fixture" | "research_market_data";
+      /**
+       * Snapshot Id
+       * Format: uuid
+       */
+      snapshot_id: string;
+      /** Snapshot Sha256 */
+      snapshot_sha256: string;
+    };
+    /** ExperimentAccepted */
+    ExperimentAccepted: {
+      /**
+       * Experiment Id
+       * Format: uuid
+       */
+      experiment_id: string;
+      /**
+       * Job Id
+       * Format: uuid
+       */
+      job_id: string;
+    };
+    /** ExperimentBenchmarkSummaryV1 */
+    ExperimentBenchmarkSummaryV1: {
+      /** Asset Id */
+      asset_id: string;
+      /** Available */
+      available: boolean;
+      periods: components["schemas"]["MetricsPeriods"] | null;
+      /** Unavailable Reason */
+      unavailable_reason: string | null;
+      /** Warnings */
+      warnings: string[];
+    };
+    /** ExperimentCurvePointV1 */
+    ExperimentCurvePointV1: {
+      /** Benchmark Nav Usd */
+      benchmark_nav_usd: string | null;
+      /** Benchmark Unavailable Reason */
+      benchmark_unavailable_reason: string | null;
+      /** Cash Baseline Nav Usd */
+      cash_baseline_nav_usd: string;
+      /** Cash Usd */
+      cash_usd: string;
+      cash_weight: components["schemas"]["WeightValue"];
+      /**
+       * Currency
+       * @default USD
        * @constant
        */
-      id: "us_eod_next_open_v1";
+      currency: "USD";
+      drawdown_fraction: components["schemas"]["MetricValue"];
+      max_position_weight: components["schemas"]["WeightValue"];
+      /**
+       * Phase
+       * @enum {string}
+       */
+      phase: "development" | "holdout";
+      /** Portfolio Nav Usd */
+      portfolio_nav_usd: string;
+      /** Positions */
+      positions: components["schemas"]["Position"][];
+      /**
+       * Session Date
+       * Format: date
+       */
+      session_date: string;
+    };
+    /** ExperimentDetailV1 */
+    ExperimentDetailV1: {
+      /** Config Sha256 */
+      config_sha256: string;
+      /**
+       * Created At
+       * Format: date-time
+       */
+      created_at: string;
+      /**
+       * Currency
+       * @default USD
+       * @constant
+       */
+      currency: "USD";
+      curve_artifact: components["schemas"]["ArtifactReference"] | null;
+      /**
+       * Data Status
+       * @enum {string}
+       */
+      data_status: "synthetic_fixture" | "research_market_data";
+      /** Engine Version */
+      engine_version: string;
+      error: components["schemas"]["ErrorDetail"] | null;
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      inputs: components["schemas"]["ExperimentRequest"];
+      /**
+       * Job Id
+       * Format: uuid
+       */
+      job_id: string;
+      metrics: components["schemas"]["ExperimentMetrics"] | null;
+      /** Provider */
+      provider: string;
+      report: components["schemas"]["ExperimentReportSummaryV1"] | null;
+      reproducibility_manifest:
+        components["schemas"]["ArtifactReference"] | null;
+      /** Snapshot Sha256 */
+      snapshot_sha256: string;
+      /**
+       * Status
+       * @enum {string}
+       */
+      status:
+        | "queued"
+        | "running"
+        | "cancel_requested"
+        | "completed"
+        | "failed"
+        | "cancelled";
+      strategy_config: components["schemas"]["StrategyConfigV1"];
+      trade_artifact: components["schemas"]["ArtifactReference"] | null;
+      /** Warnings */
+      warnings: string[];
     };
     /** ExperimentMetrics */
     ExperimentMetrics: {
@@ -573,6 +882,80 @@ export interface components {
       /** Trade Count */
       trade_count: number;
       turnover_fraction: components["schemas"]["MetricValue"];
+    };
+    /** ExperimentPageV1 */
+    ExperimentPageV1: {
+      /** Items */
+      items: components["schemas"]["ExperimentSummaryV1"][];
+      /** Next Cursor */
+      next_cursor: string | null;
+    };
+    /** ExperimentReportSummaryV1 */
+    ExperimentReportSummaryV1: {
+      benchmark: components["schemas"]["ExperimentBenchmarkSummaryV1"];
+      cash: components["schemas"]["MetricsPeriods"];
+      comparison: components["schemas"]["ComparisonTerms"];
+      /** Comparison Sha256 */
+      comparison_sha256: string;
+      /** Core Manifest Sha256 */
+      core_manifest_sha256: string;
+      portfolio: components["schemas"]["MetricsPeriods"];
+      /** Reporting Engine Version */
+      reporting_engine_version: string;
+      /**
+       * Reporting Version
+       * @constant
+       */
+      reporting_version: "q12_v1";
+      /** Warnings */
+      warnings: string[];
+    };
+    /** ExperimentReproducibilityV1 */
+    ExperimentReproducibilityV1: {
+      /** Calendar Sha256 */
+      calendar_sha256: string;
+      /** Config Sha256 */
+      config_sha256: string;
+      /** Core Manifest Sha256 */
+      core_manifest_sha256: string;
+      /**
+       * Core Policy Version
+       * @constant
+       */
+      core_policy_version: "walk_forward_v1";
+      /**
+       * Decision Clock Policy
+       * @constant
+       */
+      decision_clock_policy: "next_pinned_open_minus_one_hour";
+      /** Engine Version */
+      engine_version: string;
+      inputs: components["schemas"]["ExperimentRequest"];
+      /** Provider */
+      provider: string;
+      /** Reporting Engine Version */
+      reporting_engine_version: string;
+      /**
+       * Reporting Version
+       * @constant
+       */
+      reporting_version: "q12_v1";
+      /**
+       * Schema Version
+       * @default 1
+       * @constant
+       */
+      schema_version: 1;
+      /** Snapshot Sha256 */
+      snapshot_sha256: string;
+      /**
+       * Source Mode
+       * @enum {string}
+       */
+      source_mode: "synthetic_fixture" | "research_market_data";
+      strategy_config: components["schemas"]["StrategyConfigV1"];
+      /** Warnings */
+      warnings: string[];
     };
     /** ExperimentRequest */
     ExperimentRequest: {
@@ -658,6 +1041,97 @@ export interface components {
       /** Warnings */
       warnings: string[];
     };
+    /** ExperimentSeriesPageV1 */
+    ExperimentSeriesPageV1: {
+      /** Items */
+      items: components["schemas"]["ExperimentCurvePointV1"][];
+      /** Next Cursor */
+      next_cursor: string | null;
+    };
+    /** ExperimentSummaryV1 */
+    ExperimentSummaryV1: {
+      /** Config Sha256 */
+      config_sha256: string;
+      /**
+       * Created At
+       * Format: date-time
+       */
+      created_at: string;
+      /**
+       * Data Status
+       * @enum {string}
+       */
+      data_status: "synthetic_fixture" | "research_market_data";
+      /** Engine Version */
+      engine_version: string;
+      error: components["schemas"]["ErrorDetail"] | null;
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      inputs: components["schemas"]["ExperimentRequest"];
+      /**
+       * Job Id
+       * Format: uuid
+       */
+      job_id: string;
+      /** Snapshot Sha256 */
+      snapshot_sha256: string;
+      /**
+       * Status
+       * @enum {string}
+       */
+      status:
+        | "queued"
+        | "running"
+        | "cancel_requested"
+        | "completed"
+        | "failed"
+        | "cancelled";
+    };
+    /** ExperimentTradeV1 */
+    ExperimentTradeV1: {
+      context: components["schemas"]["ExecutionContext"];
+      /**
+       * Currency
+       * @default USD
+       * @constant
+       */
+      currency: "USD";
+      eligible_session: components["schemas"]["Session"];
+      fill: components["schemas"]["FillEffect"] | null;
+      /** Filled Quantity */
+      filled_quantity: string;
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      order: components["schemas"]["OrderIntent"];
+      /** Pending Quantity */
+      pending_quantity: string;
+      policy: components["schemas"]["backend__portfolio__execution__ExecutionPolicy"];
+      /** Reason */
+      reason: string | null;
+      /** Skipped Quantity */
+      skipped_quantity: string;
+      state_after: components["schemas"]["PortfolioState"];
+      /**
+       * Status
+       * @enum {string}
+       */
+      status: "pending" | "skipped" | "filled" | "partially_filled";
+      /** Terminal */
+      terminal: boolean;
+    };
+    /** ExperimentTradesPageV1 */
+    ExperimentTradesPageV1: {
+      /** Items */
+      items: components["schemas"]["ExperimentTradeV1"][];
+      /** Next Cursor */
+      next_cursor: string | null;
+    };
     /** FeatureValue */
     FeatureValue: {
       /** Name */
@@ -675,6 +1149,47 @@ export interface components {
       momentum_short: number;
       /** Volatility */
       volatility: number;
+    };
+    /** FillEffect */
+    FillEffect: {
+      /** Cash Delta Usd */
+      cash_delta_usd: string;
+      /** Commission Usd */
+      commission_usd: string;
+      /**
+       * Evidence Available At
+       * Format: date-time
+       */
+      evidence_available_at: string;
+      /** Executed Price */
+      executed_price: string;
+      /**
+       * Execution At
+       * Format: date-time
+       */
+      execution_at: string;
+      /**
+       * Execution Session
+       * Format: date
+       */
+      execution_session: string;
+      /** Gross Usd */
+      gross_usd: string;
+      /**
+       * Proposed At
+       * Format: date-time
+       */
+      proposed_at: string;
+      /** Quantity */
+      quantity: string;
+      /** Raw Price */
+      raw_price: string;
+      /** Realized Pnl Usd */
+      realized_pnl_usd: string;
+      /** Removed Basis Usd */
+      removed_basis_usd: string;
+      /** Slippage Usd */
+      slippage_usd: string;
     };
     /** FixtureMetadata */
     FixtureMetadata: {
@@ -869,6 +1384,11 @@ export interface components {
       status: "ready" | "not_ready";
       workspace: components["schemas"]["ReadinessCheck"];
     };
+    /**
+     * JobCancelRequest
+     * @description Explicit empty JSON command; extra fields are forbidden.
+     */
+    JobCancelRequest: Record<string, never>;
     /** JobResult */
     JobResult: {
       /**
@@ -1081,6 +1601,12 @@ export interface components {
       /** Value */
       value: number | null;
     };
+    /** MetricsPeriods */
+    MetricsPeriods: {
+      development: components["schemas"]["PeriodMetrics"];
+      holdout: components["schemas"]["PeriodMetrics"];
+      total: components["schemas"]["PeriodMetrics"];
+    };
     /** MissingSession */
     MissingSession: {
       /** Asset Id */
@@ -1090,6 +1616,22 @@ export interface components {
        * Format: date
        */
       session_date: string;
+    };
+    /** OrderIntent */
+    OrderIntent: {
+      /** Asset Id */
+      asset_id: string;
+      /** Key */
+      key: string;
+      /** Requested Quantity */
+      requested_quantity: string;
+      /** Sector */
+      sector: string;
+      /**
+       * Side
+       * @enum {string}
+       */
+      side: "BUY" | "SELL";
     };
     /** PageRequest */
     PageRequest: {
@@ -1227,6 +1769,14 @@ export interface components {
       /** Terminal */
       terminal: boolean;
     };
+    /** PeriodMetrics */
+    PeriodMetrics: {
+      /** Daily Nav Observations */
+      daily_nav_observations: number;
+      metrics: components["schemas"]["ExperimentMetrics"];
+      /** Return Observations */
+      return_observations: number;
+    };
     /** PortfolioConfig */
     PortfolioConfig: {
       /** Max Position Weight */
@@ -1246,6 +1796,34 @@ export interface components {
        * @constant
        */
       weighting: "inverse_volatility";
+    };
+    /** PortfolioState */
+    PortfolioState: {
+      /**
+       * Applied Actions
+       * @default []
+       */
+      applied_actions: components["schemas"]["AppliedAction"][];
+      /** Cash Usd */
+      cash_usd: string;
+      /**
+       * Entitlements
+       * @default []
+       */
+      entitlements: components["schemas"]["DividendEntitlement"][];
+      /** Positions */
+      positions: components["schemas"]["Position"][];
+    };
+    /** Position */
+    Position: {
+      /** Asset Id */
+      asset_id: string;
+      /** Quantity */
+      quantity: string;
+      /** Sector */
+      sector: string;
+      /** Total Basis Usd */
+      total_basis_usd: string;
     };
     /** RNGMetadata */
     RNGMetadata: {
@@ -1722,7 +2300,7 @@ export interface components {
     StrategyConfigV1: {
       /** Display Name */
       display_name: string;
-      execution_policy: components["schemas"]["ExecutionPolicy"];
+      execution_policy: components["schemas"]["backend__domain__strategy__ExecutionPolicy"];
       portfolio: components["schemas"]["PortfolioConfig"];
       rebalance: components["schemas"]["RebalanceConfig"];
       /**
@@ -1981,6 +2559,13 @@ export interface components {
       /** Error Type */
       type: string;
     };
+    /** WeightValue */
+    WeightValue: {
+      /** Unavailable Reason */
+      unavailable_reason: string | null;
+      /** Value */
+      value: string | null;
+    };
     /** WorkspaceV1 */
     WorkspaceV1: {
       /** Default Benchmark */
@@ -2002,6 +2587,33 @@ export interface components {
       preferences: {
         [key: string]: components["schemas"]["JsonValue"];
       };
+    };
+    /** ExecutionPolicy */
+    backend__domain__strategy__ExecutionPolicy: {
+      /**
+       * Id
+       * @constant
+       */
+      id: "us_eod_next_open_v1";
+    };
+    /** ExecutionPolicy */
+    backend__portfolio__execution__ExecutionPolicy: {
+      /**
+       * Commission Usd
+       * @default 0.00
+       */
+      commission_usd: string;
+      /**
+       * Id
+       * @default us_eod_next_open_v1
+       * @constant
+       */
+      id: "us_eod_next_open_v1";
+      /**
+       * Slippage Fraction
+       * @default 0.001
+       */
+      slippage_fraction: string;
     };
   };
   responses: never;
@@ -2254,6 +2866,309 @@ export interface operations {
       };
     };
   };
+  list_experiments_api_v1_experiments_get: {
+    parameters: {
+      query?: {
+        limit?: number;
+        cursor?: string | null;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ExperimentPageV1"];
+        };
+      };
+      /** @description Not Found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Conflict */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Unprocessable Content */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Service Unavailable */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+    };
+  };
+  create_api_v1_experiments_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ExperimentRequest"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      202: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ExperimentAccepted"];
+        };
+      };
+      /** @description Not Found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Conflict */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Unprocessable Content */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Service Unavailable */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+    };
+  };
+  read_api_v1_experiments__experiment_id__get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        experiment_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ExperimentDetailV1"];
+        };
+      };
+      /** @description Not Found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Conflict */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Unprocessable Content */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Service Unavailable */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+    };
+  };
+  series_api_v1_experiments__experiment_id__series_get: {
+    parameters: {
+      query?: {
+        limit?: number;
+        cursor?: string | null;
+        start_session?: string | null;
+        end_session_exclusive?: string | null;
+      };
+      header?: never;
+      path: {
+        experiment_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ExperimentSeriesPageV1"];
+        };
+      };
+      /** @description Not Found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Conflict */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Unprocessable Content */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Service Unavailable */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+    };
+  };
+  trades_api_v1_experiments__experiment_id__trades_get: {
+    parameters: {
+      query?: {
+        limit?: number;
+        cursor?: string | null;
+        start_session?: string | null;
+        end_session_exclusive?: string | null;
+      };
+      header?: never;
+      path: {
+        experiment_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ExperimentTradesPageV1"];
+        };
+      };
+      /** @description Not Found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Conflict */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Unprocessable Content */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Service Unavailable */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+    };
+  };
   health_api_v1_health_get: {
     parameters: {
       query?: never;
@@ -2319,6 +3234,68 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+      /** @description Service Unavailable */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+    };
+  };
+  cancel_job_api_v1_jobs__job_id__cancel_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        job_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["JobCancelRequest"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      202: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["JobV1"];
+        };
+      };
+      /** @description Not Found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Conflict */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Unprocessable Content */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
         };
       };
       /** @description Service Unavailable */

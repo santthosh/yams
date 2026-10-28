@@ -77,7 +77,7 @@ class RefreshPayload(Contract):
 def validate_payload(
     kind: str, payload: object
 ) -> DiagnosticPayload | RefreshPayload | StrategyEvaluationPayload | BacktestCorePayload:
-    if kind == "backtest_core":
+    if kind in {"backtest_core", "backtest"}:
         return BacktestCorePayload.model_validate(payload)
     if kind == "diagnostic":
         return DiagnosticPayload.model_validate(payload)

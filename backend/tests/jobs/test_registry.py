@@ -21,7 +21,7 @@ def test_closed_diagnostic_admission(payload: object) -> None:
 
 def test_unknown_kind_and_initial_limits() -> None:
     with pytest.raises(ValueError, match="Unregistered"):
-        validate_payload("backtest", {"schema_version": 1, "work_units": 1})
+        validate_payload("forecast", {"schema_version": 1, "work_units": 1})
     limits = JobLimits()
     assert (limits.wall_seconds, limits.heartbeat_seconds, limits.lease_seconds) == (300, 5, 30)
     assert (limits.max_attempts, limits.memory_mib, limits.cpu_count, limits.pids) == (

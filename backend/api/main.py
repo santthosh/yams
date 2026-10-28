@@ -11,6 +11,7 @@ from pydantic import BaseModel
 from backend.api.errors import register_error_handlers
 from backend.api.openapi import ContractAPI
 from backend.api.routes.data import data_router
+from backend.api.routes.experiments import experiments_router
 from backend.api.routes.health import health_router
 from backend.api.routes.jobs import jobs_router
 from backend.api.routes.strategies import strategies_router
@@ -55,6 +56,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(data_router(engine, settings))
     app.include_router(strategies_router(engine))
     app.include_router(evaluations_router(engine, settings))
+    app.include_router(experiments_router(engine, settings))
 
     @app.get("/livez", response_model=Liveness, tags=["operations"])
     def liveness() -> Liveness:

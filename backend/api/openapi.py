@@ -3,7 +3,7 @@
 import argparse
 import json
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 from fastapi import FastAPI
 from fastapi.openapi.utils import get_openapi
@@ -19,6 +19,16 @@ from backend.domain.evaluation import (
     StrategyEvaluationV1,
 )
 from backend.domain.experiment import ExperimentRequest, ExperimentRunV1
+from backend.domain.experiment_api import (
+    ExperimentAccepted,
+    ExperimentDetailV1,
+    ExperimentPageV1,
+    ExperimentReproducibilityV1,
+    ExperimentSeriesPageV1,
+    ExperimentSummaryV1,
+    ExperimentTradesPageV1,
+    JobCancelRequest,
+)
 from backend.domain.forecast import ForecastV1
 from backend.domain.market import AssetV1, MarketBarV1, SnapshotManifestV1
 from backend.domain.orders import PaperOrderBatchV1
@@ -47,6 +57,14 @@ MODELS: tuple[type[BaseModel], ...] = (
     PaperOrderBatchV1,
     ExperimentRequest,
     ExperimentRunV1,
+    ExperimentAccepted,
+    ExperimentDetailV1,
+    ExperimentSummaryV1,
+    ExperimentPageV1,
+    ExperimentSeriesPageV1,
+    ExperimentTradesPageV1,
+    ExperimentReproducibilityV1,
+    JobCancelRequest,
     JobV1,
     ErrorEnvelope,
     PageRequest,
@@ -62,6 +80,42 @@ def build_openapi(app: FastAPI) -> dict[str, Any]:
         ref_template="#/components/schemas/{model}",
     )
     schemas = document.setdefault("components", {}).setdefault("schemas", {})
+    # FastAPI suffixes duplicated input/output definitions even when Pydantic's
+    # combined bundle proves they share a schema. Normalize only known aliases;
+    # compare definitions below rather than overwriting a genuine conflict.
+    aliases = {
+        "StrategyConfigV1-Input": "StrategyConfigV1",
+        "StrategyConfigV1-Output": "StrategyConfigV1",
+        "ExecutionPolicy-Input": "backend__domain__strategy__ExecutionPolicy",
+    }
+
+    def normalize(value: Any) -> Any:
+        if isinstance(value, dict):
+            return {key: normalize(item) for key, item in value.items()}
+        if isinstance(value, list):
+            return [normalize(item) for item in value]
+        if isinstance(value, str) and value.startswith("#/components/schemas/"):
+            name = value.rsplit("/", 1)[-1]
+            return "#/components/schemas/" + aliases.get(name, name)
+        return value
+
+    document = cast(dict[str, Any], normalize(document))
+    schemas = document["components"]["schemas"]
+    for alias, name in aliases.items():
+        if alias in schemas:
+            if schemas[alias] != bundle["$defs"][name]:
+                raise ValueError(f"Conflicting OpenAPI alias: {alias}")
+            schemas.pop(alias)
+    # FastAPI's OpenAPI numeric-bound DTO coerces the uint64 ceiling to float.
+    # Restore the exact integer constraint from the authoritative typed request.
+    request_schema = schemas.get("ExperimentRequest")
+    if request_schema is not None:
+        seed = request_schema["properties"]["random_seed"]
+        exact_seed = bundle["$defs"]["ExperimentRequest"]["properties"]["random_seed"]
+        if seed != exact_seed:
+            if seed != {**exact_seed, "maximum": float(exact_seed["maximum"])}:
+                raise ValueError("Conflicting experiment random-seed schema")
+            request_schema["properties"]["random_seed"] = exact_seed
     for name, definition in bundle["$defs"].items():
         if name in schemas and schemas[name] != definition:
             raise ValueError(f"Conflicting OpenAPI schema: {name}")

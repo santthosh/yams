@@ -52,3 +52,43 @@ def backtest_core(
     if cancelled.is_set():
         raise BacktestFailure("CANCELLED")
     return stage_core(stage, result)
+
+
+def backtest(
+    payload: dict[str, Any],
+    cancelled: Event,
+    progress: Callable[[int, int], None] = lambda completed, total: None,
+    *,
+    root: Path,
+    stage: Path,
+) -> str:
+    """One bounded job computes all output; only the supervisor can publish it."""
+    from backend.backtesting.artifacts import read_core
+    from backend.backtesting.benchmark import calculate_report
+    from backend.backtesting.report_artifacts import stage_report
+    from backend.backtesting.reports import project_report
+
+    stage.mkdir(mode=0o700, exist_ok=False)
+    digest = backtest_core(
+        payload,
+        cancelled,
+        lambda completed, total: progress(completed * 80 // total, 100),
+        root=root,
+        stage=stage / "core",
+    )
+    core = read_core(stage / "core", digest)
+    pinned = BacktestCorePayload.model_validate(payload)
+    snapshot = PinnedSnapshot.open(
+        root / "snapshots" / pinned.snapshot_sha256, pinned.snapshot_sha256
+    )
+    if cancelled.is_set():
+        raise BacktestFailure("CANCELLED")
+    with MarketRepository(snapshot) as repository:
+        report = calculate_report(pinned, core, digest, repository)
+    progress(95, 100)
+    output = project_report(pinned, core, report, snapshot.manifest.source.provider)
+    if cancelled.is_set():
+        raise BacktestFailure("CANCELLED")
+    report_digest = stage_report(stage / "report", *output)
+    progress(99, 100)
+    return report_digest

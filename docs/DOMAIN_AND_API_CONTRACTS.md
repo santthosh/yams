@@ -177,7 +177,7 @@ Use the closed `RefreshPayload`: fixture mode pins `expected_manifest_hash`;
 research mode supplies the closed `research_config` instead. Exact retries reuse
 the durable job; changed inputs with the same key return 409. Browser proxy accepts
 only same-origin JSON, caps input at 1 MiB and forwards no user credentials. Public
-cancellation remains unavailable until #41.
+cancellation is implemented by #41 through the explicit JSON-empty job command.
 
 The research configuration is a closed provider-specific union. Existing Yahoo
 `ResearchConfig` remains supported for conditional inspection. Tiingo uses
@@ -228,6 +228,24 @@ conventions. [ADR-013](adr/0013-backtest-reporting-methodology.md) owns Q12 repo
 formulas, interval observations, benchmark alignment and explicit unavailable reasons. Internal core output does not weaken the completed experiment
 contract: metrics and all sealed output references remain required. #40/#41 own
 report composition and public transport after the core is delivered.
+
+### Implemented experiment transport (#41)
+
+See [experiment API operations](operations/experiment-api.md). Creation returns202
+with experiment/job UUIDs; history is a bounded descending keyset page. Detail
+includes the pinned configuration, provider, Q12 period/report summary and managed
+UUID/SHA/schema references only after atomic completion. Series/trades are separate
+bounded pages (default25, maximum100), with optional contained half-open session
+windows and run/artifact/role/window/page-size-bound cursors. Unfinished output is409;
+unknown resources404; invalid IDs, windows/cursors422; unavailable storage/integrity503.
+Backtest execution outcomes do not post durable portfolio fills. Public exposure
+weights remain decimal strings and drawdown uses the shared Q12 backend path.
+
+`POST /jobs/{id}/cancel` requires `{}` JSON. Accepted queued/running/cancel_requested
+states return202; originally terminal states return409 under the queue row lock.
+Core/report/files are sealed and registered with public completion in one fenced
+transaction. Existing internal core success is not public report completion.
+Migration0005a adds report registration to the existing experiment aggregate.
 
 ## 5. Portfolios, orders, recommendations and forecasts
 
@@ -321,6 +339,7 @@ All forecast numbers above are **fabricated contract examples**. The `horizon_tr
 | `POST /strategies` | Create named strategy with initial version | 201 strategy/version | 0.0.3 | #36 |
 | `GET /strategies/{id}/versions` | Browse immutable versions | 200 paginated | 0.0.3 | #36 |
 | `POST /strategies/{id}/versions` | Fork/edit config into new version | 201 strategy version | 0.0.3 | #36 |
+| `GET /experiments` | Bounded experiment history | 200 page | 0.0.3 | #41 |
 | `POST /experiments` | Create backtest job | 202 job + experiment ID | 0.0.3 | #41 |
 | `GET /experiments/{id}` | Read results/provenance/warnings | 200 experiment | 0.0.3 | #41 |
 | `GET /experiments/{id}/series` | Equity curve and benchmark samples | 200 windowed points | 0.0.3 | #41 |
@@ -414,7 +433,7 @@ schema ownership and verification.
 
 ### 6.3 Staged operations
 
-[ADR-008](adr/0008-lifecycle-api-additions.md#deferred-lifecycle-contracts-and-handoffs) assigns dismiss, pending-order cancellation, idempotency recovery, Arena lifecycle, settings, backup and export contracts to owning issues. Each owner defines exact transport and tests before exposing an action. In 0.0.1, workspace/health expose labeled fixture metadata rather than fabricated later resources. Public job cancellation remains staged to 0.0.3 even though its internal queue service exists earlier.
+[ADR-008](adr/0008-lifecycle-api-additions.md#deferred-lifecycle-contracts-and-handoffs) assigns dismiss, pending-order cancellation, idempotency recovery, Arena lifecycle, settings, backup and export contracts to owning issues. Each owner defines exact transport and tests before exposing an action. In 0.0.1, workspace/health expose labeled fixture metadata rather than fabricated later resources. Public job cancellation is implemented in planned0.0.3 by #41, with terminal-state409 and accepted queued/running202.
 
 Foundation health returns `status`, `paper_only`, separate `database`, `migration`, `workspace` and `fixtures` checks (`status` ready/failed/unchecked plus nullable reason), and nullable `fixture_metadata`. Metadata contains the synthetic label, snapshot UUID/hash, coverage dates and asset count. It verifies the committed fixture artifacts; it does not register a research snapshot. Missing configuration, wrong migration, absent workspace or invalid/missing fixtures cannot report ready. `/workspace` returns UUID, locale, default benchmark, preferences and `paper_only`; unavailable database/migration/workspace returns `503 NOT_READY` in the typed error envelope, retryable. Workspace configuration remains readable when only fixtures fail. No public mutation/settings endpoint is activated by #22.
 
