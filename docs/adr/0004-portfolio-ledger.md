@@ -61,9 +61,30 @@ One Alembic history, one head. Reserve the following unique revision identifiers
 | `0002_jobs` | #23 / 0.0.1 | Durable job/attempt/lease tables after workspace |
 | `0003_snapshots` | #30 / 0.0.2 | Asset/snapshot metadata and immutable artifact references |
 | `0004_strategies` | #71 / 0.0.2 | Strategy/version registry after workspace; #36 extends it later |
-| `0005_experiments` | #41 / 0.0.3 | Experiment persistence after snapshot/strategy tables |
+| `0005_experiments` | #39 / 0.0.3; #41 consumes it | Initial experiment persistence after delivered snapshot/strategy tables |
 | `0006_paper_ledger` | #44 / 0.0.4 | Portfolio, recommendation-reference schema, batch/order/fill, ledger/action and projection tables after snapshot/strategy schemas |
 | `0007_recommendation_content` | #49 / 0.0.5 | Additive recommendation computation/content extensions, preserving #44 IDs and foreign keys |
+
+The 0.0.3 sequencing amendment under #39 assigns initial experiment persistence
+and the reserved `0005_experiments` migration to the backtest-core owner #39.
+Its scope already includes the experiment model and core worker handler; downstream
+#41 depends on #39/#40 and therefore cannot be an undelivered schema prerequisite
+for the core. #39 supplies immutable strategy/snapshot/config/policy/seed inputs,
+job relationships and fenced sealed-output persistence under the existing domain,
+queue and artifact contracts. #40 owns metrics/benchmark calculations. #41 owns
+public experiment creation/detail/windowed-series/trades and cooperative job
+cancellation transport over those delivered services. It must not create a second
+experiment aggregate, replay financial logic in transport or reuse this revision.
+
+This is an ownership/order correction, not a new table or handler implementation,
+financial policy, public endpoint or definition of completed state. #39 must first
+verify the actual merged schema head (currently `0004a_evaluations`), contract
+compatibility, immutable references and independent transaction/artifact recovery
+proofs. Join that actual head linearly; the reserved ID does not authorize skipping
+intervening delivered migrations. Completion still requires all owned outputs to
+be sealed under a valid lease; cancelled/failed/partial artifacts cannot appear
+complete. Later public responses must satisfy the complete versioned API contract;
+no scaffold placeholder metrics or future-only dependencies are introduced.
 
 Other feature migrations receive distinct IDs at their owning PR and join the actual merged head; never reuse these reserved identifiers or create an unreviewed second head. #44 creates the real recommendation reference/content envelope before batch foreign keys, in the same migration sequence. Service integration tests may insert fully linked `synthetic_fixture` recommendation rows with explicit test evidence; production startup seeds no recommendations. #49 later produces valid recommendation content through the real evaluator. Thus 0.0.4 can persist/test execution infrastructure without a dependency on the 0.0.5 producer. Earlier migrations never import later application code.
 
