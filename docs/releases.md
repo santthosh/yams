@@ -1,23 +1,35 @@
 # Installing and upgrading YAMS releases
 
-YAMS 0.0.3 is a **Strategy Lab and historical-experiments prerelease**, preceding
-the complete 0.0.5 core product. It includes immutable strategy publication,
-momentum/mean-reversion/low-volatility templates, reproducible walk-forward jobs,
-separate development/holdout metrics, aligned SPY/cash references, immutable reports
-and fair comparison with controlled one-rule challenges. The complete offline
-editor→fork→run→report→challenge→compare journey uses labeled synthetic data.
-It is research evidence, not investment performance or a forecast.
+YAMS 0.0.4 is a **Paper Portfolios prerelease**, preceding the complete 0.0.5
+core product. It adds independent cash accounts, exact-cent posted holdings,
+backend valuations and immutable ledger inspection to the existing Strategy Lab,
+historical experiments and candidate diagnostics. At `/portfolios`, create a
+$1,000 synthetic cash account, select a published strategy version and inspect
+its source, cash and history. Creation retries preserve the original account.
 
-Market snapshots, candidate diagnostics and optional personal-use Tiingo acquisition
-remain available. Provider acquisition requires the operator's own token and terms;
-source data remains local. Current real feeds lack historical raw/action/publication/
-membership evidence for the accounting engine and remain diagnostic-only. Forecasts
-and durable paper accounts/orders/fills are unavailable. No real money or brokerage
-is involved. See `RESEARCH.md` for the optional source workflow.
+Private authorization and the supervised worker can post explicitly authorized
+synthetic fills and corporate-action effects with revision/idempotency/lease
+fences. Native installation verification uses clearly labeled, service-seeded
+synthetic intent to exercise those internals and inspect posted state in the
+real browser after restart. **The public recommendation/apply/cancel controls
+remain staged until 0.0.5**; this release does not expose an operator approval UI.
+Starting or migrating an installation creates no paper accounts or orders.
 
-Existing 0.0.1 and 0.0.2 releases remain immutable with their original capabilities and
-assets. A milestone name or candidate workflow alone does not establish publication;
-use the exact release's tag, source SHA, immutable image digests and native evidence.
+Missing or stale holding marks retain known cash/shares and show unavailable
+value with reasons. No frontend financial calculation or assumed fill is used.
+Historical Strategy Lab accounting proofs use `SYNTHETIC_DATA_ONLY`; they are
+research evidence, not investment performance or a forecast. Forecasts are not
+included in this increment.
+
+Optional Tiingo acquisition requires the operator's own token and terms; source
+data remains local. Current real feeds lack historical raw/action/publication/
+membership evidence for accounting and remain diagnostic-only. They cannot execute research-mode paper orders. No real money or brokerage is involved.
+See `RESEARCH.md` for the optional source workflow.
+
+Existing 0.0.1–0.0.3 releases remain immutable with their original capabilities
+and assets. A milestone name or candidate workflow alone does not establish
+publication; use the exact release's tag, source SHA, immutable image digests
+and native evidence.
 
 ## Fresh installation
 
@@ -81,6 +93,24 @@ Scheduled work runs only while Docker is active. Backtests do not post durable
 paper holdings/fills, and neither backtests nor later scenario models guarantee
 future outcomes.
 
+## First paper account journey
+
+Open `/portfolios`, give the account a name, keep or edit the positive starting
+capital and select an actual published strategy version. Choose the source mode
+explicitly; fixture and research accounts stay independent. A confirmed default
+account has $1,000 cash, 100% cash weight and no posted holdings. View its funding
+event, original strategy version, risk assumptions and current reconciliation
+status. Inspect an account with posted holdings to see exact quantity/basis,
+mark/session, cash, total value and immutable transaction lineage/fees.
+
+If creation loses its response, use **Retry same account creation** with the frozen
+request rather than starting another account. Definitive validation errors allow
+editing. Missing marks leave value unavailable, never zero; known cash and shares
+remain visible. Refresh if account and separately paginated history show different
+sequences. Pending/partial/cancelled presentation is implemented, while live batch
+inspection and approval remain honestly staged for 0.0.5. No UI action in this
+increment previews or approves a recommendation.
+
 ## Backup before upgrading
 
 Keep the existing Compose manifest, `.env`, exact image digests and backups
@@ -113,6 +143,16 @@ Back up both stores before upgrading; new images may write schemas older images
 cannot read. Existing results pin their original engine; use explicit common-setting
 reruns rather than treating different engine builds as directly comparable.
 Older images must not be run against a newer schema as an assumed rollback.
+
+The 0.0.3→0.0.4 upgrade adds the `0006_paper_ledger` migration: linked account,
+recommendation, batch, order, immutable event/fill/entry/action and projection
+records with deferred accounting safeguards. Existing workspace, preferences,
+strategies, snapshots, jobs, experiments and artifacts are retained. Migration
+creates no accounts, recommendations or fills. Durable account keys, histories
+and pending private-worker jobs survive normal restart; work runs only while
+Docker is active. Real research data remains unsuitable for accounting. Back up
+both stores before applying this forward migration; use the prior matching
+backup and images for restore-aware rollback.
 
 Read the new release's migration notes. Download/verify its assets separately,
 back up the old installation, stop old services with `docker compose down`, then

@@ -258,6 +258,19 @@ def release_summary(version: str) -> tuple[str, str]:
             "comparison journey and retained state. No forecasts or durable paper accounts/"
             "orders/fills are included; no real money or brokerage is involved.",
         )
+    if version == "0.0.4":
+        return (
+            "Paper Portfolios",
+            "Local paper-only prerelease: independent cash accounts, posted holdings, "
+            "exact-cent immutable ledger history and backend valuations, with idempotent "
+            "authorization and fenced synthetic fill/action processing. Native amd64 and "
+            "arm64 installations verify browser-created $1,000 accounts and explicitly "
+            "service-seeded synthetic fills through the real worker, including cached "
+            "restart. Public recommendation/apply controls and forecasts remain staged "
+            "for 0.0.5. Real feeds remain diagnostic-only; financial examples are labeled "
+            "SYNTHETIC_DATA_ONLY. Download all assets, verify SHA256SUMS and follow INSTALL.md. "
+            "No real money or brokerage is involved.",
+        )
     return (
         "local paper research prerelease",
         "Local paper-only research prerelease. Download all assets, verify SHA256SUMS "
