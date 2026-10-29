@@ -1,9 +1,10 @@
 # Seeded scenario comparisons
 
 The source implementation for 0.0.5 adds a private numerical engine, immutable
-forecast jobs and durable artifact inspection. Public recommendation/forecast
-transport belongs to #49 and the Decision Center to #52. Their presence in the
-versioned domain schema does not activate an HTTP endpoint. The published 0.0.4
+forecast jobs and durable artifact inspection. The source
+[recommendation/forecast APIs](recommendations.md) now own their public read
+transport; the Decision Center remains #52. A standalone private forecast
+admission is not a public arbitrary-input endpoint. The published 0.0.4
 bundle retains its original capabilities.
 
 These are historical scenarios, **not calibrated predictions**. Fixture examples
@@ -62,8 +63,11 @@ The private entry points are:
 `ForecastInputs` pins portfolio/revision, strategy/config identity, snapshot and
 calendar hashes, source mode, as-of/canonical cutoff, valuation session, original
 NAV, complete current/proposed weights and costs, and uint64 seed (default 42).
-The recommendation owner must derive a coherent valuation and preview cost from
-backend evidence before calling admission. This is **not** permission to expose
+The recommendation producer derives coherent valuation, complete feasible
+post-preview weights and cost from shared backend evidence. Its fenced publisher
+enqueues frozen forecast inputs in the same transaction as original analysis;
+stale original revisions remain inspectable without becoming current approvals.
+Standalone admission still checks the current portfolio. This is **not** permission to expose
 arbitrary user-supplied NAV, prices or trade-cost overrides as a public API.
 
 Admission verifies immutable source/config files before locking the portfolio,

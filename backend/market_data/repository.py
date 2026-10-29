@@ -226,6 +226,38 @@ class MarketRepository:
         """
         return self._view(cutoff, session_date, include_inactive=True)
 
+    def _sector_at(
+        self, asset_id: str, cutoff: datetime, session_date: date, live: bool
+    ) -> Sector | None:
+        rows = [
+            row
+            for row in self._context.sectors
+            if row.asset_id == asset_id and row.covers(session_date) and row.visible(cutoff, live)
+        ]
+        return (
+            max(rows, key=lambda row: row.available_at)
+            if len({row.sector for row in rows}) == 1
+            else None
+        )
+
+    def accounting_sectors(
+        self, asset_ids: tuple[str, ...], cutoff: datetime, session_date: date
+    ) -> dict[str, str]:
+        """As-of risk classifications for held assets, including universe exits.
+
+        This lookup does not change eligibility or the account's posted projection.
+        Ambiguous/missing classifications retain the shared Unknown risk bucket.
+        """
+        cutoff = TypeAdapter(UTCTimestamp).validate_python(cutoff)
+        session_date = TypeAdapter(SessionDate).validate_python(session_date)
+        live = self.snapshot.manifest.mode != "synthetic_fixture"
+        return {
+            identity: row.sector
+            if (row := self._sector_at(identity, cutoff, session_date, live))
+            else "Unknown"
+            for identity in asset_ids
+        }
+
     def _view(
         self,
         cutoff: datetime,
@@ -279,16 +311,8 @@ class MarketRepository:
             ):
                 alias = None
                 reasons.append("AMBIGUOUS_OR_MISSING_ALIAS")
-            sectors = [
-                row
-                for row in self._context.sectors
-                if row.asset_id == asset.asset_id
-                and row.covers(session_date)
-                and row.visible(cutoff, live)
-            ]
-            sector = max(sectors, key=lambda row: row.available_at) if sectors else None
-            if len({row.sector for row in sectors}) != 1:
-                sector = None
+            sector = self._sector_at(asset.asset_id, cutoff, session_date, live)
+            if sector is None:
                 reasons.append("AMBIGUOUS_OR_MISSING_SECTOR")
             assets.append(
                 AsOfAsset(

@@ -111,6 +111,8 @@ def test_admission_completion_replay_and_immutable_evidence(
             "cash_ledger_entry",
             "forecast",
             "forecast_artifact",
+            "recommendation_run",
+            "recommendation_publication",
         ):
             assert connection.execute(text(f"SELECT count(*) FROM {table}")).scalar_one() == 0
         assert (

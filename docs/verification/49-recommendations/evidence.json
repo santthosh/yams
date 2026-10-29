@@ -1,0 +1,291 @@
+{
+  "label": "SYNTHETIC_DATA_ONLY",
+  "evidence_kind": "RECORDED_APPLICATION_OUTPUT_NOT_INDEPENDENT_ORACLE",
+  "project": "yams-smoke-9cb9ed5d4204",
+  "passed": true,
+  "check_count": 24,
+  "request_canonical_json": "{\"as_of_session\":\"2028-07-17\",\"clock_mode\":\"synthetic_replay\",\"seed\":18446744073709551615,\"snapshot_id\":\"5c223992-90ec-59a7-a1e7-7889b76cacea\"}",
+  "recommendation": {
+    "id": "36f545c7-7490-55c0-afa4-fadb54efa545",
+    "portfolio_id": "26576e2f-0dc3-5d1c-a52e-23c749875812",
+    "portfolio_revision": 1,
+    "strategy_version_id": "184f4ef7-c542-5387-a5aa-9bd4d162efde",
+    "snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+    "snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+    "as_of_session": "2028-07-17",
+    "decision_cutoff_utc": "2028-07-18T12:30:00Z",
+    "clock_mode": "synthetic_replay",
+    "created_at": "2028-07-18T12:30:00Z",
+    "computed_at": "2026-10-29T07:55:44.534134Z",
+    "summary_action": "BUY",
+    "target_weights": [
+      {
+        "asset_id": "SYN:AAA",
+        "weight": "0.2",
+        "reason_codes": [
+          "RISK_CONSTRAINED_TARGET"
+        ]
+      },
+      {
+        "asset_id": "SYN:BBB",
+        "weight": "0.2",
+        "reason_codes": [
+          "RISK_CONSTRAINED_TARGET"
+        ]
+      },
+      {
+        "asset_id": "SYN:CCC",
+        "weight": "0.2",
+        "reason_codes": [
+          "RISK_CONSTRAINED_TARGET"
+        ]
+      }
+    ],
+    "cash_target_weight": "0.4",
+    "actions": [
+      {
+        "asset_id": "SYN:AAA",
+        "side": "BUY",
+        "label": "INCREASE",
+        "current_weight": "0",
+        "target_weight": "0.2",
+        "estimated_notional_usd": "200.00",
+        "estimated_quantity": "2.857142",
+        "reason_codes": [
+          "TARGET_REBALANCE"
+        ],
+        "evidence": {
+          "position_cap": "0.2",
+          "current_weight": "0"
+        },
+        "explanation": "Buy SYN:AAA: current weight 0, target 0.2; target rebalance. Estimated quantity 2.857142; paper preview only."
+      },
+      {
+        "asset_id": "SYN:BBB",
+        "side": "BUY",
+        "label": "INCREASE",
+        "current_weight": "0",
+        "target_weight": "0.2",
+        "estimated_notional_usd": "200.00",
+        "estimated_quantity": "2.857142",
+        "reason_codes": [
+          "TARGET_REBALANCE"
+        ],
+        "evidence": {
+          "position_cap": "0.2",
+          "current_weight": "0"
+        },
+        "explanation": "Buy SYN:BBB: current weight 0, target 0.2; target rebalance. Estimated quantity 2.857142; paper preview only."
+      },
+      {
+        "asset_id": "SYN:CCC",
+        "side": "BUY",
+        "label": "INCREASE",
+        "current_weight": "0",
+        "target_weight": "0.2",
+        "estimated_notional_usd": "200.00",
+        "estimated_quantity": "2.985074",
+        "reason_codes": [
+          "TARGET_REBALANCE"
+        ],
+        "evidence": {
+          "position_cap": "0.2",
+          "current_weight": "0"
+        },
+        "explanation": "Buy SYN:CCC: current weight 0, target 0.2; target rebalance. Estimated quantity 2.985074; paper preview only."
+      }
+    ],
+    "estimated_total_trade_cost_usd": "0.60",
+    "config_sha256": "2093c63d190815eba052508d6d42d8ae0c93400cf777602d2c5f759627f43f21",
+    "calendar_sha256": "e3d2312d54e172d7aada8239f296eecf38c6038d66b5a203c5c5690ede82d660",
+    "engine_version": "6a1c6c412071f284b1e99026059700d4e99b63c1f47c7d087007b61933ce3d01"
+  },
+  "forecast": {
+    "id": "ba1a2307-0d2f-5d69-8041-e0b487ce9b9e",
+    "status": "available",
+    "unavailable_reason": null,
+    "as_of_session": "2028-07-17",
+    "decision_cutoff_utc": "2028-07-18T12:30:00Z",
+    "data_status": "synthetic_fixture",
+    "snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+    "snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+    "calendar_version": "e3d2312d54e172d7aada8239f296eecf38c6038d66b5a203c5c5690ede82d660",
+    "horizon_calendar_days": 90,
+    "horizon_trading_sessions": 64,
+    "horizon_end_at": "2028-10-16T12:30:00Z",
+    "future_sessions": [
+      "2028-07-18",
+      "2028-07-19",
+      "2028-07-20",
+      "2028-07-21",
+      "2028-07-24",
+      "2028-07-25",
+      "2028-07-26",
+      "2028-07-27",
+      "2028-07-28",
+      "2028-07-31",
+      "2028-08-01",
+      "2028-08-02",
+      "2028-08-03",
+      "2028-08-04",
+      "2028-08-07",
+      "2028-08-08",
+      "2028-08-09",
+      "2028-08-10",
+      "2028-08-11",
+      "2028-08-14",
+      "2028-08-15",
+      "2028-08-16",
+      "2028-08-17",
+      "2028-08-18",
+      "2028-08-21",
+      "2028-08-22",
+      "2028-08-23",
+      "2028-08-24",
+      "2028-08-25",
+      "2028-08-28",
+      "2028-08-29",
+      "2028-08-30",
+      "2028-08-31",
+      "2028-09-01",
+      "2028-09-04",
+      "2028-09-05",
+      "2028-09-06",
+      "2028-09-07",
+      "2028-09-08",
+      "2028-09-11",
+      "2028-09-12",
+      "2028-09-13",
+      "2028-09-14",
+      "2028-09-15",
+      "2028-09-18",
+      "2028-09-19",
+      "2028-09-20",
+      "2028-09-21",
+      "2028-09-22",
+      "2028-09-25",
+      "2028-09-26",
+      "2028-09-27",
+      "2028-09-28",
+      "2028-09-29",
+      "2028-10-02",
+      "2028-10-03",
+      "2028-10-04",
+      "2028-10-05",
+      "2028-10-06",
+      "2028-10-09",
+      "2028-10-10",
+      "2028-10-11",
+      "2028-10-12",
+      "2028-10-13"
+    ],
+    "method": "multivariate_block_bootstrap_v1",
+    "seed": 18446744073709551615,
+    "simulation_count": 5000,
+    "lookback_sessions": 252,
+    "block_length_sessions": 5,
+    "cash_return_fraction": 0.0,
+    "initial_value_usd": "1000.00",
+    "current_allocation": {
+      "weights": [],
+      "cash_weight": "1",
+      "upfront_cost_usd": "0.00"
+    },
+    "proposed_allocation": {
+      "weights": [
+        {
+          "asset_id": "SYN:AAA",
+          "weight": "0.200120044446114869192124083574246086679873966519494272721705204038666254016342956"
+        },
+        {
+          "asset_id": "SYN:BBB",
+          "weight": "0.200120044446114869192124083574246086679873966519494272721705204038666254016342956"
+        },
+        {
+          "asset_id": "SYN:CCC",
+          "weight": "0.20012006245692427258528332881318718004434977705089441889623360135065381109257294"
+        }
+      ],
+      "cash_weight": "0.3996398486508459890304685040383206465959022899101170356603559905720136808747411463",
+      "upfront_cost_usd": "0.60"
+    },
+    "rng": {
+      "generator": "PCG64",
+      "numpy_version": "2.5.4",
+      "sampling_version": "noncircular_c_order_v1",
+      "initial_state": {
+        "id": "275e4a24-cfc6-5d73-8e53-44d0c411e258",
+        "sha256": "e1df367c0b5a510df77a734b7903615c4db68583f8e9feffdbd6d0f42bde473a",
+        "schema_version": 1
+      }
+    },
+    "input_array_sha256": "18d3859cb8497029fee86ce293bbf81f2c6c8645efd05f56b5759e15adbc010e",
+    "sampled_indices": {
+      "id": "d63b721a-7fa2-5541-9085-be18b6cbaac6",
+      "sha256": "5edecd9c1a488afa1cc3e9c2e145d8154cf51ea9a14c53022e9f4df1ac8c8881",
+      "schema_version": 1
+    },
+    "fingerprint": "2a9f2be70d97c3e9c55c622d88a32c9125fb3f08d4991c0a2a1a0e438b0e2dbd",
+    "fingerprint_schema_version": 1,
+    "engine_version": "6a1c6c412071f284b1e99026059700d4e99b63c1f47c7d087007b61933ce3d01",
+    "proposed": {
+      "median_return_fraction": 0.034004911437105434,
+      "p10_return_fraction": 0.0062516729722696986,
+      "p90_return_fraction": 0.06281272183493022,
+      "probability_of_loss": 0.0782,
+      "median_ending_value_usd": "1034.00"
+    },
+    "hold_unchanged": {
+      "median_return_fraction": 0.0,
+      "p10_return_fraction": 0.0,
+      "p90_return_fraction": 0.0,
+      "probability_of_loss": 0.0,
+      "median_ending_value_usd": "1000.00"
+    },
+    "median_return_delta_fraction": 0.034004911437105434,
+    "comparability": "common_shock_paths",
+    "limitations": [
+      "CONSTANT_WEIGHT_APPROXIMATION",
+      "ESTIMATED_UPFRONT_COST",
+      "SCENARIO_NOT_CALIBRATED_PREDICTION",
+      "SYNTHETIC_DATA_ONLY",
+      "ZERO_CASH_YIELD"
+    ]
+  },
+  "verified_invariants": {
+    "cash_usd": "1000.00",
+    "portfolio_revision": 1,
+    "last_sequence": 1,
+    "holding_count": 0,
+    "funding_event_count": 1,
+    "posted_fill_count": 0,
+    "restart_and_rebuild_original_analysis_retained": true,
+    "same_key_retry_retained_original_identity": true
+  },
+  "checks": [
+    "clean boot and real same-origin API readiness",
+    "same-origin keyed paper account funding, exact retry and read-only ledger history",
+    "real persisted diagnostic job completed by bounded worker",
+    "warm-up plus three diagnostic batches with concurrent API/DB reads",
+    "real Docker browser Dashboard/Settings/job at both widths",
+    "real browser cash creation, independent accounts and keyed retries",
+    "real browser same-origin strategy creation, immutable append, conflict and pagination",
+    "real browser candidate/target reruns and cash-only cases via supervised worker",
+    "real browser public experiment rerun, pages, cancellation and fingerprints",
+    "real mobile/desktop experiment form, charts/tables/Axe, exact uint64 rerun, original preservation and cancellation",
+    "real mobile/desktop aligned and mismatched comparison, one-rule challenge, shared-setting exact-seed reruns and immutable source evidence",
+    "internal core admission, actual supervised next-open replay and sealed artifact",
+    "worker-side Q12 metrics, aligned SPY/cash, continuing holdout and exposure",
+    "real same-origin recommendation, shared order preview and numeric forecast; exact uint64 retry and unchanged account",
+    "real portfolio holdings/fees/history, staged batch controls and Axe at360/1280",
+    "private explicit fixture approval and real worker atomic fill",
+    "private real-worker seeded common-shock scenarios and immutable artifacts; no portfolio effects",
+    "API and worker external routing blocked",
+    "restart retains paper account identity, funding and original creation retry",
+    "restart preserves workspace, job, fixtures and artifact hash",
+    "rebuild/recreate preserves named-volume state",
+    "restart and rebuild preserve original recommendation/forecast and readonly account",
+    "actual private ports and aggregate 4 CPU/4.5 GiB caps",
+    "failed migration blocks application startup; repair preserves workspace"
+  ]
+}

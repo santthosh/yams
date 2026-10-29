@@ -165,6 +165,7 @@ def test_populated_003_upgrade_preserves_existing_workspace_registry_and_jobs(
 
     prior = tmp_path / "prior"
     shutil.copytree(MIGRATIONS, prior)
+    (prior / "versions/0008_recommendations.py").unlink()
     (prior / "versions/0007_forecasts.py").unlink()
     (prior / "versions/0006_paper_ledger.py").unlink()
     identity = bootstrap(database, prior)

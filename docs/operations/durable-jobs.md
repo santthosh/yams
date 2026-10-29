@@ -7,14 +7,16 @@ an integer from zero through one million. Ten units produce the independent
 integer sum 45. The sealed result has kind `diagnostic`, no financial resource ID,
 and a fixed synthetic message; its durable effect lives in `job_diagnostic_effect`.
 
-The current 0.0.2 application also registers `refresh_market_data` and
-`evaluate_strategy`. Use the source-aware refresh API and strategy-evaluation
-admission API; they pin validated source/config/calendar/build inputs and own
-atomic publication. The diagnostic service example below is not a way to enqueue
+The current source also registers `refresh_market_data`, `evaluate_strategy`,
+`backtest_core`, `backtest`, `evaluate_portfolio`, `forecast` and
+`apply_scheduled_fills`. Their owning admission services pin validated immutable
+inputs and own fenced publication; the diagnostic example below cannot enqueue
 arbitrary financial work. See [market refresh](market-refresh.md),
-[candidate inspection](strategy-evaluations.md) and the optional
-[Tiingo workflow](tiingo-research.md). Backtest, forecast and durable trade-posting
-handlers remain unavailable. Public cancellation is owned by #41.
+[candidate inspection](strategy-evaluations.md), [experiments](experiment-api.md),
+[recommendations](recommendations.md), [forecasts](scenario-forecasts.md) and
+[private paper batches](paper-batches.md). Public job cancellation is implemented;
+paper approval/dismissal/batch transport remains #50. The optional
+[Tiingo workflow](tiingo-research.md) remains diagnostic-only for accounting.
 
 ## Startup and configuration
 

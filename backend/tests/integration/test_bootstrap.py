@@ -98,6 +98,8 @@ def test_fresh_repeat_and_concurrent_bootstrap_preserves_identity_and_preference
         "experiment_report",
         "forecast",
         "forecast_artifact",
+        "recommendation_run",
+        "recommendation_publication",
         "paper_portfolio",
         "paper_position",
         "recommendation",

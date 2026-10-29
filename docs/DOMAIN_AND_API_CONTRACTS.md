@@ -330,6 +330,39 @@ In a real result `target_weights` must include the **complete** target allocatio
 
 All forecast numbers above are **fabricated contract examples**. The `horizon_trading_sessions` must be computed using the selected market calendar; 61 is just illustrative. For unavailable forecasts, return `status="unavailable"`, `unavailable_reason` and `null` outcome fields; do not substitute zero.
 
+### 5.1 Recommendation production and forecast lifecycle (#49)
+
+The source [recommendation contract](operations/recommendations.md) implements
+`RecommendationRequest`, `RecommendationAccepted`, bounded history and
+`RecommendationDetailV1` through the generated client. Requests select an as-of
+session, optional registered snapshot, explicit `clock_mode` and exact uint64 seed.
+The server freezes coherent posted state/revision and immutable source/version
+references; no arbitrary NAV, price, cost or approval-time override is accepted.
+An optional portfolio-scoped UUID `Idempotency-Key` retains the original evaluation
+on exact retry and conflicts on changed inputs.
+
+Synthetic accounts require explicit `synthetic_replay`. Their result `created_at`
+is the later of request admission and the authored decision cutoff; `computed_at`
+records actual UTC publication. History timestamps retain actual admission time.
+These fields and `data_status` disclose replay chronology; they do not backdate
+real-market observation or operator approval. Posted state observed after a
+requested cutoff cannot support that historical recommendation.
+
+HTTP202 identifies the evaluation job and recommendation. Atomic publication
+retains immutable original content and enqueues a separate bounded forecast job.
+Detail includes its `forecast_job` and optional `forecast`; unfinished or failed
+jobs are distinct from completed-unavailable model output. A known unpublished
+recommendation/incomplete forecast returns409 `STATE_CONFLICT` with safe job ID,
+status and kind. Completed forecasts return200 `ForecastV1`, including unavailable
+reason/null outcomes. Unknown IDs return404 and broken storage returns503.
+
+Original content remains separate from disposition. `is_current`, current
+portfolio revision and stale reasons report eligibility without mutating history.
+Revision changes during computation preserve expired evidence. Public approval,
+dismissal and batch lifecycle remain #50; GET and recommendation generation post
+no financial effects. ADR-006 binds scenarios to the feasible preview rather than
+pretending skipped/under-band target changes were executed.
+
 ## 6. Resource endpoints (minimum contracts)
 
 | Method & route | Action | Response | Milestone | Primary owner |

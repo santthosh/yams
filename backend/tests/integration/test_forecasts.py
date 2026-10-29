@@ -238,6 +238,7 @@ def test_populated_004_upgrade_retains_accounts_events_and_existing_jobs(
 ) -> None:
     prior = tmp_path / "prior"
     shutil.copytree(MIGRATIONS, prior)
+    (prior / "versions/0008_recommendations.py").unlink()
     (prior / "versions/0007_forecasts.py").unlink()
     workspace = bootstrap(database, prior)
     owner = uuid4()

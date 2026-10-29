@@ -32,6 +32,14 @@ For case c and path p, define each step's return as `r[c,p,t] = sum_i(w[c,i] * s
 
 Let original current NAV be V. Current/hold case starts at V with zero upfront cost. Proposed case starts at V−C, where C is the nonnegative estimated slippage plus commission cost of its previewed change, computed using the pinned as-of prices and ADR-001 policy. Trade notional itself is exchanged value, not a cost. Do not include future opening quotes, double-charge costs already deducted from the supplied NAV, or add costs again on every scenario step. Missing reliable cost/valuation inputs yield an unavailable comparison. Reject C>=V for this supported model; it cannot leave a positive starting value. Estimated cost is not a promise of actual next-open execution.
 
+Recommendation caller binding (#49): current weights come from coherent posted
+valuation; proposed weights come from the shared planner's feasible close-price
+preview, including cash, quantity, minimum-trade and rebalance-band decisions.
+Keep ideal allocation targets inspectable separately. A wholly unchanged HOLD
+preview has identical current/proposed weights and zero change cost. The forecast
+still uses the original V and charges the estimated initial cost once; it does
+not consume a second already-cost-reduced NAV or post that hypothetical preview.
+
 Ending value is `(V−C_c) * product_t(1+r[c,p,t])`. Report return relative to the **same original V**: ending_value/V−1, so upfront costs count against the proposed case. No ledger cent rounding occurs between steps. Output money values are decimal strings rounded once to cents with ROUND_HALF_EVEN at presentation; statistical fields remain finite float64 values. Scenario arithmetic is not the Decimal cash ledger. Preserve unrounded paths for reproducibility and quantile checks.
 
 Implementation precision: archive unrounded float64 gross growth factors with the original decimal NAV and upfront cost. Apply the initial capital/cost once in the ending-value equation and round only the displayed money. Algebraically equivalent return evaluation must retain a known small cost at neutral growth and the remaining capital when cost is close to NAV; avoid subtracting nearly equal float dollar balances. These are stable evaluations of the same constant-weight equations, not additional trading or ledger effects. Stored original endpoints, session dates and statistics remain readable without recomputing them under a different host timezone or numerical build; publication still verifies the pinned rules and numerical evidence.

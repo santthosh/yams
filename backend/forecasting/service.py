@@ -44,6 +44,34 @@ class ForecastRun:
     manifest_sha256: str | None
 
 
+def _enqueue_frozen_forecast(
+    session: Session, queue: Queue, payload: ForecastPayload
+) -> ForecastAccepted:
+    """Owning admission/publication transaction has verified the frozen context.
+
+    Historical recommendation evidence may outlive its original portfolio revision;
+    this helper grants no approval and performs no financial posting. Public/private
+    standalone admission below still requires a current matching portfolio.
+    """
+    inputs = payload.inputs
+    job_id = queue._enqueue(
+        session, "forecast", payload.model_dump(mode="json"), payload.forecast_id
+    )
+    session.add(
+        Forecast(
+            id=payload.forecast_id,
+            job_id=job_id,
+            portfolio_id=inputs.portfolio_id,
+            portfolio_revision=inputs.portfolio_revision,
+            strategy_version_id=inputs.strategy_version_id,
+            snapshot_id=inputs.snapshot_id,
+            payload=payload.model_dump(mode="json"),
+            created_at=database_now(session),
+        )
+    )
+    return ForecastAccepted(payload.forecast_id, job_id)
+
+
 def _snapshot_identity(inputs: ForecastInputs, pinned: PinnedSnapshot) -> Calendar:
     calendar = Calendar.model_validate_json(
         pinned.artifacts[pinned.manifest.calendar.artifact_path]
@@ -95,20 +123,8 @@ def admit_forecast(engine: Engine, root: Path, inputs: ForecastInputs) -> Foreca
             or portfolio.source_mode != inputs.source_mode
         ):
             raise ValueError("STATE_CONFLICT")
-        job_id = queue._enqueue(session, "forecast", payload.model_dump(mode="json"), identity)
-        session.add(
-            Forecast(
-                id=identity,
-                job_id=job_id,
-                portfolio_id=inputs.portfolio_id,
-                portfolio_revision=inputs.portfolio_revision,
-                strategy_version_id=inputs.strategy_version_id,
-                snapshot_id=inputs.snapshot_id,
-                payload=payload.model_dump(mode="json"),
-                created_at=database_now(session),
-            )
-        )
-    return ForecastAccepted(identity, job_id)
+        accepted = _enqueue_frozen_forecast(session, queue, payload)
+    return accepted
 
 
 def validate_result(

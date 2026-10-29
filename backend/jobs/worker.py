@@ -29,6 +29,7 @@ from backend.forecasting.errors import SAFE_FORECAST_REASONS, ForecastFailure
 from backend.forecasting.service import seal_forecast
 from backend.jobs.handlers.apply_scheduled_fills import apply_scheduled_fills
 from backend.jobs.handlers.backtest import backtest, backtest_core
+from backend.jobs.handlers.evaluate_portfolio import evaluate_portfolio
 from backend.jobs.handlers.evaluate_strategy import EvaluationFailure, evaluate_strategy
 from backend.jobs.handlers.forecast import forecast
 from backend.jobs.handlers.refresh_market_data import refresh_market_data
@@ -38,6 +39,11 @@ from backend.market_data.providers.yahoo import ProviderFailure
 from backend.market_data.snapshots import PublicationFenceError, publish_snapshot
 from backend.persistence.database import Settings, database_engine
 from backend.portfolio.fills import enqueue_due_batches, seal_fill
+from backend.portfolio.recommendation_errors import (
+    SAFE_RECOMMENDATION_REASONS,
+    RecommendationFailure,
+)
+from backend.portfolio.recommendations import seal_recommendation
 from backend.strategies.evaluations import seal_evaluation
 
 logger = logging.getLogger(__name__)
@@ -121,7 +127,7 @@ def child_entry(
                 last_progress = percent
 
         value: int | str
-        if lease.kind in {"backtest_core", "backtest", "forecast"}:
+        if lease.kind in {"backtest_core", "backtest", "forecast", "evaluate_portfolio"}:
             value = cast(CoreHandler, handler)(lease.payload, cancelled, report_progress)
         else:
             value = handler(lease.payload, cancelled)
@@ -135,6 +141,8 @@ def child_entry(
         pipe.send(("cancelled",))
     except ForecastFailure as error:
         pipe.send(("forecast_error", error.reason))
+    except RecommendationFailure as error:
+        pipe.send(("recommendation_error", error.reason))
     except BacktestFailure as error:
         pipe.send(
             ("cancelled",) if error.reason == "CANCELLED" else ("backtest_error", error.reason)
@@ -219,6 +227,8 @@ class Worker:
             handler = partial(refresh_market_data, stage=stage)
         elif lease.kind == "evaluate_strategy":
             handler = partial(evaluate_strategy, root=self.artifact_root)
+        elif lease.kind == "evaluate_portfolio":
+            handler = partial(evaluate_portfolio, root=self.artifact_root)
         elif lease.kind == "forecast":
             staging = self.artifact_root / "forecast-staging"
             staging.mkdir(mode=0o700, parents=True, exist_ok=True)
@@ -266,7 +276,8 @@ class Worker:
                     return
                 if incoming[0] == "progress":
                     if (
-                        lease.kind not in {"backtest_core", "backtest", "forecast"}
+                        lease.kind
+                        not in {"backtest_core", "backtest", "forecast", "evaluate_portfolio"}
                         or type(incoming[1]) is not int
                         or not progress <= incoming[1] <= 99
                     ):
@@ -364,6 +375,10 @@ class Worker:
                         if stage is None or not isinstance(message[1], str):
                             raise ValueError("Invalid forecast completion")
                         seal_forecast(self.queue, lease, self.artifact_root, stage, message[1])
+                    elif lease.kind == "evaluate_portfolio":
+                        if not isinstance(message[1], str):
+                            raise ValueError("Invalid recommendation completion")
+                        seal_recommendation(self.queue, lease, message[1])
                     elif lease.kind in {"backtest_core", "backtest"}:
                         if stage is None or not isinstance(message[1], str):
                             raise ValueError("Invalid core completion")
@@ -386,7 +401,11 @@ class Worker:
                 if message and message[0] == "evaluation_error":
                     if message[1] in {"VALIDATION_ERROR", "STALE_DATA"}:
                         code = message[1]
-                if message and message[0] == "forecast_error":
+                if message and message[0] == "recommendation_error":
+                    if message[1] not in SAFE_RECOMMENDATION_REASONS:
+                        raise ValueError("Invalid recommendation failure")
+                    self.queue.fail(lease, "VALIDATION_ERROR", reason=message[1])
+                elif message and message[0] == "forecast_error":
                     if message[1] not in SAFE_FORECAST_REASONS:
                         raise ValueError("Invalid forecast failure")
                     self.queue.fail(lease, "VALIDATION_ERROR", reason=message[1])
