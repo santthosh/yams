@@ -584,6 +584,60 @@ def main() -> None:
         )
         evidence["paper_batch"] = paper_batch
         evidence["checks"].append("private explicit fixture approval and real worker atomic fill")
+        scenario = json.loads(python((ROOT / "scripts/forecast_smoke_fixture.py").read_text()))
+        deadline = time.monotonic() + 60
+        while get(f"jobs/{scenario['job_id']}")["status"] in {"queued", "running"}:
+            if time.monotonic() >= deadline:
+                raise AssertionError("Private forecast worker did not complete")
+            time.sleep(0.2)
+
+        def scenario_result() -> Any:
+            assert get(f"jobs/{scenario['job_id']}")["status"] == "completed"
+            result = json.loads(
+                python(
+                    "import json; from uuid import UUID; "
+                    "from backend.persistence.database import Settings,database_engine; "
+                    "from backend.forecasting.service import read_forecast; "
+                    "s=Settings.from_environment(); e=database_engine(s.database_url); "
+                    f"r=read_forecast(e,s.artifact_root,UUID({scenario['forecast_id']!r})); "
+                    "assert r is not None and r.result is not None; "
+                    "print(json.dumps({'forecast':r.result.model_dump(mode='json'),"
+                    "'manifest_sha256':r.manifest_sha256,"
+                    "'payload':r.payload.model_dump(mode='json')})); "
+                    "e.dispose()"
+                )
+            )
+            forecast = result["forecast"]
+            assert (
+                forecast["status"] == "available" and forecast["data_status"] == "synthetic_fixture"
+            )
+            assert forecast["hold_unchanged"]["median_ending_value_usd"] == "1000.00"
+            assert forecast["hold_unchanged"]["probability_of_loss"] == 0
+            assert forecast["proposed"] is not None and forecast["sampled_indices"] is not None
+            assert (
+                forecast["simulation_count"] == 5000
+                and 0 < forecast["horizon_trading_sessions"] < 90
+            )
+            assert (
+                forecast["fingerprint"] is not None and forecast["rng"]["initial_state"] is not None
+            )
+            account = get(f"portfolios/{scenario['portfolio_id']}")
+            assert (
+                account["cash_usd"] == "1000.00"
+                and account["revision"] == 1
+                and account["holdings"] == []
+            )
+            history = get(f"portfolios/{scenario['portfolio_id']}/transactions")
+            assert [row["kind"] for row in history["items"]] == ["opening_funding"]
+            return result
+
+        original_scenario = scenario_result()
+        evidence["scenario_probe"] = scenario
+        evidence["scenario_result"] = original_scenario
+        evidence["checks"].append(
+            "private real-worker seeded common-shock scenarios and immutable artifacts; "
+            "no portfolio effects"
+        )
         for service in ("api", "worker"):
             blocked = compose(
                 "exec",
@@ -613,6 +667,7 @@ def main() -> None:
         verify_public_runs()
         verify_paper_batch()
         verify_portfolio_screens("restart")
+        assert scenario_result() == original_scenario
         assert get("strategies") == strategies
         assert get(f"strategies/{strategy_id}/versions") == versions
         for editor_id, history in editor_versions.items():
@@ -640,6 +695,7 @@ def main() -> None:
         verify_public_runs()
         verify_paper_batch()
         verify_portfolio_screens("rebuild")
+        assert scenario_result() == original_scenario
         assert get("strategies") == strategies
         assert get(f"strategies/{strategy_id}/versions") == versions
         for editor_id, history in editor_versions.items():

@@ -256,6 +256,7 @@ def test_public_negative_inputs_and_safe_errors(database: Engine, tmp_path: Path
 def test_populated_core_schema_upgrade_retains_admission(database: Engine, tmp_path: Path) -> None:
     prior = tmp_path / "prior-migrations"
     shutil.copytree(MIGRATIONS, prior)
+    (prior / "versions/0007_forecasts.py").unlink()
     (prior / "versions/0006_paper_ledger.py").unlink()
     (prior / "versions/0005a_experiment_reports.py").unlink()
     workspace = bootstrap(database, prior)

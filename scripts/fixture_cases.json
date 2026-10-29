@@ -666,6 +666,10 @@
         ],
         "upfront_cost_usd": "0.00",
         "initial_nav_usd": "1000.00"
+      },
+      "precision_cash_probe": {
+        "initial_nav_usd": "1000000000000000000000.00",
+        "proposed_upfront_cost_usd": "0.01"
       }
     },
     "expected": {
@@ -725,9 +729,14 @@
         130,
         241,
         182
-      ]
+      ],
+      "precision_cash_probe": {
+        "proposed_ending_usd": "999999999999999999999.99",
+        "proposed_return": -1e-23,
+        "proposed_loss_probability": 1
+      }
     },
-    "derivation": "Whole vectors selected at rows1,2,0 preserve exact anti-correlation. .5*x+.5*(-x)=0 at every step. For five sorted paths, (N-1)*q gives0.4/2/3.6, hence-.16/0/.16. Constant-vector75/25 case earns .005 per step, independently evaluable as1.005^63. A 63-session count is an explicit sampling probe, never a hard-coded 90-day mapping.",
+    "derivation": "Whole vectors selected at rows1,2,0 preserve exact anti-correlation. .5*x+.5*(-x)=0 at every step. For five sorted paths, (N-1)*q gives0.4/2/3.6, hence-.16/0/.16. Constant-vector75/25 case earns .005 per step, independently evaluable as1.005^63. A 63-session count is an explicit sampling probe, never a hard-coded 90-day mapping. At NAV1000000000000000000000.00, a one-cent cash cost leaves999999999999999999999.99; its return is -1e-23 and every path loses. The known cost must not vanish through float cancellation.",
     "negative_cases": [
       {
         "mutation": "draw separate per-asset streams",

@@ -1,0 +1,21 @@
+{
+  "label": "SYNTHETIC_DATA_ONLY",
+  "probe": "NUMERICAL_DIMENSION_STRESS_NOT_MARKET_PERFORMANCE",
+  "native_host": "aarch64",
+  "numpy_version": "2.5.4",
+  "assets": 16,
+  "paths": 5000,
+  "future_sessions": 90,
+  "history_returns": 252,
+  "path_shape": [
+    2,
+    5000,
+    91
+  ],
+  "computation_seconds": 0.029350540600717068,
+  "process_peak_rss_kib": 64504,
+  "address_space_limit_mib": 2048,
+  "cpu_seconds_limit": 10,
+  "cpu_affinity_count": 2,
+  "passed": true
+}
