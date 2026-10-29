@@ -580,7 +580,7 @@ it("allows scoped recommendation and forecast reads with exact seed bytes", asyn
         fetcher,
       )
     ).status,
-  ).toBe(405);
+  ).toBe(422);
 });
 
 it("forwards only a valid recommendation key and preserves exact request tokens", async () => {
@@ -662,3 +662,90 @@ it.each(["queued", "running", "failed", "cancelled"])(
     expect(JSON.stringify(body)).not.toContain("private");
   },
 );
+
+it("forwards only scoped paper controls with mandatory operation keys", async () => {
+  const id = "11111111-1111-4111-8111-111111111111";
+  const fetcher = vi.fn(async (_input, init) => {
+    expect(init.headers).not.toHaveProperty("Cookie");
+    expect(init.headers).not.toHaveProperty("Authorization");
+    return Response.json({ batch_id: id });
+  });
+  for (const parts of [
+    ["recommendations", id, "apply"],
+    ["order-batches", id, "advance-fixture"],
+  ]) {
+    const make = (key?: string) =>
+      new Request(`http://web.test/api/v1/${parts.join("/")}`, {
+        method: "POST",
+        headers: {
+          Origin: "http://web.test",
+          "Content-Type": "application/json",
+          Cookie: "private",
+          Authorization: "private",
+          ...(key ? { "Idempotency-Key": key } : {}),
+        },
+        body:
+          parts[2] === "apply"
+            ? '{"expected_revision":9223372036854775807}'
+            : "{}",
+      });
+    expect((await proxyApi(make(), parts, fetcher)).status).toBe(422);
+    expect((await proxyApi(make("invalid"), parts, fetcher)).status).toBe(422);
+    expect((await proxyApi(make(id), parts, fetcher)).status).toBe(200);
+    expect(fetcher.mock.lastCall?.[1].headers["Idempotency-Key"]).toBe(id);
+    if (parts[2] === "apply")
+      expect(fetcher.mock.lastCall?.[1].body).toBe(
+        '{"expected_revision":9223372036854775807}',
+      );
+  }
+  const parts = ["recommendations", id, "apply-result"];
+  expect(
+    (await proxyApi(request(parts.join("/")), parts, fetcher)).status,
+  ).toBe(422);
+  const recover = new Request(`http://web.test/api/v1/${parts.join("/")}`, {
+    headers: { "Idempotency-Key": id, Cookie: "private" },
+  });
+  expect((await proxyApi(recover, parts, fetcher)).status).toBe(200);
+  expect(fetcher.mock.lastCall?.[1].headers["Idempotency-Key"]).toBe(id);
+  for (const parts of [
+    ["recommendations", id, "dismiss"],
+    ["order-batches", id, "cancel"],
+  ]) {
+    const body = new Request(`http://web.test/api/v1/${parts.join("/")}`, {
+      method: "POST",
+      headers: {
+        Origin: "http://web.test",
+        "Content-Type": "application/json",
+      },
+      body: "{}",
+    });
+    expect((await proxyApi(body, parts, fetcher)).status).toBe(200);
+  }
+  expect(
+    (
+      await proxyApi(
+        request(`order-batches/${id}`),
+        ["order-batches", id],
+        fetcher,
+      )
+    ).status,
+  ).toBe(200);
+  expect(
+    (
+      await proxyApi(
+        request(`order-batches/${id}/fill`, "POST"),
+        ["order-batches", id, "fill"],
+        fetcher,
+      )
+    ).status,
+  ).toBe(405);
+  expect(
+    (
+      await proxyApi(
+        request(`order-batches/${id}?price=1`),
+        ["order-batches", id],
+        fetcher,
+      )
+    ).status,
+  ).toBe(404);
+});

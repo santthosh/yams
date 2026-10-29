@@ -33,6 +33,23 @@ from backend.portfolio.execution import (
     next_eligible_session,
 )
 from backend.portfolio.ledger import LedgerConflict, _append, _check_projection, _locked, digest
+from backend.portfolio.paper_clock import operator_audit, operator_clock
+
+
+class ApprovalIdempotencyConflict(LedgerConflict):
+    """The original key refers to different immutable approval inputs."""
+
+
+class StaleApprovalData(LedgerConflict):
+    """The original decision source is stale or incompatible."""
+
+
+class ApprovalIntegrityConflict(LedgerConflict):
+    """Original immutable content differs from its recorded digest."""
+
+
+class NoExecutableOrders(LedgerConflict):
+    """A legitimate HOLD/cash recommendation has no batch to authorize."""
 
 
 class ExecutionIntentV1(Contract):
@@ -62,7 +79,7 @@ def _retry(session: Session, owner: UUID, key: UUID, request_hash: str) -> UUID 
     if prior is None:
         return None
     if prior.request_sha256 != request_hash:
-        raise LedgerConflict("Approval idempotency key refers to different inputs")
+        raise ApprovalIdempotencyConflict("Approval idempotency key refers to different inputs")
     return prior.id
 
 
@@ -75,6 +92,7 @@ def approve_batch(
     idempotency_key: UUID,
     pinned: PinnedSnapshot | None = None,
     approved_at: datetime | None = None,
+    server_clock: bool = False,
 ) -> UUID:
     """Approve stored intent once; unchanged cash/holdings, one active reservation.
 
@@ -103,7 +121,7 @@ def approve_batch(
     now = TypeAdapter(UTCTimestamp).validate_python(approved_at or datetime.now(UTC))
     calendar = Calendar.model_validate_json(pinned.artifacts[manifest.calendar.artifact_path])
     if calendar_digest(calendar) != manifest.calendar.version or manifest.quality == "blocked":
-        raise LedgerConflict("Decision snapshot/calendar is unavailable")
+        raise StaleApprovalData("Decision snapshot/calendar is unavailable")
     # Current providers do not support complete action/raw execution accounting.
     # No schema or approval operation may silently promote their capabilities.
     if mode != "synthetic_fixture":
@@ -120,7 +138,7 @@ def approve_batch(
             .order_by(LedgerEvent.sequence.desc())
             .limit(1)
         )
-        if latest is not None and now < latest:
+        if not server_clock and latest is not None and now < latest:
             raise LedgerConflict("Operator clock precedes posted history")
 
         if account.status != "active" or account.revision != expected_revision:
@@ -141,8 +159,17 @@ def approve_batch(
         )
         if rec is None:
             raise LookupError("Recommendation does not exist")
+        actual = None
+        if server_clock:
+            if approved_at is not None:
+                raise ValueError("Server-owned approval cannot accept a caller timestamp")
+            now, actual = operator_clock(
+                session, portfolio_id, mode, max(rec.created_at, rec.decision_cutoff)
+            )
         registered = session.get(DatasetSnapshot, rec.snapshot_id)
         current = session.get(CurrentSnapshot, mode)
+        if digest(rec.content) != rec.content_sha256:
+            raise ApprovalIntegrityConflict("Recommendation immutable content is unavailable")
         if (
             rec.portfolio_id != portfolio_id
             or rec.strategy_version_id != account.strategy_version_id
@@ -150,10 +177,12 @@ def approve_batch(
             or rec.disposition != "ready"
             or rec.source_mode != account.source_mode
             or rec.source_mode != mode
-            or digest(rec.content) != rec.content_sha256
             or rec.created_at > now
             or rec.decision_cutoff > now
-            or registered is None
+        ):
+            raise LedgerConflict("Recommendation is obsolete or incompatible")
+        if (
+            registered is None
             or registered.id != manifest.snapshot_id()
             or registered.manifest_hash != manifest.manifest_hash()
             or registered.manifest != manifest.model_dump(mode="json")
@@ -161,10 +190,15 @@ def approve_batch(
             or current is None
             or current.snapshot_id != registered.id
         ):
-            raise LedgerConflict("Recommendation is obsolete, stale or incompatible")
+            raise StaleApprovalData("Recommendation source is stale or incompatible")
+        if (
+            rec.content.get("execution_intent") is None
+            and "recommendation_canonical_json" in rec.content
+        ):
+            raise NoExecutableOrders("Recommendation has no executable orders to approve")
         intent = ExecutionIntentV1.model_validate(rec.content.get("execution_intent"))
         if any(row.asset_id not in manifest.coverage.asset_ids for row in intent.orders):
-            raise LedgerConflict("Approved asset is absent from decision source")
+            raise StaleApprovalData("Approved asset is absent from decision source")
         decision = next(
             (row for row in calendar.sessions if row.session_date == rec.as_of_session), None
         )
@@ -246,12 +280,19 @@ def approve_batch(
             recorded_at=now,
             effective_at=now,
             snapshot_id=registered.id,
+            details=operator_audit(actual),
         )
         session.flush()
         return identity
 
 
-def cancel_batch(engine: Engine, batch_id: UUID, *, cancelled_at: datetime | None = None) -> UUID:
+def cancel_batch(
+    engine: Engine,
+    batch_id: UUID,
+    *,
+    cancelled_at: datetime | None = None,
+    server_clock: bool = False,
+) -> UUID:
     """Close only outstanding intent; any committed fills remain immutable."""
     now = TypeAdapter(UTCTimestamp).validate_python(cancelled_at or datetime.now(UTC))
     with Session(engine) as session:
@@ -269,6 +310,16 @@ def cancel_batch(engine: Engine, batch_id: UUID, *, cancelled_at: datetime | Non
         if batch.terminal:
             return batch.id
         before = _check_projection(session, account)
+        actual = None
+        if server_clock:
+            if cancelled_at is not None:
+                raise ValueError("Server-owned cancellation cannot accept a caller timestamp")
+            now, actual = operator_clock(
+                session,
+                owner,
+                TypeAdapter(SourceMode).validate_python(account.source_mode),
+                batch.approved_at,
+            )
         latest = session.scalar(
             select(LedgerEvent.recorded_at)
             .where(LedgerEvent.portfolio_id == account.id)
@@ -309,6 +360,7 @@ def cancel_batch(engine: Engine, batch_id: UUID, *, cancelled_at: datetime | Non
             recorded_at=now,
             effective_at=now,
             snapshot_id=batch.snapshot_id,
+            details=operator_audit(actual),
         )
         session.flush()
         return batch.id
@@ -333,39 +385,44 @@ def read_batch(engine: Engine, batch_id: UUID) -> PaperOrderBatchV1:
                 .order_by(PaperOrder.ordinal)
             )
         )
-        return PaperOrderBatchV1.model_validate(
-            dict(
-                id=batch.id,
-                portfolio_id=owner,
-                recommendation_id=batch.recommendation_id,
-                approval_idempotency_key=batch.idempotency_key,
-                approved_revision=batch.approved_revision,
-                approved_at=batch.approved_at,
-                decision_cutoff_utc=batch.decision_cutoff,
-                snapshot_id=batch.snapshot_id,
-                calendar_version=batch.calendar_sha256,
-                execution_policy_id=batch.policy["id"],
-                eligible_open_at=batch.eligible_open_at,
-                status=batch.status,
-                terminal=batch.terminal,
-                reason=batch.reason,
-                orders=tuple(
-                    PaperOrderV1.model_validate(
-                        dict(
-                            id=row.id,
-                            asset_id=row.asset_id,
-                            side=row.side,
-                            requested_quantity=format(row.requested_quantity, ".6f"),
-                            filled_quantity=format(row.filled_quantity, ".6f"),
-                            pending_quantity=format(row.pending_quantity, ".6f"),
-                            cancelled_or_skipped_quantity=format(row.closed_quantity, ".6f"),
-                            earliest_fill_session=batch.eligible_open_at.date(),
-                            status=row.status,
-                            terminal=row.terminal,
-                            reason=row.reason,
-                        )
+        return batch_view(batch, orders)
+
+
+def batch_view(batch: PaperOrderBatch, orders: list[PaperOrder]) -> PaperOrderBatchV1:
+    """Map rows already read under the caller's portfolio lock."""
+    return PaperOrderBatchV1.model_validate(
+        dict(
+            id=batch.id,
+            portfolio_id=batch.portfolio_id,
+            recommendation_id=batch.recommendation_id,
+            approval_idempotency_key=batch.idempotency_key,
+            approved_revision=batch.approved_revision,
+            approved_at=batch.approved_at,
+            decision_cutoff_utc=batch.decision_cutoff,
+            snapshot_id=batch.snapshot_id,
+            calendar_version=batch.calendar_sha256,
+            execution_policy_id=batch.policy["id"],
+            eligible_open_at=batch.eligible_open_at,
+            status=batch.status,
+            terminal=batch.terminal,
+            reason=batch.reason,
+            orders=tuple(
+                PaperOrderV1.model_validate(
+                    dict(
+                        id=row.id,
+                        asset_id=row.asset_id,
+                        side=row.side,
+                        requested_quantity=format(row.requested_quantity, ".6f"),
+                        filled_quantity=format(row.filled_quantity, ".6f"),
+                        pending_quantity=format(row.pending_quantity, ".6f"),
+                        cancelled_or_skipped_quantity=format(row.closed_quantity, ".6f"),
+                        earliest_fill_session=batch.eligible_open_at.date(),
+                        status=row.status,
+                        terminal=row.terminal,
+                        reason=row.reason,
                     )
-                    for row in orders
-                ),
-            )
+                )
+                for row in orders
+            ),
         )
+    )

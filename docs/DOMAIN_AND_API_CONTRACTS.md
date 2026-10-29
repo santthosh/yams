@@ -359,9 +359,29 @@ reason/null outcomes. Unknown IDs return404 and broken storage returns503.
 Original content remains separate from disposition. `is_current`, current
 portfolio revision and stale reasons report eligibility without mutating history.
 Revision changes during computation preserve expired evidence. Public approval,
-dismissal and batch lifecycle remain #50; GET and recommendation generation post
+dismissal and batch lifecycle use the controls below; GET and recommendation generation post
 no financial effects. ADR-006 binds scenarios to the feasible preview rather than
 pretending skipped/under-band target changes were executed.
+
+### 5.2 Public paper authorization controls (#50)
+
+[ADR-015](adr/0015-public-paper-controls.md) and the
+[operational contract](operations/paper-controls.md) define the additive public
+apply/recovery/dismiss/batch/cancel/fixture-step endpoints. Apply requires a UUID
+key and strict positive int64 `expected_revision`; its202 response is immutable
+approval identity, while batch GET returns current order state. Exact retry and
+read-only keyed recovery precede freshness and source-file checks. Dismissal and
+cancellation are target-idempotent closed `{}` commands; they accept no clock,
+price, quantity or balance input. Cancellation retains every posted effect.
+
+Synthetic replay steps require their own UUID key and closed `{}`. The server
+selects a verified completed-session close under the portfolio lock and persists
+it in the existing fill job. Daily bars not yet available at that instant leave
+orders pending. A later explicit step can expose the original opening evidence;
+it cannot substitute a different opening price. Real providers remain unsupported
+for accounting. Actual operator UTC audit is separate from synthetic replay time.
+Original eligibility, immutable evidence and exact ledger arithmetic remain under
+ADR-001/004/014; scheduling and screens belong to #51/#52.
 
 ## 6. Resource endpoints (minimum contracts)
 
@@ -392,7 +412,11 @@ pretending skipped/under-band target changes were executed.
 | `GET /recommendations/{id}` | Full proposed orders/explanations | 200 immutable recommendation | 0.0.5 | #49 |
 | `GET /forecasts/{id}` | Numerical scenario details | 200 forecast or unavailable | 0.0.5 | #49 |
 | `POST /recommendations/{id}/apply` | **Authorize synthetic** order batch; requires key | 202 order batch / 409 stale | 0.0.5 | #50 |
+| `GET /recommendations/{id}/apply-result` | Recover original approval by required key | 200 immutable identity / 404 unknown | 0.0.5 | #50 |
+| `POST /recommendations/{id}/dismiss` | Retain content, dismiss ready/expired disposition | 200 disposition / 409 applied | 0.0.5 | #50 |
 | `GET /order-batches/{id}` | Pending/fill/reconcile state | 200 batch | 0.0.5 | #50 |
+| `POST /order-batches/{id}/cancel` | Close only outstanding intent | 200 actual batch outcome | 0.0.5 | #50 |
+| `POST /order-batches/{id}/advance-fixture` | Explicit keyed server-owned replay step | 202 job and observation identity / 409 active | 0.0.5 | #50 |
 | `POST /arenas` | Create fair prospective competition | 201 arena | 0.0.6 | #55 |
 | `GET /arenas/{id}` | Arena entrants and results | 200 arena | 0.0.6 | #55 |
 | `POST /arenas/{id}/entrants` | Launch entrant with frozen version | 201 entrant | 0.0.6 | #55 |
@@ -504,8 +528,8 @@ signed effects, actual fills, original source/strategy/times and correction line
 not private command payloads. Reads never post events, enqueue jobs or repair
 projections. Invalid cursor 422, unknown account 404, reconciliation mismatch 409
 STATE_CONFLICT, unavailable database/integrity 503 NOT_READY. Source labels and
-paper-only status remain explicit. No deposit/withdraw/direct-fill or public
-recommendation apply route is activated. See the [operational contract and examples](operations/paper-portfolio-api.md).
+paper-only status remain explicit. No deposit/withdraw/direct-fill route is activated;
+public recommendation authorization delegates to the shared batch service (§5.2). See the [operational contract and examples](operations/paper-portfolio-api.md).
 
 ### 6.4 Staged operations
 
@@ -558,9 +582,10 @@ original eligible opening. Coordinated implementation/generated types and runtim
 proofs remain with #46; this decision does not activate a handler or change prices.
 
 The [private #46 batch/worker service](operations/paper-batches.md) implements
-authorization, cancellation and typed batch inspection for future transport. It
-registers only the closed internal `apply_scheduled_fills` job; public approval
-and `GET /order-batches/{id}` remain assigned to #50. Its optional execution-source
+authorization, cancellation and typed batch inspection behind the
+[public #50 controls](operations/paper-controls.md). It registers the closed
+internal `apply_scheduled_fills` job; public routes delegate to this service.
+Its optional execution-source
 context pair is additive; absent fields retain legacy serialized bytes.
 
 [ADR-004](adr/0004-portfolio-ledger.md) ratifies event schemas, numeric scales, portfolio locking with revision checks, one active batch as the exclusive reservation, partial-result termination, corrections, replay and staged migration ownership. Batch/order responses include `terminal` and filled/pending/cancelled-or-skipped quantities so a terminal cash-reduced fill is not mistaken for an outstanding order.

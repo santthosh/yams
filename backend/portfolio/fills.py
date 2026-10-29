@@ -27,6 +27,7 @@ from backend.market_data.models import Calendar, CorporateAction
 from backend.market_data.snapshots import PublicationFenceError
 from backend.persistence.models.job import JobAttempt
 from backend.persistence.models.ledger import PaperOrder, PaperOrderBatch
+from backend.persistence.models.portfolio import PaperPortfolio
 from backend.persistence.models.snapshot import CurrentSnapshot, DatasetSnapshot
 from backend.portfolio.corporate_actions import action_key, apply_action
 from backend.portfolio.execution import (
@@ -73,61 +74,76 @@ def enqueue_batch_attempt(
         assert batch is not None
         if batch.terminal or account.reconciliation_failed or account.status != "active":
             return None
-        now = fixture_observed_at or datetime.now(UTC)
-        if (fixture_observed_at is not None) != (account.source_mode == "synthetic_fixture"):
-            raise ValueError("Fixture execution requires an explicit replay clock")
-        if now < batch.eligible_open_at:
-            return None
-        orders = list(
-            session.scalars(
-                select(PaperOrder).where(PaperOrder.batch_id == batch_id, ~PaperOrder.terminal)
-            )
+        return _enqueue_locked_attempt(queue, session, account, batch, fixture_observed_at)
+
+
+def _enqueue_locked_attempt(
+    queue: Queue,
+    session: Session,
+    account: PaperPortfolio,
+    batch: PaperOrderBatch,
+    fixture_observed_at: datetime | None,
+    *,
+    request_correlation: UUID | None = None,
+) -> UUID | None:
+    """Caller owns the portfolio lock; shared bounded order admission, no fills."""
+    now = fixture_observed_at or datetime.now(UTC)
+    if (fixture_observed_at is not None) != (account.source_mode == "synthetic_fixture"):
+        raise ValueError("Fixture execution requires an explicit replay clock")
+    if now < batch.eligible_open_at:
+        return None
+    orders = list(
+        session.scalars(
+            select(PaperOrder).where(PaperOrder.batch_id == batch.id, ~PaperOrder.terminal)
         )
-        if not orders:
-            return None
-        order = min(
-            orders, key=lambda row: (0 if row.side == "SELL" else 1, row.asset_id, row.ordinal)
-        )
-        pointer = session.get(CurrentSnapshot, account.source_mode)
-        source = session.get(DatasetSnapshot, pointer.snapshot_id) if pointer else None
-        if source is None or source.quality == "blocked":
-            return None
-        manifest = SnapshotManifestV1.model_validate(source.manifest)
-        calendar_rows = next(
-            (a.row_count for a in manifest.artifacts if a.path == manifest.calendar.artifact_path),
-            None,
-        )
-        if calendar_rows is None or calendar_rows < 1:
-            raise ValueError("Execution calendar lacks admission metadata")
-        validate_workload(assets=len(manifest.coverage.asset_ids), sessions=calendar_rows)
-        payload = ScheduledFillPayload(
-            portfolio_id=owner,
-            batch_id=batch_id,
-            order_id=order.id,
-            asset_id=order.asset_id,
-            eligible_session=batch.eligible_open_at.date(),
-            source_mode=TypeAdapter(SourceMode).validate_python(account.source_mode),
-            decision_snapshot_id=batch.snapshot_id,
-            decision_snapshot_sha256=batch.snapshot_sha256,
-            execution_snapshot_id=source.id,
-            execution_snapshot_sha256=source.manifest_hash,
-            fixture_observed_at=fixture_observed_at,
-        )
-        identity = uuid5(
-            batch_id,
-            "fill-attempt:"
-            + digest(
-                [
-                    str(order.id),
-                    source.manifest_hash,
-                    account.revision,
-                    fixture_observed_at.isoformat() if fixture_observed_at else None,
-                ]
-            ),
-        )
-        return queue._enqueue(
-            session, "apply_scheduled_fills", payload.model_dump(mode="json"), identity
-        )
+    )
+    if not orders:
+        return None
+    order = min(orders, key=lambda row: (0 if row.side == "SELL" else 1, row.asset_id, row.ordinal))
+    pointer = session.get(CurrentSnapshot, account.source_mode)
+    source = session.get(DatasetSnapshot, pointer.snapshot_id) if pointer else None
+    if source is None or source.quality == "blocked":
+        return None
+    manifest = SnapshotManifestV1.model_validate(source.manifest)
+    calendar_rows = next(
+        (a.row_count for a in manifest.artifacts if a.path == manifest.calendar.artifact_path),
+        None,
+    )
+    if calendar_rows is None or calendar_rows < 1:
+        raise ValueError("Execution calendar lacks admission metadata")
+    validate_workload(assets=len(manifest.coverage.asset_ids), sessions=calendar_rows)
+    payload = ScheduledFillPayload(
+        portfolio_id=batch.portfolio_id,
+        batch_id=batch.id,
+        order_id=order.id,
+        asset_id=order.asset_id,
+        eligible_session=batch.eligible_open_at.date(),
+        source_mode=TypeAdapter(SourceMode).validate_python(account.source_mode),
+        decision_snapshot_id=batch.snapshot_id,
+        decision_snapshot_sha256=batch.snapshot_sha256,
+        execution_snapshot_id=source.id,
+        execution_snapshot_sha256=source.manifest_hash,
+        fixture_observed_at=fixture_observed_at,
+    )
+    identity = uuid5(
+        batch.id,
+        "fill-attempt:"
+        + digest(
+            [
+                str(order.id),
+                source.manifest_hash,
+                account.revision,
+                fixture_observed_at.isoformat() if fixture_observed_at else None,
+            ]
+        ),
+    )
+    return queue._enqueue(
+        session,
+        "apply_scheduled_fills",
+        payload.model_dump(mode="json"),
+        identity,
+        correlation_id=request_correlation,
+    )
 
 
 def seal_fill(queue: Queue, lease: Lease, value: str) -> None:

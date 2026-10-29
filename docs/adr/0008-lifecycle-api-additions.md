@@ -54,3 +54,11 @@ API §6 inventories every existing route plus candidate diagnostics with respons
 ## Verification and consequences
 
 Review the route inventory for unique method/path pairs and preservation of all original routes. Compare staging with every milestone exit and UX test journey. No runtime test or financial computation is claimed by this document-only change. Implementation tests must prove immutable history, duplicate-name conflicts, diagnostic empty/failure states and truthful staged UI. Later contract owners coordinate API, client, docs and tests instead of inventing isolated UI endpoints.
+
+## Public paper lifecycle ratification (#50)
+
+[ADR-015](0015-public-paper-controls.md) specifies the concrete apply, keyed
+recovery, dismiss, batch inspection, cancel and explicit fixture-step contracts.
+It preserves the policy/service ownership above and separates actual operator
+audit from durable synthetic replay. The generated OpenAPI exposes only implemented
+methods; scheduling and Decision Center screens remain separately owned.

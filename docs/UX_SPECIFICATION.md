@@ -139,7 +139,7 @@ benchmark gaps, failed submissions and full forks remain explicit.
 The 0.0.4 [account-screen handoff](operations/paper-portfolios.md) implements
 creation/list/detail and posted ledger inspection. Valuation, quantities and
 weights come from the API. Live pending-batch transport and approval remain
-explicitly staged until #50/#52; a typed service-fixture component separately
+explicitly staged until the #52 screen integrates the #50 transport; a typed service-fixture component separately
 proves pending/terminal-partial/cancelled presentation without a fake endpoint.
 Performance change, targets, rationale and forecasts remain with their producers.
 
@@ -153,6 +153,16 @@ A consistent four-step presentation:
 4. **Approve virtual trades**: order preview, execution assumptions, safe modal confirmation.
 
 `HOLD` is a genuine full-screen outcome, not an error: `No changes meet the threshold` plus signals and re-evaluation date. The user can dismiss, approve a batch, or return to the Lab. A changed portfolio revision or stale market snapshot invalidates the preview and asks for re-evaluation. A forecast that cannot be computed shows **unavailable** and clear reason; do not substitute arbitrary projected returns. If data restrictions prevent a safe actionable order, approval must be disabled, but the last historical analysis remains viewable.
+
+The [public paper controls](operations/paper-controls.md) are available to the
+#52 screen owner. Persist the UUID approval key before submitting; recover the
+original identity after response loss and poll batch GET for current state.
+Synthetic replay must visibly distinguish logical fixture time from actual UTC
+operator audit. After approval show pending intent and an explicit fixture-advance
+action; never automatically invent future sessions. Unavailable opening evidence
+stays pending, even after an accepted step. Cancellation shows the actual partial
+or filled race outcome and retains posted effects. HOLD/cash-only results without
+executable orders cannot enable approval. Scheduling remains #51.
 
 ### 5.7 Arena (`/arena`, `/arena/[id]`)
 

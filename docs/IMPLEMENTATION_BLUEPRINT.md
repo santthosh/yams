@@ -134,7 +134,9 @@ evidence from a later immutable execution-price publication. Implementation and
 verification belong to #46; the decision alone activates no worker path. The
 [private authorization/worker handoff](operations/paper-batches.md) describes the
 closed stored intent, one active reservation, separately committed sell/buy jobs,
-explicit fixture replay and lease-fenced publication. Public apply remains #50.
+explicit fixture replay and lease-fenced publication. The [public #50 controls](operations/paper-controls.md)
+delegate to that service, retain actual UTC audit separately and require explicit
+keyed fixture advances; scheduling/screens remain #51/#52.
 
 - Calculate portfolio value from posted holdings at a coherent market price timestamp plus settled simulated cash; mark stale valuations clearly.
 - Compare current weights with versioned targets and calculate trade deltas. If change is under tolerance, label `HOLD` unless a hard risk rule is violated.

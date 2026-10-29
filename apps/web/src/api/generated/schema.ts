@@ -204,6 +204,57 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/order-batches/{batch_id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Read */
+    get: operations["read_api_v1_order_batches__batch_id__get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/order-batches/{batch_id}/advance-fixture": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Advance */
+    post: operations["advance_api_v1_order_batches__batch_id__advance_fixture_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/order-batches/{batch_id}/cancel": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Cancel */
+    post: operations["cancel_api_v1_order_batches__batch_id__cancel_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/v1/portfolios": {
     parameters: {
       query?: never;
@@ -285,6 +336,57 @@ export interface paths {
     get: operations["read_api_v1_recommendations__recommendation_id__get"];
     put?: never;
     post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/recommendations/{recommendation_id}/apply": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Apply */
+    post: operations["apply_api_v1_recommendations__recommendation_id__apply_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/recommendations/{recommendation_id}/apply-result": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Recover */
+    get: operations["recover_api_v1_recommendations__recommendation_id__apply_result_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/recommendations/{recommendation_id}/dismiss": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Dismiss */
+    post: operations["dismiss_api_v1_recommendations__recommendation_id__dismiss_post"];
     delete?: never;
     options?: never;
     head?: never;
@@ -478,6 +580,11 @@ export interface components {
       key: string;
       /** Payload Sha256 */
       payload_sha256: string;
+    };
+    /** ApplyRecommendationRequest */
+    ApplyRecommendationRequest: {
+      /** Expected Revision */
+      expected_revision: number;
     };
     /** ArtifactReference */
     ArtifactReference: {
@@ -1307,6 +1414,36 @@ export interface components {
       /** Slippage Usd */
       slippage_usd: string;
     };
+    /** FixtureAdvanceAccepted */
+    FixtureAdvanceAccepted: {
+      /**
+       * Batch Id
+       * Format: uuid
+       */
+      batch_id: string;
+      /**
+       * Data Status
+       * @default synthetic_fixture
+       * @constant
+       */
+      data_status: "synthetic_fixture";
+      /**
+       * Fixture Observed At
+       * Format: date-time
+       */
+      fixture_observed_at: string;
+      /**
+       * Job Id
+       * Format: uuid
+       */
+      job_id: string;
+      /**
+       * Paper Only
+       * @default true
+       * @constant
+       */
+      paper_only: true;
+    };
     /** FixtureMetadata */
     FixtureMetadata: {
       /** Asset Count */
@@ -1789,6 +1926,157 @@ export interface components {
       items: components["schemas"]["StrategyVersionV1"][];
       /** Next Cursor */
       next_cursor: string | null;
+    };
+    /**
+     * PaperActionRequest
+     * @description Explicit empty JSON body; caller timestamps/amounts are forbidden.
+     */
+    PaperActionRequest: Record<string, never>;
+    /** PaperApprovalAccepted */
+    PaperApprovalAccepted: {
+      /**
+       * Approval Idempotency Key
+       * Format: uuid
+       */
+      approval_idempotency_key: string;
+      /**
+       * Approved At
+       * Format: date-time
+       */
+      approved_at: string;
+      /** Approved Revision */
+      approved_revision: number;
+      /**
+       * Batch Id
+       * Format: uuid
+       */
+      batch_id: string;
+      /**
+       * Clock Mode
+       * @enum {string}
+       */
+      clock_mode: "synthetic_replay" | "current_paper";
+      /**
+       * Data Status
+       * @enum {string}
+       */
+      data_status: "synthetic_fixture" | "research_market_data";
+      /**
+       * Eligible Open At
+       * Format: date-time
+       */
+      eligible_open_at: string;
+      /** Operator Recorded At */
+      operator_recorded_at: string | null;
+      /**
+       * Paper Only
+       * @default true
+       * @constant
+       */
+      paper_only: true;
+      /**
+       * Portfolio Id
+       * Format: uuid
+       */
+      portfolio_id: string;
+      /**
+       * Recommendation Id
+       * Format: uuid
+       */
+      recommendation_id: string;
+    };
+    /** PaperBatchDetailV1 */
+    PaperBatchDetailV1: {
+      /** Advance Unavailable Reason */
+      advance_unavailable_reason: string | null;
+      /**
+       * Approval Idempotency Key
+       * Format: uuid
+       */
+      approval_idempotency_key: string;
+      /**
+       * Approved At
+       * Format: date-time
+       */
+      approved_at: string;
+      /** Approved Revision */
+      approved_revision: number;
+      /** Calendar Version */
+      calendar_version: string;
+      /** Can Advance Fixture */
+      can_advance_fixture: boolean;
+      /**
+       * Clock Mode
+       * @enum {string}
+       */
+      clock_mode: "synthetic_replay" | "current_paper";
+      /** Current Portfolio Revision */
+      current_portfolio_revision: number;
+      /**
+       * Data Status
+       * @enum {string}
+       */
+      data_status: "synthetic_fixture" | "research_market_data";
+      /**
+       * Decision Cutoff Utc
+       * Format: date-time
+       */
+      decision_cutoff_utc: string;
+      /**
+       * Eligible Open At
+       * Format: date-time
+       */
+      eligible_open_at: string;
+      /**
+       * Execution Policy Id
+       * @constant
+       */
+      execution_policy_id: "us_eod_next_open_v1";
+      /** Fixture Clock At */
+      fixture_clock_at: string | null;
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      latest_fill_job: components["schemas"]["JobV1"] | null;
+      /** Operator Recorded At */
+      operator_recorded_at: string | null;
+      /** Orders */
+      orders: components["schemas"]["PaperOrderV1"][];
+      /**
+       * Paper Only
+       * @default true
+       * @constant
+       */
+      paper_only: true;
+      /**
+       * Portfolio Id
+       * Format: uuid
+       */
+      portfolio_id: string;
+      /** Reason */
+      reason: string | null;
+      /**
+       * Recommendation Id
+       * Format: uuid
+       */
+      recommendation_id: string;
+      /**
+       * Snapshot Id
+       * Format: uuid
+       */
+      snapshot_id: string;
+      /** Snapshot Sha256 */
+      snapshot_sha256: string;
+      /**
+       * Status
+       * @enum {string}
+       */
+      status:
+        "pending" | "partially_filled" | "filled" | "cancelled" | "rejected";
+      /** Terminal */
+      terminal: boolean;
     };
     /** PaperOrderBatchV1 */
     PaperOrderBatchV1: {
@@ -2380,6 +2668,19 @@ export interface components {
         "BUY" | "SELL" | "HOLD" | "REBALANCE" | "ALLOCATE_TO_CASH";
       /** Target Weights */
       target_weights: components["schemas"]["TargetWeight"][];
+    };
+    /** RecommendationDispositionV1 */
+    RecommendationDispositionV1: {
+      /**
+       * Recommendation Id
+       * Format: uuid
+       */
+      recommendation_id: string;
+      /**
+       * Status
+       * @enum {string}
+       */
+      status: "ready" | "applied" | "dismissed" | "expired";
     };
     /** RecommendationPageV1 */
     RecommendationPageV1: {
@@ -3976,6 +4277,190 @@ export interface operations {
       };
     };
   };
+  read_api_v1_order_batches__batch_id__get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        batch_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PaperBatchDetailV1"];
+        };
+      };
+      /** @description Not Found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Conflict */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Unprocessable Content */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Service Unavailable */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+    };
+  };
+  advance_api_v1_order_batches__batch_id__advance_fixture_post: {
+    parameters: {
+      query?: never;
+      header: {
+        "Idempotency-Key": string;
+      };
+      path: {
+        batch_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PaperActionRequest"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      202: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["FixtureAdvanceAccepted"];
+        };
+      };
+      /** @description Not Found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Conflict */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Unprocessable Content */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Service Unavailable */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+    };
+  };
+  cancel_api_v1_order_batches__batch_id__cancel_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        batch_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PaperActionRequest"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PaperBatchDetailV1"];
+        };
+      };
+      /** @description Not Found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Conflict */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Unprocessable Content */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Service Unavailable */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+    };
+  };
   accounts_api_v1_portfolios_get: {
     parameters: {
       query?: {
@@ -4360,6 +4845,192 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["RecommendationDetailV1"];
+        };
+      };
+      /** @description Not Found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Conflict */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Unprocessable Content */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Service Unavailable */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+    };
+  };
+  apply_api_v1_recommendations__recommendation_id__apply_post: {
+    parameters: {
+      query?: never;
+      header: {
+        "Idempotency-Key": string;
+      };
+      path: {
+        recommendation_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ApplyRecommendationRequest"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      202: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PaperApprovalAccepted"];
+        };
+      };
+      /** @description Not Found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Conflict */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Unprocessable Content */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Service Unavailable */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+    };
+  };
+  recover_api_v1_recommendations__recommendation_id__apply_result_get: {
+    parameters: {
+      query?: never;
+      header: {
+        "Idempotency-Key": string;
+      };
+      path: {
+        recommendation_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PaperApprovalAccepted"];
+        };
+      };
+      /** @description Not Found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Conflict */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Unprocessable Content */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Service Unavailable */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+    };
+  };
+  dismiss_api_v1_recommendations__recommendation_id__dismiss_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        recommendation_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PaperActionRequest"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["RecommendationDispositionV1"];
         };
       };
       /** @description Not Found */

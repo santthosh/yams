@@ -625,8 +625,114 @@ def main() -> None:
             "real same-origin recommendation, shared order preview and numeric forecast; "
             "exact uint64 retry and unchanged account"
         )
-        # Explicit synthetic relational fixture exercises the private #46 service;
-        # public apply transport remains #50.
+
+        # Independent account preserves the readonly #49 proof above while the
+        # actual same-origin controls drive computed intent through the worker.
+        def paper_post(path: str, body: dict[str, Any], key: str | None = None) -> Any:
+            headers = {"Content-Type": "application/json", "Origin": f"http://{address}"}
+            if key is not None:
+                headers["Idempotency-Key"] = key
+            request = urllib.request.Request(
+                f"http://{address}/api/v1/{path}",
+                data=json.dumps(body).encode(),
+                headers=headers,
+                method="POST",
+            )
+            with urllib.request.urlopen(request, timeout=5) as response:
+                return json.load(response)
+
+        def paper_wait(job_id: str) -> None:
+            deadline = time.monotonic() + 60
+            while get(f"jobs/{job_id}")["status"] in {"queued", "running"}:
+                if time.monotonic() >= deadline:
+                    raise AssertionError("Public paper-control worker timed out")
+                time.sleep(0.2)
+            assert get(f"jobs/{job_id}")["status"] == "completed"
+
+        control_account = paper_post(
+            "portfolios",
+            {**portfolio_body, "name": "SYNTHETIC_DATA_ONLY public controls"},
+            str(uuid4()),
+        )
+        control_rec = paper_post(
+            f"portfolios/{control_account['id']}/recommendations", recommendation_body, str(uuid4())
+        )
+        paper_wait(control_rec["job_id"])
+        control_analysis = get(f"recommendations/{control_rec['recommendation_id']}")
+        paper_wait(control_analysis["forecast_job"]["id"])
+        control_apply_path = f"recommendations/{control_rec['recommendation_id']}/apply"
+        control_key = str(uuid4())
+        control_approval = paper_post(control_apply_path, {"expected_revision": 1}, control_key)
+        assert (
+            paper_post(control_apply_path, {"expected_revision": 1}, control_key)
+            == control_approval
+        )
+        control_batch_path = f"order-batches/{control_approval['batch_id']}"
+        initial_batch = get(control_batch_path)
+        assert initial_batch["status"] == "pending" and initial_batch["latest_fill_job"] is None
+        assert initial_batch["clock_mode"] == "synthetic_replay"
+        assert control_approval["operator_recorded_at"] is not None
+        assert get(f"portfolios/{control_account['id']}")["cash_usd"] == "1000.00"
+        first_step_key = str(uuid4())
+        first_step = paper_post(control_batch_path + "/advance-fixture", {}, first_step_key)
+        paper_wait(first_step["job_id"])
+        waiting = get(control_batch_path)
+        assert all(row["filled_quantity"] == "0.000000" for row in waiting["orders"])
+        assert not waiting["terminal"]  # Fixture availability is one second after close.
+        second_step = paper_post(control_batch_path + "/advance-fixture", {}, str(uuid4()))
+        paper_wait(second_step["job_id"])
+        deadline = time.monotonic() + 60
+        while not get(control_batch_path)["terminal"]:
+            if time.monotonic() >= deadline:
+                raise AssertionError("Public paper batch did not resolve")
+            time.sleep(0.2)
+        posted_control_batch = get(control_batch_path)
+        assert any(row["filled_quantity"] != "0.000000" for row in posted_control_batch["orders"])
+        control_posted_account = get(f"portfolios/{control_account['id']}")
+        assert (
+            control_posted_account["holdings"] and control_posted_account["cash_usd"] != "1000.00"
+        )
+        control_transactions = get(f"portfolios/{control_account['id']}/transactions")
+
+        def verify_public_controls() -> None:
+            request = urllib.request.Request(
+                f"http://{address}/api/v1/"
+                + f"recommendations/{control_rec['recommendation_id']}/apply-result",
+                headers={"Idempotency-Key": control_key},
+            )
+            with urllib.request.urlopen(request, timeout=5) as response:
+                assert json.load(response) == control_approval
+            assert (
+                paper_post(control_apply_path, {"expected_revision": 1}, control_key)
+                == control_approval
+            )
+            assert (
+                paper_post(control_batch_path + "/advance-fixture", {}, first_step_key)
+                == first_step
+            )
+            assert get(control_batch_path) == posted_control_batch
+            assert get(f"portfolios/{control_account['id']}/transactions") == control_transactions
+            saved = get(f"portfolios/{control_account['id']}")
+            for field in ("cash_usd", "holdings", "revision"):
+                assert saved[field] == control_posted_account[field]
+            original = get(f"recommendations/{control_rec['recommendation_id']}")
+            assert original["actions"] == control_analysis["actions"]
+            assert original["status"] == "applied"
+
+        verify_public_controls()
+        evidence["public_paper_controls"] = dict(
+            approval=control_approval,
+            first_step=first_step,
+            second_step=second_step,
+            batch=posted_control_batch,
+            account=control_posted_account,
+            transactions=control_transactions,
+        )
+        evidence["checks"].append(
+            "public computed approval leaves cash unchanged; explicit unavailable "
+            "fixture close remains pending; later step posts actual worker fills"
+        )
+        # The following independent private service proof remains intact.
         paper_batch = json.loads(python((ROOT / "scripts/paper_smoke_fixture.py").read_text()))
         deadline = time.monotonic() + 60
         while get(f"jobs/{paper_batch['job_id']}")["status"] in {"queued", "running"}:
@@ -753,6 +859,7 @@ def main() -> None:
         verify_portfolio_screens("restart")
         assert scenario_result() == original_scenario
         verify_public_recommendation()
+        verify_public_controls()
         assert get("strategies") == strategies
         assert get(f"strategies/{strategy_id}/versions") == versions
         for editor_id, history in editor_versions.items():
@@ -782,6 +889,7 @@ def main() -> None:
         verify_portfolio_screens("rebuild")
         assert scenario_result() == original_scenario
         verify_public_recommendation()
+        verify_public_controls()
         assert get("strategies") == strategies
         assert get(f"strategies/{strategy_id}/versions") == versions
         for editor_id, history in editor_versions.items():
@@ -799,6 +907,10 @@ def main() -> None:
         evidence["checks"].append("rebuild/recreate preserves named-volume state")
         evidence["checks"].append(
             "restart and rebuild preserve original recommendation/forecast and readonly account"
+        )
+        evidence["checks"].append(
+            "public approval key, replay clock, original decision, posted fills "
+            "and ledger survive actual restart and rebuild"
         )
         ids = compose("ps", "-q").split()
         inspect = json.loads(subprocess.check_output(["docker", "inspect", *ids], text=True))

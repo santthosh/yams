@@ -172,6 +172,22 @@
         "title": "AppliedAction",
         "type": "object"
       },
+      "ApplyRecommendationRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "expected_revision": {
+            "maximum": 9223372036854775807,
+            "minimum": 1,
+            "title": "Expected Revision",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "expected_revision"
+        ],
+        "title": "ApplyRecommendationRequest",
+        "type": "object"
+      },
       "ArtifactReference": {
         "additionalProperties": false,
         "properties": {
@@ -2328,6 +2344,46 @@
         "title": "FillEffect",
         "type": "object"
       },
+      "FixtureAdvanceAccepted": {
+        "additionalProperties": false,
+        "properties": {
+          "batch_id": {
+            "format": "uuid",
+            "title": "Batch Id",
+            "type": "string"
+          },
+          "data_status": {
+            "const": "synthetic_fixture",
+            "default": "synthetic_fixture",
+            "title": "Data Status",
+            "type": "string"
+          },
+          "fixture_observed_at": {
+            "format": "date-time",
+            "pattern": "Z$",
+            "title": "Fixture Observed At",
+            "type": "string"
+          },
+          "job_id": {
+            "format": "uuid",
+            "title": "Job Id",
+            "type": "string"
+          },
+          "paper_only": {
+            "const": true,
+            "default": true,
+            "title": "Paper Only",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "batch_id",
+          "job_id",
+          "fixture_observed_at"
+        ],
+        "title": "FixtureAdvanceAccepted",
+        "type": "object"
+      },
       "FixtureMetadata": {
         "additionalProperties": false,
         "properties": {
@@ -3626,6 +3682,314 @@
           "next_cursor"
         ],
         "title": "Page[StrategyVersionV1]",
+        "type": "object"
+      },
+      "PaperActionRequest": {
+        "additionalProperties": false,
+        "description": "Explicit empty JSON body; caller timestamps/amounts are forbidden.",
+        "properties": {},
+        "title": "PaperActionRequest",
+        "type": "object"
+      },
+      "PaperApprovalAccepted": {
+        "additionalProperties": false,
+        "properties": {
+          "approval_idempotency_key": {
+            "format": "uuid",
+            "title": "Approval Idempotency Key",
+            "type": "string"
+          },
+          "approved_at": {
+            "format": "date-time",
+            "pattern": "Z$",
+            "title": "Approved At",
+            "type": "string"
+          },
+          "approved_revision": {
+            "minimum": 1,
+            "title": "Approved Revision",
+            "type": "integer"
+          },
+          "batch_id": {
+            "format": "uuid",
+            "title": "Batch Id",
+            "type": "string"
+          },
+          "clock_mode": {
+            "enum": [
+              "synthetic_replay",
+              "current_paper"
+            ],
+            "title": "Clock Mode",
+            "type": "string"
+          },
+          "data_status": {
+            "enum": [
+              "synthetic_fixture",
+              "research_market_data"
+            ],
+            "title": "Data Status",
+            "type": "string"
+          },
+          "eligible_open_at": {
+            "format": "date-time",
+            "pattern": "Z$",
+            "title": "Eligible Open At",
+            "type": "string"
+          },
+          "operator_recorded_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "pattern": "Z$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Operator Recorded At"
+          },
+          "paper_only": {
+            "const": true,
+            "default": true,
+            "title": "Paper Only",
+            "type": "boolean"
+          },
+          "portfolio_id": {
+            "format": "uuid",
+            "title": "Portfolio Id",
+            "type": "string"
+          },
+          "recommendation_id": {
+            "format": "uuid",
+            "title": "Recommendation Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "batch_id",
+          "portfolio_id",
+          "recommendation_id",
+          "approval_idempotency_key",
+          "approved_revision",
+          "approved_at",
+          "eligible_open_at",
+          "operator_recorded_at",
+          "data_status",
+          "clock_mode"
+        ],
+        "title": "PaperApprovalAccepted",
+        "type": "object"
+      },
+      "PaperBatchDetailV1": {
+        "additionalProperties": false,
+        "properties": {
+          "advance_unavailable_reason": {
+            "anyOf": [
+              {
+                "pattern": "^[A-Z][A-Z0-9_]*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Advance Unavailable Reason"
+          },
+          "approval_idempotency_key": {
+            "format": "uuid",
+            "title": "Approval Idempotency Key",
+            "type": "string"
+          },
+          "approved_at": {
+            "format": "date-time",
+            "pattern": "Z$",
+            "title": "Approved At",
+            "type": "string"
+          },
+          "approved_revision": {
+            "minimum": 0,
+            "title": "Approved Revision",
+            "type": "integer"
+          },
+          "calendar_version": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Calendar Version",
+            "type": "string"
+          },
+          "can_advance_fixture": {
+            "title": "Can Advance Fixture",
+            "type": "boolean"
+          },
+          "clock_mode": {
+            "enum": [
+              "synthetic_replay",
+              "current_paper"
+            ],
+            "title": "Clock Mode",
+            "type": "string"
+          },
+          "current_portfolio_revision": {
+            "minimum": 1,
+            "title": "Current Portfolio Revision",
+            "type": "integer"
+          },
+          "data_status": {
+            "enum": [
+              "synthetic_fixture",
+              "research_market_data"
+            ],
+            "title": "Data Status",
+            "type": "string"
+          },
+          "decision_cutoff_utc": {
+            "format": "date-time",
+            "pattern": "Z$",
+            "title": "Decision Cutoff Utc",
+            "type": "string"
+          },
+          "eligible_open_at": {
+            "format": "date-time",
+            "pattern": "Z$",
+            "title": "Eligible Open At",
+            "type": "string"
+          },
+          "execution_policy_id": {
+            "const": "us_eod_next_open_v1",
+            "title": "Execution Policy Id",
+            "type": "string"
+          },
+          "fixture_clock_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "pattern": "Z$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fixture Clock At"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "latest_fill_job": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/JobV1"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "operator_recorded_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "pattern": "Z$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Operator Recorded At"
+          },
+          "orders": {
+            "items": {
+              "$ref": "#/components/schemas/PaperOrderV1"
+            },
+            "minItems": 1,
+            "title": "Orders",
+            "type": "array"
+          },
+          "paper_only": {
+            "const": true,
+            "default": true,
+            "title": "Paper Only",
+            "type": "boolean"
+          },
+          "portfolio_id": {
+            "format": "uuid",
+            "title": "Portfolio Id",
+            "type": "string"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "pattern": "^[A-Z][A-Z0-9_]*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          },
+          "recommendation_id": {
+            "format": "uuid",
+            "title": "Recommendation Id",
+            "type": "string"
+          },
+          "snapshot_id": {
+            "format": "uuid",
+            "title": "Snapshot Id",
+            "type": "string"
+          },
+          "snapshot_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Snapshot Sha256",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "pending",
+              "partially_filled",
+              "filled",
+              "cancelled",
+              "rejected"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "terminal": {
+            "title": "Terminal",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "portfolio_id",
+          "recommendation_id",
+          "approval_idempotency_key",
+          "approved_revision",
+          "approved_at",
+          "decision_cutoff_utc",
+          "snapshot_id",
+          "calendar_version",
+          "execution_policy_id",
+          "eligible_open_at",
+          "status",
+          "terminal",
+          "orders",
+          "reason",
+          "data_status",
+          "clock_mode",
+          "snapshot_sha256",
+          "operator_recorded_at",
+          "current_portfolio_revision",
+          "fixture_clock_at",
+          "latest_fill_job",
+          "can_advance_fixture",
+          "advance_unavailable_reason"
+        ],
+        "title": "PaperBatchDetailV1",
         "type": "object"
       },
       "PaperOrderBatchV1": {
@@ -5034,6 +5398,32 @@
           "stale_reasons"
         ],
         "title": "RecommendationDetailV1",
+        "type": "object"
+      },
+      "RecommendationDispositionV1": {
+        "additionalProperties": false,
+        "properties": {
+          "recommendation_id": {
+            "format": "uuid",
+            "title": "Recommendation Id",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "ready",
+              "applied",
+              "dismissed",
+              "expired"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "recommendation_id",
+          "status"
+        ],
+        "title": "RecommendationDispositionV1",
         "type": "object"
       },
       "RecommendationPageV1": {
@@ -8165,6 +8555,246 @@
         "summary": "Cancel Job"
       }
     },
+    "/api/v1/order-batches/{batch_id}": {
+      "get": {
+        "operationId": "read_api_v1_order_batches__batch_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "batch_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Batch Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaperBatchDetailV1"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "summary": "Read"
+      }
+    },
+    "/api/v1/order-batches/{batch_id}/advance-fixture": {
+      "post": {
+        "operationId": "advance_api_v1_order_batches__batch_id__advance_fixture_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "batch_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Batch Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Idempotency-Key",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PaperActionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FixtureAdvanceAccepted"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "summary": "Advance"
+      }
+    },
+    "/api/v1/order-batches/{batch_id}/cancel": {
+      "post": {
+        "operationId": "cancel_api_v1_order_batches__batch_id__cancel_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "batch_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Batch Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PaperActionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaperBatchDetailV1"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "summary": "Cancel"
+      }
+    },
     "/api/v1/portfolios": {
       "get": {
         "operationId": "accounts_api_v1_portfolios_get",
@@ -8785,6 +9415,256 @@
           }
         },
         "summary": "Read"
+      }
+    },
+    "/api/v1/recommendations/{recommendation_id}/apply": {
+      "post": {
+        "operationId": "apply_api_v1_recommendations__recommendation_id__apply_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "recommendation_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Recommendation Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Idempotency-Key",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApplyRecommendationRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaperApprovalAccepted"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "summary": "Apply"
+      }
+    },
+    "/api/v1/recommendations/{recommendation_id}/apply-result": {
+      "get": {
+        "operationId": "recover_api_v1_recommendations__recommendation_id__apply_result_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "recommendation_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Recommendation Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Idempotency-Key",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaperApprovalAccepted"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "summary": "Recover"
+      }
+    },
+    "/api/v1/recommendations/{recommendation_id}/dismiss": {
+      "post": {
+        "operationId": "dismiss_api_v1_recommendations__recommendation_id__dismiss_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "recommendation_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Recommendation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PaperActionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecommendationDispositionV1"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "summary": "Dismiss"
       }
     },
     "/api/v1/strategies": {

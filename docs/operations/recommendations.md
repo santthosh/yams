@@ -1,7 +1,7 @@
 # Immutable portfolio recommendations
 
 The source implementation for 0.0.5 adds recommendation production and forecast
-read APIs. Public approval/dismissal/batch transport remains #50, scheduling #51,
+read APIs. Public approval/dismissal/batch transport delegates through the [#50 controls](paper-controls.md); scheduling remains #51,
 and Decision Center screens #52. This source work does not publish 0.0.5 or change
 the immutable 0.0.4 bundle.
 
