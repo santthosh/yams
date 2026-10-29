@@ -1,0 +1,2552 @@
+{
+  "checks": [
+    "clean boot and real same-origin API readiness",
+    "same-origin keyed paper account funding, exact retry and read-only ledger history",
+    "real persisted diagnostic job completed by bounded worker",
+    "warm-up plus three diagnostic batches with concurrent API/DB reads",
+    "real Docker browser Dashboard/Settings/job at both widths",
+    "real browser cash creation, independent accounts and keyed retries",
+    "real browser same-origin strategy creation, immutable append, conflict and pagination",
+    "real browser candidate/target reruns and cash-only cases via supervised worker",
+    "real browser public experiment rerun, pages, cancellation and fingerprints",
+    "real mobile/desktop experiment form, charts/tables/Axe, exact uint64 rerun, original preservation and cancellation",
+    "real mobile/desktop aligned and mismatched comparison, one-rule challenge, shared-setting exact-seed reruns and immutable source evidence",
+    "internal core admission, actual supervised next-open replay and sealed artifact",
+    "worker-side Q12 metrics, aligned SPY/cash, continuing holdout and exposure",
+    "real same-origin recommendation, shared order preview and numeric forecast; exact uint64 retry and unchanged account",
+    "public computed approval leaves cash unchanged; explicit unavailable fixture close remains pending; later step posts actual worker fills",
+    "stopped worker exposes backlog immediately after explicit clock selection; restart deduplicates the next monthly/manual review without trading",
+    "explicit manual cash review advances only synthetic observation; 18 missed months retain chronology; monthly/manual dedup produces one actual worker job and numeric forecast with unchanged1000cash",
+    "real portfolio holdings/fees/history, staged batch controls and Axe at360/1280",
+    "private explicit fixture approval and real worker atomic fill",
+    "private real-worker seeded common-shock scenarios and immutable artifacts; no portfolio effects",
+    "API and worker external routing blocked",
+    "restart retains paper account identity, funding and original creation retry",
+    "restart preserves workspace, job, fixtures and artifact hash",
+    "rebuild/recreate preserves named-volume state",
+    "restart and rebuild preserve original recommendation/forecast and readonly account",
+    "public approval key, replay clock, original decision, posted fills and ledger survive actual restart and rebuild",
+    "monthly review checkpoints, original request key, logical clock, forecast and readonly ledger survive actual restart/rebuild with fresh supervisor observations",
+    "actual private ports and aggregate 4 CPU/4.5 GiB caps",
+    "failed migration blocks application startup; repair preserves workspace"
+  ],
+  "classification": "RECORDED_APPLICATION_OUTPUT_NOT_INDEPENDENT_ORACLE",
+  "data_label": "SYNTHETIC_DATA_ONLY",
+  "monthly_review": {
+    "accepted": {
+      "job_id": "df82b1b8-7de8-4ba9-b443-572c0f0fff41",
+      "recommendation_id": "564123a9-292a-5979-a93b-b619f470b8c9"
+    },
+    "analysis": {
+      "actions": [
+        {
+          "asset_id": "SYN:AAA",
+          "current_weight": "0",
+          "estimated_notional_usd": "200.00",
+          "estimated_quantity": "2.836879",
+          "evidence": {
+            "current_weight": "0",
+            "position_cap": "0.2"
+          },
+          "explanation": "Buy SYN:AAA: current weight 0, target 0.2; target rebalance. Estimated quantity 2.836879; paper preview only.",
+          "label": "INCREASE",
+          "reason_codes": [
+            "TARGET_REBALANCE"
+          ],
+          "side": "BUY",
+          "target_weight": "0.2"
+        },
+        {
+          "asset_id": "SYN:BBB",
+          "current_weight": "0",
+          "estimated_notional_usd": "200.00",
+          "estimated_quantity": "2.836879",
+          "evidence": {
+            "current_weight": "0",
+            "position_cap": "0.2"
+          },
+          "explanation": "Buy SYN:BBB: current weight 0, target 0.2; target rebalance. Estimated quantity 2.836879; paper preview only.",
+          "label": "INCREASE",
+          "reason_codes": [
+            "TARGET_REBALANCE"
+          ],
+          "side": "BUY",
+          "target_weight": "0.2"
+        },
+        {
+          "asset_id": "SYN:CCC",
+          "current_weight": "0",
+          "estimated_notional_usd": "200.00",
+          "estimated_quantity": "2.967359",
+          "evidence": {
+            "current_weight": "0",
+            "position_cap": "0.2"
+          },
+          "explanation": "Buy SYN:CCC: current weight 0, target 0.2; target rebalance. Estimated quantity 2.967359; paper preview only.",
+          "label": "INCREASE",
+          "reason_codes": [
+            "TARGET_REBALANCE"
+          ],
+          "side": "BUY",
+          "target_weight": "0.2"
+        }
+      ],
+      "as_of_session": "2028-07-31",
+      "calendar_sha256": "e3d2312d54e172d7aada8239f296eecf38c6038d66b5a203c5c5690ede82d660",
+      "candidates": [
+        {
+          "asset_id": "SYN:AAA",
+          "contributions": [
+            {
+              "name": "momentum_long_z",
+              "unavailable_reason": null,
+              "value": 0.707106781186547
+            },
+            {
+              "name": "momentum_short_z",
+              "unavailable_reason": null,
+              "value": -0.7071067811865475
+            },
+            {
+              "name": "volatility_z",
+              "unavailable_reason": null,
+              "value": -0.7071067811865475
+            },
+            {
+              "name": "momentum_long_contribution",
+              "unavailable_reason": null,
+              "value": 0.4242640687119282
+            },
+            {
+              "name": "momentum_short_contribution",
+              "unavailable_reason": null,
+              "value": -0.17677669529663687
+            },
+            {
+              "name": "volatility_contribution",
+              "unavailable_reason": null,
+              "value": 0.10606601717798211
+            }
+          ],
+          "exclusion_reasons": [],
+          "features": [
+            {
+              "name": "momentum_long",
+              "unavailable_reason": null,
+              "value": 0.09813084112149532
+            },
+            {
+              "name": "momentum_short",
+              "unavailable_reason": null,
+              "value": 0.0467706013363029
+            },
+            {
+              "name": "volatility",
+              "unavailable_reason": null,
+              "value": 0.0001456272029133545
+            }
+          ],
+          "score": 0.3535533905932734
+        },
+        {
+          "asset_id": "SYN:BBB",
+          "contributions": [
+            {
+              "name": "momentum_long_z",
+              "unavailable_reason": null,
+              "value": 0.707106781186547
+            },
+            {
+              "name": "momentum_short_z",
+              "unavailable_reason": null,
+              "value": -0.7071067811865475
+            },
+            {
+              "name": "volatility_z",
+              "unavailable_reason": null,
+              "value": -0.7071067811865475
+            },
+            {
+              "name": "momentum_long_contribution",
+              "unavailable_reason": null,
+              "value": 0.4242640687119282
+            },
+            {
+              "name": "momentum_short_contribution",
+              "unavailable_reason": null,
+              "value": -0.17677669529663687
+            },
+            {
+              "name": "volatility_contribution",
+              "unavailable_reason": null,
+              "value": 0.10606601717798211
+            }
+          ],
+          "exclusion_reasons": [],
+          "features": [
+            {
+              "name": "momentum_long",
+              "unavailable_reason": null,
+              "value": 0.09813084112149532
+            },
+            {
+              "name": "momentum_short",
+              "unavailable_reason": null,
+              "value": 0.0467706013363029
+            },
+            {
+              "name": "volatility",
+              "unavailable_reason": null,
+              "value": 0.0001456272029133545
+            }
+          ],
+          "score": 0.3535533905932734
+        },
+        {
+          "asset_id": "SYN:CCC",
+          "contributions": [
+            {
+              "name": "momentum_long_z",
+              "unavailable_reason": null,
+              "value": -1.4142135623730954
+            },
+            {
+              "name": "momentum_short_z",
+              "unavailable_reason": null,
+              "value": 1.414213562373095
+            },
+            {
+              "name": "volatility_z",
+              "unavailable_reason": null,
+              "value": 1.4142135623730951
+            },
+            {
+              "name": "momentum_long_contribution",
+              "unavailable_reason": null,
+              "value": -0.8485281374238572
+            },
+            {
+              "name": "momentum_short_contribution",
+              "unavailable_reason": null,
+              "value": 0.35355339059327373
+            },
+            {
+              "name": "volatility_contribution",
+              "unavailable_reason": null,
+              "value": -0.21213203435596426
+            }
+          ],
+          "exclusion_reasons": [],
+          "features": [
+            {
+              "name": "momentum_long",
+              "unavailable_reason": null,
+              "value": 0.08082103912764593
+            },
+            {
+              "name": "momentum_short",
+              "unavailable_reason": null,
+              "value": 0.07188295165394402
+            },
+            {
+              "name": "volatility",
+              "unavailable_reason": null,
+              "value": 0.491176166679689
+            }
+          ],
+          "score": -0.7071067811865478
+        },
+        {
+          "asset_id": "SYN:SPY",
+          "contributions": [],
+          "exclusion_reasons": [
+            "UNSUPPORTED_INSTRUMENT"
+          ],
+          "features": [],
+          "score": null
+        },
+        {
+          "asset_id": "SYN:ZERO",
+          "contributions": [],
+          "exclusion_reasons": [
+            "NONPOSITIVE_TREND"
+          ],
+          "features": [],
+          "score": null
+        }
+      ],
+      "cash_target_weight": "0.4",
+      "clock_mode": "synthetic_replay",
+      "computed_at": "2026-10-29T10:50:38.937754Z",
+      "config_sha256": "2093c63d190815eba052508d6d42d8ae0c93400cf777602d2c5f759627f43f21",
+      "created_at": "2028-08-01T12:30:00Z",
+      "current_portfolio_revision": 1,
+      "data_status": "synthetic_fixture",
+      "decision_cutoff_utc": "2028-08-01T12:30:00Z",
+      "engine_version": "a88fd77bf70a9fe69d80a328e1c00925e996caf5c94987dcfc50ddcb8b315267",
+      "estimated_total_trade_cost_usd": "0.60",
+      "forecast": {
+        "as_of_session": "2028-07-31",
+        "block_length_sessions": 5,
+        "calendar_version": "e3d2312d54e172d7aada8239f296eecf38c6038d66b5a203c5c5690ede82d660",
+        "cash_return_fraction": 0.0,
+        "comparability": "common_shock_paths",
+        "current_allocation": {
+          "cash_weight": "1",
+          "upfront_cost_usd": "0.00",
+          "weights": []
+        },
+        "data_status": "synthetic_fixture",
+        "decision_cutoff_utc": "2028-08-01T12:30:00Z",
+        "engine_version": "a88fd77bf70a9fe69d80a328e1c00925e996caf5c94987dcfc50ddcb8b315267",
+        "fingerprint": "22e53b4f061725f27094764c3c17c461b7f9beb8eda0dd865b39736d4d8a776f",
+        "fingerprint_schema_version": 1,
+        "future_sessions": [
+          "2028-08-01",
+          "2028-08-02",
+          "2028-08-03",
+          "2028-08-04",
+          "2028-08-07",
+          "2028-08-08",
+          "2028-08-09",
+          "2028-08-10",
+          "2028-08-11",
+          "2028-08-14",
+          "2028-08-15",
+          "2028-08-16",
+          "2028-08-17",
+          "2028-08-18",
+          "2028-08-21",
+          "2028-08-22",
+          "2028-08-23",
+          "2028-08-24",
+          "2028-08-25",
+          "2028-08-28",
+          "2028-08-29",
+          "2028-08-30",
+          "2028-08-31",
+          "2028-09-01",
+          "2028-09-04",
+          "2028-09-05",
+          "2028-09-06",
+          "2028-09-07",
+          "2028-09-08",
+          "2028-09-11",
+          "2028-09-12",
+          "2028-09-13",
+          "2028-09-14",
+          "2028-09-15",
+          "2028-09-18",
+          "2028-09-19",
+          "2028-09-20",
+          "2028-09-21",
+          "2028-09-22",
+          "2028-09-25",
+          "2028-09-26",
+          "2028-09-27",
+          "2028-09-28",
+          "2028-09-29",
+          "2028-10-02",
+          "2028-10-03",
+          "2028-10-04",
+          "2028-10-05",
+          "2028-10-06",
+          "2028-10-09",
+          "2028-10-10",
+          "2028-10-11",
+          "2028-10-12",
+          "2028-10-13",
+          "2028-10-16",
+          "2028-10-17",
+          "2028-10-18",
+          "2028-10-19",
+          "2028-10-20",
+          "2028-10-23",
+          "2028-10-24",
+          "2028-10-25",
+          "2028-10-26",
+          "2028-10-27"
+        ],
+        "hold_unchanged": {
+          "median_ending_value_usd": "1000.00",
+          "median_return_fraction": 0.0,
+          "p10_return_fraction": 0.0,
+          "p90_return_fraction": 0.0,
+          "probability_of_loss": 0.0
+        },
+        "horizon_calendar_days": 90,
+        "horizon_end_at": "2028-10-30T12:30:00Z",
+        "horizon_trading_sessions": 64,
+        "id": "a582f217-0203-58c4-a01b-f7df4992ca7e",
+        "initial_value_usd": "1000.00",
+        "input_array_sha256": "c2e5e5fa07283b2b4397b2f7128e77d5223dd54e97c522b32c311f82f7841bf7",
+        "limitations": [
+          "CONSTANT_WEIGHT_APPROXIMATION",
+          "ESTIMATED_UPFRONT_COST",
+          "SCENARIO_NOT_CALIBRATED_PREDICTION",
+          "SYNTHETIC_DATA_ONLY",
+          "ZERO_CASH_YIELD"
+        ],
+        "lookback_sessions": 252,
+        "median_return_delta_fraction": 0.03386145610895394,
+        "method": "multivariate_block_bootstrap_v1",
+        "proposed": {
+          "median_ending_value_usd": "1033.86",
+          "median_return_fraction": 0.03386145610895394,
+          "p10_return_fraction": 0.006261307339776396,
+          "p90_return_fraction": 0.062329206478758094,
+          "probability_of_loss": 0.0752
+        },
+        "proposed_allocation": {
+          "cash_weight": "0.39963980962257728606561659258125731662294495749215055282619131679679888104247342318",
+          "upfront_cost_usd": "0.60",
+          "weights": [
+            {
+              "asset_id": "SYN:AAA",
+              "weight": "0.200120054420383734913660724874675487221434237602926657623050581273221366815545350131"
+            },
+            {
+              "asset_id": "SYN:BBB",
+              "weight": "0.200120054420383734913660724874675487221434237602926657623050581273221366815545350131"
+            },
+            {
+              "asset_id": "SYN:CCC",
+              "weight": "0.20012008153665524410706195766939170893418656730199613192770752065675838532643587654"
+            }
+          ]
+        },
+        "rng": {
+          "generator": "PCG64",
+          "initial_state": {
+            "id": "2d40eea3-5324-5bc7-8e16-e15b9b6bfd8f",
+            "schema_version": 1,
+            "sha256": "f7eeadec4bb6327d9c1e417fbdb8433721abcc3f1c62a370fd34905c51973c03"
+          },
+          "numpy_version": "2.5.4",
+          "sampling_version": "noncircular_c_order_v1"
+        },
+        "sampled_indices": {
+          "id": "f06ffa7f-4f07-5eca-8735-0c24051544b0",
+          "schema_version": 1,
+          "sha256": "b7795d3889530bb259a8b5a3e42cf41663dd7555bfe2d0f5251d7bc0febec332"
+        },
+        "seed": 42,
+        "simulation_count": 5000,
+        "snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+        "snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+        "status": "available",
+        "unavailable_reason": null
+      },
+      "forecast_id": "a582f217-0203-58c4-a01b-f7df4992ca7e",
+      "forecast_inputs_canonical_json": "{\"as_of_session\":\"2028-07-31\",\"calendar_sha256\":\"e3d2312d54e172d7aada8239f296eecf38c6038d66b5a203c5c5690ede82d660\",\"config_sha256\":\"2093c63d190815eba052508d6d42d8ae0c93400cf777602d2c5f759627f43f21\",\"current_allocation\":{\"cash_weight\":\"1\",\"upfront_cost_usd\":\"0.00\",\"weights\":[]},\"decision_cutoff_utc\":\"2028-08-01T12:30:00Z\",\"initial_value_usd\":\"1000.00\",\"portfolio_id\":\"d76988e1-3318-5351-875c-9030a2bf86c5\",\"portfolio_revision\":1,\"proposed_allocation\":{\"cash_weight\":\"0.39963980962257728606561659258125731662294495749215055282619131679679888104247342318\",\"upfront_cost_usd\":\"0.60\",\"weights\":[{\"asset_id\":\"SYN:AAA\",\"weight\":\"0.200120054420383734913660724874675487221434237602926657623050581273221366815545350131\"},{\"asset_id\":\"SYN:BBB\",\"weight\":\"0.200120054420383734913660724874675487221434237602926657623050581273221366815545350131\"},{\"asset_id\":\"SYN:CCC\",\"weight\":\"0.20012008153665524410706195766939170893418656730199613192770752065675838532643587654\"}]},\"seed\":42,\"snapshot_id\":\"5c223992-90ec-59a7-a1e7-7889b76cacea\",\"snapshot_sha256\":\"40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add\",\"source_mode\":\"synthetic_fixture\",\"strategy_version_id\":\"184f4ef7-c542-5387-a5aa-9bd4d162efde\",\"valuation_as_of_session\":\"2028-07-31\"}",
+      "forecast_job": {
+        "attempts": 1,
+        "created_at": "2026-10-29T10:50:38.940673Z",
+        "error": null,
+        "id": "19099dc5-5aeb-4d1f-bb48-1cff134f710d",
+        "kind": "forecast",
+        "max_attempts": 3,
+        "progress": 100.0,
+        "result": {
+          "kind": "resource",
+          "message": "Immutable scenario comparison sealed; not a calibrated prediction.",
+          "resource_id": "a582f217-0203-58c4-a01b-f7df4992ca7e"
+        },
+        "status": "completed",
+        "updated_at": "2026-10-29T10:50:39.730150Z"
+      },
+      "id": "564123a9-292a-5979-a93b-b619f470b8c9",
+      "inputs": {
+        "as_of_session": "2028-07-31",
+        "clock_mode": "synthetic_replay",
+        "seed": 42,
+        "snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea"
+      },
+      "inputs_canonical_json": "{\"as_of_session\":\"2028-07-31\",\"clock_mode\":\"synthetic_replay\",\"seed\":42,\"snapshot_id\":\"5c223992-90ec-59a7-a1e7-7889b76cacea\"}",
+      "is_current": true,
+      "job_id": "df82b1b8-7de8-4ba9-b443-572c0f0fff41",
+      "portfolio_id": "d76988e1-3318-5351-875c-9030a2bf86c5",
+      "portfolio_revision": 1,
+      "snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+      "snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+      "stale_reasons": [],
+      "status": "ready",
+      "strategy_config": {
+        "display_name": "Risk-Adjusted Momentum",
+        "execution_policy": {
+          "id": "us_eod_next_open_v1"
+        },
+        "portfolio": {
+          "max_position_weight": "0.2",
+          "max_positions": 8,
+          "max_sector_weight": "0.4",
+          "min_cash_weight": "0.05",
+          "min_trade_usd": "5",
+          "rebalance_band_absolute_weight": "0.02",
+          "weighting": "inverse_volatility"
+        },
+        "rebalance": {
+          "frequency": "monthly"
+        },
+        "schema_version": 1,
+        "signals": {
+          "kind": "risk_adjusted_momentum",
+          "momentum_long_sessions": 126,
+          "momentum_short_sessions": 63,
+          "require_positive_trend": true,
+          "trend_sma_sessions": 200,
+          "volatility_sessions": 60,
+          "z_score_weights": {
+            "momentum_long": 0.6,
+            "momentum_short": 0.25,
+            "volatility_penalty": -0.15
+          }
+        },
+        "universe": {
+          "kind": "liquid_us_equities",
+          "min_history_sessions": 252,
+          "min_median_dollar_volume_usd": "1000000",
+          "min_price_usd": "5"
+        }
+      },
+      "strategy_evidence": {
+        "allocation_exclusions": [],
+        "allocation_reasons": [
+          "UNALLOCATABLE_CAPACITY"
+        ],
+        "as_of_session": "2028-07-31",
+        "candidates": [
+          {
+            "allocation_eligible": true,
+            "asset_id": "SYN:AAA",
+            "eligible": true,
+            "features": {
+              "momentum_long": 0.09813084112149532,
+              "momentum_short": 0.0467706013363029,
+              "volatility": 0.0001456272029133545
+            },
+            "input_sha256": "1e56b118633a97168ea311aaf6a6c08371114db841c526d15f7886189e3766c7",
+            "median_dollar_volume": "70025000.000",
+            "rank": 1,
+            "raw_close": "70.500",
+            "reasons": [],
+            "scoring": {
+              "momentum_long_contribution": 0.4242640687119282,
+              "momentum_long_z": 0.707106781186547,
+              "momentum_short_contribution": -0.17677669529663687,
+              "momentum_short_z": -0.7071067811865475,
+              "score": 0.3535533905932734,
+              "volatility_contribution": 0.10606601717798211,
+              "volatility_z": -0.7071067811865475
+            },
+            "sector": "Technology",
+            "trend_sma": "65.525"
+          },
+          {
+            "allocation_eligible": true,
+            "asset_id": "SYN:BBB",
+            "eligible": true,
+            "features": {
+              "momentum_long": 0.09813084112149532,
+              "momentum_short": 0.0467706013363029,
+              "volatility": 0.0001456272029133545
+            },
+            "input_sha256": "ce640a0c86e5d3e24a50d47ebc8c6781152b03f7bb98c491c8025505641e6923",
+            "median_dollar_volume": "70025000.000",
+            "rank": 2,
+            "raw_close": "70.500",
+            "reasons": [],
+            "scoring": {
+              "momentum_long_contribution": 0.4242640687119282,
+              "momentum_long_z": 0.707106781186547,
+              "momentum_short_contribution": -0.17677669529663687,
+              "momentum_short_z": -0.7071067811865475,
+              "score": 0.3535533905932734,
+              "volatility_contribution": 0.10606601717798211,
+              "volatility_z": -0.7071067811865475
+            },
+            "sector": "Technology",
+            "trend_sma": "65.525"
+          },
+          {
+            "allocation_eligible": true,
+            "asset_id": "SYN:CCC",
+            "eligible": true,
+            "features": {
+              "momentum_long": 0.08082103912764593,
+              "momentum_short": 0.07188295165394402,
+              "volatility": 0.491176166679689
+            },
+            "input_sha256": "f491231994017c2351c857ee7559ba816855aeed9877a0aabb47997ffebdb072",
+            "median_dollar_volume": "66020000.000",
+            "rank": 3,
+            "raw_close": "67.400",
+            "reasons": [],
+            "scoring": {
+              "momentum_long_contribution": -0.8485281374238572,
+              "momentum_long_z": -1.4142135623730954,
+              "momentum_short_contribution": 0.35355339059327373,
+              "momentum_short_z": 1.414213562373095,
+              "score": -0.7071067811865478,
+              "volatility_contribution": -0.21213203435596426,
+              "volatility_z": 1.4142135623730951
+            },
+            "sector": "Unknown",
+            "trend_sma": "62.420"
+          },
+          {
+            "allocation_eligible": false,
+            "asset_id": "SYN:SPY",
+            "eligible": false,
+            "features": null,
+            "input_sha256": "232f1cd05946c472adb705ac36e24a94fb5c09366e5c65f7ecea0d6dcda0240d",
+            "median_dollar_volume": "110012500.000",
+            "rank": null,
+            "raw_close": "110.250",
+            "reasons": [
+              "UNSUPPORTED_INSTRUMENT"
+            ],
+            "scoring": null,
+            "sector": "Unknown",
+            "trend_sma": "107.7625"
+          },
+          {
+            "allocation_eligible": false,
+            "asset_id": "SYN:ZERO",
+            "eligible": false,
+            "features": null,
+            "input_sha256": "32d5b1784f7341253fedfe98f4acda5544bb3a28fa2175eaa42fd31a9fa3d748",
+            "median_dollar_volume": "50000000.000",
+            "rank": null,
+            "raw_close": "50.000",
+            "reasons": [
+              "NONPOSITIVE_TREND"
+            ],
+            "scoring": null,
+            "sector": "Unknown",
+            "trend_sma": "50.000"
+          }
+        ],
+        "cash_target_weight": "0.4",
+        "constraint_evidence": {
+          "capped_positions": [
+            "SYN:AAA",
+            "SYN:BBB",
+            "SYN:CCC"
+          ],
+          "cash_floor": "0.05",
+          "cash_weight": "0.4",
+          "compliant": true,
+          "invested_weight": "0.6",
+          "max_position_weight": "0.2",
+          "max_sector_weight": "0.4",
+          "position_count": 3,
+          "position_limit": "0.2",
+          "sector_limit": "0.4",
+          "sectors": [
+            {
+              "at_cap": true,
+              "sector": "Technology",
+              "weight": "0.4"
+            },
+            {
+              "at_cap": false,
+              "sector": "Unknown",
+              "weight": "0.2"
+            }
+          ],
+          "unmet_investable_weight": "0.35",
+          "violations": []
+        },
+        "data_diagnostics": [],
+        "decision_cutoff_utc": "2028-08-01T12:30:00Z",
+        "mode": "synthetic_fixture",
+        "reproducibility": {
+          "calendar_sha256": "e3d2312d54e172d7aada8239f296eecf38c6038d66b5a203c5c5690ede82d660",
+          "config_sha256": "2093c63d190815eba052508d6d42d8ae0c93400cf777602d2c5f759627f43f21",
+          "engine_version": "a88fd77bf70a9fe69d80a328e1c00925e996caf5c94987dcfc50ddcb8b315267",
+          "snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+          "snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+          "strategy_version_id": "184f4ef7-c542-5387-a5aa-9bd4d162efde"
+        },
+        "schema_version": 1,
+        "selected_ids": [
+          "SYN:AAA",
+          "SYN:BBB",
+          "SYN:CCC"
+        ],
+        "target_weights": [
+          {
+            "asset_id": "SYN:AAA",
+            "sector": "Technology",
+            "weight": "0.2"
+          },
+          {
+            "asset_id": "SYN:BBB",
+            "sector": "Technology",
+            "weight": "0.2"
+          },
+          {
+            "asset_id": "SYN:CCC",
+            "sector": "Unknown",
+            "weight": "0.2"
+          }
+        ],
+        "warnings": [
+          "SYNTHETIC_DATA_ONLY"
+        ]
+      },
+      "strategy_version_id": "184f4ef7-c542-5387-a5aa-9bd4d162efde",
+      "summary_action": "BUY",
+      "target_weights": [
+        {
+          "asset_id": "SYN:AAA",
+          "reason_codes": [
+            "RISK_CONSTRAINED_TARGET"
+          ],
+          "weight": "0.2"
+        },
+        {
+          "asset_id": "SYN:BBB",
+          "reason_codes": [
+            "RISK_CONSTRAINED_TARGET"
+          ],
+          "weight": "0.2"
+        },
+        {
+          "asset_id": "SYN:CCC",
+          "reason_codes": [
+            "RISK_CONSTRAINED_TARGET"
+          ],
+          "weight": "0.2"
+        }
+      ]
+    },
+    "before_next_scan": {
+      "account_state": "active",
+      "active_batch_controls_available": false,
+      "active_order_batch_id": null,
+      "backlog_unavailable_reason": null,
+      "clock_at": "2028-09-01T12:30:00Z",
+      "clock_mode": "synthetic_replay",
+      "data_status": "synthetic_fixture",
+      "due_backlog": true,
+      "frequency": "monthly",
+      "last_explicit_review_cutoff": "2028-09-01T12:30:00Z",
+      "last_observed_at": "2026-10-29T10:50:46.756169Z",
+      "last_observed_state": "up_to_date",
+      "next_review_due_at": "2028-09-01T12:30:00Z",
+      "next_review_session": "2028-08-31",
+      "observed_clock_at": "2028-08-01T12:30:00Z",
+      "paper_only": true,
+      "portfolio_id": "d76988e1-3318-5351-875c-9030a2bf86c5",
+      "reason": "NEXT_MONTHLY_REVIEW_NOT_DUE",
+      "recent_occurrences": [
+        {
+          "as_of_session": "2028-07-31",
+          "created_at": "2026-10-29T10:50:41.593519Z",
+          "first_observed_clock_at": "2028-08-01T12:30:00Z",
+          "handled_at": "2026-10-29T10:50:41.616235Z",
+          "handled_clock_at": "2028-08-01T12:30:00Z",
+          "id": "28baea1e-b4e7-5eda-ac69-179174ab4ebc",
+          "intended_due_at": "2028-08-01T12:30:00Z",
+          "job": {
+            "attempts": 1,
+            "created_at": "2026-10-29T10:50:37.902268Z",
+            "error": null,
+            "id": "df82b1b8-7de8-4ba9-b443-572c0f0fff41",
+            "kind": "evaluate_portfolio",
+            "max_attempts": 3,
+            "progress": 100.0,
+            "result": {
+              "kind": "resource",
+              "message": "Immutable recommendation published; forecast has its own observable job.",
+              "resource_id": "564123a9-292a-5979-a93b-b619f470b8c9"
+            },
+            "status": "completed",
+            "updated_at": "2026-10-29T10:50:38.942237Z"
+          },
+          "observed_snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+          "observed_snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+          "opportunity_end_at": "2028-08-02T12:30:00Z",
+          "outcome": "admitted",
+          "reason": null,
+          "recommendation_id": "564123a9-292a-5979-a93b-b619f470b8c9"
+        },
+        {
+          "as_of_session": "2028-06-30",
+          "created_at": "2026-10-29T10:50:41.587831Z",
+          "first_observed_clock_at": "2028-08-01T12:30:00Z",
+          "handled_at": "2026-10-29T10:50:41.591409Z",
+          "handled_clock_at": "2028-08-01T12:30:00Z",
+          "id": "6340aaf1-a8b5-5368-9da5-90b4be652d21",
+          "intended_due_at": "2028-07-03T12:30:00Z",
+          "job": null,
+          "observed_snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+          "observed_snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+          "opportunity_end_at": "2028-07-04T12:30:00Z",
+          "outcome": "missed",
+          "reason": "REVIEW_WINDOW_PASSED",
+          "recommendation_id": null
+        },
+        {
+          "as_of_session": "2028-05-31",
+          "created_at": "2026-10-29T10:50:41.582226Z",
+          "first_observed_clock_at": "2028-08-01T12:30:00Z",
+          "handled_at": "2026-10-29T10:50:41.585521Z",
+          "handled_clock_at": "2028-08-01T12:30:00Z",
+          "id": "7c2d1cbe-b9bf-5661-9139-64e396c1dc6c",
+          "intended_due_at": "2028-06-01T12:30:00Z",
+          "job": null,
+          "observed_snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+          "observed_snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+          "opportunity_end_at": "2028-06-02T12:30:00Z",
+          "outcome": "missed",
+          "reason": "REVIEW_WINDOW_PASSED",
+          "recommendation_id": null
+        },
+        {
+          "as_of_session": "2028-04-28",
+          "created_at": "2026-10-29T10:50:41.576891Z",
+          "first_observed_clock_at": "2028-08-01T12:30:00Z",
+          "handled_at": "2026-10-29T10:50:41.580063Z",
+          "handled_clock_at": "2028-08-01T12:30:00Z",
+          "id": "5325815b-2670-5ebb-a603-b0b2488fa29c",
+          "intended_due_at": "2028-05-01T12:30:00Z",
+          "job": null,
+          "observed_snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+          "observed_snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+          "opportunity_end_at": "2028-05-02T12:30:00Z",
+          "outcome": "missed",
+          "reason": "REVIEW_WINDOW_PASSED",
+          "recommendation_id": null
+        },
+        {
+          "as_of_session": "2028-03-31",
+          "created_at": "2026-10-29T10:50:41.571812Z",
+          "first_observed_clock_at": "2028-08-01T12:30:00Z",
+          "handled_at": "2026-10-29T10:50:41.574749Z",
+          "handled_clock_at": "2028-08-01T12:30:00Z",
+          "id": "e29b2163-6010-506d-b621-6ab7a171632a",
+          "intended_due_at": "2028-04-03T12:30:00Z",
+          "job": null,
+          "observed_snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+          "observed_snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+          "opportunity_end_at": "2028-04-04T12:30:00Z",
+          "outcome": "missed",
+          "reason": "REVIEW_WINDOW_PASSED",
+          "recommendation_id": null
+        },
+        {
+          "as_of_session": "2028-02-29",
+          "created_at": "2026-10-29T10:50:41.566625Z",
+          "first_observed_clock_at": "2028-08-01T12:30:00Z",
+          "handled_at": "2026-10-29T10:50:41.569762Z",
+          "handled_clock_at": "2028-08-01T12:30:00Z",
+          "id": "a7d44899-9511-5bb2-83d8-9132109f7e49",
+          "intended_due_at": "2028-03-01T13:30:00Z",
+          "job": null,
+          "observed_snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+          "observed_snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+          "opportunity_end_at": "2028-03-02T13:30:00Z",
+          "outcome": "missed",
+          "reason": "REVIEW_WINDOW_PASSED",
+          "recommendation_id": null
+        },
+        {
+          "as_of_session": "2028-01-31",
+          "created_at": "2026-10-29T10:50:41.561058Z",
+          "first_observed_clock_at": "2028-08-01T12:30:00Z",
+          "handled_at": "2026-10-29T10:50:41.564286Z",
+          "handled_clock_at": "2028-08-01T12:30:00Z",
+          "id": "51c0775a-d4cd-5c69-baf0-e88cc4ec5e58",
+          "intended_due_at": "2028-02-01T13:30:00Z",
+          "job": null,
+          "observed_snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+          "observed_snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+          "opportunity_end_at": "2028-02-02T13:30:00Z",
+          "outcome": "missed",
+          "reason": "REVIEW_WINDOW_PASSED",
+          "recommendation_id": null
+        },
+        {
+          "as_of_session": "2027-12-31",
+          "created_at": "2026-10-29T10:50:41.555874Z",
+          "first_observed_clock_at": "2028-08-01T12:30:00Z",
+          "handled_at": "2026-10-29T10:50:41.558962Z",
+          "handled_clock_at": "2028-08-01T12:30:00Z",
+          "id": "72947c3c-4ce0-53da-8977-6283780f5aeb",
+          "intended_due_at": "2028-01-03T13:30:00Z",
+          "job": null,
+          "observed_snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+          "observed_snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+          "opportunity_end_at": "2028-01-04T13:30:00Z",
+          "outcome": "missed",
+          "reason": "REVIEW_WINDOW_PASSED",
+          "recommendation_id": null
+        },
+        {
+          "as_of_session": "2027-11-30",
+          "created_at": "2026-10-29T10:50:41.550630Z",
+          "first_observed_clock_at": "2028-08-01T12:30:00Z",
+          "handled_at": "2026-10-29T10:50:41.553814Z",
+          "handled_clock_at": "2028-08-01T12:30:00Z",
+          "id": "89abb15c-64b5-5d1d-bb3f-24773d4f88d9",
+          "intended_due_at": "2027-12-01T13:30:00Z",
+          "job": null,
+          "observed_snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+          "observed_snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+          "opportunity_end_at": "2027-12-02T13:30:00Z",
+          "outcome": "missed",
+          "reason": "REVIEW_WINDOW_PASSED",
+          "recommendation_id": null
+        },
+        {
+          "as_of_session": "2027-10-29",
+          "created_at": "2026-10-29T10:50:41.544642Z",
+          "first_observed_clock_at": "2028-08-01T12:30:00Z",
+          "handled_at": "2026-10-29T10:50:41.548412Z",
+          "handled_clock_at": "2028-08-01T12:30:00Z",
+          "id": "b714632f-75c0-595f-b9dd-0ccbefa0e4a1",
+          "intended_due_at": "2027-11-01T12:30:00Z",
+          "job": null,
+          "observed_snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+          "observed_snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+          "opportunity_end_at": "2027-11-02T12:30:00Z",
+          "outcome": "missed",
+          "reason": "REVIEW_WINDOW_PASSED",
+          "recommendation_id": null
+        },
+        {
+          "as_of_session": "2027-09-30",
+          "created_at": "2026-10-29T10:50:41.538905Z",
+          "first_observed_clock_at": "2028-08-01T12:30:00Z",
+          "handled_at": "2026-10-29T10:50:41.541896Z",
+          "handled_clock_at": "2028-08-01T12:30:00Z",
+          "id": "39112419-70e5-5adf-8708-c9ab0de504ef",
+          "intended_due_at": "2027-10-01T12:30:00Z",
+          "job": null,
+          "observed_snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+          "observed_snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+          "opportunity_end_at": "2027-10-04T12:30:00Z",
+          "outcome": "missed",
+          "reason": "REVIEW_WINDOW_PASSED",
+          "recommendation_id": null
+        },
+        {
+          "as_of_session": "2027-08-31",
+          "created_at": "2026-10-29T10:50:41.533880Z",
+          "first_observed_clock_at": "2028-08-01T12:30:00Z",
+          "handled_at": "2026-10-29T10:50:41.536864Z",
+          "handled_clock_at": "2028-08-01T12:30:00Z",
+          "id": "f51a9f4a-9159-5ebf-97c5-babb61989dbc",
+          "intended_due_at": "2027-09-01T12:30:00Z",
+          "job": null,
+          "observed_snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+          "observed_snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+          "opportunity_end_at": "2027-09-02T12:30:00Z",
+          "outcome": "missed",
+          "reason": "REVIEW_WINDOW_PASSED",
+          "recommendation_id": null
+        },
+        {
+          "as_of_session": "2027-07-30",
+          "created_at": "2026-10-29T10:50:41.528849Z",
+          "first_observed_clock_at": "2028-08-01T12:30:00Z",
+          "handled_at": "2026-10-29T10:50:41.531817Z",
+          "handled_clock_at": "2028-08-01T12:30:00Z",
+          "id": "5248af1b-6d2a-50bf-a42c-47af0e136d87",
+          "intended_due_at": "2027-08-02T12:30:00Z",
+          "job": null,
+          "observed_snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+          "observed_snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+          "opportunity_end_at": "2027-08-03T12:30:00Z",
+          "outcome": "missed",
+          "reason": "REVIEW_WINDOW_PASSED",
+          "recommendation_id": null
+        },
+        {
+          "as_of_session": "2027-06-30",
+          "created_at": "2026-10-29T10:50:41.523701Z",
+          "first_observed_clock_at": "2028-08-01T12:30:00Z",
+          "handled_at": "2026-10-29T10:50:41.526766Z",
+          "handled_clock_at": "2028-08-01T12:30:00Z",
+          "id": "d6eb3838-3d04-5754-a813-f144f8df6fb1",
+          "intended_due_at": "2027-07-01T12:30:00Z",
+          "job": null,
+          "observed_snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+          "observed_snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+          "opportunity_end_at": "2027-07-02T12:30:00Z",
+          "outcome": "missed",
+          "reason": "REVIEW_WINDOW_PASSED",
+          "recommendation_id": null
+        },
+        {
+          "as_of_session": "2027-05-31",
+          "created_at": "2026-10-29T10:50:41.518404Z",
+          "first_observed_clock_at": "2028-08-01T12:30:00Z",
+          "handled_at": "2026-10-29T10:50:41.521625Z",
+          "handled_clock_at": "2028-08-01T12:30:00Z",
+          "id": "26802fde-7cf6-5386-86a6-7b2cb911cb87",
+          "intended_due_at": "2027-06-01T12:30:00Z",
+          "job": null,
+          "observed_snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+          "observed_snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+          "opportunity_end_at": "2027-06-02T12:30:00Z",
+          "outcome": "missed",
+          "reason": "REVIEW_WINDOW_PASSED",
+          "recommendation_id": null
+        },
+        {
+          "as_of_session": "2027-04-30",
+          "created_at": "2026-10-29T10:50:41.512792Z",
+          "first_observed_clock_at": "2028-08-01T12:30:00Z",
+          "handled_at": "2026-10-29T10:50:41.516179Z",
+          "handled_clock_at": "2028-08-01T12:30:00Z",
+          "id": "58e4e373-b7ce-530d-aa7e-affbf994ed8b",
+          "intended_due_at": "2027-05-03T12:30:00Z",
+          "job": null,
+          "observed_snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+          "observed_snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+          "opportunity_end_at": "2027-05-04T12:30:00Z",
+          "outcome": "missed",
+          "reason": "REVIEW_WINDOW_PASSED",
+          "recommendation_id": null
+        },
+        {
+          "as_of_session": "2027-03-31",
+          "created_at": "2026-10-29T10:50:41.506831Z",
+          "first_observed_clock_at": "2028-08-01T12:30:00Z",
+          "handled_at": "2026-10-29T10:50:41.510342Z",
+          "handled_clock_at": "2028-08-01T12:30:00Z",
+          "id": "364838b9-214c-5fc4-a1ad-53c13b51bc19",
+          "intended_due_at": "2027-04-01T12:30:00Z",
+          "job": null,
+          "observed_snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+          "observed_snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+          "opportunity_end_at": "2027-04-02T12:30:00Z",
+          "outcome": "missed",
+          "reason": "REVIEW_WINDOW_PASSED",
+          "recommendation_id": null
+        },
+        {
+          "as_of_session": "2027-02-26",
+          "created_at": "2026-10-29T10:50:41.500945Z",
+          "first_observed_clock_at": "2028-08-01T12:30:00Z",
+          "handled_at": "2026-10-29T10:50:41.504498Z",
+          "handled_clock_at": "2028-08-01T12:30:00Z",
+          "id": "233641ed-e6c9-5f5d-9eba-5793046f4290",
+          "intended_due_at": "2027-03-01T13:30:00Z",
+          "job": null,
+          "observed_snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+          "observed_snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+          "opportunity_end_at": "2027-03-02T13:30:00Z",
+          "outcome": "missed",
+          "reason": "REVIEW_WINDOW_PASSED",
+          "recommendation_id": null
+        },
+        {
+          "as_of_session": "2027-01-29",
+          "created_at": "2026-10-29T10:50:41.494070Z",
+          "first_observed_clock_at": "2028-08-01T12:30:00Z",
+          "handled_at": "2026-10-29T10:50:41.498174Z",
+          "handled_clock_at": "2028-08-01T12:30:00Z",
+          "id": "3e34e1ab-75be-5246-a689-716afde94662",
+          "intended_due_at": "2027-02-01T13:30:00Z",
+          "job": null,
+          "observed_snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+          "observed_snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+          "opportunity_end_at": "2027-02-02T13:30:00Z",
+          "outcome": "missed",
+          "reason": "REVIEW_WINDOW_PASSED",
+          "recommendation_id": null
+        }
+      ],
+      "reconciliation_required": false,
+      "supervisor": {
+        "last_seen_at": "2026-10-29T10:50:46.733382Z",
+        "last_unobserved_end_at": null,
+        "last_unobserved_start_at": null,
+        "limitation": "OBSERVATION_NOT_EXACT_SHUTDOWN",
+        "measured_at": "2026-10-29T10:50:47.120854Z",
+        "status": "fresh"
+      }
+    },
+    "first_schedule": {
+      "account_state": "active",
+      "active_batch_controls_available": false,
+      "active_order_batch_id": null,
+      "backlog_unavailable_reason": null,
+      "clock_at": "2028-08-01T12:30:00Z",
+      "clock_mode": "synthetic_replay",
+      "data_status": "synthetic_fixture",
+      "due_backlog": false,
+      "frequency": "monthly",
+      "last_explicit_review_cutoff": "2028-08-01T12:30:00Z",
+      "last_observed_at": "2026-10-29T10:50:46.756169Z",
+      "last_observed_state": "up_to_date",
+      "next_review_due_at": "2028-09-01T12:30:00Z",
+      "next_review_session": "2028-08-31",
+      "observed_clock_at": "2028-08-01T12:30:00Z",
+      "paper_only": true,
+      "portfolio_id": "d76988e1-3318-5351-875c-9030a2bf86c5",
+      "reason": "NEXT_MONTHLY_REVIEW_NOT_DUE",
+      "recent_occurrences": [
+        {
+          "as_of_session": "2028-07-31",
+          "created_at": "2026-10-29T10:50:41.593519Z",
+          "first_observed_clock_at": "2028-08-01T12:30:00Z",
+          "handled_at": "2026-10-29T10:50:41.616235Z",
+          "handled_clock_at": "2028-08-01T12:30:00Z",
+          "id": "28baea1e-b4e7-5eda-ac69-179174ab4ebc",
+          "intended_due_at": "2028-08-01T12:30:00Z",
+          "job": {
+            "attempts": 1,
+            "created_at": "2026-10-29T10:50:37.902268Z",
+            "error": null,
+            "id": "df82b1b8-7de8-4ba9-b443-572c0f0fff41",
+            "kind": "evaluate_portfolio",
+            "max_attempts": 3,
+            "progress": 100.0,
+            "result": {
+              "kind": "resource",
+              "message": "Immutable recommendation published; forecast has its own observable job.",
+              "resource_id": "564123a9-292a-5979-a93b-b619f470b8c9"
+            },
+            "status": "completed",
+            "updated_at": "2026-10-29T10:50:38.942237Z"
+          },
+          "observed_snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+          "observed_snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+          "opportunity_end_at": "2028-08-02T12:30:00Z",
+          "outcome": "admitted",
+          "reason": null,
+          "recommendation_id": "564123a9-292a-5979-a93b-b619f470b8c9"
+        },
+        {
+          "as_of_session": "2028-06-30",
+          "created_at": "2026-10-29T10:50:41.587831Z",
+          "first_observed_clock_at": "2028-08-01T12:30:00Z",
+          "handled_at": "2026-10-29T10:50:41.591409Z",
+          "handled_clock_at": "2028-08-01T12:30:00Z",
+          "id": "6340aaf1-a8b5-5368-9da5-90b4be652d21",
+          "intended_due_at": "2028-07-03T12:30:00Z",
+          "job": null,
+          "observed_snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+          "observed_snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+          "opportunity_end_at": "2028-07-04T12:30:00Z",
+          "outcome": "missed",
+          "reason": "REVIEW_WINDOW_PASSED",
+          "recommendation_id": null
+        },
+        {
+          "as_of_session": "2028-05-31",
+          "created_at": "2026-10-29T10:50:41.582226Z",
+          "first_observed_clock_at": "2028-08-01T12:30:00Z",
+          "handled_at": "2026-10-29T10:50:41.585521Z",
+          "handled_clock_at": "2028-08-01T12:30:00Z",
+          "id": "7c2d1cbe-b9bf-5661-9139-64e396c1dc6c",
+          "intended_due_at": "2028-06-01T12:30:00Z",
+          "job": null,
+          "observed_snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+          "observed_snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+          "opportunity_end_at": "2028-06-02T12:30:00Z",
+          "outcome": "missed",
+          "reason": "REVIEW_WINDOW_PASSED",
+          "recommendation_id": null
+        },
+        {
+          "as_of_session": "2028-04-28",
+          "created_at": "2026-10-29T10:50:41.576891Z",
+          "first_observed_clock_at": "2028-08-01T12:30:00Z",
+          "handled_at": "2026-10-29T10:50:41.580063Z",
+          "handled_clock_at": "2028-08-01T12:30:00Z",
+          "id": "5325815b-2670-5ebb-a603-b0b2488fa29c",
+          "intended_due_at": "2028-05-01T12:30:00Z",
+          "job": null,
+          "observed_snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+          "observed_snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+          "opportunity_end_at": "2028-05-02T12:30:00Z",
+          "outcome": "missed",
+          "reason": "REVIEW_WINDOW_PASSED",
+          "recommendation_id": null
+        },
+        {
+          "as_of_session": "2028-03-31",
+          "created_at": "2026-10-29T10:50:41.571812Z",
+          "first_observed_clock_at": "2028-08-01T12:30:00Z",
+          "handled_at": "2026-10-29T10:50:41.574749Z",
+          "handled_clock_at": "2028-08-01T12:30:00Z",
+          "id": "e29b2163-6010-506d-b621-6ab7a171632a",
+          "intended_due_at": "2028-04-03T12:30:00Z",
+          "job": null,
+          "observed_snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+          "observed_snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+          "opportunity_end_at": "2028-04-04T12:30:00Z",
+          "outcome": "missed",
+          "reason": "REVIEW_WINDOW_PASSED",
+          "recommendation_id": null
+        },
+        {
+          "as_of_session": "2028-02-29",
+          "created_at": "2026-10-29T10:50:41.566625Z",
+          "first_observed_clock_at": "2028-08-01T12:30:00Z",
+          "handled_at": "2026-10-29T10:50:41.569762Z",
+          "handled_clock_at": "2028-08-01T12:30:00Z",
+          "id": "a7d44899-9511-5bb2-83d8-9132109f7e49",
+          "intended_due_at": "2028-03-01T13:30:00Z",
+          "job": null,
+          "observed_snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+          "observed_snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+          "opportunity_end_at": "2028-03-02T13:30:00Z",
+          "outcome": "missed",
+          "reason": "REVIEW_WINDOW_PASSED",
+          "recommendation_id": null
+        },
+        {
+          "as_of_session": "2028-01-31",
+          "created_at": "2026-10-29T10:50:41.561058Z",
+          "first_observed_clock_at": "2028-08-01T12:30:00Z",
+          "handled_at": "2026-10-29T10:50:41.564286Z",
+          "handled_clock_at": "2028-08-01T12:30:00Z",
+          "id": "51c0775a-d4cd-5c69-baf0-e88cc4ec5e58",
+          "intended_due_at": "2028-02-01T13:30:00Z",
+          "job": null,
+          "observed_snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+          "observed_snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+          "opportunity_end_at": "2028-02-02T13:30:00Z",
+          "outcome": "missed",
+          "reason": "REVIEW_WINDOW_PASSED",
+          "recommendation_id": null
+        },
+        {
+          "as_of_session": "2027-12-31",
+          "created_at": "2026-10-29T10:50:41.555874Z",
+          "first_observed_clock_at": "2028-08-01T12:30:00Z",
+          "handled_at": "2026-10-29T10:50:41.558962Z",
+          "handled_clock_at": "2028-08-01T12:30:00Z",
+          "id": "72947c3c-4ce0-53da-8977-6283780f5aeb",
+          "intended_due_at": "2028-01-03T13:30:00Z",
+          "job": null,
+          "observed_snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+          "observed_snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+          "opportunity_end_at": "2028-01-04T13:30:00Z",
+          "outcome": "missed",
+          "reason": "REVIEW_WINDOW_PASSED",
+          "recommendation_id": null
+        },
+        {
+          "as_of_session": "2027-11-30",
+          "created_at": "2026-10-29T10:50:41.550630Z",
+          "first_observed_clock_at": "2028-08-01T12:30:00Z",
+          "handled_at": "2026-10-29T10:50:41.553814Z",
+          "handled_clock_at": "2028-08-01T12:30:00Z",
+          "id": "89abb15c-64b5-5d1d-bb3f-24773d4f88d9",
+          "intended_due_at": "2027-12-01T13:30:00Z",
+          "job": null,
+          "observed_snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+          "observed_snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+          "opportunity_end_at": "2027-12-02T13:30:00Z",
+          "outcome": "missed",
+          "reason": "REVIEW_WINDOW_PASSED",
+          "recommendation_id": null
+        },
+        {
+          "as_of_session": "2027-10-29",
+          "created_at": "2026-10-29T10:50:41.544642Z",
+          "first_observed_clock_at": "2028-08-01T12:30:00Z",
+          "handled_at": "2026-10-29T10:50:41.548412Z",
+          "handled_clock_at": "2028-08-01T12:30:00Z",
+          "id": "b714632f-75c0-595f-b9dd-0ccbefa0e4a1",
+          "intended_due_at": "2027-11-01T12:30:00Z",
+          "job": null,
+          "observed_snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+          "observed_snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+          "opportunity_end_at": "2027-11-02T12:30:00Z",
+          "outcome": "missed",
+          "reason": "REVIEW_WINDOW_PASSED",
+          "recommendation_id": null
+        },
+        {
+          "as_of_session": "2027-09-30",
+          "created_at": "2026-10-29T10:50:41.538905Z",
+          "first_observed_clock_at": "2028-08-01T12:30:00Z",
+          "handled_at": "2026-10-29T10:50:41.541896Z",
+          "handled_clock_at": "2028-08-01T12:30:00Z",
+          "id": "39112419-70e5-5adf-8708-c9ab0de504ef",
+          "intended_due_at": "2027-10-01T12:30:00Z",
+          "job": null,
+          "observed_snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+          "observed_snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+          "opportunity_end_at": "2027-10-04T12:30:00Z",
+          "outcome": "missed",
+          "reason": "REVIEW_WINDOW_PASSED",
+          "recommendation_id": null
+        },
+        {
+          "as_of_session": "2027-08-31",
+          "created_at": "2026-10-29T10:50:41.533880Z",
+          "first_observed_clock_at": "2028-08-01T12:30:00Z",
+          "handled_at": "2026-10-29T10:50:41.536864Z",
+          "handled_clock_at": "2028-08-01T12:30:00Z",
+          "id": "f51a9f4a-9159-5ebf-97c5-babb61989dbc",
+          "intended_due_at": "2027-09-01T12:30:00Z",
+          "job": null,
+          "observed_snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+          "observed_snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+          "opportunity_end_at": "2027-09-02T12:30:00Z",
+          "outcome": "missed",
+          "reason": "REVIEW_WINDOW_PASSED",
+          "recommendation_id": null
+        },
+        {
+          "as_of_session": "2027-07-30",
+          "created_at": "2026-10-29T10:50:41.528849Z",
+          "first_observed_clock_at": "2028-08-01T12:30:00Z",
+          "handled_at": "2026-10-29T10:50:41.531817Z",
+          "handled_clock_at": "2028-08-01T12:30:00Z",
+          "id": "5248af1b-6d2a-50bf-a42c-47af0e136d87",
+          "intended_due_at": "2027-08-02T12:30:00Z",
+          "job": null,
+          "observed_snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+          "observed_snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+          "opportunity_end_at": "2027-08-03T12:30:00Z",
+          "outcome": "missed",
+          "reason": "REVIEW_WINDOW_PASSED",
+          "recommendation_id": null
+        },
+        {
+          "as_of_session": "2027-06-30",
+          "created_at": "2026-10-29T10:50:41.523701Z",
+          "first_observed_clock_at": "2028-08-01T12:30:00Z",
+          "handled_at": "2026-10-29T10:50:41.526766Z",
+          "handled_clock_at": "2028-08-01T12:30:00Z",
+          "id": "d6eb3838-3d04-5754-a813-f144f8df6fb1",
+          "intended_due_at": "2027-07-01T12:30:00Z",
+          "job": null,
+          "observed_snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+          "observed_snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+          "opportunity_end_at": "2027-07-02T12:30:00Z",
+          "outcome": "missed",
+          "reason": "REVIEW_WINDOW_PASSED",
+          "recommendation_id": null
+        },
+        {
+          "as_of_session": "2027-05-31",
+          "created_at": "2026-10-29T10:50:41.518404Z",
+          "first_observed_clock_at": "2028-08-01T12:30:00Z",
+          "handled_at": "2026-10-29T10:50:41.521625Z",
+          "handled_clock_at": "2028-08-01T12:30:00Z",
+          "id": "26802fde-7cf6-5386-86a6-7b2cb911cb87",
+          "intended_due_at": "2027-06-01T12:30:00Z",
+          "job": null,
+          "observed_snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+          "observed_snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+          "opportunity_end_at": "2027-06-02T12:30:00Z",
+          "outcome": "missed",
+          "reason": "REVIEW_WINDOW_PASSED",
+          "recommendation_id": null
+        },
+        {
+          "as_of_session": "2027-04-30",
+          "created_at": "2026-10-29T10:50:41.512792Z",
+          "first_observed_clock_at": "2028-08-01T12:30:00Z",
+          "handled_at": "2026-10-29T10:50:41.516179Z",
+          "handled_clock_at": "2028-08-01T12:30:00Z",
+          "id": "58e4e373-b7ce-530d-aa7e-affbf994ed8b",
+          "intended_due_at": "2027-05-03T12:30:00Z",
+          "job": null,
+          "observed_snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+          "observed_snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+          "opportunity_end_at": "2027-05-04T12:30:00Z",
+          "outcome": "missed",
+          "reason": "REVIEW_WINDOW_PASSED",
+          "recommendation_id": null
+        },
+        {
+          "as_of_session": "2027-03-31",
+          "created_at": "2026-10-29T10:50:41.506831Z",
+          "first_observed_clock_at": "2028-08-01T12:30:00Z",
+          "handled_at": "2026-10-29T10:50:41.510342Z",
+          "handled_clock_at": "2028-08-01T12:30:00Z",
+          "id": "364838b9-214c-5fc4-a1ad-53c13b51bc19",
+          "intended_due_at": "2027-04-01T12:30:00Z",
+          "job": null,
+          "observed_snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+          "observed_snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+          "opportunity_end_at": "2027-04-02T12:30:00Z",
+          "outcome": "missed",
+          "reason": "REVIEW_WINDOW_PASSED",
+          "recommendation_id": null
+        },
+        {
+          "as_of_session": "2027-02-26",
+          "created_at": "2026-10-29T10:50:41.500945Z",
+          "first_observed_clock_at": "2028-08-01T12:30:00Z",
+          "handled_at": "2026-10-29T10:50:41.504498Z",
+          "handled_clock_at": "2028-08-01T12:30:00Z",
+          "id": "233641ed-e6c9-5f5d-9eba-5793046f4290",
+          "intended_due_at": "2027-03-01T13:30:00Z",
+          "job": null,
+          "observed_snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+          "observed_snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+          "opportunity_end_at": "2027-03-02T13:30:00Z",
+          "outcome": "missed",
+          "reason": "REVIEW_WINDOW_PASSED",
+          "recommendation_id": null
+        },
+        {
+          "as_of_session": "2027-01-29",
+          "created_at": "2026-10-29T10:50:41.494070Z",
+          "first_observed_clock_at": "2028-08-01T12:30:00Z",
+          "handled_at": "2026-10-29T10:50:41.498174Z",
+          "handled_clock_at": "2028-08-01T12:30:00Z",
+          "id": "3e34e1ab-75be-5246-a689-716afde94662",
+          "intended_due_at": "2027-02-01T13:30:00Z",
+          "job": null,
+          "observed_snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+          "observed_snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+          "opportunity_end_at": "2027-02-02T13:30:00Z",
+          "outcome": "missed",
+          "reason": "REVIEW_WINDOW_PASSED",
+          "recommendation_id": null
+        }
+      ],
+      "reconciliation_required": false,
+      "supervisor": {
+        "last_seen_at": "2026-10-29T10:50:46.733382Z",
+        "last_unobserved_end_at": null,
+        "last_unobserved_start_at": null,
+        "limitation": "OBSERVATION_NOT_EXACT_SHUTDOWN",
+        "measured_at": "2026-10-29T10:50:46.781090Z",
+        "status": "fresh"
+      }
+    },
+    "next_accepted": {
+      "job_id": "c05cec74-9294-4e39-9fd3-58dbabb49c1e",
+      "recommendation_id": "90ceb9f5-b806-57e8-9123-6029bdfbb4b0"
+    },
+    "next_analysis": {
+      "actions": [
+        {
+          "asset_id": "SYN:AAA",
+          "current_weight": "0",
+          "estimated_notional_usd": "200.00",
+          "estimated_quantity": "2.791346",
+          "evidence": {
+            "current_weight": "0",
+            "position_cap": "0.2"
+          },
+          "explanation": "Buy SYN:AAA: current weight 0, target 0.2; target rebalance. Estimated quantity 2.791346; paper preview only.",
+          "label": "INCREASE",
+          "reason_codes": [
+            "TARGET_REBALANCE"
+          ],
+          "side": "BUY",
+          "target_weight": "0.2"
+        },
+        {
+          "asset_id": "SYN:BBB",
+          "current_weight": "0",
+          "estimated_notional_usd": "200.00",
+          "estimated_quantity": "2.791346",
+          "evidence": {
+            "current_weight": "0",
+            "position_cap": "0.2"
+          },
+          "explanation": "Buy SYN:BBB: current weight 0, target 0.2; target rebalance. Estimated quantity 2.791346; paper preview only.",
+          "label": "INCREASE",
+          "reason_codes": [
+            "TARGET_REBALANCE"
+          ],
+          "side": "BUY",
+          "target_weight": "0.2"
+        },
+        {
+          "asset_id": "SYN:CCC",
+          "current_weight": "0",
+          "estimated_notional_usd": "200.00",
+          "estimated_quantity": "3.015681",
+          "evidence": {
+            "current_weight": "0",
+            "position_cap": "0.2"
+          },
+          "explanation": "Buy SYN:CCC: current weight 0, target 0.2; target rebalance. Estimated quantity 3.015681; paper preview only.",
+          "label": "INCREASE",
+          "reason_codes": [
+            "TARGET_REBALANCE"
+          ],
+          "side": "BUY",
+          "target_weight": "0.2"
+        }
+      ],
+      "as_of_session": "2028-08-31",
+      "calendar_sha256": "e3d2312d54e172d7aada8239f296eecf38c6038d66b5a203c5c5690ede82d660",
+      "candidates": [
+        {
+          "asset_id": "SYN:AAA",
+          "contributions": [
+            {
+              "name": "momentum_long_z",
+              "unavailable_reason": null,
+              "value": 0.7071067811865476
+            },
+            {
+              "name": "momentum_short_z",
+              "unavailable_reason": null,
+              "value": 0.7071067811865476
+            },
+            {
+              "name": "volatility_z",
+              "unavailable_reason": null,
+              "value": -0.7071067811865475
+            },
+            {
+              "name": "momentum_long_contribution",
+              "unavailable_reason": null,
+              "value": 0.4242640687119285
+            },
+            {
+              "name": "momentum_short_contribution",
+              "unavailable_reason": null,
+              "value": 0.1767766952966369
+            },
+            {
+              "name": "volatility_contribution",
+              "unavailable_reason": null,
+              "value": 0.10606601717798211
+            }
+          ],
+          "exclusion_reasons": [],
+          "features": [
+            {
+              "name": "momentum_long",
+              "unavailable_reason": null,
+              "value": 0.09640397857689365
+            },
+            {
+              "name": "momentum_short",
+              "unavailable_reason": null,
+              "value": 0.04598540145985401
+            },
+            {
+              "name": "volatility",
+              "unavailable_reason": null,
+              "value": 0.00014089008919504272
+            }
+          ],
+          "score": 0.7071067811865475
+        },
+        {
+          "asset_id": "SYN:BBB",
+          "contributions": [
+            {
+              "name": "momentum_long_z",
+              "unavailable_reason": null,
+              "value": 0.7071067811865476
+            },
+            {
+              "name": "momentum_short_z",
+              "unavailable_reason": null,
+              "value": 0.7071067811865476
+            },
+            {
+              "name": "volatility_z",
+              "unavailable_reason": null,
+              "value": -0.7071067811865475
+            },
+            {
+              "name": "momentum_long_contribution",
+              "unavailable_reason": null,
+              "value": 0.4242640687119285
+            },
+            {
+              "name": "momentum_short_contribution",
+              "unavailable_reason": null,
+              "value": 0.1767766952966369
+            },
+            {
+              "name": "volatility_contribution",
+              "unavailable_reason": null,
+              "value": 0.10606601717798211
+            }
+          ],
+          "exclusion_reasons": [],
+          "features": [
+            {
+              "name": "momentum_long",
+              "unavailable_reason": null,
+              "value": 0.09640397857689365
+            },
+            {
+              "name": "momentum_short",
+              "unavailable_reason": null,
+              "value": 0.04598540145985401
+            },
+            {
+              "name": "volatility",
+              "unavailable_reason": null,
+              "value": 0.00014089008919504272
+            }
+          ],
+          "score": 0.7071067811865475
+        },
+        {
+          "asset_id": "SYN:CCC",
+          "contributions": [
+            {
+              "name": "momentum_long_z",
+              "unavailable_reason": null,
+              "value": -1.4142135623730951
+            },
+            {
+              "name": "momentum_short_z",
+              "unavailable_reason": null,
+              "value": -1.4142135623730951
+            },
+            {
+              "name": "volatility_z",
+              "unavailable_reason": null,
+              "value": 1.4142135623730951
+            },
+            {
+              "name": "momentum_long_contribution",
+              "unavailable_reason": null,
+              "value": -0.848528137423857
+            },
+            {
+              "name": "momentum_short_contribution",
+              "unavailable_reason": null,
+              "value": -0.3535533905932738
+            },
+            {
+              "name": "volatility_contribution",
+              "unavailable_reason": null,
+              "value": -0.21213203435596426
+            }
+          ],
+          "exclusion_reasons": [],
+          "features": [
+            {
+              "name": "momentum_long",
+              "unavailable_reason": null,
+              "value": 0.08224543080939947
+            },
+            {
+              "name": "momentum_short",
+              "unavailable_reason": null,
+              "value": 0.007902735562310031
+            },
+            {
+              "name": "volatility",
+              "unavailable_reason": null,
+              "value": 0.4843444836208134
+            }
+          ],
+          "score": -1.4142135623730951
+        },
+        {
+          "asset_id": "SYN:SPY",
+          "contributions": [],
+          "exclusion_reasons": [
+            "UNSUPPORTED_INSTRUMENT"
+          ],
+          "features": [],
+          "score": null
+        },
+        {
+          "asset_id": "SYN:ZERO",
+          "contributions": [],
+          "exclusion_reasons": [
+            "NONPOSITIVE_TREND"
+          ],
+          "features": [],
+          "score": null
+        }
+      ],
+      "cash_target_weight": "0.4",
+      "clock_mode": "synthetic_replay",
+      "computed_at": "2026-10-29T10:50:50.745447Z",
+      "config_sha256": "2093c63d190815eba052508d6d42d8ae0c93400cf777602d2c5f759627f43f21",
+      "created_at": "2028-09-01T12:30:00Z",
+      "current_portfolio_revision": 1,
+      "data_status": "synthetic_fixture",
+      "decision_cutoff_utc": "2028-09-01T12:30:00Z",
+      "engine_version": "a88fd77bf70a9fe69d80a328e1c00925e996caf5c94987dcfc50ddcb8b315267",
+      "estimated_total_trade_cost_usd": "0.60",
+      "forecast": {
+        "as_of_session": "2028-08-31",
+        "block_length_sessions": 5,
+        "calendar_version": "e3d2312d54e172d7aada8239f296eecf38c6038d66b5a203c5c5690ede82d660",
+        "cash_return_fraction": 0.0,
+        "comparability": "common_shock_paths",
+        "current_allocation": {
+          "cash_weight": "1",
+          "upfront_cost_usd": "0.00",
+          "weights": []
+        },
+        "data_status": "synthetic_fixture",
+        "decision_cutoff_utc": "2028-09-01T12:30:00Z",
+        "engine_version": "a88fd77bf70a9fe69d80a328e1c00925e996caf5c94987dcfc50ddcb8b315267",
+        "fingerprint": "da16f16ef12513ef16d73982d6493e7440263505cefc1447363127ac7bbf58bf",
+        "fingerprint_schema_version": 1,
+        "future_sessions": [
+          "2028-09-01",
+          "2028-09-04",
+          "2028-09-05",
+          "2028-09-06",
+          "2028-09-07",
+          "2028-09-08",
+          "2028-09-11",
+          "2028-09-12",
+          "2028-09-13",
+          "2028-09-14",
+          "2028-09-15",
+          "2028-09-18",
+          "2028-09-19",
+          "2028-09-20",
+          "2028-09-21",
+          "2028-09-22",
+          "2028-09-25",
+          "2028-09-26",
+          "2028-09-27",
+          "2028-09-28",
+          "2028-09-29",
+          "2028-10-02",
+          "2028-10-03",
+          "2028-10-04",
+          "2028-10-05",
+          "2028-10-06",
+          "2028-10-09",
+          "2028-10-10",
+          "2028-10-11",
+          "2028-10-12",
+          "2028-10-13",
+          "2028-10-16",
+          "2028-10-17",
+          "2028-10-18",
+          "2028-10-19",
+          "2028-10-20",
+          "2028-10-23",
+          "2028-10-24",
+          "2028-10-25",
+          "2028-10-26",
+          "2028-10-27",
+          "2028-10-30",
+          "2028-10-31",
+          "2028-11-01",
+          "2028-11-02",
+          "2028-11-03",
+          "2028-11-06",
+          "2028-11-07",
+          "2028-11-08",
+          "2028-11-09",
+          "2028-11-10",
+          "2028-11-13",
+          "2028-11-14",
+          "2028-11-15",
+          "2028-11-16",
+          "2028-11-17",
+          "2028-11-20",
+          "2028-11-21",
+          "2028-11-22",
+          "2028-11-23",
+          "2028-11-24",
+          "2028-11-27",
+          "2028-11-28",
+          "2028-11-29"
+        ],
+        "hold_unchanged": {
+          "median_ending_value_usd": "1000.00",
+          "median_return_fraction": 0.0,
+          "p10_return_fraction": 0.0,
+          "p90_return_fraction": 0.0,
+          "probability_of_loss": 0.0
+        },
+        "horizon_calendar_days": 90,
+        "horizon_end_at": "2028-11-30T13:30:00Z",
+        "horizon_trading_sessions": 64,
+        "id": "750e7383-9a88-508e-b4f3-ec5a0fdbd201",
+        "initial_value_usd": "1000.00",
+        "input_array_sha256": "29786a353918cc36d5ff8f81a088f51b5b6fb468c431ff4e8165088c55ca5246",
+        "limitations": [
+          "CONSTANT_WEIGHT_APPROXIMATION",
+          "ESTIMATED_UPFRONT_COST",
+          "SCENARIO_NOT_CALIBRATED_PREDICTION",
+          "SYNTHETIC_DATA_ONLY",
+          "ZERO_CASH_YIELD"
+        ],
+        "lookback_sessions": 252,
+        "median_return_delta_fraction": 0.033117200988196205,
+        "method": "multivariate_block_bootstrap_v1",
+        "proposed": {
+          "median_ending_value_usd": "1033.12",
+          "median_return_fraction": 0.033117200988196205,
+          "p10_return_fraction": 0.006129322912199125,
+          "p90_return_fraction": 0.06128553668530203,
+          "probability_of_loss": 0.076
+        },
+        "proposed_allocation": {
+          "cash_weight": "0.3996398455637736377616538261636504908224912188252403845888398382691717512185489073421",
+          "upfront_cost_usd": "0.60",
+          "weights": [
+            {
+              "asset_id": "SYN:AAA",
+              "weight": "0.2001200438008008380904075451151451474530651881718003113321513231181770368944899460495"
+            },
+            {
+              "asset_id": "SYN:BBB",
+              "weight": "0.2001200438008008380904075451151451474530651881718003113321513231181770368944899460495"
+            },
+            {
+              "asset_id": "SYN:CCC",
+              "weight": "0.2001200668346246860575310836060592142713784048311589927468575154944741749924712005587"
+            }
+          ]
+        },
+        "rng": {
+          "generator": "PCG64",
+          "initial_state": {
+            "id": "2d40eea3-5324-5bc7-8e16-e15b9b6bfd8f",
+            "schema_version": 1,
+            "sha256": "f7eeadec4bb6327d9c1e417fbdb8433721abcc3f1c62a370fd34905c51973c03"
+          },
+          "numpy_version": "2.5.4",
+          "sampling_version": "noncircular_c_order_v1"
+        },
+        "sampled_indices": {
+          "id": "f06ffa7f-4f07-5eca-8735-0c24051544b0",
+          "schema_version": 1,
+          "sha256": "b7795d3889530bb259a8b5a3e42cf41663dd7555bfe2d0f5251d7bc0febec332"
+        },
+        "seed": 42,
+        "simulation_count": 5000,
+        "snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+        "snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+        "status": "available",
+        "unavailable_reason": null
+      },
+      "forecast_id": "750e7383-9a88-508e-b4f3-ec5a0fdbd201",
+      "forecast_inputs_canonical_json": "{\"as_of_session\":\"2028-08-31\",\"calendar_sha256\":\"e3d2312d54e172d7aada8239f296eecf38c6038d66b5a203c5c5690ede82d660\",\"config_sha256\":\"2093c63d190815eba052508d6d42d8ae0c93400cf777602d2c5f759627f43f21\",\"current_allocation\":{\"cash_weight\":\"1\",\"upfront_cost_usd\":\"0.00\",\"weights\":[]},\"decision_cutoff_utc\":\"2028-09-01T12:30:00Z\",\"initial_value_usd\":\"1000.00\",\"portfolio_id\":\"d76988e1-3318-5351-875c-9030a2bf86c5\",\"portfolio_revision\":1,\"proposed_allocation\":{\"cash_weight\":\"0.3996398455637736377616538261636504908224912188252403845888398382691717512185489073421\",\"upfront_cost_usd\":\"0.60\",\"weights\":[{\"asset_id\":\"SYN:AAA\",\"weight\":\"0.2001200438008008380904075451151451474530651881718003113321513231181770368944899460495\"},{\"asset_id\":\"SYN:BBB\",\"weight\":\"0.2001200438008008380904075451151451474530651881718003113321513231181770368944899460495\"},{\"asset_id\":\"SYN:CCC\",\"weight\":\"0.2001200668346246860575310836060592142713784048311589927468575154944741749924712005587\"}]},\"seed\":42,\"snapshot_id\":\"5c223992-90ec-59a7-a1e7-7889b76cacea\",\"snapshot_sha256\":\"40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add\",\"source_mode\":\"synthetic_fixture\",\"strategy_version_id\":\"184f4ef7-c542-5387-a5aa-9bd4d162efde\",\"valuation_as_of_session\":\"2028-08-31\"}",
+      "forecast_job": {
+        "attempts": 1,
+        "created_at": "2026-10-29T10:50:50.748818Z",
+        "error": null,
+        "id": "4a78c73b-18a4-4f96-812d-a954d4e75b5e",
+        "kind": "forecast",
+        "max_attempts": 3,
+        "progress": 100.0,
+        "result": {
+          "kind": "resource",
+          "message": "Immutable scenario comparison sealed; not a calibrated prediction.",
+          "resource_id": "750e7383-9a88-508e-b4f3-ec5a0fdbd201"
+        },
+        "status": "completed",
+        "updated_at": "2026-10-29T10:50:51.709304Z"
+      },
+      "id": "90ceb9f5-b806-57e8-9123-6029bdfbb4b0",
+      "inputs": {
+        "as_of_session": "2028-08-31",
+        "clock_mode": "synthetic_replay",
+        "seed": 42,
+        "snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea"
+      },
+      "inputs_canonical_json": "{\"as_of_session\":\"2028-08-31\",\"clock_mode\":\"synthetic_replay\",\"seed\":42,\"snapshot_id\":\"5c223992-90ec-59a7-a1e7-7889b76cacea\"}",
+      "is_current": true,
+      "job_id": "c05cec74-9294-4e39-9fd3-58dbabb49c1e",
+      "portfolio_id": "d76988e1-3318-5351-875c-9030a2bf86c5",
+      "portfolio_revision": 1,
+      "snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+      "snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+      "stale_reasons": [],
+      "status": "ready",
+      "strategy_config": {
+        "display_name": "Risk-Adjusted Momentum",
+        "execution_policy": {
+          "id": "us_eod_next_open_v1"
+        },
+        "portfolio": {
+          "max_position_weight": "0.2",
+          "max_positions": 8,
+          "max_sector_weight": "0.4",
+          "min_cash_weight": "0.05",
+          "min_trade_usd": "5",
+          "rebalance_band_absolute_weight": "0.02",
+          "weighting": "inverse_volatility"
+        },
+        "rebalance": {
+          "frequency": "monthly"
+        },
+        "schema_version": 1,
+        "signals": {
+          "kind": "risk_adjusted_momentum",
+          "momentum_long_sessions": 126,
+          "momentum_short_sessions": 63,
+          "require_positive_trend": true,
+          "trend_sma_sessions": 200,
+          "volatility_sessions": 60,
+          "z_score_weights": {
+            "momentum_long": 0.6,
+            "momentum_short": 0.25,
+            "volatility_penalty": -0.15
+          }
+        },
+        "universe": {
+          "kind": "liquid_us_equities",
+          "min_history_sessions": 252,
+          "min_median_dollar_volume_usd": "1000000",
+          "min_price_usd": "5"
+        }
+      },
+      "strategy_evidence": {
+        "allocation_exclusions": [],
+        "allocation_reasons": [
+          "UNALLOCATABLE_CAPACITY"
+        ],
+        "as_of_session": "2028-08-31",
+        "candidates": [
+          {
+            "allocation_eligible": true,
+            "asset_id": "SYN:AAA",
+            "eligible": true,
+            "features": {
+              "momentum_long": 0.09640397857689365,
+              "momentum_short": 0.04598540145985401,
+              "volatility": 0.00014089008919504272
+            },
+            "input_sha256": "efab72f059a9710ae9859adb98e37ee420aeedc85ce95d2f188d6e8ec44a315f",
+            "median_dollar_volume": "71175000.000",
+            "rank": 1,
+            "raw_close": "71.650",
+            "reasons": [],
+            "scoring": {
+              "momentum_long_contribution": 0.4242640687119285,
+              "momentum_long_z": 0.7071067811865476,
+              "momentum_short_contribution": 0.1767766952966369,
+              "momentum_short_z": 0.7071067811865476,
+              "score": 0.7071067811865475,
+              "volatility_contribution": 0.10606601717798211,
+              "volatility_z": -0.7071067811865475
+            },
+            "sector": "Technology",
+            "trend_sma": "66.675"
+          },
+          {
+            "allocation_eligible": true,
+            "asset_id": "SYN:BBB",
+            "eligible": true,
+            "features": {
+              "momentum_long": 0.09640397857689365,
+              "momentum_short": 0.04598540145985401,
+              "volatility": 0.00014089008919504272
+            },
+            "input_sha256": "56383a4c77f52f50d391aab758cb7497ec001e660eff5019bce2ff9f4224170b",
+            "median_dollar_volume": "71175000.000",
+            "rank": 2,
+            "raw_close": "71.650",
+            "reasons": [],
+            "scoring": {
+              "momentum_long_contribution": 0.4242640687119285,
+              "momentum_long_z": 0.7071067811865476,
+              "momentum_short_contribution": 0.1767766952966369,
+              "momentum_short_z": 0.7071067811865476,
+              "score": 0.7071067811865475,
+              "volatility_contribution": 0.10606601717798211,
+              "volatility_z": -0.7071067811865475
+            },
+            "sector": "Technology",
+            "trend_sma": "66.675"
+          },
+          {
+            "allocation_eligible": true,
+            "asset_id": "SYN:CCC",
+            "eligible": true,
+            "features": {
+              "momentum_long": 0.08224543080939947,
+              "momentum_short": 0.007902735562310031,
+              "volatility": 0.4843444836208134
+            },
+            "input_sha256": "640040132b93ae65f1f7689b004845b08dc43f66cb385d2f6a12ceea3ccea298",
+            "median_dollar_volume": "66940000.000",
+            "rank": 3,
+            "raw_close": "66.320",
+            "reasons": [],
+            "scoring": {
+              "momentum_long_contribution": -0.848528137423857,
+              "momentum_long_z": -1.4142135623730951,
+              "momentum_short_contribution": -0.3535533905932738,
+              "momentum_short_z": -1.4142135623730951,
+              "score": -1.4142135623730951,
+              "volatility_contribution": -0.21213203435596426,
+              "volatility_z": 1.4142135623730951
+            },
+            "sector": "Unknown",
+            "trend_sma": "63.340"
+          },
+          {
+            "allocation_eligible": false,
+            "asset_id": "SYN:SPY",
+            "eligible": false,
+            "features": null,
+            "input_sha256": "048c22f027a08c1f04bfa368ccaaf721761dd75c046fa539068dd96853c488ce",
+            "median_dollar_volume": "110587500.000",
+            "rank": null,
+            "raw_close": "110.825",
+            "reasons": [
+              "UNSUPPORTED_INSTRUMENT"
+            ],
+            "scoring": null,
+            "sector": "Unknown",
+            "trend_sma": "108.3375"
+          },
+          {
+            "allocation_eligible": false,
+            "asset_id": "SYN:ZERO",
+            "eligible": false,
+            "features": null,
+            "input_sha256": "36af47bc31aa7da5b23e53f3d5b0348211d53995932bcf1b386367b480a7780a",
+            "median_dollar_volume": "50000000.000",
+            "rank": null,
+            "raw_close": "50.000",
+            "reasons": [
+              "NONPOSITIVE_TREND"
+            ],
+            "scoring": null,
+            "sector": "Unknown",
+            "trend_sma": "50.000"
+          }
+        ],
+        "cash_target_weight": "0.4",
+        "constraint_evidence": {
+          "capped_positions": [
+            "SYN:AAA",
+            "SYN:BBB",
+            "SYN:CCC"
+          ],
+          "cash_floor": "0.05",
+          "cash_weight": "0.4",
+          "compliant": true,
+          "invested_weight": "0.6",
+          "max_position_weight": "0.2",
+          "max_sector_weight": "0.4",
+          "position_count": 3,
+          "position_limit": "0.2",
+          "sector_limit": "0.4",
+          "sectors": [
+            {
+              "at_cap": true,
+              "sector": "Technology",
+              "weight": "0.4"
+            },
+            {
+              "at_cap": false,
+              "sector": "Unknown",
+              "weight": "0.2"
+            }
+          ],
+          "unmet_investable_weight": "0.35",
+          "violations": []
+        },
+        "data_diagnostics": [],
+        "decision_cutoff_utc": "2028-09-01T12:30:00Z",
+        "mode": "synthetic_fixture",
+        "reproducibility": {
+          "calendar_sha256": "e3d2312d54e172d7aada8239f296eecf38c6038d66b5a203c5c5690ede82d660",
+          "config_sha256": "2093c63d190815eba052508d6d42d8ae0c93400cf777602d2c5f759627f43f21",
+          "engine_version": "a88fd77bf70a9fe69d80a328e1c00925e996caf5c94987dcfc50ddcb8b315267",
+          "snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+          "snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+          "strategy_version_id": "184f4ef7-c542-5387-a5aa-9bd4d162efde"
+        },
+        "schema_version": 1,
+        "selected_ids": [
+          "SYN:AAA",
+          "SYN:BBB",
+          "SYN:CCC"
+        ],
+        "target_weights": [
+          {
+            "asset_id": "SYN:AAA",
+            "sector": "Technology",
+            "weight": "0.2"
+          },
+          {
+            "asset_id": "SYN:BBB",
+            "sector": "Technology",
+            "weight": "0.2"
+          },
+          {
+            "asset_id": "SYN:CCC",
+            "sector": "Unknown",
+            "weight": "0.2"
+          }
+        ],
+        "warnings": [
+          "SYNTHETIC_DATA_ONLY"
+        ]
+      },
+      "strategy_version_id": "184f4ef7-c542-5387-a5aa-9bd4d162efde",
+      "summary_action": "BUY",
+      "target_weights": [
+        {
+          "asset_id": "SYN:AAA",
+          "reason_codes": [
+            "RISK_CONSTRAINED_TARGET"
+          ],
+          "weight": "0.2"
+        },
+        {
+          "asset_id": "SYN:BBB",
+          "reason_codes": [
+            "RISK_CONSTRAINED_TARGET"
+          ],
+          "weight": "0.2"
+        },
+        {
+          "asset_id": "SYN:CCC",
+          "reason_codes": [
+            "RISK_CONSTRAINED_TARGET"
+          ],
+          "weight": "0.2"
+        }
+      ]
+    },
+    "next_request": {
+      "as_of_session": "2028-08-31",
+      "clock_mode": "synthetic_replay",
+      "seed": 42,
+      "snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea"
+    },
+    "request": {
+      "as_of_session": "2028-07-31",
+      "clock_mode": "synthetic_replay",
+      "seed": 42,
+      "snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea"
+    },
+    "schedule": {
+      "account_state": "active",
+      "active_batch_controls_available": false,
+      "active_order_batch_id": null,
+      "backlog_unavailable_reason": null,
+      "clock_at": "2028-09-01T12:30:00Z",
+      "clock_mode": "synthetic_replay",
+      "data_status": "synthetic_fixture",
+      "due_backlog": false,
+      "frequency": "monthly",
+      "last_explicit_review_cutoff": "2028-09-01T12:30:00Z",
+      "last_observed_at": "2026-10-29T10:50:54.860264Z",
+      "last_observed_state": "up_to_date",
+      "next_review_due_at": "2028-10-02T12:30:00Z",
+      "next_review_session": "2028-09-29",
+      "observed_clock_at": "2028-09-01T12:30:00Z",
+      "paper_only": true,
+      "portfolio_id": "d76988e1-3318-5351-875c-9030a2bf86c5",
+      "reason": "NEXT_MONTHLY_REVIEW_NOT_DUE",
+      "recent_occurrences": [
+        {
+          "as_of_session": "2028-08-31",
+          "created_at": "2026-10-29T10:50:49.762887Z",
+          "first_observed_clock_at": "2028-09-01T12:30:00Z",
+          "handled_at": "2026-10-29T10:50:49.787514Z",
+          "handled_clock_at": "2028-09-01T12:30:00Z",
+          "id": "2d604608-6511-5537-9f57-d19bb3baedd8",
+          "intended_due_at": "2028-09-01T12:30:00Z",
+          "job": {
+            "attempts": 1,
+            "created_at": "2026-10-29T10:50:47.113377Z",
+            "error": null,
+            "id": "c05cec74-9294-4e39-9fd3-58dbabb49c1e",
+            "kind": "evaluate_portfolio",
+            "max_attempts": 3,
+            "progress": 100.0,
+            "result": {
+              "kind": "resource",
+              "message": "Immutable recommendation published; forecast has its own observable job.",
+              "resource_id": "90ceb9f5-b806-57e8-9123-6029bdfbb4b0"
+            },
+            "status": "completed",
+            "updated_at": "2026-10-29T10:50:50.751670Z"
+          },
+          "observed_snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+          "observed_snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+          "opportunity_end_at": "2028-09-04T12:30:00Z",
+          "outcome": "admitted",
+          "reason": null,
+          "recommendation_id": "90ceb9f5-b806-57e8-9123-6029bdfbb4b0"
+        },
+        {
+          "as_of_session": "2028-07-31",
+          "created_at": "2026-10-29T10:50:41.593519Z",
+          "first_observed_clock_at": "2028-08-01T12:30:00Z",
+          "handled_at": "2026-10-29T10:50:41.616235Z",
+          "handled_clock_at": "2028-08-01T12:30:00Z",
+          "id": "28baea1e-b4e7-5eda-ac69-179174ab4ebc",
+          "intended_due_at": "2028-08-01T12:30:00Z",
+          "job": {
+            "attempts": 1,
+            "created_at": "2026-10-29T10:50:37.902268Z",
+            "error": null,
+            "id": "df82b1b8-7de8-4ba9-b443-572c0f0fff41",
+            "kind": "evaluate_portfolio",
+            "max_attempts": 3,
+            "progress": 100.0,
+            "result": {
+              "kind": "resource",
+              "message": "Immutable recommendation published; forecast has its own observable job.",
+              "resource_id": "564123a9-292a-5979-a93b-b619f470b8c9"
+            },
+            "status": "completed",
+            "updated_at": "2026-10-29T10:50:38.942237Z"
+          },
+          "observed_snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+          "observed_snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+          "opportunity_end_at": "2028-08-02T12:30:00Z",
+          "outcome": "admitted",
+          "reason": null,
+          "recommendation_id": "564123a9-292a-5979-a93b-b619f470b8c9"
+        },
+        {
+          "as_of_session": "2028-06-30",
+          "created_at": "2026-10-29T10:50:41.587831Z",
+          "first_observed_clock_at": "2028-08-01T12:30:00Z",
+          "handled_at": "2026-10-29T10:50:41.591409Z",
+          "handled_clock_at": "2028-08-01T12:30:00Z",
+          "id": "6340aaf1-a8b5-5368-9da5-90b4be652d21",
+          "intended_due_at": "2028-07-03T12:30:00Z",
+          "job": null,
+          "observed_snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+          "observed_snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+          "opportunity_end_at": "2028-07-04T12:30:00Z",
+          "outcome": "missed",
+          "reason": "REVIEW_WINDOW_PASSED",
+          "recommendation_id": null
+        },
+        {
+          "as_of_session": "2028-05-31",
+          "created_at": "2026-10-29T10:50:41.582226Z",
+          "first_observed_clock_at": "2028-08-01T12:30:00Z",
+          "handled_at": "2026-10-29T10:50:41.585521Z",
+          "handled_clock_at": "2028-08-01T12:30:00Z",
+          "id": "7c2d1cbe-b9bf-5661-9139-64e396c1dc6c",
+          "intended_due_at": "2028-06-01T12:30:00Z",
+          "job": null,
+          "observed_snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+          "observed_snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+          "opportunity_end_at": "2028-06-02T12:30:00Z",
+          "outcome": "missed",
+          "reason": "REVIEW_WINDOW_PASSED",
+          "recommendation_id": null
+        },
+        {
+          "as_of_session": "2028-04-28",
+          "created_at": "2026-10-29T10:50:41.576891Z",
+          "first_observed_clock_at": "2028-08-01T12:30:00Z",
+          "handled_at": "2026-10-29T10:50:41.580063Z",
+          "handled_clock_at": "2028-08-01T12:30:00Z",
+          "id": "5325815b-2670-5ebb-a603-b0b2488fa29c",
+          "intended_due_at": "2028-05-01T12:30:00Z",
+          "job": null,
+          "observed_snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+          "observed_snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+          "opportunity_end_at": "2028-05-02T12:30:00Z",
+          "outcome": "missed",
+          "reason": "REVIEW_WINDOW_PASSED",
+          "recommendation_id": null
+        },
+        {
+          "as_of_session": "2028-03-31",
+          "created_at": "2026-10-29T10:50:41.571812Z",
+          "first_observed_clock_at": "2028-08-01T12:30:00Z",
+          "handled_at": "2026-10-29T10:50:41.574749Z",
+          "handled_clock_at": "2028-08-01T12:30:00Z",
+          "id": "e29b2163-6010-506d-b621-6ab7a171632a",
+          "intended_due_at": "2028-04-03T12:30:00Z",
+          "job": null,
+          "observed_snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+          "observed_snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+          "opportunity_end_at": "2028-04-04T12:30:00Z",
+          "outcome": "missed",
+          "reason": "REVIEW_WINDOW_PASSED",
+          "recommendation_id": null
+        },
+        {
+          "as_of_session": "2028-02-29",
+          "created_at": "2026-10-29T10:50:41.566625Z",
+          "first_observed_clock_at": "2028-08-01T12:30:00Z",
+          "handled_at": "2026-10-29T10:50:41.569762Z",
+          "handled_clock_at": "2028-08-01T12:30:00Z",
+          "id": "a7d44899-9511-5bb2-83d8-9132109f7e49",
+          "intended_due_at": "2028-03-01T13:30:00Z",
+          "job": null,
+          "observed_snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+          "observed_snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+          "opportunity_end_at": "2028-03-02T13:30:00Z",
+          "outcome": "missed",
+          "reason": "REVIEW_WINDOW_PASSED",
+          "recommendation_id": null
+        },
+        {
+          "as_of_session": "2028-01-31",
+          "created_at": "2026-10-29T10:50:41.561058Z",
+          "first_observed_clock_at": "2028-08-01T12:30:00Z",
+          "handled_at": "2026-10-29T10:50:41.564286Z",
+          "handled_clock_at": "2028-08-01T12:30:00Z",
+          "id": "51c0775a-d4cd-5c69-baf0-e88cc4ec5e58",
+          "intended_due_at": "2028-02-01T13:30:00Z",
+          "job": null,
+          "observed_snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+          "observed_snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+          "opportunity_end_at": "2028-02-02T13:30:00Z",
+          "outcome": "missed",
+          "reason": "REVIEW_WINDOW_PASSED",
+          "recommendation_id": null
+        },
+        {
+          "as_of_session": "2027-12-31",
+          "created_at": "2026-10-29T10:50:41.555874Z",
+          "first_observed_clock_at": "2028-08-01T12:30:00Z",
+          "handled_at": "2026-10-29T10:50:41.558962Z",
+          "handled_clock_at": "2028-08-01T12:30:00Z",
+          "id": "72947c3c-4ce0-53da-8977-6283780f5aeb",
+          "intended_due_at": "2028-01-03T13:30:00Z",
+          "job": null,
+          "observed_snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+          "observed_snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+          "opportunity_end_at": "2028-01-04T13:30:00Z",
+          "outcome": "missed",
+          "reason": "REVIEW_WINDOW_PASSED",
+          "recommendation_id": null
+        },
+        {
+          "as_of_session": "2027-11-30",
+          "created_at": "2026-10-29T10:50:41.550630Z",
+          "first_observed_clock_at": "2028-08-01T12:30:00Z",
+          "handled_at": "2026-10-29T10:50:41.553814Z",
+          "handled_clock_at": "2028-08-01T12:30:00Z",
+          "id": "89abb15c-64b5-5d1d-bb3f-24773d4f88d9",
+          "intended_due_at": "2027-12-01T13:30:00Z",
+          "job": null,
+          "observed_snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+          "observed_snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+          "opportunity_end_at": "2027-12-02T13:30:00Z",
+          "outcome": "missed",
+          "reason": "REVIEW_WINDOW_PASSED",
+          "recommendation_id": null
+        },
+        {
+          "as_of_session": "2027-10-29",
+          "created_at": "2026-10-29T10:50:41.544642Z",
+          "first_observed_clock_at": "2028-08-01T12:30:00Z",
+          "handled_at": "2026-10-29T10:50:41.548412Z",
+          "handled_clock_at": "2028-08-01T12:30:00Z",
+          "id": "b714632f-75c0-595f-b9dd-0ccbefa0e4a1",
+          "intended_due_at": "2027-11-01T12:30:00Z",
+          "job": null,
+          "observed_snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+          "observed_snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+          "opportunity_end_at": "2027-11-02T12:30:00Z",
+          "outcome": "missed",
+          "reason": "REVIEW_WINDOW_PASSED",
+          "recommendation_id": null
+        },
+        {
+          "as_of_session": "2027-09-30",
+          "created_at": "2026-10-29T10:50:41.538905Z",
+          "first_observed_clock_at": "2028-08-01T12:30:00Z",
+          "handled_at": "2026-10-29T10:50:41.541896Z",
+          "handled_clock_at": "2028-08-01T12:30:00Z",
+          "id": "39112419-70e5-5adf-8708-c9ab0de504ef",
+          "intended_due_at": "2027-10-01T12:30:00Z",
+          "job": null,
+          "observed_snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+          "observed_snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+          "opportunity_end_at": "2027-10-04T12:30:00Z",
+          "outcome": "missed",
+          "reason": "REVIEW_WINDOW_PASSED",
+          "recommendation_id": null
+        },
+        {
+          "as_of_session": "2027-08-31",
+          "created_at": "2026-10-29T10:50:41.533880Z",
+          "first_observed_clock_at": "2028-08-01T12:30:00Z",
+          "handled_at": "2026-10-29T10:50:41.536864Z",
+          "handled_clock_at": "2028-08-01T12:30:00Z",
+          "id": "f51a9f4a-9159-5ebf-97c5-babb61989dbc",
+          "intended_due_at": "2027-09-01T12:30:00Z",
+          "job": null,
+          "observed_snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+          "observed_snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+          "opportunity_end_at": "2027-09-02T12:30:00Z",
+          "outcome": "missed",
+          "reason": "REVIEW_WINDOW_PASSED",
+          "recommendation_id": null
+        },
+        {
+          "as_of_session": "2027-07-30",
+          "created_at": "2026-10-29T10:50:41.528849Z",
+          "first_observed_clock_at": "2028-08-01T12:30:00Z",
+          "handled_at": "2026-10-29T10:50:41.531817Z",
+          "handled_clock_at": "2028-08-01T12:30:00Z",
+          "id": "5248af1b-6d2a-50bf-a42c-47af0e136d87",
+          "intended_due_at": "2027-08-02T12:30:00Z",
+          "job": null,
+          "observed_snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+          "observed_snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+          "opportunity_end_at": "2027-08-03T12:30:00Z",
+          "outcome": "missed",
+          "reason": "REVIEW_WINDOW_PASSED",
+          "recommendation_id": null
+        },
+        {
+          "as_of_session": "2027-06-30",
+          "created_at": "2026-10-29T10:50:41.523701Z",
+          "first_observed_clock_at": "2028-08-01T12:30:00Z",
+          "handled_at": "2026-10-29T10:50:41.526766Z",
+          "handled_clock_at": "2028-08-01T12:30:00Z",
+          "id": "d6eb3838-3d04-5754-a813-f144f8df6fb1",
+          "intended_due_at": "2027-07-01T12:30:00Z",
+          "job": null,
+          "observed_snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+          "observed_snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+          "opportunity_end_at": "2027-07-02T12:30:00Z",
+          "outcome": "missed",
+          "reason": "REVIEW_WINDOW_PASSED",
+          "recommendation_id": null
+        },
+        {
+          "as_of_session": "2027-05-31",
+          "created_at": "2026-10-29T10:50:41.518404Z",
+          "first_observed_clock_at": "2028-08-01T12:30:00Z",
+          "handled_at": "2026-10-29T10:50:41.521625Z",
+          "handled_clock_at": "2028-08-01T12:30:00Z",
+          "id": "26802fde-7cf6-5386-86a6-7b2cb911cb87",
+          "intended_due_at": "2027-06-01T12:30:00Z",
+          "job": null,
+          "observed_snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+          "observed_snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+          "opportunity_end_at": "2027-06-02T12:30:00Z",
+          "outcome": "missed",
+          "reason": "REVIEW_WINDOW_PASSED",
+          "recommendation_id": null
+        },
+        {
+          "as_of_session": "2027-04-30",
+          "created_at": "2026-10-29T10:50:41.512792Z",
+          "first_observed_clock_at": "2028-08-01T12:30:00Z",
+          "handled_at": "2026-10-29T10:50:41.516179Z",
+          "handled_clock_at": "2028-08-01T12:30:00Z",
+          "id": "58e4e373-b7ce-530d-aa7e-affbf994ed8b",
+          "intended_due_at": "2027-05-03T12:30:00Z",
+          "job": null,
+          "observed_snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+          "observed_snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+          "opportunity_end_at": "2027-05-04T12:30:00Z",
+          "outcome": "missed",
+          "reason": "REVIEW_WINDOW_PASSED",
+          "recommendation_id": null
+        },
+        {
+          "as_of_session": "2027-03-31",
+          "created_at": "2026-10-29T10:50:41.506831Z",
+          "first_observed_clock_at": "2028-08-01T12:30:00Z",
+          "handled_at": "2026-10-29T10:50:41.510342Z",
+          "handled_clock_at": "2028-08-01T12:30:00Z",
+          "id": "364838b9-214c-5fc4-a1ad-53c13b51bc19",
+          "intended_due_at": "2027-04-01T12:30:00Z",
+          "job": null,
+          "observed_snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+          "observed_snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+          "opportunity_end_at": "2027-04-02T12:30:00Z",
+          "outcome": "missed",
+          "reason": "REVIEW_WINDOW_PASSED",
+          "recommendation_id": null
+        },
+        {
+          "as_of_session": "2027-02-26",
+          "created_at": "2026-10-29T10:50:41.500945Z",
+          "first_observed_clock_at": "2028-08-01T12:30:00Z",
+          "handled_at": "2026-10-29T10:50:41.504498Z",
+          "handled_clock_at": "2028-08-01T12:30:00Z",
+          "id": "233641ed-e6c9-5f5d-9eba-5793046f4290",
+          "intended_due_at": "2027-03-01T13:30:00Z",
+          "job": null,
+          "observed_snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+          "observed_snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+          "opportunity_end_at": "2027-03-02T13:30:00Z",
+          "outcome": "missed",
+          "reason": "REVIEW_WINDOW_PASSED",
+          "recommendation_id": null
+        },
+        {
+          "as_of_session": "2027-01-29",
+          "created_at": "2026-10-29T10:50:41.494070Z",
+          "first_observed_clock_at": "2028-08-01T12:30:00Z",
+          "handled_at": "2026-10-29T10:50:41.498174Z",
+          "handled_clock_at": "2028-08-01T12:30:00Z",
+          "id": "3e34e1ab-75be-5246-a689-716afde94662",
+          "intended_due_at": "2027-02-01T13:30:00Z",
+          "job": null,
+          "observed_snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+          "observed_snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+          "opportunity_end_at": "2027-02-02T13:30:00Z",
+          "outcome": "missed",
+          "reason": "REVIEW_WINDOW_PASSED",
+          "recommendation_id": null
+        }
+      ],
+      "reconciliation_required": false,
+      "supervisor": {
+        "last_seen_at": "2026-10-29T10:50:54.836479Z",
+        "last_unobserved_end_at": null,
+        "last_unobserved_start_at": null,
+        "limitation": "OBSERVATION_NOT_EXACT_SHUTDOWN",
+        "measured_at": "2026-10-29T10:50:54.864516Z",
+        "status": "fresh"
+      }
+    },
+    "transactions": {
+      "items": [
+        {
+          "cash_delta_usd": "1000.00",
+          "correction_target_id": null,
+          "effective_at": "2026-10-29T10:50:37.816115Z",
+          "event_key": "opening_funding",
+          "fill": null,
+          "id": "ce5ba052-8552-51ff-ae69-eda581f37298",
+          "kind": "opening_funding",
+          "portfolio_revision": 1,
+          "position_changes": [],
+          "recorded_at": "2026-10-29T10:50:37.816115Z",
+          "sequence": 1,
+          "snapshot_id": null,
+          "strategy_version_id": "184f4ef7-c542-5387-a5aa-9bd4d162efde"
+        }
+      ],
+      "mode": "synthetic_fixture",
+      "next_cursor": null,
+      "paper_only": true,
+      "portfolio_id": "d76988e1-3318-5351-875c-9030a2bf86c5",
+      "warnings": [
+        "SYNTHETIC_DATA_ONLY"
+      ]
+    }
+  },
+  "passed": true,
+  "project": "yams-smoke-c1127a7e39bb",
+  "verification": {
+    "actual_postgresql_restart": 11,
+    "backend_unit": 470,
+    "final_production_sources_match_integration_and_production_images": true,
+    "fixture_files": 30,
+    "native_macos_web_build": "UNAVAILABLE: proven local Turbopack subprocess port binding restriction; final production Docker build and actual29-check runtime/rebuild passed",
+    "postgresql_full": 185,
+    "prior_routes_unchanged": true,
+    "prior_standalone_schemas_unchanged": true,
+    "proxy_cases": 32,
+    "python_package": "wheel and sdist passed",
+    "regression_backlog_after": "PASSED: current durable clock used, old observed clock retained separately",
+    "regression_backlog_before": "FAILED: False instead of True after explicit clock advance before scan",
+    "targeted_api_contract_cases": 123,
+    "web_unit": 74
+  }
+}

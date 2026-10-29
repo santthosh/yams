@@ -54,11 +54,15 @@ from backend.domain.recommendation_api import (
     RecommendationSummaryV1,
 )
 from backend.domain.registry import StrategyCreateRequest, StrategyV1, StrategyVersionV1
+from backend.domain.review import PortfolioScheduleV1, ReviewOccurrenceV1, SupervisorObservationV1
 from backend.domain.strategy import StrategyConfigV1
 from backend.domain.workspace import HealthV1, WorkspaceV1
 
 MODELS: tuple[type[BaseModel], ...] = (
     StrategyConfigV1,
+    PortfolioScheduleV1,
+    ReviewOccurrenceV1,
+    SupervisorObservationV1,
     StrategyCreateRequest,
     StrategyV1,
     StrategyVersionV1,

@@ -1,10 +1,11 @@
 """Atomic frozen-state admission and lease-fenced immutable recommendation publication."""
 
+from datetime import datetime
 from decimal import Decimal
 from pathlib import Path
 from uuid import UUID, uuid4, uuid5
 
-from sqlalchemy import Engine, select
+from sqlalchemy import Engine, and_, exists, or_, select
 from sqlalchemy.orm import Session
 
 from backend.domain.common import ErrorCode, JobResult
@@ -14,16 +15,28 @@ from backend.forecasting.contracts import ForecastPayload
 from backend.forecasting.service import _enqueue_frozen_forecast
 from backend.jobs.queue import IdempotencyConflict, Lease, Queue, database_now
 from backend.jobs.registry import validate_workload
+from backend.jobs.review_admission import (
+    link_scheduled_admission,
+    review_schema_available,
+    scheduled_admission,
+)
 from backend.market_data.catalog import verified_snapshot
 from backend.market_data.models import Calendar
 from backend.market_data.snapshots import PublicationFenceError
+from backend.persistence.models.job import Job
 from backend.persistence.models.ledger import LedgerEvent, RecommendationReference
 from backend.persistence.models.recommendation import RecommendationPublication, RecommendationRun
+from backend.persistence.models.review import (
+    PortfolioReviewOccurrence,
+    PortfolioReviewTarget,
+    RecommendationRequestAlias,
+)
 from backend.persistence.models.snapshot import CurrentSnapshot, DatasetSnapshot
 from backend.portfolio.accounts import account_record
 from backend.portfolio.batches import ExecutionIntentV1
 from backend.portfolio.execution import calendar_digest
 from backend.portfolio.ledger import _locked, digest
+from backend.portfolio.paper_clock import replay_floor
 from backend.portfolio.recommendation_contracts import (
     MAX_RECOMMENDATION_BYTES,
     RecommendationComputed,
@@ -41,8 +54,24 @@ class RecommendationAdmissionError(ValueError):
 
 
 def _retry(
-    session: Session, identity: UUID, owner: UUID, request: RecommendationRequest
+    session: Session,
+    identity: UUID,
+    owner: UUID,
+    request: RecommendationRequest,
+    *,
+    key: UUID | None = None,
 ) -> RecommendationAccepted | None:
+    if key is not None and review_schema_available(session):
+        alias = session.get(RecommendationRequestAlias, (owner, key))
+        if alias is not None:
+            if alias.inputs_canonical_json != request.canonical_bytes().decode():
+                raise IdempotencyConflict("Recommendation key refers to different request inputs")
+            original_run = session.get(RecommendationRun, alias.recommendation_id)
+            if original_run is None or original_run.portfolio_id != owner:
+                raise ValueError("Original recommendation key binding is unavailable")
+            return RecommendationAccepted(
+                recommendation_id=original_run.id, job_id=original_run.job_id
+            )
     row = session.get(RecommendationRun, identity)
     if row is None:
         return None
@@ -63,12 +92,13 @@ def admit_recommendation(
     request: RecommendationRequest,
     *,
     idempotency_key: UUID | None = None,
+    schedule_occurrence_id: UUID | None = None,
 ) -> RecommendationAccepted:
     identity = (
         uuid5(owner, "recommendation:" + str(idempotency_key)) if idempotency_key else uuid4()
     )
     with Session(engine) as session:
-        prior = _retry(session, identity, owner, request)
+        prior = _retry(session, identity, owner, request, key=idempotency_key)
         if prior is not None:
             return prior
     record = account_record(engine, owner)
@@ -148,7 +178,7 @@ def admit_recommendation(
     build = engine_fingerprint()
     with Session(engine) as session, session.begin():
         portfolio = _locked(session, owner)
-        prior = _retry(session, identity, owner, request)
+        prior = _retry(session, identity, owner, request, key=idempotency_key)
         if prior is not None:
             return prior
         if (
@@ -163,6 +193,13 @@ def admit_recommendation(
                 "STATE_CONFLICT", "Portfolio changed during admission; refresh and retry."
             )
         now = database_now(session)
+        review = (
+            scheduled_admission(
+                session, portfolio, schedule_occurrence_id, request, manifest, calendar, now
+            )
+            if schedule_occurrence_id is not None
+            else None
+        )
         payload = RecommendationPayload(
             recommendation_id=identity,
             forecast_id=uuid5(identity, "forecast"),
@@ -181,12 +218,21 @@ def admit_recommendation(
             source_mode=record.mode,
             decision_cutoff_utc=cutoff,
             engine_version=build,
-            requested_at=now,
+            requested_at=max(now, replay_floor(session, owner, cutoff)),
         )
         if len(payload.model_dump_json().encode()) > MAX_RECOMMENDATION_BYTES:
             raise RecommendationAdmissionError(
                 "WORKLOAD_LIMIT", "Frozen portfolio inputs exceed the evaluation limit."
             )
+        reusable = _matching_review_run(session, payload, scheduled_only=review is None)
+        if reusable is not None:
+            accepted = RecommendationAccepted(recommendation_id=reusable.id, job_id=reusable.job_id)
+            _remember_request_alias(session, owner, idempotency_key, request, accepted, now)
+            if review is not None:
+                link_scheduled_admission(session, review, accepted)
+            else:
+                _remember_explicit_clock(session, owner, cutoff, now)
+            return accepted
         job_id = queue._enqueue(
             session, "evaluate_portfolio", payload.model_dump(mode="json"), identity
         )
@@ -199,7 +245,120 @@ def admit_recommendation(
                 created_at=now,
             )
         )
-    return RecommendationAccepted(recommendation_id=identity, job_id=job_id)
+        session.flush()
+        accepted = RecommendationAccepted(recommendation_id=identity, job_id=job_id)
+        _remember_request_alias(session, owner, idempotency_key, request, accepted, now)
+        if review is not None:
+            link_scheduled_admission(session, review, accepted)
+        else:
+            _remember_explicit_clock(session, owner, cutoff, now)
+    return accepted
+
+
+def _remember_explicit_clock(
+    session: Session, owner: UUID, cutoff: datetime, actual_at: datetime
+) -> None:
+    """Caller holds the portfolio lock; accepted manual input is a durable observation."""
+    if not review_schema_available(session):
+        return
+    target = session.get(PortfolioReviewTarget, owner)
+    if target is None:
+        target = PortfolioReviewTarget(
+            portfolio_id=owner,
+            last_observed_at=actual_at,
+            status="unobserved",
+            reason="NOT_YET_OBSERVED",
+        )
+        session.add(target)
+    target.last_explicit_review_cutoff = max(target.last_explicit_review_cutoff or cutoff, cutoff)
+    session.flush()
+
+
+def _matching_review_run(
+    session: Session, payload: RecommendationPayload, *, scheduled_only: bool
+) -> RecommendationRun | None:
+    if not review_schema_available(session):
+        return None
+    frozen = payload.model_dump(mode="json")
+    conditions = [RecommendationRun.portfolio_id == payload.portfolio_id]
+    for field in (
+        "portfolio_revision",
+        "last_sequence",
+        "strategy_version_id",
+        "config_sha256",
+        "snapshot_id",
+        "snapshot_sha256",
+        "calendar_sha256",
+        "source_mode",
+        "engine_version",
+        "decision_cutoff_utc",
+    ):
+        conditions.append(RecommendationRun.payload[field].as_string() == str(frozen[field]))
+    for field in ("as_of_session", "clock_mode", "seed"):
+        conditions.append(
+            RecommendationRun.payload["inputs"][field].as_string() == str(frozen["inputs"][field])
+        )
+    if scheduled_only:
+        conditions.append(
+            exists(
+                select(PortfolioReviewOccurrence.id).where(
+                    PortfolioReviewOccurrence.recommendation_id == RecommendationRun.id,
+                    PortfolioReviewOccurrence.outcome == "admitted",
+                )
+            )
+        )
+    row = session.scalar(
+        select(RecommendationRun)
+        .join(Job, Job.id == RecommendationRun.job_id)
+        .outerjoin(RecommendationReference, RecommendationReference.id == RecommendationRun.id)
+        .where(
+            *conditions,
+            or_(
+                Job.status.in_(("queued", "running")),
+                and_(Job.status == "completed", RecommendationReference.disposition == "ready"),
+            ),
+        )
+        .order_by(RecommendationRun.created_at.desc(), RecommendationRun.id.desc())
+        .limit(1)
+    )
+    if row is not None:
+        job = session.get(Job, row.job_id)
+        if job is None or job.kind != "evaluate_portfolio" or job.payload != row.payload:
+            raise ValueError("Reusable review linkage is unavailable")
+        original = RecommendationPayload.model_validate(row.payload)
+        if original.portfolio_id != payload.portfolio_id:
+            raise ValueError("Reusable review owner differs")
+        if job.status == "completed":
+            reference = session.get(RecommendationReference, row.id)
+            if (
+                reference is None
+                or digest(reference.content) != reference.content_sha256
+                or job.result is None
+                or job.result.get("resource_id") != str(row.id)
+            ):
+                raise ValueError("Reusable completed review evidence is unavailable")
+    return row
+
+
+def _remember_request_alias(
+    session: Session,
+    owner: UUID,
+    key: UUID | None,
+    request: RecommendationRequest,
+    accepted: RecommendationAccepted,
+    actual_at: datetime,
+) -> None:
+    if key is not None and review_schema_available(session):
+        session.add(
+            RecommendationRequestAlias(
+                portfolio_id=owner,
+                idempotency_key=key,
+                recommendation_id=accepted.recommendation_id,
+                inputs_canonical_json=request.canonical_bytes().decode(),
+                created_at=actual_at,
+            )
+        )
+        session.flush()
 
 
 def validate_computed(payload: RecommendationPayload, computed: RecommendationComputed) -> None:

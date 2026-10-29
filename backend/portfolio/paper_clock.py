@@ -10,12 +10,14 @@ from sqlalchemy.orm import Session
 from backend.domain.types import SourceMode, UTCTimestamp
 from backend.persistence.models.job import Job
 from backend.persistence.models.ledger import LedgerEvent
+from backend.persistence.models.review import PortfolioReviewTarget
 
 
 def replay_floor(session: Session, owner: UUID, floor: datetime) -> datetime:
     """Caller holds the portfolio lock for operations; reads are observational.
 
-    Accepted failed/cancelled jobs still retain the operator's explicit step.
+    Explicit manual review cutoffs and accepted failed/cancelled fill steps
+    retain the operator's clock observation. Scheduled reviews never update it.
     PostgreSQL compares timestamps, not lexicographically sorted JSON strings.
     """
     floor = TypeAdapter(UTCTimestamp).validate_python(floor)
@@ -31,8 +33,15 @@ def replay_floor(session: Session, owner: UUID, floor: datetime) -> datetime:
             Job.payload["portfolio_id"].as_string() == str(owner),
         )
     )
+    explicit_review = None
+    if session.scalar(select(func.to_regclass("portfolio_review_target"))) is not None:
+        explicit_review = session.scalar(
+            select(PortfolioReviewTarget.last_explicit_review_cutoff).where(
+                PortfolioReviewTarget.portfolio_id == owner,
+            )
+        )
     values = [floor]
-    for value in (posted, observed):
+    for value in (posted, observed, explicit_review):
         if value is not None:
             values.append(TypeAdapter(UTCTimestamp).validate_python(value))
     return max(values)

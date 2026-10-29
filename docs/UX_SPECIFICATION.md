@@ -86,7 +86,7 @@ A status banner must explain if the next valid fill is pending (e.g. `Queued for
 
 ### 4.3 Return visit (0.0.5)
 
-Dashboard shows current portfolio value, most recent settled fills, pending paper orders, last recommended changes, forecast-horizon countdown, next scheduled review and data freshness. If the application was shut down, show `Monitoring paused while YAMS was closed`; after restart, show what due work was safely caught up (if anything). Do not claim 24/7 monitoring.
+Dashboard shows current portfolio value, most recent settled fills, pending paper orders, last recommended changes, forecast-horizon countdown, next scheduled review and data freshness. If the application was shut down, show `Monitoring paused while YAMS was closed`; after restart, show what due work was safely caught up (if anything). Qualify this as Docker shutdown, not closing a browser tab. Do not claim 24/7 monitoring.
 
 ## 5. Screen-by-screen requirements
 
@@ -162,7 +162,18 @@ operator audit. After approval show pending intent and an explicit fixture-advan
 action; never automatically invent future sessions. Unavailable opening evidence
 stays pending, even after an accepted step. Cancellation shows the actual partial
 or filled race outcome and retains posted effects. HOLD/cash-only results without
-executable orders cannot enable approval. Scheduling remains #51.
+executable orders cannot enable approval. Monthly scheduling is implemented by
+#51; its accessible screen integration remains #52.
+
+The [monthly review status](operations/portfolio-schedules.md) supplies current
+versus last-observed replay time, latest explicit manual review cutoff, next due,
+nullable backlog, recent missed/skipped/waiting outcomes, real jobs and observed
+supervisor gaps. Explain that selecting a later manual synthetic session advances
+virtual review observation without trading; cancelling accepted computation does
+not rewind that selection. Background scheduling never advances time or approves
+orders. Show a missing calendar/source or unresolved earlier review explicitly,
+and disclose that an unobserved heartbeat interval is not an exact shutdown time.
+These transport capabilities do not themselves implement the #52 screen.
 
 ### 5.7 Arena (`/arena`, `/arena/[id]`)
 

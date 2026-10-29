@@ -308,6 +308,23 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/portfolios/{portfolio_id}/schedule": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Read */
+    get: operations["read_api_v1_portfolios__portfolio_id__schedule_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/v1/portfolios/{portfolio_id}/transactions": {
     parameters: {
       query?: never;
@@ -2372,6 +2389,83 @@ export interface components {
       /** Total Basis Delta Usd */
       total_basis_delta_usd: string;
     };
+    /** PortfolioScheduleV1 */
+    PortfolioScheduleV1: {
+      /**
+       * Account State
+       * @enum {string}
+       */
+      account_state: "active" | "paused" | "closed";
+      /** Active Batch Controls Available */
+      active_batch_controls_available: boolean;
+      /** Active Order Batch Id */
+      active_order_batch_id: string | null;
+      /** Backlog Unavailable Reason */
+      backlog_unavailable_reason: string | null;
+      /**
+       * Clock At
+       * Format: date-time
+       */
+      clock_at: string;
+      /**
+       * Clock Mode
+       * @enum {string}
+       */
+      clock_mode: "synthetic_replay" | "current_paper";
+      /**
+       * Data Status
+       * @enum {string}
+       */
+      data_status: "synthetic_fixture" | "research_market_data";
+      /** Due Backlog */
+      due_backlog: boolean | null;
+      /**
+       * Frequency
+       * @default monthly
+       * @constant
+       */
+      frequency: "monthly";
+      /** Last Explicit Review Cutoff */
+      last_explicit_review_cutoff: string | null;
+      /** Last Observed At */
+      last_observed_at: string | null;
+      /**
+       * Last Observed State
+       * @enum {string}
+       */
+      last_observed_state:
+        | "waiting"
+        | "review_admitted"
+        | "unavailable"
+        | "paused"
+        | "up_to_date"
+        | "catching_up"
+        | "unobserved";
+      /** Next Review Due At */
+      next_review_due_at: string | null;
+      /** Next Review Session */
+      next_review_session: string | null;
+      /** Observed Clock At */
+      observed_clock_at: string | null;
+      /**
+       * Paper Only
+       * @default true
+       * @constant
+       */
+      paper_only: true;
+      /**
+       * Portfolio Id
+       * Format: uuid
+       */
+      portfolio_id: string;
+      /** Reason */
+      reason: string | null;
+      /** Recent Occurrences */
+      recent_occurrences: components["schemas"]["ReviewOccurrenceV1"][];
+      /** Reconciliation Required */
+      reconciliation_required: boolean;
+      supervisor: components["schemas"]["SupervisorObservationV1"];
+    };
     /** PortfolioState */
     PortfolioState: {
       /**
@@ -2934,6 +3028,57 @@ export interface components {
       /** Selection Rule Reference */
       selection_rule_reference: string;
     };
+    /** ReviewOccurrenceV1 */
+    ReviewOccurrenceV1: {
+      /**
+       * As Of Session
+       * Format: date
+       */
+      as_of_session: string;
+      /**
+       * Created At
+       * Format: date-time
+       */
+      created_at: string;
+      /**
+       * First Observed Clock At
+       * Format: date-time
+       */
+      first_observed_clock_at: string;
+      /** Handled At */
+      handled_at: string | null;
+      /** Handled Clock At */
+      handled_clock_at: string | null;
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /**
+       * Intended Due At
+       * Format: date-time
+       */
+      intended_due_at: string;
+      job: components["schemas"]["JobV1"] | null;
+      /**
+       * Observed Snapshot Id
+       * Format: uuid
+       */
+      observed_snapshot_id: string;
+      /** Observed Snapshot Sha256 */
+      observed_snapshot_sha256: string;
+      /** Opportunity End At */
+      opportunity_end_at: string | null;
+      /**
+       * Outcome
+       * @enum {string}
+       */
+      outcome: "waiting" | "admitted" | "missed" | "skipped";
+      /** Reason */
+      reason: string | null;
+      /** Recommendation Id */
+      recommendation_id: string | null;
+    };
     /** RiskReport */
     RiskReport: {
       /** Capped Positions */
@@ -3399,6 +3544,31 @@ export interface components {
       strategy_id: string;
       /** Version */
       version: number;
+    };
+    /** SupervisorObservationV1 */
+    SupervisorObservationV1: {
+      /** Last Seen At */
+      last_seen_at: string | null;
+      /** Last Unobserved End At */
+      last_unobserved_end_at: string | null;
+      /** Last Unobserved Start At */
+      last_unobserved_start_at: string | null;
+      /**
+       * Limitation
+       * @default OBSERVATION_NOT_EXACT_SHUTDOWN
+       * @constant
+       */
+      limitation: "OBSERVATION_NOT_EXACT_SHUTDOWN";
+      /**
+       * Measured At
+       * Format: date-time
+       */
+      measured_at: string;
+      /**
+       * Status
+       * @enum {string}
+       */
+      status: "unobserved" | "fresh" | "stale";
     };
     /** TargetWeight */
     TargetWeight: {
@@ -4739,6 +4909,55 @@ export interface operations {
       };
       /** @description Conflict */
       409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Unprocessable Content */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Service Unavailable */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+    };
+  };
+  read_api_v1_portfolios__portfolio_id__schedule_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        portfolio_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PortfolioScheduleV1"];
+        };
+      };
+      /** @description Not Found */
+      404: {
         headers: {
           [name: string]: unknown;
         };

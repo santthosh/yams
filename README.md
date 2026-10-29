@@ -31,8 +31,11 @@ and previews do not post orders or balances. [Public paper controls](docs/operat
 authorize immutable pending intent, recover exact request keys, dismiss analysis,
 cancel outstanding orders and explicitly advance synthetic replay. Approval changes
 no balances; only the fenced worker posts fills. Fixture time and actual UTC audit
-remain separate. Scheduling and Decision Center screens remain #51/#52; no 0.0.5
-release is claimed.
+remain separate. [Monthly review scheduling](docs/operations/portfolio-schedules.md) now records
+bounded catch-up and readonly next-due/paused diagnostics, with atomic manual/scheduled
+deduplication. Explicit manual synthetic session selection advances review observation
+without trading; background work cannot advance time. Decision Center screens remain
+#52; no0.0.5 release is claimed.
 
 The 0.0.3 Strategy Lab increment adds named strategy creation, detail and immutable
 version publication/history APIs over the existing registry, plus the ratified

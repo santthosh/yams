@@ -3,7 +3,8 @@
 All funds, holdings, intent and fills are synthetic. Current provider tokens do not
 enable real-market accounting. This is the 0.0.5 source increment; published0.0.4
 assets retain their original staged controls. The Decision Center screen and
-portfolio scheduling remain #52/#51.
+portfolio scheduling are separately owned; [monthly schedules](portfolio-schedules.md)
+are now implemented in the source increment and the screen remains #52.
 
 The API uses the real recommendation publication from #49 and delegates every
 financial transition to the existing shared approval/cancellation/fill services.
@@ -43,7 +44,9 @@ identify replay. `approved_at`/`fixture_clock_at` are logical synthetic instants
 `operator_recorded_at` records actual UTC separately in immutable ledger details.
 Legacy private records without that metadata return null rather than invented
 audit time. The durable replay floor includes accepted fill observation clocks,
-even when an attempt fails or is cancelled. New approvals/cancellations cannot
+even when an attempt fails or is cancelled. Explicitly accepted manual review
+cutoffs are additional durable observations under ADR-016; background scheduling
+cannot advance them. New approvals/cancellations cannot
 rewind that clock. Private trusted fixture seams remain compatible.
 
 An approval never automatically invents a future fixture clock. Explicit advance

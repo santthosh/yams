@@ -129,6 +129,7 @@ def test_openapi_does_not_activate_future_handlers() -> None:
         "/api/v1/portfolios",
         "/api/v1/portfolios/{portfolio_id}",
         "/api/v1/portfolios/{portfolio_id}/transactions",
+        "/api/v1/portfolios/{portfolio_id}/schedule",
         "/api/v1/portfolios/{portfolio_id}/recommendations",
         "/api/v1/recommendations/{recommendation_id}",
         "/api/v1/forecasts/{forecast_id}",

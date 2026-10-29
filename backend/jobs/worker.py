@@ -35,10 +35,12 @@ from backend.jobs.handlers.forecast import forecast
 from backend.jobs.handlers.refresh_market_data import refresh_market_data
 from backend.jobs.queue import Lease, Queue
 from backend.jobs.registry import AttemptMetrics, DiagnosticPayload, JobLimits
+from backend.jobs.review_observation import observe_supervisor
+from backend.jobs.scheduler import observation_grace, scheduler_tick
 from backend.market_data.providers.yahoo import ProviderFailure
 from backend.market_data.snapshots import PublicationFenceError, publish_snapshot
 from backend.persistence.database import Settings, database_engine
-from backend.portfolio.fills import enqueue_due_batches, seal_fill
+from backend.portfolio.fills import seal_fill
 from backend.portfolio.recommendation_errors import (
     SAFE_RECOMMENDATION_REASONS,
     RecommendationFailure,
@@ -197,7 +199,7 @@ class Worker:
             if not locked:
                 return False
             try:
-                self.schedule_if_due()
+                self.schedule_if_due(include_reviews=True)
                 self.queue.recover()
                 lease = self.queue.claim(self.owner)
                 if lease is None:
@@ -207,10 +209,11 @@ class Worker:
             finally:
                 guard.execute(text("SELECT pg_advisory_unlock(1497451860)"))
 
-    def schedule_if_due(self) -> None:
+    def schedule_if_due(self, *, include_reviews: bool = False) -> None:
         if time.monotonic() >= self.next_schedule_tick:
-            self.queue.catch_up(self.queue.limits.catchup_batch)
-            enqueue_due_batches(self.queue)
+            scheduler_tick(
+                self.queue, self.artifact_root, self.owner, include_reviews=include_reviews
+            )
             self.next_schedule_tick = time.monotonic() + self.queue.limits.scheduler_tick_seconds
 
     def execute(self, lease: Lease) -> None:
@@ -326,6 +329,7 @@ class Worker:
                         cancelled.set()
                         stop_child(process, 0)
                         return
+                    observe_supervisor(self.queue.engine, self.owner, observation_grace(self.queue))
                     heartbeat_done = time.monotonic()
                     max_gap = max(max_gap, heartbeat_done - last_heartbeat)
                     last_heartbeat = heartbeat_done

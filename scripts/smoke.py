@@ -732,6 +732,155 @@ def main() -> None:
             "public computed approval leaves cash unchanged; explicit unavailable "
             "fixture close remains pending; later step posts actual worker fills"
         )
+        review_account = paper_post(
+            "portfolios",
+            {**portfolio_body, "name": "SYNTHETIC_DATA_ONLY monthly review"},
+            str(uuid4()),
+        )
+        review_key = str(uuid4())
+        review_request = {**recommendation_body, "as_of_session": "2028-07-31", "seed": 42}
+        review_create_path = f"portfolios/{review_account['id']}/recommendations"
+        review_manual = paper_post(review_create_path, review_request, review_key)
+        paper_wait(review_manual["job_id"])
+        review_analysis = get(f"recommendations/{review_manual['recommendation_id']}")
+        paper_wait(review_analysis["forecast_job"]["id"])
+        review_analysis = get(f"recommendations/{review_manual['recommendation_id']}")
+        assert review_analysis["forecast"]["status"] == "available"
+        review_status_path = f"portfolios/{review_account['id']}/schedule"
+        deadline = time.monotonic() + 60
+        while True:
+            review_status = get(review_status_path)
+            admitted = [
+                row for row in review_status["recent_occurrences"] if row["outcome"] == "admitted"
+            ]
+            if review_status["next_review_session"] == "2028-08-31" and len(admitted) == 1:
+                break
+            if time.monotonic() >= deadline:
+                raise AssertionError("Monthly review checkpoint/status did not converge")
+            time.sleep(0.2)
+        assert (
+            review_status["clock_at"]
+            == review_status["last_explicit_review_cutoff"]
+            == "2028-08-01T12:30:00Z"
+        )
+        assert review_status["next_review_due_at"] == "2028-09-01T12:30:00Z"
+        assert (
+            review_status["due_backlog"] is False and review_status["active_order_batch_id"] is None
+        )
+        assert len(review_status["recent_occurrences"]) == 19
+        assert sum(row["outcome"] == "missed" for row in review_status["recent_occurrences"]) == 18
+        assert admitted[0]["recommendation_id"] == review_manual["recommendation_id"]
+        assert admitted[0]["job"]["id"] == review_manual["job_id"]
+        review_history = get(review_create_path + "?limit=100")
+        assert len(review_history["items"]) == 1
+        review_transactions = get(f"portfolios/{review_account['id']}/transactions")
+        assert len(review_transactions["items"]) == 1
+
+        first_review_status = review_status
+        compose("stop", "-t", "10", "worker")
+        try:
+            next_review_key = str(uuid4())
+            next_review_request = {**review_request, "as_of_session": "2028-08-31"}
+            next_review_manual = paper_post(
+                review_create_path, next_review_request, next_review_key
+            )
+            before_next_scan = get(review_status_path)
+            assert before_next_scan["observed_clock_at"] == first_review_status["observed_clock_at"]
+            assert before_next_scan["clock_at"] == "2028-09-01T12:30:00Z"
+            assert before_next_scan["due_backlog"] is True
+        finally:
+            compose(
+                "up",
+                "-d",
+                "--wait",
+                "--wait-timeout",
+                "120",
+                "--pull",
+                "never",
+                "--no-build",
+                "worker",
+            )
+        paper_wait(next_review_manual["job_id"])
+        next_review_analysis = get(f"recommendations/{next_review_manual['recommendation_id']}")
+        paper_wait(next_review_analysis["forecast_job"]["id"])
+        next_review_analysis = get(f"recommendations/{next_review_manual['recommendation_id']}")
+        assert next_review_analysis["forecast"]["status"] == "available"
+        deadline = time.monotonic() + 60
+        while True:
+            review_status = get(review_status_path)
+            if (
+                review_status["next_review_session"] is not None
+                and review_status["next_review_session"].startswith("2028-09")
+                and review_status["recent_occurrences"][0]["recommendation_id"]
+                == next_review_manual["recommendation_id"]
+            ):
+                break
+            if time.monotonic() >= deadline:
+                raise AssertionError("Resumed monthly review did not converge")
+            time.sleep(0.2)
+        assert len(review_status["recent_occurrences"]) == 20
+        assert review_status["due_backlog"] is False
+        assert review_status["recent_occurrences"][1:] == first_review_status["recent_occurrences"]
+        review_history = get(review_create_path + "?limit=100")
+        assert {row["id"] for row in review_history["items"]} == {
+            review_manual["recommendation_id"],
+            next_review_manual["recommendation_id"],
+        }
+        evidence["checks"].append(
+            "stopped worker exposes backlog immediately after explicit clock "
+            "selection; restart deduplicates the next monthly/manual review without trading"
+        )
+
+        def verify_monthly_review() -> None:
+            saved = get(review_status_path)
+            assert saved["recent_occurrences"] == review_status["recent_occurrences"]
+            assert (
+                saved["clock_at"]
+                == saved["last_explicit_review_cutoff"]
+                == review_status["clock_at"]
+            )
+            assert saved["next_review_session"] == review_status["next_review_session"]
+            assert saved["supervisor"]["status"] == "fresh"
+            assert saved["supervisor"]["limitation"] == "OBSERVATION_NOT_EXACT_SHUTDOWN"
+            assert paper_post(review_create_path, review_request, review_key) == review_manual
+            assert (
+                paper_post(review_create_path, next_review_request, next_review_key)
+                == next_review_manual
+            )
+            assert get(review_create_path + "?limit=100") == review_history
+            assert get(f"portfolios/{review_account['id']}/transactions") == review_transactions
+            account = get(f"portfolios/{review_account['id']}")
+            assert (
+                account["cash_usd"] == "1000.00"
+                and account["revision"] == 1
+                and account["holdings"] == []
+            )
+            original = get(f"recommendations/{review_manual['recommendation_id']}")
+            assert original["actions"] == review_analysis["actions"]
+            assert original["forecast"] == review_analysis["forecast"]
+            later = get(f"recommendations/{next_review_manual['recommendation_id']}")
+            assert later["actions"] == next_review_analysis["actions"]
+            assert later["forecast"] == next_review_analysis["forecast"]
+
+        verify_monthly_review()
+        evidence["monthly_review"] = dict(
+            request=review_request,
+            accepted=review_manual,
+            first_schedule=first_review_status,
+            schedule=review_status,
+            before_next_scan=before_next_scan,
+            next_request=next_review_request,
+            next_accepted=next_review_manual,
+            next_analysis=next_review_analysis,
+            transactions=review_transactions,
+            analysis=review_analysis,
+        )
+        evidence["checks"].append(
+            "explicit manual cash review advances only synthetic observation; "
+            "18 missed months retain chronology; monthly/manual dedup produces "
+            "one actual worker job "
+            "and numeric forecast with unchanged1000cash"
+        )
         # The following independent private service proof remains intact.
         paper_batch = json.loads(python((ROOT / "scripts/paper_smoke_fixture.py").read_text()))
         deadline = time.monotonic() + 60
@@ -860,6 +1009,7 @@ def main() -> None:
         assert scenario_result() == original_scenario
         verify_public_recommendation()
         verify_public_controls()
+        verify_monthly_review()
         assert get("strategies") == strategies
         assert get(f"strategies/{strategy_id}/versions") == versions
         for editor_id, history in editor_versions.items():
@@ -890,6 +1040,7 @@ def main() -> None:
         assert scenario_result() == original_scenario
         verify_public_recommendation()
         verify_public_controls()
+        verify_monthly_review()
         assert get("strategies") == strategies
         assert get(f"strategies/{strategy_id}/versions") == versions
         for editor_id, history in editor_versions.items():
@@ -911,6 +1062,11 @@ def main() -> None:
         evidence["checks"].append(
             "public approval key, replay clock, original decision, posted fills "
             "and ledger survive actual restart and rebuild"
+        )
+        evidence["checks"].append(
+            "monthly review checkpoints, original request key, logical clock, "
+            "forecast and readonly ledger survive actual restart/rebuild "
+            "with fresh supervisor observations"
         )
         ids = compose("ps", "-q").split()
         inspect = json.loads(subprocess.check_output(["docker", "inspect", *ids], text=True))

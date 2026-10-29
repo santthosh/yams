@@ -749,3 +749,28 @@ it("forwards only scoped paper controls with mandatory operation keys", async ()
     ).status,
   ).toBe(404);
 });
+
+it("allows readonly portfolio schedule status without forwarding credentials or accepting clocks", async () => {
+  const id = "11111111-1111-4111-8111-111111111111";
+  const parts = ["portfolios", id, "schedule"];
+  const fetcher = vi.fn(async (_input, init) => {
+    expect(init.headers).toEqual({ Accept: "application/json" });
+    return Response.json({ portfolio_id: id, clock_mode: "synthetic_replay" });
+  });
+  const read = new Request(`http://web.test/api/v1/${parts.join("/")}`, {
+    headers: {
+      Cookie: "private",
+      Authorization: "private",
+      "Idempotency-Key": id,
+    },
+  });
+  expect((await proxyApi(read, parts, fetcher)).status).toBe(200);
+  expect(
+    (await proxyApi(request(parts.join("/") + "?clock=2030"), parts, fetcher))
+      .status,
+  ).toBe(404);
+  expect(
+    (await proxyApi(request(parts.join("/"), "POST"), parts, fetcher)).status,
+  ).toBe(405);
+  expect(fetcher).toHaveBeenCalledTimes(1);
+});

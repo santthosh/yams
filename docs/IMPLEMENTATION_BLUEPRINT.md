@@ -136,7 +136,9 @@ verification belong to #46; the decision alone activates no worker path. The
 closed stored intent, one active reservation, separately committed sell/buy jobs,
 explicit fixture replay and lease-fenced publication. The [public #50 controls](operations/paper-controls.md)
 delegate to that service, retain actual UTC audit separately and require explicit
-keyed fixture advances; scheduling/screens remain #51/#52.
+keyed fixture advances. [Monthly review scheduling](operations/portfolio-schedules.md)
+uses explicit manual review cutoffs as additional durable synthetic observations;
+screens remain #52.
 
 - Calculate portfolio value from posted holdings at a coherent market price timestamp plus settled simulated cash; mark stale valuations clearly.
 - Compare current weights with versioned targets and calculate trade deltas. If change is under tolerance, label `HOLD` unless a hard risk rule is violated.
@@ -175,6 +177,18 @@ is not a completed report or public endpoint.
 **Jobs:** `refresh_market_data`, `backtest`, `forecast`, `evaluate_portfolio`, `apply_scheduled_fills`, `evaluate_arena`, `mature_journal`. Initial implementation uses Postgres row-based queue, `SELECT ... FOR UPDATE SKIP LOCKED`, a single bounded worker and cooperative cancel. `queued → running → completed|failed|cancelled`, plus retry with bounded exponential backoff for transient provider failures; safe restart leases with heartbeat and claim expiry. Retry of financial posting uses idempotent key and unique constraints.
 
 **Clock behavior:** scheduler runs only when Docker is running. On restart, scan for pending fills and due evaluations; replay missed eligible periods **in order**, honoring original timestamps, without retroactively recommending as though an earlier decision were fresh. Surface `paused while app stopped` and recovery results in diagnostics. An Arena entrant may not be retroactively credited with trades from before it was launched.
+
+[ADR-016](adr/0016-portfolio-review-scheduler.md) implements monthly review
+opportunities from pinned month-end sessions and canonical cutoffs. The local
+supervisor records missed/skipped/waiting occurrences chronologically, admits at
+most one review per tick and atomically links current posted-state admission to
+its checkpoint. Equivalent manual/scheduled requests reuse original work without
+rewriting request-key bindings. Explicit manual synthetic session selection is a
+durable observation even for cash-only accounts; scheduled work, GETs, forecasts
+and future fixture publication cannot advance time. Actual admission/heartbeat
+UTC remains separate. New observation projections are monotonic and original
+financial event/approval/fill chronology stays unchanged. See the
+[status/operations contract](operations/portfolio-schedules.md); #52 owns screens.
 
 ## 10. Strategy Arena and Journal (0.0.6–0.0.7)
 

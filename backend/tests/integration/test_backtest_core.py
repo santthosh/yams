@@ -313,6 +313,7 @@ def test_populated_prior_schema_upgrade_preserves_workspace_versions_and_jobs(
 
     prior = tmp_path / "prior-migrations"
     shutil.copytree(MIGRATIONS, prior)
+    (prior / "versions/0009_portfolio_reviews.py").unlink()
     (prior / "versions/0008_recommendations.py").unlink()
     (prior / "versions/0007_forecasts.py").unlink()
     (prior / "versions/0006_paper_ledger.py").unlink()
