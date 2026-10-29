@@ -1,0 +1,485 @@
+{
+  "application_version": "0.0.5",
+  "checks": [
+    "clean boot and real same-origin API readiness",
+    "same-origin keyed paper account funding, exact retry and read-only ledger history",
+    "real persisted diagnostic job completed by bounded worker",
+    "warm-up plus three diagnostic batches with concurrent API/DB reads",
+    "real Docker browser Dashboard/Settings/job at both widths",
+    "real browser cash creation, independent accounts and keyed retries",
+    "real browser same-origin strategy creation, immutable append, conflict and pagination",
+    "real browser candidate/target reruns and cash-only cases via supervised worker",
+    "real browser public experiment rerun, pages, cancellation and fingerprints",
+    "real mobile/desktop experiment form, charts/tables/Axe, exact uint64 rerun, original preservation and cancellation",
+    "real mobile/desktop aligned and mismatched comparison, one-rule challenge, shared-setting exact-seed reruns and immutable source evidence",
+    "internal core admission, actual supervised next-open replay and sealed artifact",
+    "worker-side Q12 metrics, aligned SPY/cash, continuing holdout and exposure",
+    "real same-origin recommendation, shared order preview and numeric forecast; exact uint64 retry and unchanged account",
+    "public computed approval leaves cash unchanged; explicit unavailable fixture close remains pending; later step posts actual worker fills",
+    "stopped worker exposes backlog immediately after explicit clock selection; restart deduplicates the next monthly/manual review without trading",
+    "explicit manual cash review advances only synthetic observation; 18 missed months retain chronology; monthly/manual dedup produces one actual worker job and numeric forecast with unchanged1000cash",
+    "real Decision Center at360/1280, common-shock scenarios, keyboard confirmation, response-loss reload recovery, duplicate suppression, unchanged approval cash, explicit replay, durable fills, actionable dashboard and Axe",
+    "real portfolio holdings/fees/history, Decision Center entry and Axe at360/1280",
+    "genuine empty universe/cash-only, unavailable90day calendar and recovered connection errors preserve exact cash/ledger at360/1280",
+    "private explicit fixture approval and real worker atomic fill",
+    "private real-worker seeded common-shock scenarios and immutable artifacts; no portfolio effects",
+    "API and worker external routing blocked",
+    "restart retains paper account identity, funding and original creation retry",
+    "restart preserves workspace, job, fixtures and artifact hash",
+    "rebuild/recreate preserves named-volume state",
+    "restart and rebuild preserve original recommendation/forecast and readonly account",
+    "public approval key, replay clock, original decision, posted fills and ledger survive actual restart and rebuild",
+    "monthly review checkpoints, original request key, logical clock, forecast and readonly ledger survive actual restart/rebuild with fresh supervisor observations",
+    "readonly Decision Center after restart/rebuild restores original keys, scenarios, fills, exact ledger/cash, HOLD/dismissal, unavailable/cash-only outcomes and logical clocks with zero POSTs at360/1280",
+    "actual private ports and aggregate 4 CPU/4.5 GiB caps",
+    "failed migration blocks application startup; repair preserves workspace"
+  ],
+  "classification": "RECORDED_APPLICATION_OUTPUT_NOT_INDEPENDENT_ORACLE",
+  "data_label": "SYNTHETIC_DATA_ONLY",
+  "native_packaged_installations": "PENDING_SEPARATE_EXACT_SOURCE_WORKFLOW",
+  "negative": [
+    {
+      "account_id": "f73cafdd-97b6-51f0-97a3-687fa6dc3d61",
+      "connection_error_recovered_without_mutation": true,
+      "decisions": [
+        {
+          "as_of_session": "2027-01-04",
+          "axe_violations": [],
+          "cash_target_weight": "1",
+          "cash_usd": "1000.00",
+          "forecast_status": "available",
+          "forecast_unavailable_reason": null,
+          "hold_unchanged": {
+            "median_ending_value_usd": "1000.00",
+            "median_return_fraction": 0,
+            "p10_return_fraction": 0,
+            "p90_return_fraction": 0,
+            "probability_of_loss": 0
+          },
+          "kind": "empty",
+          "proposed": {
+            "median_ending_value_usd": "1000.00",
+            "median_return_fraction": 0,
+            "p10_return_fraction": 0,
+            "p90_return_fraction": 0,
+            "probability_of_loss": 0
+          },
+          "recommendation": {
+            "job_id": "84135a53-ebf9-4cd0-8ae6-e9ec43bebade",
+            "recommendation_id": "64d8229f-3048-5851-843b-c8fde25b534c"
+          },
+          "revision": 1,
+          "summary_action": "ALLOCATE_TO_CASH"
+        },
+        {
+          "as_of_session": "2030-12-30",
+          "axe_violations": [],
+          "cash_target_weight": "0.4",
+          "cash_usd": "1000.00",
+          "forecast_status": "unavailable",
+          "forecast_unavailable_reason": "CALENDAR_UNAVAILABLE",
+          "hold_unchanged": null,
+          "kind": "unavailable",
+          "proposed": null,
+          "recommendation": {
+            "job_id": "027c3fe4-f3e2-4e7f-b6a4-08bef7a400fc",
+            "recommendation_id": "88b34b38-9af9-5390-b79c-fb39bb21273a"
+          },
+          "revision": 1,
+          "summary_action": "BUY"
+        }
+      ],
+      "width": 360
+    },
+    {
+      "account_id": "c81ef5bc-9e8f-5740-a5b3-e2f07fd38dfd",
+      "connection_error_recovered_without_mutation": true,
+      "decisions": [
+        {
+          "as_of_session": "2027-01-04",
+          "axe_violations": [],
+          "cash_target_weight": "1",
+          "cash_usd": "1000.00",
+          "forecast_status": "available",
+          "forecast_unavailable_reason": null,
+          "hold_unchanged": {
+            "median_ending_value_usd": "1000.00",
+            "median_return_fraction": 0,
+            "p10_return_fraction": 0,
+            "p90_return_fraction": 0,
+            "probability_of_loss": 0
+          },
+          "kind": "empty",
+          "proposed": {
+            "median_ending_value_usd": "1000.00",
+            "median_return_fraction": 0,
+            "p10_return_fraction": 0,
+            "p90_return_fraction": 0,
+            "probability_of_loss": 0
+          },
+          "recommendation": {
+            "job_id": "d02bb761-44ee-4a5a-9487-d8dbeee9ff96",
+            "recommendation_id": "ff6bf23d-b0b8-5b73-88f5-10bd5be69a18"
+          },
+          "revision": 1,
+          "summary_action": "ALLOCATE_TO_CASH"
+        },
+        {
+          "as_of_session": "2030-12-30",
+          "axe_violations": [],
+          "cash_target_weight": "0.4",
+          "cash_usd": "1000.00",
+          "forecast_status": "unavailable",
+          "forecast_unavailable_reason": "CALENDAR_UNAVAILABLE",
+          "hold_unchanged": null,
+          "kind": "unavailable",
+          "proposed": null,
+          "recommendation": {
+            "job_id": "6425861a-cfb6-4b06-9072-65f3d52d3f17",
+            "recommendation_id": "83966aa0-f35a-5304-ac05-9a5619a413a4"
+          },
+          "revision": 1,
+          "summary_action": "BUY"
+        }
+      ],
+      "width": 1280
+    }
+  ],
+  "positive": [
+    {
+      "account_id": "3c0b6ea9-f548-527e-8d0d-2678f3acb035",
+      "actions": [
+        {
+          "asset_id": "SYN:AAA",
+          "estimated_quantity": "2.857142"
+        },
+        {
+          "asset_id": "SYN:BBB",
+          "estimated_quantity": "2.857142"
+        },
+        {
+          "asset_id": "SYN:CCC",
+          "estimated_quantity": "2.985074"
+        }
+      ],
+      "approval": {
+        "approval_idempotency_key": "a5c56ce2-68bd-4985-be86-0875879e4433",
+        "approved_at": "2028-07-18T12:30:00Z",
+        "approved_revision": 1,
+        "batch_id": "0092a40a-0960-5f45-aee1-7ad335fc5c4e",
+        "clock_mode": "synthetic_replay",
+        "data_status": "synthetic_fixture",
+        "eligible_open_at": "2028-07-18T13:30:00Z",
+        "operator_recorded_at": "2026-10-29T13:08:07.436549Z",
+        "paper_only": true,
+        "portfolio_id": "3c0b6ea9-f548-527e-8d0d-2678f3acb035",
+        "recommendation_id": "1ca7a763-b0eb-5ce5-b738-f97259626877"
+      },
+      "axe_violations": [],
+      "batch_status": "filled",
+      "before_cash_usd": "1000.00",
+      "dismissed_review": {
+        "accepted": {
+          "job_id": "0f464156-c7ea-43f0-a544-34e9e356ba3c",
+          "recommendation_id": "7bb6672d-9f43-51bd-a5db-ce272474a2c8"
+        },
+        "disposition": "dismissed",
+        "ledger_unchanged": true,
+        "summary_action": "HOLD"
+      },
+      "forecast": {
+        "fingerprint": "427fba381376021b1597f00661063ca68a31744fd06ddfa9a3520ad853c56211",
+        "hold_unchanged": {
+          "median_ending_value_usd": "1000.00",
+          "median_return_fraction": 0,
+          "p10_return_fraction": 0,
+          "p90_return_fraction": 0,
+          "probability_of_loss": 0
+        },
+        "horizon_calendar_days": 90,
+        "horizon_trading_sessions": 64,
+        "limitations": [
+          "CONSTANT_WEIGHT_APPROXIMATION",
+          "ESTIMATED_UPFRONT_COST",
+          "SCENARIO_NOT_CALIBRATED_PREDICTION",
+          "SYNTHETIC_DATA_ONLY",
+          "ZERO_CASH_YIELD"
+        ],
+        "proposed": {
+          "median_ending_value_usd": "1034.16",
+          "median_return_fraction": 0.034157289802597024,
+          "p10_return_fraction": 0.006364618895775845,
+          "p90_return_fraction": 0.06283124421289563,
+          "probability_of_loss": 0.0752
+        },
+        "status": "available"
+      },
+      "lost_response_recovered_after_reload": true,
+      "orders": [
+        {
+          "asset_id": "SYN:AAA",
+          "cancelled_or_skipped_quantity": "0.000000",
+          "earliest_fill_session": "2028-07-18",
+          "filled_quantity": "2.857142",
+          "id": "53712327-aeff-5a5d-80a4-af422d51ad2e",
+          "pending_quantity": "0.000000",
+          "reason": null,
+          "requested_quantity": "2.857142",
+          "side": "BUY",
+          "status": "filled",
+          "terminal": true
+        },
+        {
+          "asset_id": "SYN:BBB",
+          "cancelled_or_skipped_quantity": "0.000000",
+          "earliest_fill_session": "2028-07-18",
+          "filled_quantity": "2.857142",
+          "id": "9c88d38d-50ce-5c55-9291-04e3a77a6446",
+          "pending_quantity": "0.000000",
+          "reason": null,
+          "requested_quantity": "2.857142",
+          "side": "BUY",
+          "status": "filled",
+          "terminal": true
+        },
+        {
+          "asset_id": "SYN:CCC",
+          "cancelled_or_skipped_quantity": "0.000000",
+          "earliest_fill_session": "2028-07-18",
+          "filled_quantity": "2.985074",
+          "id": "ccceda0e-3984-5a64-9dc7-e3e0816e0f45",
+          "pending_quantity": "0.000000",
+          "reason": null,
+          "requested_quantity": "2.985074",
+          "side": "BUY",
+          "status": "filled",
+          "terminal": true
+        }
+      ],
+      "original_inputs_canonical_json": "{\"as_of_session\":\"2028-07-17\",\"clock_mode\":\"synthetic_replay\",\"seed\":42,\"snapshot_id\":\"5c223992-90ec-59a7-a1e7-7889b76cacea\"}",
+      "posted_cash_usd": "404.98",
+      "recommendation": {
+        "job_id": "d1c41850-6e16-4c33-8b06-455c576ef7c1",
+        "recommendation_id": "1ca7a763-b0eb-5ce5-b738-f97259626877"
+      },
+      "summary_action": "BUY",
+      "viewport_bounded": true,
+      "width": 360
+    },
+    {
+      "account_id": "1cc55a32-b2a9-5610-b550-97858b0fcbed",
+      "actions": [
+        {
+          "asset_id": "SYN:AAA",
+          "estimated_quantity": "2.857142"
+        },
+        {
+          "asset_id": "SYN:BBB",
+          "estimated_quantity": "2.857142"
+        },
+        {
+          "asset_id": "SYN:CCC",
+          "estimated_quantity": "2.985074"
+        }
+      ],
+      "approval": {
+        "approval_idempotency_key": "db78182d-cc95-4324-a25b-f32c0726ff04",
+        "approved_at": "2028-07-18T12:30:00Z",
+        "approved_revision": 1,
+        "batch_id": "d518cbf5-2fb7-573f-bd73-093dd05c0b7c",
+        "clock_mode": "synthetic_replay",
+        "data_status": "synthetic_fixture",
+        "eligible_open_at": "2028-07-18T13:30:00Z",
+        "operator_recorded_at": "2026-10-29T13:08:29.046511Z",
+        "paper_only": true,
+        "portfolio_id": "1cc55a32-b2a9-5610-b550-97858b0fcbed",
+        "recommendation_id": "cc435956-06df-5fcc-9143-0a6c1c00096b"
+      },
+      "axe_violations": [],
+      "batch_status": "filled",
+      "before_cash_usd": "1000.00",
+      "dismissed_review": {
+        "accepted": {
+          "job_id": "b6e7018d-5699-4eb0-b915-c8221ea7b25b",
+          "recommendation_id": "c59f8e45-b7c8-52c8-9401-14d55cd702bf"
+        },
+        "disposition": "dismissed",
+        "ledger_unchanged": true,
+        "summary_action": "HOLD"
+      },
+      "forecast": {
+        "fingerprint": "7cf8cd7742048f52a10cdd5d7b7a06af6b0ae88783f4a34d8b7f84bf40f7bc12",
+        "hold_unchanged": {
+          "median_ending_value_usd": "1000.00",
+          "median_return_fraction": 0,
+          "p10_return_fraction": 0,
+          "p90_return_fraction": 0,
+          "probability_of_loss": 0
+        },
+        "horizon_calendar_days": 90,
+        "horizon_trading_sessions": 64,
+        "limitations": [
+          "CONSTANT_WEIGHT_APPROXIMATION",
+          "ESTIMATED_UPFRONT_COST",
+          "SCENARIO_NOT_CALIBRATED_PREDICTION",
+          "SYNTHETIC_DATA_ONLY",
+          "ZERO_CASH_YIELD"
+        ],
+        "proposed": {
+          "median_ending_value_usd": "1034.16",
+          "median_return_fraction": 0.034157289802597024,
+          "p10_return_fraction": 0.006364618895775845,
+          "p90_return_fraction": 0.06283124421289563,
+          "probability_of_loss": 0.0752
+        },
+        "status": "available"
+      },
+      "lost_response_recovered_after_reload": false,
+      "orders": [
+        {
+          "asset_id": "SYN:AAA",
+          "cancelled_or_skipped_quantity": "0.000000",
+          "earliest_fill_session": "2028-07-18",
+          "filled_quantity": "2.857142",
+          "id": "61b8a630-0624-545f-8ce6-0cddeb94cf6a",
+          "pending_quantity": "0.000000",
+          "reason": null,
+          "requested_quantity": "2.857142",
+          "side": "BUY",
+          "status": "filled",
+          "terminal": true
+        },
+        {
+          "asset_id": "SYN:BBB",
+          "cancelled_or_skipped_quantity": "0.000000",
+          "earliest_fill_session": "2028-07-18",
+          "filled_quantity": "2.857142",
+          "id": "47670711-12f5-5cf6-9199-d354a32415ac",
+          "pending_quantity": "0.000000",
+          "reason": null,
+          "requested_quantity": "2.857142",
+          "side": "BUY",
+          "status": "filled",
+          "terminal": true
+        },
+        {
+          "asset_id": "SYN:CCC",
+          "cancelled_or_skipped_quantity": "0.000000",
+          "earliest_fill_session": "2028-07-18",
+          "filled_quantity": "2.985074",
+          "id": "7f9e6b68-afa8-58c2-a15a-9d286f836ebd",
+          "pending_quantity": "0.000000",
+          "reason": null,
+          "requested_quantity": "2.985074",
+          "side": "BUY",
+          "status": "filled",
+          "terminal": true
+        }
+      ],
+      "original_inputs_canonical_json": "{\"as_of_session\":\"2028-07-17\",\"clock_mode\":\"synthetic_replay\",\"seed\":42,\"snapshot_id\":\"5c223992-90ec-59a7-a1e7-7889b76cacea\"}",
+      "posted_cash_usd": "404.98",
+      "recommendation": {
+        "job_id": "959fc8a0-f171-44d3-9a51-a2e465acb38c",
+        "recommendation_id": "cc435956-06df-5fcc-9143-0a6c1c00096b"
+      },
+      "summary_action": "BUY",
+      "viewport_bounded": true,
+      "width": 1280
+    }
+  ],
+  "project": "yams-smoke-a1a8891f4883",
+  "publication": "PENDING_SEPARATE_RELEASE_GATE",
+  "readonly_retention": [
+    {
+      "records": [
+        {
+          "auxiliary_sha256": "4326cbfb289abb234a312c70829bf2ebbd97d372281e45bace01e3a7b5d092d1",
+          "axe_violations": [],
+          "clock_at": "2028-07-20T12:30:00Z",
+          "last_explicit_review_cutoff": "2028-07-20T12:30:00Z",
+          "readonly_post_count": 0,
+          "retained_sha256": "c68ea1601edd364f5e26371a9c1ce2d190782027d76f6b19ce0e2c3706ed5b12",
+          "viewport_bounded": true,
+          "width": 360
+        },
+        {
+          "auxiliary_sha256": "85b0d820122ec9f7902a8227cce4e42fa966ac159b7ebf61d68040b35c3463d4",
+          "axe_violations": [],
+          "clock_at": "2028-07-20T12:30:00Z",
+          "last_explicit_review_cutoff": "2028-07-20T12:30:00Z",
+          "readonly_post_count": 0,
+          "retained_sha256": "7192f437b4b9ed15f7c6a4f77524a222ba77a6836f6216b4aa7b631c0f3465ae",
+          "viewport_bounded": true,
+          "width": 1280
+        }
+      ],
+      "stage": "initial"
+    },
+    {
+      "records": [
+        {
+          "auxiliary_sha256": "4326cbfb289abb234a312c70829bf2ebbd97d372281e45bace01e3a7b5d092d1",
+          "axe_violations": [],
+          "clock_at": "2028-07-20T12:30:00Z",
+          "last_explicit_review_cutoff": "2028-07-20T12:30:00Z",
+          "readonly_post_count": 0,
+          "retained_sha256": "c68ea1601edd364f5e26371a9c1ce2d190782027d76f6b19ce0e2c3706ed5b12",
+          "viewport_bounded": true,
+          "width": 360
+        },
+        {
+          "auxiliary_sha256": "85b0d820122ec9f7902a8227cce4e42fa966ac159b7ebf61d68040b35c3463d4",
+          "axe_violations": [],
+          "clock_at": "2028-07-20T12:30:00Z",
+          "last_explicit_review_cutoff": "2028-07-20T12:30:00Z",
+          "readonly_post_count": 0,
+          "retained_sha256": "7192f437b4b9ed15f7c6a4f77524a222ba77a6836f6216b4aa7b631c0f3465ae",
+          "viewport_bounded": true,
+          "width": 1280
+        }
+      ],
+      "stage": "restart"
+    },
+    {
+      "records": [
+        {
+          "auxiliary_sha256": "4326cbfb289abb234a312c70829bf2ebbd97d372281e45bace01e3a7b5d092d1",
+          "axe_violations": [],
+          "clock_at": "2028-07-20T12:30:00Z",
+          "last_explicit_review_cutoff": "2028-07-20T12:30:00Z",
+          "readonly_post_count": 0,
+          "retained_sha256": "c68ea1601edd364f5e26371a9c1ce2d190782027d76f6b19ce0e2c3706ed5b12",
+          "viewport_bounded": true,
+          "width": 360
+        },
+        {
+          "auxiliary_sha256": "85b0d820122ec9f7902a8227cce4e42fa966ac159b7ebf61d68040b35c3463d4",
+          "axe_violations": [],
+          "clock_at": "2028-07-20T12:30:00Z",
+          "last_explicit_review_cutoff": "2028-07-20T12:30:00Z",
+          "readonly_post_count": 0,
+          "retained_sha256": "7192f437b4b9ed15f7c6a4f77524a222ba77a6836f6216b4aa7b631c0f3465ae",
+          "viewport_bounded": true,
+          "width": 1280
+        }
+      ],
+      "stage": "rebuild"
+    }
+  ],
+  "scope": "LOCAL_SOURCE_CORE_GATE",
+  "source_base": "37bd1329bf134fb60e209a303da6aed0f9a40dd3",
+  "source_passed": true,
+  "verification": {
+    "actual_postgresql_restart_passed": 11,
+    "backend_unit_contract_passed": 472,
+    "fixtures_verified": 30,
+    "full_production_docker_checks_passed": 32,
+    "images": {
+      "yams-backend:local": "sha256:c5313584d0e3eb8e85595af2b6da0392ae2d54a2556a0efdd7f90e4e0e1a8429",
+      "yams-it-8ea3dba39b83-test": "sha256:57f7e2d1c7b37b8b7e9ad58ef182a0148f6004ac82ff07b863d7ed29bf1d3764"
+    },
+    "postgresql_passed": 188,
+    "python_sources_matched": 158,
+    "web_passed": 84
+  }
+}

@@ -1,35 +1,36 @@
 # Installing and upgrading YAMS releases
 
-YAMS 0.0.4 is a **Paper Portfolios prerelease**, preceding the complete 0.0.5
-core product. It adds independent cash accounts, exact-cent posted holdings,
-backend valuations and immutable ledger inspection to the existing Strategy Lab,
-historical experiments and candidate diagnostics. At `/portfolios`, create a
-$1,000 synthetic cash account, select a published strategy version and inspect
-its source, cash and history. Creation retries preserve the original account.
+YAMS 0.0.5 is the **Decision Center — first complete core prerelease**. It combines
+immutable data/strategy research, audited historical experiments, independent
+synthetic $1,000 accounts, constrained recommendations, numerical 90-calendar-day
+historical scenarios and explicit public paper authorization through durable fills.
+Capital, orders and holdings are synthetic. No real money or brokerage is involved.
+Startup creates no accounts, recommendations or orders.
 
-Private authorization and the supervised worker can post explicitly authorized
-synthetic fills and corporate-action effects with revision/idempotency/lease
-fences. Native installation verification uses clearly labeled, service-seeded
-synthetic intent to exercise those internals and inspect posted state in the
-real browser after restart. **The public recommendation/apply/cancel controls
-remain staged until 0.0.5**; this release does not expose an operator approval UI.
-Starting or migrating an installation creates no paper accounts or orders.
+The Decision Center separates posted holdings, original proposed targets and risk,
+shared-assumption scenarios and confirmation. Original request keys survive response
+loss/reload; approval is pending intent, never an assumed fill. Explicit fixture
+observations expose eligible opening evidence to the existing bounded worker.
+HOLD/cash-only decisions, stale previews, missing marks and unavailable forecasts
+remain complete outcomes with reasons. The dashboard exposes real pending work and
+monthly review/supervisor diagnostics. Monitoring runs only while Docker is active.
 
-Missing or stale holding marks retain known cash/shares and show unavailable
-value with reasons. No frontend financial calculation or assumed fill is used.
-Historical Strategy Lab accounting proofs use `SYNTHETIC_DATA_ONLY`; they are
-research evidence, not investment performance or a forecast. Forecasts are not
-included in this increment.
+Financial demonstrations are labeled `SYNTHETIC_DATA_ONLY`. Scenarios use common
+historical shock paths and disclose constant weights, zero cash yield and estimated
+upfront costs. They are not calibrated predictions or guaranteed returns. Existing
+independent ranks, timing, risk, accounting and benchmark fixture proofs remain part
+of required CI. Native amd64 and arm64 installation gates exercise the real public
+UI/worker flow, readonly inspection after restart and honest negative states.
 
-Optional Tiingo acquisition requires the operator's own token and terms; source
-data remains local. Current real feeds lack historical raw/action/publication/
-membership evidence for accounting and remain diagnostic-only. They cannot execute research-mode paper orders. No real money or brokerage is involved.
-See `RESEARCH.md` for the optional source workflow.
+Optional Tiingo acquisition requires the operator's own token and terms; source data
+remains local. Current real feeds lack the complete historical raw/action/publication/
+membership evidence required for accounting and remain diagnostic-only. They cannot
+execute research-mode paper orders. See `RESEARCH.md` for the optional source workflow.
+Arena, outcome Journal and assisted authoring remain later increments.
 
-Existing 0.0.1–0.0.3 releases remain immutable with their original capabilities
-and assets. A milestone name or candidate workflow alone does not establish
-publication; use the exact release's tag, source SHA, immutable image digests
-and native evidence.
+Existing 0.0.1–0.0.4 releases remain immutable with their original capabilities/assets.
+A source version or candidate workflow does not establish publication. Use the exact
+GitHub Release, source SHA, immutable image digests and both native evidence files.
 
 ## Fresh installation
 
@@ -93,23 +94,45 @@ Scheduled work runs only while Docker is active. Backtests do not post durable
 paper holdings/fills, and neither backtests nor later scenario models guarantee
 future outcomes.
 
-## First paper account journey
+## First paper decision journey
 
-Open `/portfolios`, give the account a name, keep or edit the positive starting
-capital and select an actual published strategy version. Choose the source mode
-explicitly; fixture and research accounts stay independent. A confirmed default
-account has $1,000 cash, 100% cash weight and no posted holdings. View its funding
-event, original strategy version, risk assumptions and current reconciliation
-status. Inspect an account with posted holdings to see exact quantity/basis,
-mark/session, cash, total value and immutable transaction lineage/fees.
+In **Settings & data → Manage market data**, choose **Synthetic demo** and explicitly
+refresh the offline snapshot; wait for its real job to complete. No provider token is
+needed. Open `/portfolios`, name an account, keep or edit the positive starting capital
+and select a published immutable strategy version. A confirmed default account has
+$1,000 cash, 100% cash weight and no posted holdings. Inspect its funding event and
+risk assumptions, then open **Decision Center**.
 
-If creation loses its response, use **Retry same account creation** with the frozen
-request rather than starting another account. Definitive validation errors allow
-editing. Missing marks leave value unavailable, never zero; known cash and shares
-remain visible. Refresh if account and separately paginated history show different
-sequences. Pending/partial/cancelled presentation is implemented, while live batch
-inspection and approval remain honestly staged for 0.0.5. No UI action in this
-increment previews or approves a recommendation.
+Choose a pinned as-of session and **Generate paper review**. The server suggests the
+earliest covered date with calendar history/horizon support; actual prices/features
+are still validated by the engine. The reproducible reference journey uses
+**2028-07-17** in the generated fixtures. Submitting a later synthetic date explicitly
+observes its virtual cutoff without trading; the clock cannot rewind. Background
+reviews do not advance future time.
+
+Inspect original current/target weights, costs, estimated quantities, candidate
+explanations/exclusions and proposed-vs-hold P10/P50/P90, loss probability and median
+ending values over 90 calendar days. Original decision dates and frozen state are
+separate from current posted valuation marks. A forecast without adequate calendar
+or history shows unavailable, never substitute returns. With no executable orders,
+inspect/dismiss the HOLD/cash-only decision; approval stays disabled.
+
+For an eligible review, confirm portfolio/revision/version/as-of, estimated quantities/
+cost and indicative opening, then **Authorize paper orders**. The server revalidates;
+preview does not reserve the opening. Cash/holdings remain unchanged until a durable
+fill posts. The synthetic **Observe next fixture close explicitly** action may first
+remain pending because daily bars arrive after close. A later explicit observation
+can expose the original opening; bounded attempts may pass through partial state.
+A completed job is not necessarily a terminal batch. Cancellation closes only remaining
+intent and retains committed fills.
+
+Review/approval keys are persisted before submission. After an uncertain response,
+recover/retry the same operation; do not substitute a new key or silently change its
+revision. Refresh posted state to inspect actual cash, holdings and ledger fees.
+Request a later review for updated actions; the reference **2028-07-19** review is a
+genuine HOLD after the reference fills and can be dismissed without ledger changes.
+Immutable history/scenarios remain inspectable after restart. Outcome maturation and
+the Journal belong to 0.0.7 and are not claimed by this core release.
 
 ## Backup before upgrading
 
@@ -143,6 +166,15 @@ Back up both stores before upgrading; new images may write schemas older images
 cannot read. Existing results pin their original engine; use explicit common-setting
 reruns rather than treating different engine builds as directly comparable.
 Older images must not be run against a newer schema as an assumed rollback.
+
+The 0.0.4→0.0.5 upgrade adds migrations `0007_forecasts`,
+`0008_recommendations` and `0009_portfolio_reviews` for immutable scenario/recommendation
+admission and monthly review/key-alias/observation state. Existing cash, positions,
+original approvals, ledger events, queue payloads and snapshots are retained. Startup
+never resets them. The supervisor may resume already authorized fills and eligible
+reviews under their original evidence; it never authorizes new orders or advances
+future fixture time. Accepted manual review selections and replay keys retain their
+logical observation across restart, separately from actual UTC audit.
 
 The 0.0.3→0.0.4 upgrade adds the `0006_paper_ledger` migration: linked account,
 recommendation, batch, order, immutable event/fill/entry/action and projection

@@ -171,7 +171,7 @@ export function SettingsView() {
             </div>
             <div>
               <dt>Application version</dt>
-              <dd>0.0.4 · Paper Portfolios</dd>
+              <dd>0.0.5 · Decision Center</dd>
             </div>
           </dl>
           <VersionIdentity

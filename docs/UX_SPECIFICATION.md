@@ -162,8 +162,8 @@ operator audit. After approval show pending intent and an explicit fixture-advan
 action; never automatically invent future sessions. Unavailable opening evidence
 stays pending, even after an accepted step. Cancellation shows the actual partial
 or filled race outcome and retains posted effects. HOLD/cash-only results without
-executable orders cannot enable approval. Monthly scheduling is implemented by
-#51; its accessible screen integration remains #52.
+executable orders cannot enable approval. Monthly scheduling and its accessible Decision Center integration are implemented
+by #51/#52.
 
 The [monthly review status](operations/portfolio-schedules.md) supplies current
 versus last-observed replay time, latest explicit manual review cutoff, next due,
@@ -173,7 +173,8 @@ virtual review observation without trading; cancelling accepted computation does
 not rewind that selection. Background scheduling never advances time or approves
 orders. Show a missing calendar/source or unresolved earlier review explicitly,
 and disclose that an unobserved heartbeat interval is not an exact shutdown time.
-These transport capabilities do not themselves implement the #52 screen.
+The delivered #52 screen consumes these generated transport types; the 0.0.5 core
+release gate verifies the combined public journey and restart behavior.
 
 ### 5.7 Arena (`/arena`, `/arena/[id]`)
 
