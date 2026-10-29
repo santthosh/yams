@@ -96,6 +96,8 @@ def test_fresh_repeat_and_concurrent_bootstrap_preserves_identity_and_preference
         "experiment",
         "experiment_core",
         "experiment_report",
+        "forecast",
+        "forecast_artifact",
         "paper_portfolio",
         "paper_position",
         "recommendation",

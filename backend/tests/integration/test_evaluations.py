@@ -98,11 +98,20 @@ def test_admission_completion_replay_and_immutable_evidence(
     assert not {
         "portfolio",
         "cash_entry",
-        "forecast",
     } & set(inspect(database).get_table_names())
     with database.connect() as connection:
         # Later ledger schema exists, but evaluation must create no financial intent.
-        for table in ("paper_portfolio", "paper_order", "recommendation"):
+        for table in (
+            "paper_portfolio",
+            "paper_order",
+            "recommendation",
+            "paper_order_batch",
+            "paper_fill",
+            "ledger_event",
+            "cash_ledger_entry",
+            "forecast",
+            "forecast_artifact",
+        ):
             assert connection.execute(text(f"SELECT count(*) FROM {table}")).scalar_one() == 0
         assert (
             connection.execute(text("SELECT count(*) FROM job_diagnostic_effect")).scalar_one() == 0

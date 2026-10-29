@@ -14,6 +14,7 @@ from sqlalchemy.orm import Session, aliased
 from backend.backtesting.errors import SAFE_BACKTEST_REASONS
 from backend.domain.common import ErrorCode, ErrorDetail, JobResult, JobV1
 from backend.domain.types import canonical_json
+from backend.forecasting.errors import SAFE_FORECAST_REASONS
 from backend.jobs.registry import AttemptMetrics, JobLimits, validate_payload
 from backend.market_data.providers.yahoo import SAFE_PROVIDER_REASONS
 from backend.persistence.models.job import DiagnosticEffect, Job, JobAttempt, Schedule
@@ -432,7 +433,9 @@ class Queue:
         reason: str | None = None,
     ) -> bool:
         allowed_reasons = (
-            SAFE_BACKTEST_REASONS
+            SAFE_FORECAST_REASONS
+            if lease.kind == "forecast"
+            else SAFE_BACKTEST_REASONS
             if lease.kind in {"backtest_core", "backtest"}
             else SAFE_PROVIDER_REASONS
         )

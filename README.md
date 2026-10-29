@@ -21,6 +21,8 @@ create independent cash accounts and inspect posted holdings, values and ledger
 evidence. Live batch controls and public apply follow in 0.0.5. Startup creates
 no accounts or recommendations.
 
+Source work for 0.0.5 also includes the [private scenario engine and worker](docs/operations/scenario-forecasts.md): seeded common-shock comparisons, honest unavailable results and immutable artifacts. They do not post orders or balances. Public recommendation/forecast transport and Decision Center screens remain staged for their owning issues; no 0.0.5 release is claimed.
+
 The 0.0.3 Strategy Lab increment adds named strategy creation, detail and immutable
 version publication/history APIs over the existing registry, plus the ratified
 mean-reversion and low-volatility templates through the shared diagnostic worker.
@@ -141,9 +143,9 @@ schedules and one idempotent diagnostic effect per job. The PostgreSQL queue use
 fenced leases and bounded recovery; a Linux supervisor renews heartbeats while a
 separate resource-limited process executes the handler. Registered kinds are
 `diagnostic`, `refresh_market_data`, `evaluate_strategy`, `backtest_core`,
-`backtest` and `apply_scheduled_fills`. The private fill handler posts fenced
-synthetic effects; public recommendation/apply controls and forecast jobs remain
-staged for 0.0.5. `GET /api/v1/jobs/{job_id}` is read-only; public experiment
+`backtest`, `forecast` and `apply_scheduled_fills`. The private fill handler posts fenced
+synthetic effects; the private `forecast` job now computes immutable scenario
+comparisons. Public recommendation/apply/forecast transport remains staged for 0.0.5. `GET /api/v1/jobs/{job_id}` is read-only; public experiment
 cancellation is implemented, while paper batch cancellation transport follows in #50.
 
 See [worker operations](docs/operations/durable-jobs.md) for configuration,

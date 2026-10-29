@@ -9,6 +9,7 @@ from backend.backtesting.contracts import BacktestCorePayload
 from backend.domain.evaluation import StrategyEvaluationPayload
 from backend.domain.fill_job import ScheduledFillPayload
 from backend.domain.types import Contract, Hash256, SourceMode
+from backend.forecasting.contracts import ForecastPayload
 from backend.market_data.research_config import ResearchConfig
 from backend.market_data.tiingo_config import TiingoResearchConfigV1
 
@@ -83,7 +84,10 @@ def validate_payload(
     | StrategyEvaluationPayload
     | BacktestCorePayload
     | ScheduledFillPayload
+    | ForecastPayload
 ):
+    if kind == "forecast":
+        return ForecastPayload.model_validate(payload)
     if kind == "apply_scheduled_fills":
         return ScheduledFillPayload.model_validate(payload)
     if kind in {"backtest_core", "backtest"}:
