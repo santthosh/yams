@@ -278,13 +278,18 @@ def replace_position(state: PortfolioState, position: Position, cash: str) -> Po
     )
 
 
-def usable_bar(bar: MarketBarV1, observed_at: datetime, context: ExecutionContext) -> bool:
+def usable_evidence_bar(bar: MarketBarV1, observed_at: datetime, *, live: bool) -> bool:
+    """One raw-price/availability guard for execution and read-only valuation."""
     return (
         bar.price_basis == "raw_as_traded"
         and not set(bar.quality_flags) - {"SYNTHETIC_DATA_ONLY"}
         and bar.available_at <= observed_at
-        and (context.execution_mode == "historical_replay" or bar.ingested_at <= observed_at)
+        and (not live or bar.ingested_at <= observed_at)
     )
+
+
+def usable_bar(bar: MarketBarV1, observed_at: datetime, context: ExecutionContext) -> bool:
+    return usable_evidence_bar(bar, observed_at, live=context.execution_mode == "current_paper")
 
 
 def execute_order(

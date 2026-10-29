@@ -10533,6 +10533,1546 @@
     "title": "PaperOrderBatchV1",
     "type": "object"
   },
+  "PaperPortfolioV1.serialization": {
+    "$defs": {
+      "PortfolioConfig": {
+        "additionalProperties": false,
+        "properties": {
+          "max_position_weight": {
+            "pattern": "^(0|1)(\\.[0-9]{1,6})?$",
+            "title": "Max Position Weight",
+            "type": "string"
+          },
+          "max_positions": {
+            "maximum": 100,
+            "minimum": 1,
+            "title": "Max Positions",
+            "type": "integer"
+          },
+          "max_sector_weight": {
+            "pattern": "^(0|1)(\\.[0-9]{1,6})?$",
+            "title": "Max Sector Weight",
+            "type": "string"
+          },
+          "min_cash_weight": {
+            "pattern": "^(0|1)(\\.[0-9]{1,6})?$",
+            "title": "Min Cash Weight",
+            "type": "string"
+          },
+          "min_trade_usd": {
+            "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Min Trade Usd",
+            "type": "string"
+          },
+          "rebalance_band_absolute_weight": {
+            "pattern": "^(0|1)(\\.[0-9]{1,6})?$",
+            "title": "Rebalance Band Absolute Weight",
+            "type": "string"
+          },
+          "weighting": {
+            "const": "inverse_volatility",
+            "title": "Weighting",
+            "type": "string"
+          }
+        },
+        "required": [
+          "max_positions",
+          "weighting",
+          "max_position_weight",
+          "max_sector_weight",
+          "min_cash_weight",
+          "min_trade_usd",
+          "rebalance_band_absolute_weight"
+        ],
+        "title": "PortfolioConfig",
+        "type": "object"
+      },
+      "PortfolioHoldingV1": {
+        "additionalProperties": false,
+        "properties": {
+          "asset_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "title": "Asset Id",
+            "type": "string"
+          },
+          "mark_price_usd": {
+            "anyOf": [
+              {
+                "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mark Price Usd"
+          },
+          "market_value_usd": {
+            "anyOf": [
+              {
+                "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Market Value Usd"
+          },
+          "price_as_of_session": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Price As Of Session"
+          },
+          "quantity": {
+            "pattern": "^(0|[1-9][0-9]{0,23})(\\.[0-9]{1,6})?$",
+            "title": "Quantity",
+            "type": "string"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "pattern": "^[A-Z][A-Z0-9_]*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          },
+          "sector": {
+            "title": "Sector",
+            "type": "string"
+          },
+          "total_basis_usd": {
+            "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Total Basis Usd",
+            "type": "string"
+          },
+          "weight": {
+            "anyOf": [
+              {
+                "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Weight"
+          }
+        },
+        "required": [
+          "asset_id",
+          "sector",
+          "quantity",
+          "total_basis_usd",
+          "mark_price_usd",
+          "price_as_of_session",
+          "market_value_usd",
+          "weight",
+          "reason"
+        ],
+        "title": "PortfolioHoldingV1",
+        "type": "object"
+      },
+      "PortfolioValuationV1": {
+        "additionalProperties": false,
+        "properties": {
+          "as_of_session": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "As Of Session"
+          },
+          "cash_weight": {
+            "anyOf": [
+              {
+                "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cash Weight"
+          },
+          "checked_at": {
+            "format": "date-time",
+            "pattern": "Z$",
+            "title": "Checked At",
+            "type": "string"
+          },
+          "missing_assets": {
+            "items": {
+              "maxLength": 160,
+              "minLength": 1,
+              "type": "string"
+            },
+            "title": "Missing Assets",
+            "type": "array"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "pattern": "^[A-Z][A-Z0-9_]*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          },
+          "snapshot_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Snapshot Id"
+          },
+          "snapshot_sha256": {
+            "anyOf": [
+              {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Snapshot Sha256"
+          },
+          "status": {
+            "enum": [
+              "available",
+              "stale",
+              "unavailable"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "total_value_usd": {
+            "anyOf": [
+              {
+                "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Total Value Usd"
+          },
+          "warnings": {
+            "items": {
+              "pattern": "^[A-Z][A-Z0-9_]*$",
+              "type": "string"
+            },
+            "title": "Warnings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "status",
+          "total_value_usd",
+          "cash_weight",
+          "snapshot_id",
+          "snapshot_sha256",
+          "as_of_session",
+          "checked_at",
+          "reason",
+          "missing_assets",
+          "warnings"
+        ],
+        "title": "PortfolioValuationV1",
+        "type": "object"
+      }
+    },
+    "additionalProperties": false,
+    "properties": {
+      "benchmark_symbol": {
+        "const": "SPY",
+        "default": "SPY",
+        "title": "Benchmark Symbol",
+        "type": "string"
+      },
+      "cash_usd": {
+        "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+        "title": "Cash Usd",
+        "type": "string"
+      },
+      "created_at": {
+        "format": "date-time",
+        "pattern": "Z$",
+        "title": "Created At",
+        "type": "string"
+      },
+      "currency": {
+        "const": "USD",
+        "default": "USD",
+        "title": "Currency",
+        "type": "string"
+      },
+      "execution_policy_id": {
+        "const": "us_eod_next_open_v1",
+        "default": "us_eod_next_open_v1",
+        "title": "Execution Policy Id",
+        "type": "string"
+      },
+      "holdings": {
+        "items": {
+          "$ref": "#/$defs/PortfolioHoldingV1"
+        },
+        "title": "Holdings",
+        "type": "array"
+      },
+      "id": {
+        "format": "uuid",
+        "title": "Id",
+        "type": "string"
+      },
+      "last_sequence": {
+        "minimum": 1,
+        "title": "Last Sequence",
+        "type": "integer"
+      },
+      "name": {
+        "title": "Name",
+        "type": "string"
+      },
+      "opening_cash_usd": {
+        "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+        "title": "Opening Cash Usd",
+        "type": "string"
+      },
+      "opening_snapshot_id": {
+        "anyOf": [
+          {
+            "format": "uuid",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Opening Snapshot Id"
+      },
+      "paper_only": {
+        "const": true,
+        "default": true,
+        "title": "Paper Only",
+        "type": "boolean"
+      },
+      "reconciliation_failed": {
+        "title": "Reconciliation Failed",
+        "type": "boolean"
+      },
+      "revision": {
+        "minimum": 1,
+        "title": "Revision",
+        "type": "integer"
+      },
+      "risk_policy": {
+        "$ref": "#/$defs/PortfolioConfig"
+      },
+      "state": {
+        "enum": [
+          "active",
+          "paused",
+          "closed"
+        ],
+        "title": "State",
+        "type": "string"
+      },
+      "strategy_version_id": {
+        "format": "uuid",
+        "title": "Strategy Version Id",
+        "type": "string"
+      },
+      "total_value_usd": {
+        "anyOf": [
+          {
+            "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Total Value Usd"
+      },
+      "valuation": {
+        "$ref": "#/$defs/PortfolioValuationV1"
+      },
+      "valuation_as_of_session": {
+        "anyOf": [
+          {
+            "format": "date",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Valuation As Of Session"
+      },
+      "valuation_mode": {
+        "enum": [
+          "synthetic_fixture",
+          "research_market_data"
+        ],
+        "title": "Valuation Mode",
+        "type": "string"
+      }
+    },
+    "required": [
+      "id",
+      "name",
+      "valuation_mode",
+      "total_value_usd",
+      "valuation_as_of_session",
+      "strategy_version_id",
+      "opening_cash_usd",
+      "opening_snapshot_id",
+      "cash_usd",
+      "revision",
+      "last_sequence",
+      "state",
+      "reconciliation_failed",
+      "risk_policy",
+      "created_at",
+      "holdings",
+      "valuation"
+    ],
+    "title": "PaperPortfolioV1",
+    "type": "object"
+  },
+  "PaperPortfolioV1.validation": {
+    "$defs": {
+      "PortfolioConfig": {
+        "additionalProperties": false,
+        "properties": {
+          "max_position_weight": {
+            "pattern": "^(0|1)(\\.[0-9]{1,6})?$",
+            "title": "Max Position Weight",
+            "type": "string"
+          },
+          "max_positions": {
+            "maximum": 100,
+            "minimum": 1,
+            "title": "Max Positions",
+            "type": "integer"
+          },
+          "max_sector_weight": {
+            "pattern": "^(0|1)(\\.[0-9]{1,6})?$",
+            "title": "Max Sector Weight",
+            "type": "string"
+          },
+          "min_cash_weight": {
+            "pattern": "^(0|1)(\\.[0-9]{1,6})?$",
+            "title": "Min Cash Weight",
+            "type": "string"
+          },
+          "min_trade_usd": {
+            "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Min Trade Usd",
+            "type": "string"
+          },
+          "rebalance_band_absolute_weight": {
+            "pattern": "^(0|1)(\\.[0-9]{1,6})?$",
+            "title": "Rebalance Band Absolute Weight",
+            "type": "string"
+          },
+          "weighting": {
+            "const": "inverse_volatility",
+            "title": "Weighting",
+            "type": "string"
+          }
+        },
+        "required": [
+          "max_positions",
+          "weighting",
+          "max_position_weight",
+          "max_sector_weight",
+          "min_cash_weight",
+          "min_trade_usd",
+          "rebalance_band_absolute_weight"
+        ],
+        "title": "PortfolioConfig",
+        "type": "object"
+      },
+      "PortfolioHoldingV1": {
+        "additionalProperties": false,
+        "properties": {
+          "asset_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "title": "Asset Id",
+            "type": "string"
+          },
+          "mark_price_usd": {
+            "anyOf": [
+              {
+                "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mark Price Usd"
+          },
+          "market_value_usd": {
+            "anyOf": [
+              {
+                "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Market Value Usd"
+          },
+          "price_as_of_session": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Price As Of Session"
+          },
+          "quantity": {
+            "pattern": "^(0|[1-9][0-9]{0,23})(\\.[0-9]{1,6})?$",
+            "title": "Quantity",
+            "type": "string"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "pattern": "^[A-Z][A-Z0-9_]*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          },
+          "sector": {
+            "title": "Sector",
+            "type": "string"
+          },
+          "total_basis_usd": {
+            "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Total Basis Usd",
+            "type": "string"
+          },
+          "weight": {
+            "anyOf": [
+              {
+                "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Weight"
+          }
+        },
+        "required": [
+          "asset_id",
+          "sector",
+          "quantity",
+          "total_basis_usd",
+          "mark_price_usd",
+          "price_as_of_session",
+          "market_value_usd",
+          "weight",
+          "reason"
+        ],
+        "title": "PortfolioHoldingV1",
+        "type": "object"
+      },
+      "PortfolioValuationV1": {
+        "additionalProperties": false,
+        "properties": {
+          "as_of_session": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "As Of Session"
+          },
+          "cash_weight": {
+            "anyOf": [
+              {
+                "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cash Weight"
+          },
+          "checked_at": {
+            "format": "date-time",
+            "pattern": "Z$",
+            "title": "Checked At",
+            "type": "string"
+          },
+          "missing_assets": {
+            "items": {
+              "maxLength": 160,
+              "minLength": 1,
+              "type": "string"
+            },
+            "title": "Missing Assets",
+            "type": "array"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "pattern": "^[A-Z][A-Z0-9_]*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          },
+          "snapshot_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Snapshot Id"
+          },
+          "snapshot_sha256": {
+            "anyOf": [
+              {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Snapshot Sha256"
+          },
+          "status": {
+            "enum": [
+              "available",
+              "stale",
+              "unavailable"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "total_value_usd": {
+            "anyOf": [
+              {
+                "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Total Value Usd"
+          },
+          "warnings": {
+            "items": {
+              "pattern": "^[A-Z][A-Z0-9_]*$",
+              "type": "string"
+            },
+            "title": "Warnings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "status",
+          "total_value_usd",
+          "cash_weight",
+          "snapshot_id",
+          "snapshot_sha256",
+          "as_of_session",
+          "checked_at",
+          "reason",
+          "missing_assets",
+          "warnings"
+        ],
+        "title": "PortfolioValuationV1",
+        "type": "object"
+      }
+    },
+    "additionalProperties": false,
+    "properties": {
+      "benchmark_symbol": {
+        "const": "SPY",
+        "default": "SPY",
+        "title": "Benchmark Symbol",
+        "type": "string"
+      },
+      "cash_usd": {
+        "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+        "title": "Cash Usd",
+        "type": "string"
+      },
+      "created_at": {
+        "format": "date-time",
+        "pattern": "Z$",
+        "title": "Created At",
+        "type": "string"
+      },
+      "currency": {
+        "const": "USD",
+        "default": "USD",
+        "title": "Currency",
+        "type": "string"
+      },
+      "execution_policy_id": {
+        "const": "us_eod_next_open_v1",
+        "default": "us_eod_next_open_v1",
+        "title": "Execution Policy Id",
+        "type": "string"
+      },
+      "holdings": {
+        "items": {
+          "$ref": "#/$defs/PortfolioHoldingV1"
+        },
+        "title": "Holdings",
+        "type": "array"
+      },
+      "id": {
+        "format": "uuid",
+        "title": "Id",
+        "type": "string"
+      },
+      "last_sequence": {
+        "minimum": 1,
+        "title": "Last Sequence",
+        "type": "integer"
+      },
+      "name": {
+        "title": "Name",
+        "type": "string"
+      },
+      "opening_cash_usd": {
+        "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+        "title": "Opening Cash Usd",
+        "type": "string"
+      },
+      "opening_snapshot_id": {
+        "anyOf": [
+          {
+            "format": "uuid",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Opening Snapshot Id"
+      },
+      "paper_only": {
+        "const": true,
+        "default": true,
+        "title": "Paper Only",
+        "type": "boolean"
+      },
+      "reconciliation_failed": {
+        "title": "Reconciliation Failed",
+        "type": "boolean"
+      },
+      "revision": {
+        "minimum": 1,
+        "title": "Revision",
+        "type": "integer"
+      },
+      "risk_policy": {
+        "$ref": "#/$defs/PortfolioConfig"
+      },
+      "state": {
+        "enum": [
+          "active",
+          "paused",
+          "closed"
+        ],
+        "title": "State",
+        "type": "string"
+      },
+      "strategy_version_id": {
+        "format": "uuid",
+        "title": "Strategy Version Id",
+        "type": "string"
+      },
+      "total_value_usd": {
+        "anyOf": [
+          {
+            "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Total Value Usd"
+      },
+      "valuation": {
+        "$ref": "#/$defs/PortfolioValuationV1"
+      },
+      "valuation_as_of_session": {
+        "anyOf": [
+          {
+            "format": "date",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Valuation As Of Session"
+      },
+      "valuation_mode": {
+        "enum": [
+          "synthetic_fixture",
+          "research_market_data"
+        ],
+        "title": "Valuation Mode",
+        "type": "string"
+      }
+    },
+    "required": [
+      "id",
+      "name",
+      "valuation_mode",
+      "total_value_usd",
+      "valuation_as_of_session",
+      "strategy_version_id",
+      "opening_cash_usd",
+      "opening_snapshot_id",
+      "cash_usd",
+      "revision",
+      "last_sequence",
+      "state",
+      "reconciliation_failed",
+      "risk_policy",
+      "created_at",
+      "holdings",
+      "valuation"
+    ],
+    "title": "PaperPortfolioV1",
+    "type": "object"
+  },
+  "PortfolioCreateRequest.serialization": {
+    "additionalProperties": false,
+    "properties": {
+      "mode": {
+        "default": "synthetic_fixture",
+        "enum": [
+          "synthetic_fixture",
+          "research_market_data"
+        ],
+        "title": "Mode",
+        "type": "string"
+      },
+      "name": {
+        "title": "Name",
+        "type": "string"
+      },
+      "opening_cash_usd": {
+        "default": "1000.00",
+        "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+        "title": "Opening Cash Usd",
+        "type": "string"
+      },
+      "snapshot_id": {
+        "anyOf": [
+          {
+            "format": "uuid",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Snapshot Id"
+      },
+      "strategy_version_id": {
+        "format": "uuid",
+        "title": "Strategy Version Id",
+        "type": "string"
+      }
+    },
+    "required": [
+      "name",
+      "strategy_version_id"
+    ],
+    "title": "PortfolioCreateRequest",
+    "type": "object"
+  },
+  "PortfolioCreateRequest.validation": {
+    "additionalProperties": false,
+    "properties": {
+      "mode": {
+        "default": "synthetic_fixture",
+        "enum": [
+          "synthetic_fixture",
+          "research_market_data"
+        ],
+        "title": "Mode",
+        "type": "string"
+      },
+      "name": {
+        "title": "Name",
+        "type": "string"
+      },
+      "opening_cash_usd": {
+        "default": "1000.00",
+        "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+        "title": "Opening Cash Usd",
+        "type": "string"
+      },
+      "snapshot_id": {
+        "anyOf": [
+          {
+            "format": "uuid",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Snapshot Id"
+      },
+      "strategy_version_id": {
+        "format": "uuid",
+        "title": "Strategy Version Id",
+        "type": "string"
+      }
+    },
+    "required": [
+      "name",
+      "strategy_version_id"
+    ],
+    "title": "PortfolioCreateRequest",
+    "type": "object"
+  },
+  "PortfolioTransactionPageV1.serialization": {
+    "$defs": {
+      "PortfolioFillV1": {
+        "additionalProperties": false,
+        "properties": {
+          "commission_usd": {
+            "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Commission Usd",
+            "type": "string"
+          },
+          "executed_price_usd": {
+            "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$",
+            "title": "Executed Price Usd",
+            "type": "string"
+          },
+          "execution_session": {
+            "format": "date",
+            "title": "Execution Session",
+            "type": "string"
+          },
+          "gross_usd": {
+            "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Gross Usd",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "order_id": {
+            "format": "uuid",
+            "title": "Order Id",
+            "type": "string"
+          },
+          "quantity": {
+            "pattern": "^(0|[1-9][0-9]{0,23})(\\.[0-9]{1,6})?$",
+            "title": "Quantity",
+            "type": "string"
+          },
+          "raw_price_usd": {
+            "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$",
+            "title": "Raw Price Usd",
+            "type": "string"
+          },
+          "realized_pnl_usd": {
+            "pattern": "^-?(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Realized Pnl Usd",
+            "type": "string"
+          },
+          "removed_basis_usd": {
+            "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Removed Basis Usd",
+            "type": "string"
+          },
+          "slippage_usd": {
+            "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Slippage Usd",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "order_id",
+          "execution_session",
+          "raw_price_usd",
+          "executed_price_usd",
+          "quantity",
+          "gross_usd",
+          "commission_usd",
+          "slippage_usd",
+          "removed_basis_usd",
+          "realized_pnl_usd"
+        ],
+        "title": "PortfolioFillV1",
+        "type": "object"
+      },
+      "PortfolioPositionChangeV1": {
+        "additionalProperties": false,
+        "properties": {
+          "asset_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "title": "Asset Id",
+            "type": "string"
+          },
+          "quantity_delta": {
+            "pattern": "^-?(0|[1-9][0-9]{0,23})(\\.[0-9]{1,6})?$",
+            "title": "Quantity Delta",
+            "type": "string"
+          },
+          "total_basis_delta_usd": {
+            "pattern": "^-?(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Total Basis Delta Usd",
+            "type": "string"
+          }
+        },
+        "required": [
+          "asset_id",
+          "quantity_delta",
+          "total_basis_delta_usd"
+        ],
+        "title": "PortfolioPositionChangeV1",
+        "type": "object"
+      },
+      "PortfolioTransactionV1": {
+        "additionalProperties": false,
+        "properties": {
+          "cash_delta_usd": {
+            "pattern": "^-?(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Cash Delta Usd",
+            "type": "string"
+          },
+          "correction_target_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Correction Target Id"
+          },
+          "effective_at": {
+            "format": "date-time",
+            "pattern": "Z$",
+            "title": "Effective At",
+            "type": "string"
+          },
+          "event_key": {
+            "title": "Event Key",
+            "type": "string"
+          },
+          "fill": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/PortfolioFillV1"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "opening_funding",
+              "fill",
+              "order_closed",
+              "split",
+              "dividend",
+              "entitlement",
+              "correction",
+              "strategy_binding",
+              "batch_approval",
+              "batch_cancel"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "portfolio_revision": {
+            "minimum": 1,
+            "title": "Portfolio Revision",
+            "type": "integer"
+          },
+          "position_changes": {
+            "items": {
+              "$ref": "#/$defs/PortfolioPositionChangeV1"
+            },
+            "title": "Position Changes",
+            "type": "array"
+          },
+          "recorded_at": {
+            "format": "date-time",
+            "pattern": "Z$",
+            "title": "Recorded At",
+            "type": "string"
+          },
+          "sequence": {
+            "minimum": 1,
+            "title": "Sequence",
+            "type": "integer"
+          },
+          "snapshot_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Snapshot Id"
+          },
+          "strategy_version_id": {
+            "format": "uuid",
+            "title": "Strategy Version Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "sequence",
+          "portfolio_revision",
+          "kind",
+          "event_key",
+          "recorded_at",
+          "effective_at",
+          "strategy_version_id",
+          "snapshot_id",
+          "cash_delta_usd",
+          "position_changes",
+          "correction_target_id",
+          "fill"
+        ],
+        "title": "PortfolioTransactionV1",
+        "type": "object"
+      }
+    },
+    "additionalProperties": false,
+    "properties": {
+      "items": {
+        "items": {
+          "$ref": "#/$defs/PortfolioTransactionV1"
+        },
+        "title": "Items",
+        "type": "array"
+      },
+      "mode": {
+        "enum": [
+          "synthetic_fixture",
+          "research_market_data"
+        ],
+        "title": "Mode",
+        "type": "string"
+      },
+      "next_cursor": {
+        "anyOf": [
+          {
+            "maxLength": 2048,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9_-]+$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Next Cursor"
+      },
+      "paper_only": {
+        "const": true,
+        "default": true,
+        "title": "Paper Only",
+        "type": "boolean"
+      },
+      "portfolio_id": {
+        "format": "uuid",
+        "title": "Portfolio Id",
+        "type": "string"
+      },
+      "warnings": {
+        "default": [],
+        "items": {
+          "pattern": "^[A-Z][A-Z0-9_]*$",
+          "type": "string"
+        },
+        "title": "Warnings",
+        "type": "array"
+      }
+    },
+    "required": [
+      "items",
+      "next_cursor",
+      "portfolio_id",
+      "mode"
+    ],
+    "title": "PortfolioTransactionPageV1",
+    "type": "object"
+  },
+  "PortfolioTransactionPageV1.validation": {
+    "$defs": {
+      "PortfolioFillV1": {
+        "additionalProperties": false,
+        "properties": {
+          "commission_usd": {
+            "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Commission Usd",
+            "type": "string"
+          },
+          "executed_price_usd": {
+            "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$",
+            "title": "Executed Price Usd",
+            "type": "string"
+          },
+          "execution_session": {
+            "format": "date",
+            "title": "Execution Session",
+            "type": "string"
+          },
+          "gross_usd": {
+            "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Gross Usd",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "order_id": {
+            "format": "uuid",
+            "title": "Order Id",
+            "type": "string"
+          },
+          "quantity": {
+            "pattern": "^(0|[1-9][0-9]{0,23})(\\.[0-9]{1,6})?$",
+            "title": "Quantity",
+            "type": "string"
+          },
+          "raw_price_usd": {
+            "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$",
+            "title": "Raw Price Usd",
+            "type": "string"
+          },
+          "realized_pnl_usd": {
+            "pattern": "^-?(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Realized Pnl Usd",
+            "type": "string"
+          },
+          "removed_basis_usd": {
+            "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Removed Basis Usd",
+            "type": "string"
+          },
+          "slippage_usd": {
+            "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Slippage Usd",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "order_id",
+          "execution_session",
+          "raw_price_usd",
+          "executed_price_usd",
+          "quantity",
+          "gross_usd",
+          "commission_usd",
+          "slippage_usd",
+          "removed_basis_usd",
+          "realized_pnl_usd"
+        ],
+        "title": "PortfolioFillV1",
+        "type": "object"
+      },
+      "PortfolioPositionChangeV1": {
+        "additionalProperties": false,
+        "properties": {
+          "asset_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "title": "Asset Id",
+            "type": "string"
+          },
+          "quantity_delta": {
+            "pattern": "^-?(0|[1-9][0-9]{0,23})(\\.[0-9]{1,6})?$",
+            "title": "Quantity Delta",
+            "type": "string"
+          },
+          "total_basis_delta_usd": {
+            "pattern": "^-?(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Total Basis Delta Usd",
+            "type": "string"
+          }
+        },
+        "required": [
+          "asset_id",
+          "quantity_delta",
+          "total_basis_delta_usd"
+        ],
+        "title": "PortfolioPositionChangeV1",
+        "type": "object"
+      },
+      "PortfolioTransactionV1": {
+        "additionalProperties": false,
+        "properties": {
+          "cash_delta_usd": {
+            "pattern": "^-?(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Cash Delta Usd",
+            "type": "string"
+          },
+          "correction_target_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Correction Target Id"
+          },
+          "effective_at": {
+            "format": "date-time",
+            "pattern": "Z$",
+            "title": "Effective At",
+            "type": "string"
+          },
+          "event_key": {
+            "title": "Event Key",
+            "type": "string"
+          },
+          "fill": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/PortfolioFillV1"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "opening_funding",
+              "fill",
+              "order_closed",
+              "split",
+              "dividend",
+              "entitlement",
+              "correction",
+              "strategy_binding",
+              "batch_approval",
+              "batch_cancel"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "portfolio_revision": {
+            "minimum": 1,
+            "title": "Portfolio Revision",
+            "type": "integer"
+          },
+          "position_changes": {
+            "items": {
+              "$ref": "#/$defs/PortfolioPositionChangeV1"
+            },
+            "title": "Position Changes",
+            "type": "array"
+          },
+          "recorded_at": {
+            "format": "date-time",
+            "pattern": "Z$",
+            "title": "Recorded At",
+            "type": "string"
+          },
+          "sequence": {
+            "minimum": 1,
+            "title": "Sequence",
+            "type": "integer"
+          },
+          "snapshot_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Snapshot Id"
+          },
+          "strategy_version_id": {
+            "format": "uuid",
+            "title": "Strategy Version Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "sequence",
+          "portfolio_revision",
+          "kind",
+          "event_key",
+          "recorded_at",
+          "effective_at",
+          "strategy_version_id",
+          "snapshot_id",
+          "cash_delta_usd",
+          "position_changes",
+          "correction_target_id",
+          "fill"
+        ],
+        "title": "PortfolioTransactionV1",
+        "type": "object"
+      }
+    },
+    "additionalProperties": false,
+    "properties": {
+      "items": {
+        "items": {
+          "$ref": "#/$defs/PortfolioTransactionV1"
+        },
+        "title": "Items",
+        "type": "array"
+      },
+      "mode": {
+        "enum": [
+          "synthetic_fixture",
+          "research_market_data"
+        ],
+        "title": "Mode",
+        "type": "string"
+      },
+      "next_cursor": {
+        "anyOf": [
+          {
+            "maxLength": 2048,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9_-]+$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Next Cursor"
+      },
+      "paper_only": {
+        "const": true,
+        "default": true,
+        "title": "Paper Only",
+        "type": "boolean"
+      },
+      "portfolio_id": {
+        "format": "uuid",
+        "title": "Portfolio Id",
+        "type": "string"
+      },
+      "warnings": {
+        "default": [],
+        "items": {
+          "pattern": "^[A-Z][A-Z0-9_]*$",
+          "type": "string"
+        },
+        "title": "Warnings",
+        "type": "array"
+      }
+    },
+    "required": [
+      "items",
+      "next_cursor",
+      "portfolio_id",
+      "mode"
+    ],
+    "title": "PortfolioTransactionPageV1",
+    "type": "object"
+  },
   "RecommendationV1.serialization": {
     "$defs": {
       "ActionEvidence": {

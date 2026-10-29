@@ -423,7 +423,7 @@ history before retrying if that distinction matters. Old IDs/configs/hashes and
 consumers' pinned references remain unchanged. There is no update/delete endpoint.
 
 `GET /strategies/{id}/versions` returns `Page[StrategyVersionV1]` ordered by ascending
-ordinal, with `limit` default25/max100 and final version UUID as `cursor`.
+ordinal, with `limit` default 25/max 100 and final version UUID as `cursor`.
 Unknown or other-strategy cursors return422; unknown strategy IDs return404.
 A new identity fork copies the chosen complete config into `POST /strategies`;
 appending under an existing identity retains that root's ID and version lineage.
@@ -435,7 +435,46 @@ same-origin JSON writes (1 MiB input cap), and list pagination queries.
 [Registry operations](operations/strategy-registry.md) records examples, identity,
 schema ownership and verification.
 
-### 6.3 Staged operations
+### 6.3 Paper accounts (0.0.4, owner #45)
+
+`POST /portfolios` requires UUID `Idempotency-Key` and closed
+`PortfolioCreateRequest`: trimmed name 1–120, immutable published strategy UUID,
+positive decimal-string `opening_cash_usd` (default 1000.00;22 whole/2 fractional
+places), `mode` (default synthetic_fixture) and optional verified `snapshot_id`.
+Return201 `PaperPortfolioV1`, initially100%cash/no holdings. Exact retries retain
+account identity, original funding and creation time; changed inputs409
+IDEMPOTENCY_CONFLICT, resolved before current reference/data checks. Distinct keys
+create independent capital. Mode/opening funding are immutable. Unknown version/
+snapshot 404; source mismatch 409 STATE_CONFLICT; blocked source 409 STALE_DATA;
+invalid capital/key/fields 422. Selected source files are verified outside the
+financial lock and their snapshot FK is retained on the opening event.
+
+`GET /portfolios` returns `Page[PaperPortfolioV1]`, with limit 25/max 100, UUID cursor
+and optional mode filter. `GET /portfolios/{id}` returns coherent posted state.
+The summary preserves §5's `state`, `total_value_usd`, `valuation_mode` and
+`valuation_as_of_session`; holdings use `mark_price_usd`/`price_as_of_session`.
+Additional `valuation` metadata contains available/stale/unavailable status,
+reason, snapshot/hash, checked time, cash weight, missing assets and warnings;
+summary and detail values/sessions must agree. Risk policy is derived from the
+bound immutable version; v1 benchmark remains SPY. Cash-only value is known without
+price evidence (market session null, reason CASH_ONLY). Undefined zero-capital
+weights are null with reason ZERO_PORTFOLIO_VALUE. Missing/stale/unsupported prices
+remainnull with reason, never fake zero; real diagnostic-only feeds cannot claim
+accounting support. Source mode cannot switch implicitly. Fixture display clock
+uses actual pinned bar observations; real reads use actual observation time.
+Exact shared valuation rounds display totals/lines half-even cents and weights
+18 decimal places; per-line display rounding need not sum to the once-rounded total.
+
+`GET /portfolios/{id}/transactions` returns `PortfolioTransactionPageV1` in descending
+immutable sequence, limit 25/max 100 and UUID cursor scoped to that account. It exposes
+signed effects, actual fills, original source/strategy/times and correction lineage,
+not private command payloads. Reads never post events, enqueue jobs or repair
+projections. Invalid cursor 422, unknown account 404, reconciliation mismatch 409
+STATE_CONFLICT, unavailable database/integrity 503 NOT_READY. Source labels and
+paper-only status remain explicit. No deposit/withdraw/direct-fill or public
+recommendation apply route is activated. See the [operational contract and examples](operations/paper-portfolio-api.md).
+
+### 6.4 Staged operations
 
 [ADR-008](adr/0008-lifecycle-api-additions.md#deferred-lifecycle-contracts-and-handoffs) assigns dismiss, pending-order cancellation, idempotency recovery, Arena lifecycle, settings, backup and export contracts to owning issues. Each owner defines exact transport and tests before exposing an action. In 0.0.1, workspace/health expose labeled fixture metadata rather than fabricated later resources. Public job cancellation is implemented in planned0.0.3 by #41, with terminal-state409 and accepted queued/running202.
 

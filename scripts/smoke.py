@@ -98,6 +98,62 @@ def main() -> None:
         evidence["workspace"] = workspace
         evidence["fixture_metadata"] = health["fixture_metadata"]
         evidence["checks"].append("clean boot and real same-origin API readiness")
+        assert get("portfolios")["items"] == []
+        portfolio_key = str(uuid4())
+        portfolio_body = {
+            "name": "SYNTHETIC_DATA_ONLY Docker account",
+            "strategy_version_id": default_version["id"],
+        }
+
+        def create_paper_account() -> Any:
+            request = urllib.request.Request(
+                f"http://{address}/api/v1/portfolios",
+                data=json.dumps(portfolio_body).encode(),
+                headers={
+                    "Content-Type": "application/json",
+                    "Origin": f"http://{address}",
+                    "Idempotency-Key": portfolio_key,
+                },
+                method="POST",
+            )
+            with urllib.request.urlopen(request, timeout=5) as response:
+                assert response.status == 201
+                return json.load(response)
+
+        paper_account = create_paper_account()
+        assert (
+            paper_account["cash_usd"] == paper_account["valuation"]["total_value_usd"] == "1000.00"
+        )
+        assert (
+            paper_account["holdings"] == []
+            and paper_account["valuation_mode"] == "synthetic_fixture"
+        )
+        assert paper_account["paper_only"] is True
+        paper_history = get(f"portfolios/{paper_account['id']}/transactions")
+        assert len(paper_history["items"]) == 1
+        assert paper_history["items"][0]["kind"] == "opening_funding"
+        assert paper_history["items"][0]["cash_delta_usd"] == "1000.00"
+        assert paper_history["next_cursor"] is None
+
+        def verify_paper_account() -> None:
+            saved = get(f"portfolios/{paper_account['id']}")
+            assert saved["cash_usd"] == "1000.00" and saved["holdings"] == []
+            assert saved["created_at"] == paper_account["created_at"]
+            assert saved["revision"] == saved["last_sequence"] == 1
+            assert get(f"portfolios/{paper_account['id']}/transactions") == paper_history
+            retried = create_paper_account()
+            assert (
+                retried["id"] == paper_account["id"]
+                and retried["created_at"] == paper_account["created_at"]
+            )
+            assert get(f"portfolios/{paper_account['id']}/transactions") == paper_history
+
+        verify_paper_account()
+        evidence["paper_account"] = paper_account
+        evidence["paper_history"] = paper_history
+        evidence["checks"].append(
+            "same-origin keyed paper account funding, exact retry and read-only ledger history"
+        )
         artifact = b"SYNTHETIC_DATA_ONLY: durable smoke artifact\n"
         python(f"from pathlib import Path; Path('/artifacts/smoke.txt').write_bytes({artifact!r})")
         expected = hashlib.sha256(artifact).hexdigest()
@@ -511,6 +567,10 @@ def main() -> None:
         )
         assert actual == expected
         evidence["artifact_sha256"] = actual
+        verify_paper_account()
+        evidence["checks"].append(
+            "restart retains paper account identity, funding and original creation retry"
+        )
         evidence["checks"].append("restart preserves workspace, job, fixtures and artifact hash")
         compose("up", "--build", "--force-recreate", "-d", "--wait", "--wait-timeout", "120")
         address = web_address()
@@ -531,6 +591,7 @@ def main() -> None:
             )
             == expected
         )
+        verify_paper_account()
         evidence["checks"].append("rebuild/recreate preserves named-volume state")
         ids = compose("ps", "-q").split()
         inspect = json.loads(subprocess.check_output(["docker", "inspect", *ids], text=True))

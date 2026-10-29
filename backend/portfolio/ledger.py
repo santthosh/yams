@@ -264,6 +264,7 @@ def create_portfolio(
     name: str,
     opening_cash_usd: str = "1000.00",
     source_mode: SourceMode = "synthetic_fixture",
+    snapshot_id: UUID | None = None,
     created_at: datetime,
 ) -> LedgerView:
     """Fund an independently identified account exactly once, without holdings."""
@@ -287,8 +288,14 @@ def create_portfolio(
         "opening_cash_usd": after.cash_usd,
         "source_mode": mode,
     }
+    if snapshot_id is not None:
+        command["snapshot_id"] = str(snapshot_id)
     fingerprint = digest(command)
     with Session(engine) as session, session.begin():
+        if snapshot_id is not None:
+            source = session.get(DatasetSnapshot, snapshot_id)
+            if source is None or source.source_mode != mode or source.quality == "blocked":
+                raise LedgerConflict("Opening snapshot does not match the account source")
         if session.get(StrategyVersion, strategy_version_id) is None:
             raise LookupError("Published strategy version does not exist")
         # INSERT serializes concurrent first delivery on the account PK. Losing
@@ -331,6 +338,7 @@ def create_portfolio(
                 recorded_at=timestamp,
                 effective_at=timestamp,
                 cash_entry=True,
+                snapshot_id=snapshot_id,
             )
         else:
             _check_projection(session, account)

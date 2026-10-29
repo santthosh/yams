@@ -32,6 +32,11 @@ from backend.domain.experiment_api import (
 from backend.domain.forecast import ForecastV1
 from backend.domain.market import AssetV1, MarketBarV1, SnapshotManifestV1
 from backend.domain.orders import PaperOrderBatchV1
+from backend.domain.portfolio import (
+    PaperPortfolioV1,
+    PortfolioCreateRequest,
+    PortfolioTransactionPageV1,
+)
 from backend.domain.recommendation import RecommendationV1
 from backend.domain.registry import StrategyCreateRequest, StrategyV1, StrategyVersionV1
 from backend.domain.strategy import StrategyConfigV1
@@ -55,6 +60,9 @@ MODELS: tuple[type[BaseModel], ...] = (
     RecommendationV1,
     ForecastV1,
     PaperOrderBatchV1,
+    PaperPortfolioV1,
+    PortfolioCreateRequest,
+    PortfolioTransactionPageV1,
     ExperimentRequest,
     ExperimentRunV1,
     ExperimentAccepted,
@@ -116,6 +124,16 @@ def build_openapi(app: FastAPI) -> dict[str, Any]:
             if seed != {**exact_seed, "maximum": float(exact_seed["maximum"])}:
                 raise ValueError("Conflicting experiment random-seed schema")
             request_schema["properties"]["random_seed"] = exact_seed
+    # FastAPI omits an explicit null default while serializing its OpenAPI DTO.
+    # Restore only this proven equivalent optional field from the typed contract.
+    portfolio_request = schemas.get("PortfolioCreateRequest")
+    if portfolio_request is not None:
+        actual = portfolio_request["properties"]["snapshot_id"]
+        expected = bundle["$defs"]["PortfolioCreateRequest"]["properties"]["snapshot_id"]
+        if actual != expected:
+            if {**actual, "default": None} != expected:
+                raise ValueError("Conflicting portfolio snapshot schema")
+            portfolio_request["properties"]["snapshot_id"] = expected
     for name, definition in bundle["$defs"].items():
         if name in schemas and schemas[name] != definition:
             raise ValueError(f"Conflicting OpenAPI schema: {name}")
