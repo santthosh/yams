@@ -6,7 +6,7 @@ Owner: [#53](https://github.com/santthosh/yams/issues/53), under
 verification and its limits. A source version, merged PR or this checklist alone is
 not a published release. The exact source, immutable image digests, checksums and
 native results belong to the corresponding GitHub Release's `provenance.json` and
-`platform-evidence-amd64.json` / `platform-evidence-arm64.json`.
+`evidence-amd64.json` / `evidence-arm64.json`.
 
 ## Integrated scope
 
