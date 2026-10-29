@@ -338,12 +338,46 @@ def main() -> None:
             evidence["checks"].append(
                 "native real browser independent cash creation/keyed retries, private "
                 "authorization and worker fill, exact posted holdings/fees/ledger, "
-                "keyboard/Axe at360/1280; public apply remains staged"
+                "keyboard/Axe at360/1280; original private compatibility retained"
+            )
+            for script in ("decision-browser.mjs", "core-negative-browser.mjs"):
+                subprocess.run(
+                    ["pnpm", "--filter", "@yams/web", "exec", "node", "tests/" + script],
+                    cwd=ROOT,
+                    env={**browser_env, "YAMS_SMOKE_URL": f"http://{address()}"},
+                    check=True,
+                )
+
+            def verify_core_screens(stage: str) -> None:
+                subprocess.run(
+                    [
+                        "pnpm",
+                        "--filter",
+                        "@yams/web",
+                        "exec",
+                        "node",
+                        "tests/decision-inspection.mjs",
+                    ],
+                    cwd=ROOT,
+                    env={
+                        **browser_env,
+                        "YAMS_SMOKE_URL": f"http://{address()}",
+                        "YAMS_SMOKE_CORE_STAGE": stage,
+                    },
+                    check=True,
+                )
+
+            verify_core_screens("initial")
+            evidence["checks"].append(
+                "native real public Decision Center/scenarios/approval/recovery/pending/"
+                "complete fills/HOLD/dismissal and genuine cash-only/unavailable/error "
+                "states at360/1280, with independent exact ledger amounts and Axe"
             )
             run("down")
             run("up", "-d", "--wait", "--wait-timeout", "120", "--pull", "never")
             assert get("workspace")["id"] == workspace["id"]
             verify_portfolios("restart")
+            verify_core_screens("restart")
             verify_reports()
             assert get("strategies") == strategies
             assert get(f"strategies/{strategy_id}/versions") == versions
@@ -368,7 +402,9 @@ def main() -> None:
             evidence["checks"].append(
                 "cached restart preserves workspace/job/artifact, exact experiment reports "
                 "and challenge "
-                "versions and paper account/key/history/fill state with only loopback web published"
+                "versions, paper account/key/history/fill state and readonly public "
+                "Decision Center/"
+                "scenario/clock/negative-state inspection with only loopback web published"
             )
             evidence["passed"] = True
         finally:

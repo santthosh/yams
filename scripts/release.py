@@ -285,6 +285,21 @@ def release_summary(version: str) -> tuple[str, str]:
             "SYNTHETIC_DATA_ONLY. Download all assets, verify SHA256SUMS and follow INSTALL.md. "
             "No real money or brokerage is involved.",
         )
+    if version == "0.0.5":
+        return (
+            "Decision Center — first complete core",
+            "Local paper-only first complete core prerelease: data-derived recommendations "
+            "from synthetic $1,000 accounts, audited shared-engine historical experiments, "
+            "risk-constrained targets, common-shock 90-calendar-day scenarios and explicit "
+            "public paper approval with durable next-open fills. Native amd64 and arm64 "
+            "installations verify real UI/worker journeys, original-key response-loss "
+            "recovery, HOLD/dismissal, honest cash-only/unavailable states and restart. "
+            "Scenarios are not calibrated predictions or guaranteed returns; financial "
+            "examples are SYNTHETIC_DATA_ONLY. Real feeds remain diagnostic-only for "
+            "accounting. Arena, outcome Journal and assisted authoring remain later "
+            "increments. Download all assets, verify SHA256SUMS and follow INSTALL.md. "
+            "No real money or brokerage is involved.",
+        )
     return (
         "local paper research prerelease",
         "Local paper-only research prerelease. Download all assets, verify SHA256SUMS "

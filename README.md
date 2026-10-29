@@ -4,43 +4,41 @@ Yet Another Market Simulator is a local, single-user paper research workspace. I
 
 ## Current state
 
-The source checkout includes the market repository, immutable snapshots and
-strategy registry, shared momentum/allocation engine, and asynchronous candidate
-inspection backed by PostgreSQL and a supervised worker. The synthetic Docker
-journey produces measured candidates, exclusions and feasible targets, with
-reproducible results retained through restart. Recommendation generation and
-forecast reads are implemented in the source increment described below; public
-approval controls and the Decision Center source screens are described below. The 0.0.4
-[internal paper ledger](docs/operations/paper-ledger.md) now persists exact-cent
-funding, authorized shared-kernel effects, corporate actions and replayable
-projections atomically. The [paper account API](docs/operations/paper-portfolio-api.md)
-creates independent cash accounts and serves coherent holdings/valuation and paginated
-immutable transactions. The [private authorization and fill worker](docs/operations/paper-batches.md)
-reserves approved intent and posts lease-fenced synthetic effects, with explicit
-fixture replay and separate decision/execution provenance. The [paper account screens](docs/operations/paper-portfolios.md)
-create independent cash accounts and inspect posted holdings, values and ledger
-evidence. The source Decision Center adds live authorization and batch controls. Startup creates
-no accounts or recommendations.
+The 0.0.5 source increment provides the first complete local core workflow:
+load labeled offline data, discover scored candidates, test an immutable strategy,
+create a synthetic $1,000 account, review a constrained target and numerical
+90-calendar-day scenarios, authorize paper orders, observe pending work and inspect
+durable fills. All financial examples use `SYNTHETIC_DATA_ONLY`; real market feeds
+remain diagnostic-only for accounting. Startup creates no accounts, recommendations
+or orders.
 
-Source work for 0.0.5 includes [immutable recommendation APIs](docs/operations/recommendations.md)
-and the [seeded scenario engine](docs/operations/scenario-forecasts.md). Explicit
-synthetic replay freezes posted state and produces measured targets, actions,
-costs and explanations through the shared worker. A separate observable forecast
-job retains common-shock scenarios or an honest unavailable result. These reads
-and previews do not post orders or balances. [Public paper controls](docs/operations/paper-controls.md)
-authorize immutable pending intent, recover exact request keys, dismiss analysis,
-cancel outstanding orders and explicitly advance synthetic replay. Approval changes
-no balances; only the fenced worker posts fills. Fixture time and actual UTC audit
-remain separate. [Monthly review scheduling](docs/operations/portfolio-schedules.md) now records
-bounded catch-up and readonly next-due/paused diagnostics, with atomic manual/scheduled
-deduplication. Explicit manual synthetic session selection advances review observation
-without trading; background work cannot advance time. The [Decision Center](docs/operations/decision-center.md)
-at `/portfolios/{id}/decisions` reviews posted holdings, engine targets/risk and
-shared-assumption 90-calendar-day scenarios before explicit paper authorization.
-The dashboard shows actual account, pending-batch and next-review status. Mutation
-keys persist locally before submission; uncertain responses recover the original
-operation. Fixture steps require explicit actions. Source functionality is distinct
-from the pending #53 integrated/native release gate; no0.0.5 release is claimed.
+The [Decision Center](docs/operations/decision-center.md) at
+`/portfolios/{id}/decisions` separates posted holdings, original target/risk/evidence,
+shared-assumption scenarios and explicit paper authorization. Approval changes no
+cash or holdings; the existing bounded worker posts verified synthetic fills.
+Request keys persist before submission, so an uncertain response/reload recovers the
+original operation. Fixture steps are explicit actions; missing opening evidence
+stays pending. A genuine HOLD/cash-only result remains inspectable and cannot create
+an empty batch. Scenarios disclose their assumptions and are not calibrated
+predictions or guaranteed returns.
+
+The dashboard shows actual accounts, valuation dates, pending batches and
+[monthly review status](docs/operations/portfolio-schedules.md). Selecting a later
+manual synthetic session observes that virtual cutoff without trading. Background
+reviews never advance future fixture time or authorize orders. Monitoring runs only
+while Docker is active. Original strategies, snapshots, recommendations and scenario
+artifacts remain inspectable after later activity and restart.
+
+Implementation details: [snapshot/data operations](docs/operations/market-refresh.md),
+[recommendation APIs](docs/operations/recommendations.md),
+[scenario engine](docs/operations/scenario-forecasts.md),
+[paper account screens](docs/operations/paper-portfolios.md),
+[paper controls](docs/operations/paper-controls.md), and
+[core release verification](docs/core-release-evidence.md).
+The release gate includes both native packaged installations, required CI and
+MergeWatch review. A version in the source checkout is not itself a published
+release: use the exact GitHub Release and its immutable image digests/provenance.
+Arena, outcome Journal and assisted authoring remain later increments.
 
 The 0.0.3 Strategy Lab increment adds named strategy creation, detail and immutable
 version publication/history APIs over the existing registry, plus the ratified

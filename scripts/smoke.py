@@ -936,6 +936,36 @@ def main() -> None:
         evidence["checks"].append(
             "real portfolio holdings/fees/history, Decision Center entry and Axe at360/1280"
         )
+        subprocess.run(
+            ["pnpm", "--filter", "@yams/web", "exec", "node", "tests/core-negative-browser.mjs"],
+            cwd=ROOT,
+            env={
+                **env,
+                "YAMS_SMOKE_URL": f"http://{address}",
+                "YAMS_SMOKE_EVIDENCE": str(destination),
+            },
+            check=True,
+        )
+
+        def verify_core_screens(stage: str) -> None:
+            subprocess.run(
+                ["pnpm", "--filter", "@yams/web", "exec", "node", "tests/decision-inspection.mjs"],
+                cwd=ROOT,
+                env={
+                    **env,
+                    "YAMS_SMOKE_URL": f"http://{address}",
+                    "YAMS_SMOKE_EVIDENCE": str(destination),
+                    "YAMS_SMOKE_CORE_STAGE": stage,
+                },
+                check=True,
+            )
+
+        verify_core_screens("initial")
+        evidence["checks"].append(
+            "genuine empty universe/cash-only, unavailable90day calendar and recovered "
+            "connection errors preserve exact cash/ledger at360/1280"
+        )
+
         evidence["paper_batch"] = paper_batch
         evidence["checks"].append("private explicit fixture approval and real worker atomic fill")
         scenario = json.loads(python((ROOT / "scripts/forecast_smoke_fixture.py").read_text()))
@@ -1021,6 +1051,7 @@ def main() -> None:
         verify_public_runs()
         verify_paper_batch()
         verify_portfolio_screens("restart")
+        verify_core_screens("restart")
         assert scenario_result() == original_scenario
         verify_public_recommendation()
         verify_public_controls()
@@ -1052,6 +1083,7 @@ def main() -> None:
         verify_public_runs()
         verify_paper_batch()
         verify_portfolio_screens("rebuild")
+        verify_core_screens("rebuild")
         assert scenario_result() == original_scenario
         verify_public_recommendation()
         verify_public_controls()
@@ -1082,6 +1114,11 @@ def main() -> None:
             "monthly review checkpoints, original request key, logical clock, "
             "forecast and readonly ledger survive actual restart/rebuild "
             "with fresh supervisor observations"
+        )
+        evidence["checks"].append(
+            "readonly Decision Center after restart/rebuild restores original keys, "
+            "scenarios, fills, exact ledger/cash, HOLD/dismissal, unavailable/cash-only "
+            "outcomes and logical clocks with zero POSTs at360/1280"
         )
         ids = compose("ps", "-q").split()
         inspect = json.loads(subprocess.check_output(["docker", "inspect", *ids], text=True))
