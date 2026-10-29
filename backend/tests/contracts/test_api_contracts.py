@@ -132,6 +132,12 @@ def test_openapi_does_not_activate_future_handlers() -> None:
         "/api/v1/portfolios/{portfolio_id}/recommendations",
         "/api/v1/recommendations/{recommendation_id}",
         "/api/v1/forecasts/{forecast_id}",
+        "/api/v1/recommendations/{recommendation_id}/apply",
+        "/api/v1/recommendations/{recommendation_id}/apply-result",
+        "/api/v1/recommendations/{recommendation_id}/dismiss",
+        "/api/v1/order-batches/{batch_id}",
+        "/api/v1/order-batches/{batch_id}/cancel",
+        "/api/v1/order-batches/{batch_id}/advance-fixture",
         "/api/v1/jobs/{job_id}",
         "/api/v1/jobs/{job_id}/cancel",
         "/api/v1/experiments",
@@ -163,7 +169,7 @@ def test_openapi_does_not_activate_future_handlers() -> None:
         client.post(
             "/api/v1/recommendations/11111111-1111-4111-8111-111111111111/apply"
         ).status_code
-        == 404
+        == 422
     )
 
 
@@ -174,6 +180,10 @@ def test_experiment_schema_keeps_exact_uint64_seed_and_no_dangling_refs() -> Non
         components["ExperimentRequest"]["properties"]["random_seed"]["maximum"]
         == 18446744073709551615
     )
+    revision = components["ApplyRecommendationRequest"]["properties"]["expected_revision"][
+        "maximum"
+    ]
+    assert type(revision) is int and revision == 9223372036854775807
     for name in ("RecommendationRequest", "ForecastV1"):
         bound = components[name]["properties"]["seed"]["maximum"]
         assert type(bound) is int and bound == 18446744073709551615

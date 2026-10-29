@@ -60,6 +60,28 @@ export async function proxyApi(
     segments.length === 2 &&
     segments[0] === "recommendations" &&
     UUID_PATTERN.test(segments[1]);
+  const recommendationAction =
+    segments.length === 3 &&
+    segments[0] === "recommendations" &&
+    UUID_PATTERN.test(segments[1]) &&
+    ["apply", "dismiss"].includes(segments[2]);
+  const approvalRecovery =
+    segments.length === 3 &&
+    segments[0] === "recommendations" &&
+    UUID_PATTERN.test(segments[1]) &&
+    segments[2] === "apply-result";
+  const batchDetail =
+    segments.length === 2 &&
+    segments[0] === "order-batches" &&
+    UUID_PATTERN.test(segments[1]);
+  const batchAction =
+    segments.length === 3 &&
+    segments[0] === "order-batches" &&
+    UUID_PATTERN.test(segments[1]) &&
+    ["cancel", "advance-fixture"].includes(segments[2]);
+  const keyedPaperAction =
+    (recommendationAction && segments[2] === "apply") ||
+    (batchAction && segments[2] === "advance-fixture");
   const forecastDetail =
     segments.length === 2 &&
     segments[0] === "forecasts" &&
@@ -100,7 +122,9 @@ export async function proxyApi(
         readStrategies ||
         strategyVersions ||
         experiments ||
-        cancelJob)
+        cancelJob ||
+        recommendationAction ||
+        batchAction)
     )
   )
     return safeError(
@@ -117,8 +141,12 @@ export async function proxyApi(
         readStrategies ||
         strategyVersions ||
         experiments ||
-        cancelJob
-      : portfolios ||
+        cancelJob ||
+        recommendationAction ||
+        batchAction
+      : approvalRecovery ||
+        batchDetail ||
+        portfolios ||
         portfolioDetail ||
         portfolioTransactions ||
         portfolioRecommendations ||
@@ -180,7 +208,10 @@ export async function proxyApi(
         422,
       );
     const key = request.headers.get("Idempotency-Key");
-    if ((refresh || portfolios) && (!key || !UUID_PATTERN.test(key)))
+    if (
+      (refresh || portfolios || keyedPaperAction) &&
+      (!key || !UUID_PATTERN.test(key))
+    )
       return safeError(
         "VALIDATION_ERROR",
         "This operation requires a valid request key.",
@@ -211,8 +242,21 @@ export async function proxyApi(
     }
     payload = new TextDecoder().decode(bytes);
     headers["Content-Type"] = "application/json";
-    if ((refresh || portfolios || portfolioRecommendations) && key)
+    if (
+      (refresh || portfolios || portfolioRecommendations || keyedPaperAction) &&
+      key
+    )
       headers["Idempotency-Key"] = key;
+  }
+  if (request.method === "GET" && approvalRecovery) {
+    const key = request.headers.get("Idempotency-Key");
+    if (!key || !UUID_PATTERN.test(key))
+      return safeError(
+        "VALIDATION_ERROR",
+        "Recovery requires a valid request key.",
+        422,
+      );
+    headers["Idempotency-Key"] = key;
   }
   try {
     const origin = new URL(

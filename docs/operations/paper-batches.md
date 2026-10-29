@@ -1,8 +1,8 @@
 # Private paper authorization and eligible-fill worker
 
 Issue #46 supplies backend orchestration for 0.0.4. All capital, orders and fills
-are synthetic. Public recommendation production/apply/batch HTTP transport belongs
-to #49/#50 in 0.0.5; this service does not expose an approval shortcut. Production
+are synthetic. Public recommendation production and [paper controls](paper-controls.md)
+delegate to these services in the 0.0.5 source increment. Production
 startup creates no recommendations or portfolios. Portfolio screens belong to #47.
 
 ## Producer and approval handoff

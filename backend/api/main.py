@@ -15,6 +15,7 @@ from backend.api.routes.experiments import experiments_router
 from backend.api.routes.forecasts import forecasts_router
 from backend.api.routes.health import health_router
 from backend.api.routes.jobs import jobs_router
+from backend.api.routes.paper_controls import paper_controls_router
 from backend.api.routes.portfolios import portfolios_router
 from backend.api.routes.recommendations import recommendations_router
 from backend.api.routes.strategies import strategies_router
@@ -63,6 +64,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(portfolios_router(engine, settings))
     app.include_router(recommendations_router(engine, settings))
     app.include_router(forecasts_router(engine, settings))
+    app.include_router(paper_controls_router(engine, settings))
 
     @app.get("/livez", response_model=Liveness, tags=["operations"])
     def liveness() -> Liveness:

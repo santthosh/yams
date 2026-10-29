@@ -1,0 +1,378 @@
+{
+  "checks": [
+    "clean boot and real same-origin API readiness",
+    "same-origin keyed paper account funding, exact retry and read-only ledger history",
+    "real persisted diagnostic job completed by bounded worker",
+    "warm-up plus three diagnostic batches with concurrent API/DB reads",
+    "real Docker browser Dashboard/Settings/job at both widths",
+    "real browser cash creation, independent accounts and keyed retries",
+    "real browser same-origin strategy creation, immutable append, conflict and pagination",
+    "real browser candidate/target reruns and cash-only cases via supervised worker",
+    "real browser public experiment rerun, pages, cancellation and fingerprints",
+    "real mobile/desktop experiment form, charts/tables/Axe, exact uint64 rerun, original preservation and cancellation",
+    "real mobile/desktop aligned and mismatched comparison, one-rule challenge, shared-setting exact-seed reruns and immutable source evidence",
+    "internal core admission, actual supervised next-open replay and sealed artifact",
+    "worker-side Q12 metrics, aligned SPY/cash, continuing holdout and exposure",
+    "real same-origin recommendation, shared order preview and numeric forecast; exact uint64 retry and unchanged account",
+    "public computed approval leaves cash unchanged; explicit unavailable fixture close remains pending; later step posts actual worker fills",
+    "real portfolio holdings/fees/history, staged batch controls and Axe at360/1280",
+    "private explicit fixture approval and real worker atomic fill",
+    "private real-worker seeded common-shock scenarios and immutable artifacts; no portfolio effects",
+    "API and worker external routing blocked",
+    "restart retains paper account identity, funding and original creation retry",
+    "restart preserves workspace, job, fixtures and artifact hash",
+    "rebuild/recreate preserves named-volume state",
+    "restart and rebuild preserve original recommendation/forecast and readonly account",
+    "public approval key, replay clock, original decision, posted fills and ledger survive actual restart and rebuild",
+    "actual private ports and aggregate 4 CPU/4.5 GiB caps",
+    "failed migration blocks application startup; repair preserves workspace"
+  ],
+  "classification": "RECORDED_APPLICATION_OUTPUT_NOT_INDEPENDENT_ORACLE",
+  "data_label": "SYNTHETIC_DATA_ONLY",
+  "passed": true,
+  "project": "yams-smoke-0bcdff018b0c",
+  "public_paper_controls": {
+    "account": {
+      "benchmark_symbol": "SPY",
+      "cash_usd": "404.98",
+      "created_at": "2026-10-29T09:08:25.918843Z",
+      "currency": "USD",
+      "execution_policy_id": "us_eod_next_open_v1",
+      "holdings": [
+        {
+          "asset_id": "SYN:AAA",
+          "mark_price_usd": "101.800",
+          "market_value_usd": "290.86",
+          "price_as_of_session": "2030-12-31",
+          "quantity": "2.857142",
+          "reason": null,
+          "sector": "Technology",
+          "total_basis_usd": "200.34",
+          "weight": "0.230357312229444043"
+        },
+        {
+          "asset_id": "SYN:BBB",
+          "mark_price_usd": "101.800",
+          "market_value_usd": "290.86",
+          "price_as_of_session": "2030-12-31",
+          "quantity": "2.857142",
+          "reason": null,
+          "sector": "Technology",
+          "total_basis_usd": "200.34",
+          "weight": "0.230357312229444043"
+        },
+        {
+          "asset_id": "SYN:CCC",
+          "mark_price_usd": "92.440",
+          "market_value_usd": "275.94",
+          "price_as_of_session": "2030-12-31",
+          "quantity": "2.985074",
+          "reason": null,
+          "sector": "Unknown",
+          "total_basis_usd": "194.34",
+          "weight": "0.218543270405532563"
+        }
+      ],
+      "id": "99d17cdd-2b65-574e-9538-76cdde4bd913",
+      "last_sequence": 5,
+      "name": "SYNTHETIC_DATA_ONLY public controls",
+      "opening_cash_usd": "1000.00",
+      "opening_snapshot_id": null,
+      "paper_only": true,
+      "reconciliation_failed": false,
+      "revision": 5,
+      "risk_policy": {
+        "max_position_weight": "0.2",
+        "max_positions": 8,
+        "max_sector_weight": "0.4",
+        "min_cash_weight": "0.05",
+        "min_trade_usd": "5",
+        "rebalance_band_absolute_weight": "0.02",
+        "weighting": "inverse_volatility"
+      },
+      "state": "active",
+      "strategy_version_id": "184f4ef7-c542-5387-a5aa-9bd4d162efde",
+      "total_value_usd": "1262.63",
+      "valuation": {
+        "as_of_session": "2030-12-31",
+        "cash_weight": "0.32074210513557935",
+        "checked_at": "2026-10-29T09:08:37.620729Z",
+        "missing_assets": [],
+        "reason": null,
+        "snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+        "snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+        "status": "available",
+        "total_value_usd": "1262.63",
+        "warnings": [
+          "SYNTHETIC_DATA_ONLY"
+        ]
+      },
+      "valuation_as_of_session": "2030-12-31",
+      "valuation_mode": "synthetic_fixture"
+    },
+    "approval": {
+      "approval_idempotency_key": "35f29569-78d5-46ad-b107-fc4221bb4ced",
+      "approved_at": "2028-07-18T12:30:00Z",
+      "approved_revision": 1,
+      "batch_id": "9d0fc1b2-78f8-5f92-b40c-f9c9a0022e2a",
+      "clock_mode": "synthetic_replay",
+      "data_status": "synthetic_fixture",
+      "eligible_open_at": "2028-07-18T13:30:00Z",
+      "operator_recorded_at": "2026-10-29T09:08:27.897575Z",
+      "paper_only": true,
+      "portfolio_id": "99d17cdd-2b65-574e-9538-76cdde4bd913",
+      "recommendation_id": "e98c4e7a-1330-5a90-af90-931eebc18e30"
+    },
+    "batch": {
+      "advance_unavailable_reason": "BATCH_TERMINAL",
+      "approval_idempotency_key": "35f29569-78d5-46ad-b107-fc4221bb4ced",
+      "approved_at": "2028-07-18T12:30:00Z",
+      "approved_revision": 1,
+      "calendar_version": "e3d2312d54e172d7aada8239f296eecf38c6038d66b5a203c5c5690ede82d660",
+      "can_advance_fixture": false,
+      "clock_mode": "synthetic_replay",
+      "current_portfolio_revision": 5,
+      "data_status": "synthetic_fixture",
+      "decision_cutoff_utc": "2028-07-18T12:30:00Z",
+      "eligible_open_at": "2028-07-18T13:30:00Z",
+      "execution_policy_id": "us_eod_next_open_v1",
+      "fixture_clock_at": "2028-07-19T20:00:00Z",
+      "id": "9d0fc1b2-78f8-5f92-b40c-f9c9a0022e2a",
+      "latest_fill_job": {
+        "attempts": 1,
+        "created_at": "2026-10-29T09:08:36.584331Z",
+        "error": null,
+        "id": "a15a27ef-39f6-4ca0-ae6b-cfa41140ace4",
+        "kind": "apply_scheduled_fills",
+        "max_attempts": 3,
+        "progress": 100.0,
+        "result": {
+          "kind": "resource",
+          "message": "Paper batch attempt committed; inspect batch for pending or terminal state.",
+          "resource_id": "9d0fc1b2-78f8-5f92-b40c-f9c9a0022e2a"
+        },
+        "status": "completed",
+        "updated_at": "2026-10-29T09:08:37.444039Z"
+      },
+      "operator_recorded_at": "2026-10-29T09:08:27.897575Z",
+      "orders": [
+        {
+          "asset_id": "SYN:AAA",
+          "cancelled_or_skipped_quantity": "0.000000",
+          "earliest_fill_session": "2028-07-18",
+          "filled_quantity": "2.857142",
+          "id": "cd92c23a-17ef-500a-8160-e3e47770b2a0",
+          "pending_quantity": "0.000000",
+          "reason": null,
+          "requested_quantity": "2.857142",
+          "side": "BUY",
+          "status": "filled",
+          "terminal": true
+        },
+        {
+          "asset_id": "SYN:BBB",
+          "cancelled_or_skipped_quantity": "0.000000",
+          "earliest_fill_session": "2028-07-18",
+          "filled_quantity": "2.857142",
+          "id": "a30ef7fe-fe93-56c9-8961-dc181e808d1b",
+          "pending_quantity": "0.000000",
+          "reason": null,
+          "requested_quantity": "2.857142",
+          "side": "BUY",
+          "status": "filled",
+          "terminal": true
+        },
+        {
+          "asset_id": "SYN:CCC",
+          "cancelled_or_skipped_quantity": "0.000000",
+          "earliest_fill_session": "2028-07-18",
+          "filled_quantity": "2.985074",
+          "id": "e1ff0d5d-bb66-5550-869e-0e4fc99f6c71",
+          "pending_quantity": "0.000000",
+          "reason": null,
+          "requested_quantity": "2.985074",
+          "side": "BUY",
+          "status": "filled",
+          "terminal": true
+        }
+      ],
+      "paper_only": true,
+      "portfolio_id": "99d17cdd-2b65-574e-9538-76cdde4bd913",
+      "reason": null,
+      "recommendation_id": "e98c4e7a-1330-5a90-af90-931eebc18e30",
+      "snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+      "snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+      "status": "filled",
+      "terminal": true
+    },
+    "first_step": {
+      "batch_id": "9d0fc1b2-78f8-5f92-b40c-f9c9a0022e2a",
+      "data_status": "synthetic_fixture",
+      "fixture_observed_at": "2028-07-18T20:00:00Z",
+      "job_id": "f7ddd557-5b46-49fe-99d5-94aa4568237a",
+      "paper_only": true
+    },
+    "second_step": {
+      "batch_id": "9d0fc1b2-78f8-5f92-b40c-f9c9a0022e2a",
+      "data_status": "synthetic_fixture",
+      "fixture_observed_at": "2028-07-19T20:00:00Z",
+      "job_id": "f88e70b5-eac0-460a-bf14-8562a4ead234",
+      "paper_only": true
+    },
+    "transactions": {
+      "items": [
+        {
+          "cash_delta_usd": "-194.34",
+          "correction_target_id": null,
+          "effective_at": "2028-07-18T13:30:00Z",
+          "event_key": "execution:72cfa9a27821025c4cb9482291e5d5f6f99813165530f879af503c083cf3055d",
+          "fill": {
+            "commission_usd": "0.00",
+            "executed_price_usd": "65.10504",
+            "execution_session": "2028-07-18",
+            "gross_usd": "194.34",
+            "id": "fab509a1-2524-556d-be68-534532fa96c2",
+            "order_id": "e1ff0d5d-bb66-5550-869e-0e4fc99f6c71",
+            "quantity": "2.985074",
+            "raw_price_usd": "65.04",
+            "realized_pnl_usd": "0.00",
+            "removed_basis_usd": "0.00",
+            "slippage_usd": "0.19"
+          },
+          "id": "ba51f55f-bd80-533c-b912-89d84076dda9",
+          "kind": "fill",
+          "portfolio_revision": 5,
+          "position_changes": [
+            {
+              "asset_id": "SYN:CCC",
+              "quantity_delta": "2.985074",
+              "total_basis_delta_usd": "194.34"
+            }
+          ],
+          "recorded_at": "2028-07-19T20:00:00Z",
+          "sequence": 5,
+          "snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+          "strategy_version_id": "184f4ef7-c542-5387-a5aa-9bd4d162efde"
+        },
+        {
+          "cash_delta_usd": "-200.34",
+          "correction_target_id": null,
+          "effective_at": "2028-07-18T13:30:00Z",
+          "event_key": "execution:3bedf7d92c1dc5530a281facdab65b3853e4f2528dfab858211f1646913ffc42",
+          "fill": {
+            "commission_usd": "0.00",
+            "executed_price_usd": "70.12005",
+            "execution_session": "2028-07-18",
+            "gross_usd": "200.34",
+            "id": "b2e6c5bd-2a52-586b-b188-4be2cce39076",
+            "order_id": "a30ef7fe-fe93-56c9-8961-dc181e808d1b",
+            "quantity": "2.857142",
+            "raw_price_usd": "70.05",
+            "realized_pnl_usd": "0.00",
+            "removed_basis_usd": "0.00",
+            "slippage_usd": "0.20"
+          },
+          "id": "1e7ca0ba-de9b-55f7-8958-c57b7d2ae265",
+          "kind": "fill",
+          "portfolio_revision": 4,
+          "position_changes": [
+            {
+              "asset_id": "SYN:BBB",
+              "quantity_delta": "2.857142",
+              "total_basis_delta_usd": "200.34"
+            }
+          ],
+          "recorded_at": "2028-07-19T20:00:00Z",
+          "sequence": 4,
+          "snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+          "strategy_version_id": "184f4ef7-c542-5387-a5aa-9bd4d162efde"
+        },
+        {
+          "cash_delta_usd": "-200.34",
+          "correction_target_id": null,
+          "effective_at": "2028-07-18T13:30:00Z",
+          "event_key": "execution:4298d63533bfc6d90a7da88096ef62adf9b8114e13f2be880b832134c6ecc13d",
+          "fill": {
+            "commission_usd": "0.00",
+            "executed_price_usd": "70.12005",
+            "execution_session": "2028-07-18",
+            "gross_usd": "200.34",
+            "id": "91435eaf-0f88-5a7c-96b9-6c414f001a8c",
+            "order_id": "cd92c23a-17ef-500a-8160-e3e47770b2a0",
+            "quantity": "2.857142",
+            "raw_price_usd": "70.05",
+            "realized_pnl_usd": "0.00",
+            "removed_basis_usd": "0.00",
+            "slippage_usd": "0.20"
+          },
+          "id": "1c175c98-3041-5441-88b4-638735238ff5",
+          "kind": "fill",
+          "portfolio_revision": 3,
+          "position_changes": [
+            {
+              "asset_id": "SYN:AAA",
+              "quantity_delta": "2.857142",
+              "total_basis_delta_usd": "200.34"
+            }
+          ],
+          "recorded_at": "2028-07-19T20:00:00Z",
+          "sequence": 3,
+          "snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+          "strategy_version_id": "184f4ef7-c542-5387-a5aa-9bd4d162efde"
+        },
+        {
+          "cash_delta_usd": "0.00",
+          "correction_target_id": null,
+          "effective_at": "2028-07-18T12:30:00Z",
+          "event_key": "approval:35f29569-78d5-46ad-b107-fc4221bb4ced",
+          "fill": null,
+          "id": "9d0fc1b2-78f8-5f92-b40c-f9c9a0022e2a",
+          "kind": "batch_approval",
+          "portfolio_revision": 2,
+          "position_changes": [],
+          "recorded_at": "2028-07-18T12:30:00Z",
+          "sequence": 2,
+          "snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+          "strategy_version_id": "184f4ef7-c542-5387-a5aa-9bd4d162efde"
+        },
+        {
+          "cash_delta_usd": "1000.00",
+          "correction_target_id": null,
+          "effective_at": "2026-10-29T09:08:25.918843Z",
+          "event_key": "opening_funding",
+          "fill": null,
+          "id": "10e437d7-b202-5cc4-9113-79dc9701a736",
+          "kind": "opening_funding",
+          "portfolio_revision": 1,
+          "position_changes": [],
+          "recorded_at": "2026-10-29T09:08:25.918843Z",
+          "sequence": 1,
+          "snapshot_id": null,
+          "strategy_version_id": "184f4ef7-c542-5387-a5aa-9bd4d162efde"
+        }
+      ],
+      "mode": "synthetic_fixture",
+      "next_cursor": null,
+      "paper_only": true,
+      "portfolio_id": "99d17cdd-2b65-574e-9538-76cdde4bd913",
+      "warnings": [
+        "SYNTHETIC_DATA_ONLY"
+      ]
+    }
+  },
+  "verification": {
+    "actual_restart": 10,
+    "additional_cash_only_postgresql": 1,
+    "all_prior_standalone_schemas_and_routes_unchanged": true,
+    "api_and_contract": 127,
+    "backend_unit": 465,
+    "final_production_sources_match_tested_image": true,
+    "fixture_files": 30,
+    "focused_legacy_and_public_postgresql": 18,
+    "full_postgresql": 168,
+    "markdown_documents_before_this_evidence": 77,
+    "native_web_build": "UNAVAILABLE: local Turbopack subprocess port binding denied; Docker production build and actual runtime/restart/rebuild passed",
+    "python_package": "wheel and sdist passed",
+    "web_unit": 73
+  }
+}

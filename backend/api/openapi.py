@@ -32,6 +32,14 @@ from backend.domain.experiment_api import (
 from backend.domain.forecast import ForecastV1
 from backend.domain.market import AssetV1, MarketBarV1, SnapshotManifestV1
 from backend.domain.orders import PaperOrderBatchV1
+from backend.domain.paper_api import (
+    ApplyRecommendationRequest,
+    FixtureAdvanceAccepted,
+    PaperActionRequest,
+    PaperApprovalAccepted,
+    PaperBatchDetailV1,
+    RecommendationDispositionV1,
+)
 from backend.domain.portfolio import (
     PaperPortfolioV1,
     PortfolioCreateRequest,
@@ -72,6 +80,12 @@ MODELS: tuple[type[BaseModel], ...] = (
     RecommendationSummaryV1,
     ForecastV1,
     PaperOrderBatchV1,
+    ApplyRecommendationRequest,
+    FixtureAdvanceAccepted,
+    PaperActionRequest,
+    PaperApprovalAccepted,
+    PaperBatchDetailV1,
+    RecommendationDispositionV1,
     PaperPortfolioV1,
     PortfolioCreateRequest,
     PortfolioTransactionPageV1,
@@ -132,6 +146,7 @@ def build_openapi(app: FastAPI) -> dict[str, Any]:
         ("ExperimentRequest", "random_seed"),
         ("RecommendationRequest", "seed"),
         ("ForecastV1", "seed"),
+        ("ApplyRecommendationRequest", "expected_revision"),
     ):
         request_schema = schemas.get(model)
         if request_schema is None:
