@@ -1,0 +1,421 @@
+{
+  "label": "SYNTHETIC_DATA_ONLY",
+  "fixture_plan": ["FIX-03", "FIX-06", "FIX-09"],
+  "strategy": {
+    "id": "b7c45d31-03d3-5584-89b4-0e25b4cd46ba",
+    "name": "Risk-Adjusted Momentum",
+    "is_template": true,
+    "template_key": "risk_adjusted_momentum_v1",
+    "created_at": "2026-10-27T00:00:00Z",
+    "published_version": {
+      "id": "184f4ef7-c542-5387-a5aa-9bd4d162efde",
+      "strategy_id": "b7c45d31-03d3-5584-89b4-0e25b4cd46ba",
+      "version": 1,
+      "status": "published",
+      "config": {
+        "schema_version": 1,
+        "display_name": "Risk-Adjusted Momentum",
+        "universe": {
+          "kind": "liquid_us_equities",
+          "min_price_usd": "5",
+          "min_median_dollar_volume_usd": "1000000",
+          "min_history_sessions": 252
+        },
+        "signals": {
+          "kind": "risk_adjusted_momentum",
+          "momentum_long_sessions": 126,
+          "momentum_short_sessions": 63,
+          "volatility_sessions": 60,
+          "trend_sma_sessions": 200,
+          "require_positive_trend": true,
+          "z_score_weights": {
+            "momentum_long": 0.6,
+            "momentum_short": 0.25,
+            "volatility_penalty": -0.15
+          }
+        },
+        "portfolio": {
+          "max_positions": 8,
+          "weighting": "inverse_volatility",
+          "max_position_weight": "0.2",
+          "max_sector_weight": "0.4",
+          "min_cash_weight": "0.05",
+          "min_trade_usd": "5",
+          "rebalance_band_absolute_weight": "0.02"
+        },
+        "rebalance": {
+          "frequency": "monthly"
+        },
+        "execution_policy": {
+          "id": "us_eod_next_open_v1"
+        }
+      },
+      "config_sha256": "2093c63d190815eba052508d6d42d8ae0c93400cf777602d2c5f759627f43f21",
+      "published_at": "2026-10-27T00:00:00Z"
+    }
+  },
+  "cash": {
+    "id": "44444444-4444-4444-8444-444444444444",
+    "name": "SYNTHETIC_DATA_ONLY cash",
+    "currency": "USD",
+    "paper_only": true,
+    "valuation_mode": "synthetic_fixture",
+    "total_value_usd": "1000.00",
+    "valuation_as_of_session": null,
+    "strategy_version_id": "184f4ef7-c542-5387-a5aa-9bd4d162efde",
+    "opening_cash_usd": "1000.00",
+    "opening_snapshot_id": null,
+    "cash_usd": "1000.00",
+    "revision": 1,
+    "last_sequence": 1,
+    "state": "active",
+    "reconciliation_failed": false,
+    "benchmark_symbol": "SPY",
+    "execution_policy_id": "us_eod_next_open_v1",
+    "risk_policy": {
+      "max_positions": 8,
+      "weighting": "inverse_volatility",
+      "max_position_weight": "0.2",
+      "max_sector_weight": "0.4",
+      "min_cash_weight": "0.05",
+      "min_trade_usd": "5",
+      "rebalance_band_absolute_weight": "0.02"
+    },
+    "created_at": "2030-01-03T21:00:00Z",
+    "holdings": [],
+    "valuation": {
+      "status": "available",
+      "total_value_usd": "1000.00",
+      "cash_weight": "1",
+      "snapshot_id": null,
+      "snapshot_sha256": null,
+      "as_of_session": null,
+      "checked_at": "2030-01-03T21:00:00Z",
+      "reason": "CASH_ONLY",
+      "missing_assets": [],
+      "warnings": ["SYNTHETIC_DATA_ONLY"]
+    }
+  },
+  "posted": {
+    "id": "44444444-4444-4444-8444-444444444444",
+    "name": "SYNTHETIC_DATA_ONLY posted",
+    "currency": "USD",
+    "paper_only": true,
+    "valuation_mode": "synthetic_fixture",
+    "total_value_usd": "1001.80",
+    "valuation_as_of_session": "2030-01-04",
+    "strategy_version_id": "184f4ef7-c542-5387-a5aa-9bd4d162efde",
+    "opening_cash_usd": "1000.00",
+    "opening_snapshot_id": null,
+    "cash_usd": "799.80",
+    "revision": 3,
+    "last_sequence": 3,
+    "state": "active",
+    "reconciliation_failed": false,
+    "benchmark_symbol": "SPY",
+    "execution_policy_id": "us_eod_next_open_v1",
+    "risk_policy": {
+      "max_positions": 8,
+      "weighting": "inverse_volatility",
+      "max_position_weight": "0.2",
+      "max_sector_weight": "0.4",
+      "min_cash_weight": "0.05",
+      "min_trade_usd": "5",
+      "rebalance_band_absolute_weight": "0.02"
+    },
+    "created_at": "2030-01-03T21:00:00Z",
+    "holdings": [
+      {
+        "asset_id": "A",
+        "sector": "Technology",
+        "quantity": "2.000000",
+        "total_basis_usd": "200.20",
+        "mark_price_usd": "101.00",
+        "price_as_of_session": "2030-01-04",
+        "market_value_usd": "202.00",
+        "weight": "0.201637053304052705",
+        "reason": null
+      }
+    ],
+    "valuation": {
+      "status": "available",
+      "total_value_usd": "1001.80",
+      "cash_weight": "0.798362946695947295",
+      "snapshot_id": "11111111-1111-4111-8111-111111111111",
+      "snapshot_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "as_of_session": "2030-01-04",
+      "checked_at": "2030-01-04T21:00:01Z",
+      "reason": null,
+      "missing_assets": [],
+      "warnings": ["SYNTHETIC_DATA_ONLY"]
+    }
+  },
+  "missing": {
+    "id": "44444444-4444-4444-8444-444444444444",
+    "name": "SYNTHETIC_DATA_ONLY missing mark",
+    "currency": "USD",
+    "paper_only": true,
+    "valuation_mode": "synthetic_fixture",
+    "total_value_usd": null,
+    "valuation_as_of_session": "2030-01-04",
+    "strategy_version_id": "184f4ef7-c542-5387-a5aa-9bd4d162efde",
+    "opening_cash_usd": "1000.00",
+    "opening_snapshot_id": null,
+    "cash_usd": "799.80",
+    "revision": 3,
+    "last_sequence": 3,
+    "state": "active",
+    "reconciliation_failed": false,
+    "benchmark_symbol": "SPY",
+    "execution_policy_id": "us_eod_next_open_v1",
+    "risk_policy": {
+      "max_positions": 8,
+      "weighting": "inverse_volatility",
+      "max_position_weight": "0.2",
+      "max_sector_weight": "0.4",
+      "min_cash_weight": "0.05",
+      "min_trade_usd": "5",
+      "rebalance_band_absolute_weight": "0.02"
+    },
+    "created_at": "2030-01-03T21:00:00Z",
+    "holdings": [
+      {
+        "asset_id": "A",
+        "sector": "Technology",
+        "quantity": "2.000000",
+        "total_basis_usd": "200.20",
+        "mark_price_usd": null,
+        "price_as_of_session": null,
+        "market_value_usd": null,
+        "weight": null,
+        "reason": "PRICE_UNAVAILABLE"
+      }
+    ],
+    "valuation": {
+      "status": "unavailable",
+      "total_value_usd": null,
+      "cash_weight": null,
+      "snapshot_id": "11111111-1111-4111-8111-111111111111",
+      "snapshot_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "as_of_session": "2030-01-04",
+      "checked_at": "2030-01-04T21:00:01Z",
+      "reason": "PRICE_UNAVAILABLE",
+      "missing_assets": ["A"],
+      "warnings": ["SYNTHETIC_DATA_ONLY"]
+    }
+  },
+  "stale": {
+    "id": "44444444-4444-4444-8444-444444444444",
+    "name": "SYNTHETIC_DATA_ONLY missing mark",
+    "currency": "USD",
+    "paper_only": true,
+    "valuation_mode": "synthetic_fixture",
+    "total_value_usd": null,
+    "valuation_as_of_session": "2030-01-04",
+    "strategy_version_id": "184f4ef7-c542-5387-a5aa-9bd4d162efde",
+    "opening_cash_usd": "1000.00",
+    "opening_snapshot_id": null,
+    "cash_usd": "799.80",
+    "revision": 3,
+    "last_sequence": 3,
+    "state": "active",
+    "reconciliation_failed": false,
+    "benchmark_symbol": "SPY",
+    "execution_policy_id": "us_eod_next_open_v1",
+    "risk_policy": {
+      "max_positions": 8,
+      "weighting": "inverse_volatility",
+      "max_position_weight": "0.2",
+      "max_sector_weight": "0.4",
+      "min_cash_weight": "0.05",
+      "min_trade_usd": "5",
+      "rebalance_band_absolute_weight": "0.02"
+    },
+    "created_at": "2030-01-03T21:00:00Z",
+    "holdings": [
+      {
+        "asset_id": "A",
+        "sector": "Technology",
+        "quantity": "2.000000",
+        "total_basis_usd": "200.20",
+        "mark_price_usd": null,
+        "price_as_of_session": null,
+        "market_value_usd": null,
+        "weight": null,
+        "reason": "STALE_PRICES"
+      }
+    ],
+    "valuation": {
+      "status": "stale",
+      "total_value_usd": null,
+      "cash_weight": null,
+      "snapshot_id": "11111111-1111-4111-8111-111111111111",
+      "snapshot_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "as_of_session": "2030-01-04",
+      "checked_at": "2030-01-04T21:00:01Z",
+      "reason": "STALE_PRICES",
+      "missing_assets": ["A"],
+      "warnings": ["SYNTHETIC_DATA_ONLY"]
+    }
+  },
+  "events": {
+    "funding": {
+      "id": "51111111-1111-4111-8111-111111111111",
+      "sequence": 1,
+      "portfolio_revision": 1,
+      "kind": "opening_funding",
+      "event_key": "opening_funding",
+      "recorded_at": "2030-01-03T21:00:00Z",
+      "effective_at": "2030-01-03T21:00:00Z",
+      "strategy_version_id": "184f4ef7-c542-5387-a5aa-9bd4d162efde",
+      "snapshot_id": null,
+      "cash_delta_usd": "1000.00",
+      "position_changes": [],
+      "correction_target_id": null,
+      "fill": null
+    },
+    "approval": {
+      "id": "52222222-2222-4222-8222-222222222222",
+      "sequence": 2,
+      "portfolio_revision": 2,
+      "kind": "batch_approval",
+      "event_key": "batch_approval",
+      "recorded_at": "2030-01-04T21:00:01Z",
+      "effective_at": "2030-01-04T14:30:00Z",
+      "strategy_version_id": "184f4ef7-c542-5387-a5aa-9bd4d162efde",
+      "snapshot_id": "11111111-1111-4111-8111-111111111111",
+      "cash_delta_usd": "0.00",
+      "position_changes": [],
+      "correction_target_id": null,
+      "fill": null
+    },
+    "fill": {
+      "id": "53333333-3333-4333-8333-333333333333",
+      "sequence": 3,
+      "portfolio_revision": 3,
+      "kind": "fill",
+      "event_key": "fill",
+      "recorded_at": "2030-01-04T21:00:01Z",
+      "effective_at": "2030-01-04T14:30:00Z",
+      "strategy_version_id": "184f4ef7-c542-5387-a5aa-9bd4d162efde",
+      "snapshot_id": "11111111-1111-4111-8111-111111111111",
+      "cash_delta_usd": "-200.20",
+      "position_changes": [
+        {
+          "asset_id": "A",
+          "quantity_delta": "2.000000",
+          "total_basis_delta_usd": "200.20"
+        }
+      ],
+      "correction_target_id": null,
+      "fill": {
+        "id": "54444444-4444-4444-8444-444444444444",
+        "order_id": "55555555-5555-4555-8555-555555555555",
+        "execution_session": "2030-01-04",
+        "raw_price_usd": "100",
+        "executed_price_usd": "100.10",
+        "quantity": "2.000000",
+        "gross_usd": "200.20",
+        "commission_usd": "0.00",
+        "slippage_usd": "0.20",
+        "removed_basis_usd": "0.00",
+        "realized_pnl_usd": "0.00"
+      }
+    }
+  },
+  "batches": {
+    "pending": {
+      "id": "66666666-6666-4666-8666-666666666666",
+      "portfolio_id": "44444444-4444-4444-8444-444444444444",
+      "recommendation_id": "67777777-7777-4777-8777-777777777777",
+      "approval_idempotency_key": "68888888-8888-4888-8888-888888888888",
+      "approved_revision": 1,
+      "approved_at": "2030-01-03T21:00:00Z",
+      "decision_cutoff_utc": "2030-01-03T21:00:00Z",
+      "snapshot_id": "11111111-1111-4111-8111-111111111111",
+      "calendar_version": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "execution_policy_id": "us_eod_next_open_v1",
+      "eligible_open_at": "2030-01-04T14:30:00Z",
+      "status": "pending",
+      "terminal": false,
+      "orders": [
+        {
+          "id": "55555555-5555-4555-8555-555555555555",
+          "asset_id": "A",
+          "side": "BUY",
+          "requested_quantity": "2.000000",
+          "filled_quantity": "0.000000",
+          "pending_quantity": "2.000000",
+          "cancelled_or_skipped_quantity": "0.000000",
+          "earliest_fill_session": "2030-01-04",
+          "status": "pending",
+          "terminal": false,
+          "reason": "AWAITING_ELIGIBLE_OPEN"
+        }
+      ],
+      "reason": "AWAITING_ELIGIBLE_OPEN"
+    },
+    "partial": {
+      "id": "66666666-6666-4666-8666-666666666666",
+      "portfolio_id": "44444444-4444-4444-8444-444444444444",
+      "recommendation_id": "67777777-7777-4777-8777-777777777777",
+      "approval_idempotency_key": "68888888-8888-4888-8888-888888888888",
+      "approved_revision": 1,
+      "approved_at": "2030-01-03T21:00:00Z",
+      "decision_cutoff_utc": "2030-01-03T21:00:00Z",
+      "snapshot_id": "11111111-1111-4111-8111-111111111111",
+      "calendar_version": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "execution_policy_id": "us_eod_next_open_v1",
+      "eligible_open_at": "2030-01-04T14:30:00Z",
+      "status": "partially_filled",
+      "terminal": true,
+      "orders": [
+        {
+          "id": "55555555-5555-4555-8555-555555555555",
+          "asset_id": "A",
+          "side": "BUY",
+          "requested_quantity": "2.000000",
+          "filled_quantity": "1.000000",
+          "pending_quantity": "0.000000",
+          "cancelled_or_skipped_quantity": "1.000000",
+          "earliest_fill_session": "2030-01-04",
+          "status": "partially_filled",
+          "terminal": true,
+          "reason": "INSUFFICIENT_CASH"
+        }
+      ],
+      "reason": "INSUFFICIENT_CASH"
+    },
+    "cancelled": {
+      "id": "66666666-6666-4666-8666-666666666666",
+      "portfolio_id": "44444444-4444-4444-8444-444444444444",
+      "recommendation_id": "67777777-7777-4777-8777-777777777777",
+      "approval_idempotency_key": "68888888-8888-4888-8888-888888888888",
+      "approved_revision": 1,
+      "approved_at": "2030-01-03T21:00:00Z",
+      "decision_cutoff_utc": "2030-01-03T21:00:00Z",
+      "snapshot_id": "11111111-1111-4111-8111-111111111111",
+      "calendar_version": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "execution_policy_id": "us_eod_next_open_v1",
+      "eligible_open_at": "2030-01-04T14:30:00Z",
+      "status": "cancelled",
+      "terminal": true,
+      "orders": [
+        {
+          "id": "55555555-5555-4555-8555-555555555555",
+          "asset_id": "A",
+          "side": "BUY",
+          "requested_quantity": "2.000000",
+          "filled_quantity": "0.000000",
+          "pending_quantity": "0.000000",
+          "cancelled_or_skipped_quantity": "2.000000",
+          "earliest_fill_session": "2030-01-04",
+          "status": "cancelled",
+          "terminal": true,
+          "reason": "OPERATOR_CANCELLED"
+        }
+      ],
+      "reason": "OPERATOR_CANCELLED"
+    }
+  }
+}

@@ -1024,3 +1024,121 @@ input::placeholder {
   margin: 0.35rem 0 0;
   overflow-wrap: anywhere;
 }
+
+/* Posted paper accounts reuse the shell's exact-value and evidence components. */
+.portfolio-page {
+  display: grid;
+  gap: 24px;
+  min-width: 0;
+}
+.portfolio-page .page-heading {
+  margin-bottom: 0;
+}
+.portfolio-metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+  gap: 16px;
+}
+.portfolio-metrics .portfolio-number {
+  font-size: 28px;
+  color: var(--foreground);
+  font-weight: 600;
+}
+.portfolio-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 20px;
+}
+.portfolio-form label {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+.portfolio-form input,
+.portfolio-form select,
+#portfolio-filter {
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: white;
+  color: var(--foreground);
+}
+.portfolio-form-note,
+.portfolio-form > .portfolio-actions {
+  grid-column: 1 / -1;
+}
+.portfolio-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: end;
+}
+.portfolio-account-list,
+.portfolio-ledger {
+  display: grid;
+  gap: 16px;
+  margin-block: 20px;
+}
+.portfolio-account-summary,
+.portfolio-event {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 18px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.portfolio-event {
+  display: grid;
+  gap: 8px;
+}
+.portfolio-event summary {
+  font-weight: 600;
+}
+.portfolio-batch {
+  display: grid;
+  gap: 10px;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 640px) {
+  .portfolio-form {
+    grid-template-columns: 1fr;
+  }
+  .portfolio-account-summary,
+  .portfolio-event {
+    padding: 14px;
+  }
+}
+
+.portfolio-page h1 {
+  overflow-wrap: anywhere;
+}
+.portfolio-page .page-heading > div {
+  min-width: 0;
+}
+.portfolio-table-hint {
+  display: none;
+}
+@media (max-width: 640px) {
+  .portfolio-table-hint {
+    display: block;
+    font-size: 12px;
+  }
+}
+
+.portfolio-batch table {
+  min-width: 780px;
+}
+.portfolio-batch th,
+.portfolio-batch td {
+  overflow-wrap: normal;
+  white-space: nowrap;
+}
+.portfolio-batch td p {
+  max-width: 220px;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}

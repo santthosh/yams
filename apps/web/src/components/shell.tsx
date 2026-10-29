@@ -17,7 +17,8 @@ function Navigation() {
         { path: "/lab/strategies", name: "Strategy Lab", mark: "03" },
         { path: "/lab/experiments", name: "Experiments", mark: "04" },
         { path: "/lab/compare", name: "Compare experiments", mark: "05" },
-        { path: "/settings", name: "Settings & data", mark: "06" },
+        { path: "/portfolios", name: "Paper portfolios", mark: "06" },
+        { path: "/settings", name: "Settings & data", mark: "07" },
       ].map((item) => (
         <Link
           key={item.path}
@@ -80,7 +81,11 @@ export function Shell({ children }: { children: ReactNode }) {
           role="region"
           aria-label="Workspace context"
         >
-          {pathname === "/lab/strategies" ? (
+          {pathname.startsWith("/portfolios") ? (
+            <span>
+              Account source and posted-state evidence below · Paper only
+            </span>
+          ) : pathname === "/lab/strategies" ? (
             <span>Strategy rules · No market data required</span>
           ) : pathname === "/settings/data" ||
             pathname === "/lab/candidates" ||
