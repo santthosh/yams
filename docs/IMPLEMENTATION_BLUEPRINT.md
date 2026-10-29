@@ -129,6 +129,10 @@ alone does not activate new kinds. Defaults are hypotheses, not optimized result
 
 ## 6. Portfolio planning, posting, and invariants (ADR-004)
 
+[ADR-014](adr/0014-decision-and-execution-snapshots.md) separates frozen decision
+evidence from a later immutable execution-price publication. Implementation and
+verification belong to #46; the decision alone activates no worker path.
+
 - Calculate portfolio value from posted holdings at a coherent market price timestamp plus settled simulated cash; mark stale valuations clearly.
 - Compare current weights with versioned targets and calculate trade deltas. If change is under tolerance, label `HOLD` unless a hard risk rule is violated.
 - Orders declare `BUY | SELL`, `requested_qty` (6dp), projected gross, fees/slippage, currency, `as_of_session`, earliest permissible fill session, and reason/evidence identifiers.
