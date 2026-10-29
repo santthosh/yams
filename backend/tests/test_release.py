@@ -1,4 +1,5 @@
 import subprocess
+import time
 from copy import deepcopy
 from pathlib import Path
 from typing import Any
@@ -100,11 +101,13 @@ def test_tag_source_outside_main_is_rejected_before_api_or_publication(
         release_script.preflight()
 
 
+@pytest.mark.parametrize("visibility_delay", [0, 2])
 def test_interrupted_draft_resumes_only_identical_assets(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, visibility_delay: int
 ) -> None:
     import json
 
+    monkeypatch.setattr(time, "sleep", lambda seconds: None)
     bundle = tmp_path / "release-bundle"
     bundle.mkdir()
     verification = tmp_path / "verification"
@@ -138,6 +141,9 @@ def test_interrupted_draft_resumes_only_identical_assets(
     def current_release(tag: str) -> Any:
         if state["release"] is None:
             return None
+        if state.get("invisible_reads", 0):
+            state["invisible_reads"] -= 1
+            return None
         return {
             "draft": state["release"] == "draft",
             "target_commitish": "source",
@@ -165,6 +171,7 @@ def test_interrupted_draft_resumes_only_identical_assets(
     def command(*args: str) -> str:
         if args[:3] == ("gh", "release", "create"):
             state["release"] = "draft"
+            state["invisible_reads"] = visibility_delay
         elif args[:3] == ("gh", "release", "upload"):
             path = Path(args[4])
             if state["interrupt"] and state["assets"]:
@@ -348,3 +355,50 @@ def test_release_version_must_match_all_application_packages(
     web.write_text(json.dumps({"version": "0.0.1"}))
     with pytest.raises(SystemExit, match="differs"):
         release_script.validate_application_version("0.0.2")
+
+
+def test_draft_visibility_wait_is_bounded_and_does_not_create_releases(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    calls: list[str] = []
+    sleeps: list[float] = []
+
+    def unavailable(tag: str) -> None:
+        calls.append(tag)
+
+    monkeypatch.setattr(release_script, "existing_release", unavailable)
+    monkeypatch.setattr(time, "sleep", sleeps.append)
+    with pytest.raises(SystemExit, match="retry publication without rebuilding"):
+        release_script.wait_for_draft("v0.0.4", "source")
+    assert calls == ["v0.0.4"] * 10
+    assert sleeps == [1] * 9
+
+
+@pytest.mark.parametrize(
+    "release",
+    [
+        {"draft": False, "target_commitish": "source"},
+        {"draft": True, "target_commitish": "other"},
+    ],
+)
+def test_draft_visibility_wait_never_accepts_published_or_conflicting_release(
+    monkeypatch: pytest.MonkeyPatch, release: dict[str, Any]
+) -> None:
+    monkeypatch.setattr(release_script, "existing_release", lambda tag: release)
+    monkeypatch.setattr(
+        time, "sleep", lambda seconds: pytest.fail("Conflict must fail immediately")
+    )
+    with pytest.raises(SystemExit, match="published release or conflicting draft"):
+        release_script.wait_for_draft("v0.0.4", "source")
+
+
+def test_draft_visibility_wait_preserves_api_errors(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    def denied(tag: str) -> None:
+        raise RuntimeError("Synthetic permission failure")
+
+    monkeypatch.setattr(release_script, "existing_release", denied)
+    monkeypatch.setattr(time, "sleep", lambda seconds: pytest.fail("API error must propagate"))
+    with pytest.raises(RuntimeError, match="Synthetic permission failure"):
+        release_script.wait_for_draft("v0.0.4", "source")

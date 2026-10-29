@@ -8,6 +8,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import time
 import tomllib
 from pathlib import Path
 from typing import Any
@@ -44,6 +45,19 @@ def existing_release(tag: str) -> Any:
             None,
         )
     raise RuntimeError(result.stderr)
+
+
+def wait_for_draft(tag: str, sha: str) -> Any:
+    """Bound GitHub's read-after-create lag without recreating or replacing a release."""
+    for attempt in range(10):
+        release = existing_release(tag)
+        if release is not None:
+            if not release_available(release, sha) or release.get("draft") is not True:
+                raise SystemExit("Refusing to modify a published release or conflicting draft")
+            return release
+        if attempt < 9:
+            time.sleep(1)
+    raise SystemExit("Release draft is not visible; retry publication without rebuilding images")
 
 
 def passed_main(runs: list[dict[str, Any]], sha: str) -> bool:
@@ -438,8 +452,7 @@ def publish() -> None:
             release_summary(version)[1],
         )
     # Resume only identical draft assets; never clobber an existing asset.
-    release = existing_release(tag)
-    assert release is not None
+    release = wait_for_draft(tag, sha)
     allowed_assets = {path.name for path in destination.iterdir() if path.is_file()}
 
     def logical_name(name: str) -> str:

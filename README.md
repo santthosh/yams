@@ -39,11 +39,17 @@ exact tables, cancel work or rerun without changing the original.
 at `/lab/compare` inspect 2–4 completed reports, flag incompatible assumptions,
 create explicit fair reruns and preserve one-rule forks with their original evidence.
 
-[v0.0.3 Strategy Lab](https://github.com/santthosh/yams/releases/tag/v0.0.3) is now
-published with verified native linux/amd64 and linux/arm64 installations. See the
-[release evidence](docs/verification/0.0.3-release/README.md) for exact source,
-image digests, checksums, experiment/challenge/comparison and restart proof.
-Historical accounting uses labeled synthetic fixtures; real feeds remain diagnostic-only.
+[v0.0.4 Paper Portfolios](https://github.com/santthosh/yams/releases/tag/v0.0.4)
+is published with verified native linux/amd64 and linux/arm64 installations. See
+[release evidence](docs/verification/0.0.4-release/README.md) for exact source,
+final image digests, anonymous asset/checksum checks, browser-created accounts,
+actual private-worker fills and cached restart proof. Public approval and forecasts
+remain staged for 0.0.5. Historical and paper accounting demonstrations use labeled
+synthetic fixtures; real feeds remain diagnostic-only.
+
+The earlier [v0.0.3 Strategy Lab](https://github.com/santthosh/yams/releases/tag/v0.0.3)
+and its [verified experiment/challenge/comparison evidence](docs/verification/0.0.3-release/README.md)
+remain immutable.
 
 Download published bundles and platform evidence from [GitHub Releases](https://github.com/santthosh/yams/releases).
 Source implementation alone does not establish publication: use each release's
