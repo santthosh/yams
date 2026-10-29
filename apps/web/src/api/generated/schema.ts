@@ -187,6 +187,58 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/portfolios": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Accounts */
+    get: operations["accounts_api_v1_portfolios_get"];
+    put?: never;
+    /** Create */
+    post: operations["create_api_v1_portfolios_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/portfolios/{portfolio_id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Detail */
+    get: operations["detail_api_v1_portfolios__portfolio_id__get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/portfolios/{portfolio_id}/transactions": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Transactions */
+    get: operations["transactions_api_v1_portfolios__portfolio_id__transactions_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/v1/strategies": {
     parameters: {
       query?: never;
@@ -1648,6 +1700,13 @@ export interface components {
        */
       limit: number;
     };
+    /** Page[PaperPortfolioV1] */
+    Page_PaperPortfolioV1_: {
+      /** Items */
+      items: components["schemas"]["PaperPortfolioV1"][];
+      /** Next Cursor */
+      next_cursor: string | null;
+    };
     /** Page[SnapshotV1] */
     Page_SnapshotV1_: {
       /** Items */
@@ -1771,6 +1830,80 @@ export interface components {
       /** Terminal */
       terminal: boolean;
     };
+    /** PaperPortfolioV1 */
+    PaperPortfolioV1: {
+      /**
+       * Benchmark Symbol
+       * @default SPY
+       * @constant
+       */
+      benchmark_symbol: "SPY";
+      /** Cash Usd */
+      cash_usd: string;
+      /**
+       * Created At
+       * Format: date-time
+       */
+      created_at: string;
+      /**
+       * Currency
+       * @default USD
+       * @constant
+       */
+      currency: "USD";
+      /**
+       * Execution Policy Id
+       * @default us_eod_next_open_v1
+       * @constant
+       */
+      execution_policy_id: "us_eod_next_open_v1";
+      /** Holdings */
+      holdings: components["schemas"]["PortfolioHoldingV1"][];
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /** Last Sequence */
+      last_sequence: number;
+      /** Name */
+      name: string;
+      /** Opening Cash Usd */
+      opening_cash_usd: string;
+      /** Opening Snapshot Id */
+      opening_snapshot_id: string | null;
+      /**
+       * Paper Only
+       * @default true
+       * @constant
+       */
+      paper_only: true;
+      /** Reconciliation Failed */
+      reconciliation_failed: boolean;
+      /** Revision */
+      revision: number;
+      risk_policy: components["schemas"]["PortfolioConfig"];
+      /**
+       * State
+       * @enum {string}
+       */
+      state: "active" | "paused" | "closed";
+      /**
+       * Strategy Version Id
+       * Format: uuid
+       */
+      strategy_version_id: string;
+      /** Total Value Usd */
+      total_value_usd: string | null;
+      valuation: components["schemas"]["PortfolioValuationV1"];
+      /** Valuation As Of Session */
+      valuation_as_of_session: string | null;
+      /**
+       * Valuation Mode
+       * @enum {string}
+       */
+      valuation_mode: "synthetic_fixture" | "research_market_data";
+    };
     /** PeriodMetrics */
     PeriodMetrics: {
       /** Daily Nav Observations */
@@ -1799,6 +1932,96 @@ export interface components {
        */
       weighting: "inverse_volatility";
     };
+    /** PortfolioCreateRequest */
+    PortfolioCreateRequest: {
+      /**
+       * Mode
+       * @default synthetic_fixture
+       * @enum {string}
+       */
+      mode: "synthetic_fixture" | "research_market_data";
+      /** Name */
+      name: string;
+      /**
+       * Opening Cash Usd
+       * @default 1000.00
+       */
+      opening_cash_usd: string;
+      /**
+       * Snapshot Id
+       * @default null
+       */
+      snapshot_id: string | null;
+      /**
+       * Strategy Version Id
+       * Format: uuid
+       */
+      strategy_version_id: string;
+    };
+    /** PortfolioFillV1 */
+    PortfolioFillV1: {
+      /** Commission Usd */
+      commission_usd: string;
+      /** Executed Price Usd */
+      executed_price_usd: string;
+      /**
+       * Execution Session
+       * Format: date
+       */
+      execution_session: string;
+      /** Gross Usd */
+      gross_usd: string;
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /**
+       * Order Id
+       * Format: uuid
+       */
+      order_id: string;
+      /** Quantity */
+      quantity: string;
+      /** Raw Price Usd */
+      raw_price_usd: string;
+      /** Realized Pnl Usd */
+      realized_pnl_usd: string;
+      /** Removed Basis Usd */
+      removed_basis_usd: string;
+      /** Slippage Usd */
+      slippage_usd: string;
+    };
+    /** PortfolioHoldingV1 */
+    PortfolioHoldingV1: {
+      /** Asset Id */
+      asset_id: string;
+      /** Mark Price Usd */
+      mark_price_usd: string | null;
+      /** Market Value Usd */
+      market_value_usd: string | null;
+      /** Price As Of Session */
+      price_as_of_session: string | null;
+      /** Quantity */
+      quantity: string;
+      /** Reason */
+      reason: string | null;
+      /** Sector */
+      sector: string;
+      /** Total Basis Usd */
+      total_basis_usd: string;
+      /** Weight */
+      weight: string | null;
+    };
+    /** PortfolioPositionChangeV1 */
+    PortfolioPositionChangeV1: {
+      /** Asset Id */
+      asset_id: string;
+      /** Quantity Delta */
+      quantity_delta: string;
+      /** Total Basis Delta Usd */
+      total_basis_delta_usd: string;
+    };
     /** PortfolioState */
     PortfolioState: {
       /**
@@ -1815,6 +2038,116 @@ export interface components {
       entitlements: components["schemas"]["DividendEntitlement"][];
       /** Positions */
       positions: components["schemas"]["Position"][];
+    };
+    /** PortfolioTransactionPageV1 */
+    PortfolioTransactionPageV1: {
+      /** Items */
+      items: components["schemas"]["PortfolioTransactionV1"][];
+      /**
+       * Mode
+       * @enum {string}
+       */
+      mode: "synthetic_fixture" | "research_market_data";
+      /** Next Cursor */
+      next_cursor: string | null;
+      /**
+       * Paper Only
+       * @default true
+       * @constant
+       */
+      paper_only: true;
+      /**
+       * Portfolio Id
+       * Format: uuid
+       */
+      portfolio_id: string;
+      /**
+       * Warnings
+       * @default []
+       */
+      warnings: string[];
+    };
+    /** PortfolioTransactionV1 */
+    PortfolioTransactionV1: {
+      /** Cash Delta Usd */
+      cash_delta_usd: string;
+      /** Correction Target Id */
+      correction_target_id: string | null;
+      /**
+       * Effective At
+       * Format: date-time
+       */
+      effective_at: string;
+      /** Event Key */
+      event_key: string;
+      fill: components["schemas"]["PortfolioFillV1"] | null;
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /**
+       * Kind
+       * @enum {string}
+       */
+      kind:
+        | "opening_funding"
+        | "fill"
+        | "order_closed"
+        | "split"
+        | "dividend"
+        | "entitlement"
+        | "correction"
+        | "strategy_binding"
+        | "batch_approval"
+        | "batch_cancel";
+      /** Portfolio Revision */
+      portfolio_revision: number;
+      /** Position Changes */
+      position_changes: components["schemas"]["PortfolioPositionChangeV1"][];
+      /**
+       * Recorded At
+       * Format: date-time
+       */
+      recorded_at: string;
+      /** Sequence */
+      sequence: number;
+      /** Snapshot Id */
+      snapshot_id: string | null;
+      /**
+       * Strategy Version Id
+       * Format: uuid
+       */
+      strategy_version_id: string;
+    };
+    /** PortfolioValuationV1 */
+    PortfolioValuationV1: {
+      /** As Of Session */
+      as_of_session: string | null;
+      /** Cash Weight */
+      cash_weight: string | null;
+      /**
+       * Checked At
+       * Format: date-time
+       */
+      checked_at: string;
+      /** Missing Assets */
+      missing_assets: string[];
+      /** Reason */
+      reason: string | null;
+      /** Snapshot Id */
+      snapshot_id: string | null;
+      /** Snapshot Sha256 */
+      snapshot_sha256: string | null;
+      /**
+       * Status
+       * @enum {string}
+       */
+      status: "available" | "stale" | "unavailable";
+      /** Total Value Usd */
+      total_value_usd: string | null;
+      /** Warnings */
+      warnings: string[];
     };
     /** Position */
     Position: {
@@ -3271,6 +3604,247 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["JobV1"];
+        };
+      };
+      /** @description Not Found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Conflict */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Unprocessable Content */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Service Unavailable */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+    };
+  };
+  accounts_api_v1_portfolios_get: {
+    parameters: {
+      query?: {
+        limit?: number;
+        cursor?: string | null;
+        mode?: ("synthetic_fixture" | "research_market_data") | null;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Page_PaperPortfolioV1_"];
+        };
+      };
+      /** @description Not Found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Conflict */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Unprocessable Content */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Service Unavailable */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+    };
+  };
+  create_api_v1_portfolios_post: {
+    parameters: {
+      query?: never;
+      header: {
+        "Idempotency-Key": string;
+      };
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PortfolioCreateRequest"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PaperPortfolioV1"];
+        };
+      };
+      /** @description Not Found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Conflict */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Unprocessable Content */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Service Unavailable */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+    };
+  };
+  detail_api_v1_portfolios__portfolio_id__get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        portfolio_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PaperPortfolioV1"];
+        };
+      };
+      /** @description Not Found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Conflict */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Unprocessable Content */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Service Unavailable */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+    };
+  };
+  transactions_api_v1_portfolios__portfolio_id__transactions_get: {
+    parameters: {
+      query?: {
+        limit?: number;
+        cursor?: string | null;
+      };
+      header?: never;
+      path: {
+        portfolio_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PortfolioTransactionPageV1"];
         };
       };
       /** @description Not Found */

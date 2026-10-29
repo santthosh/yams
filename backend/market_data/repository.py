@@ -187,6 +187,27 @@ class MarketRepository:
     def __exit__(self, *_: object) -> None:
         self.close()
 
+    def fixture_observation_at(self, session_date: date) -> datetime:
+        """Explicit synthetic clock after that session's pinned bar observations.
+
+        Fixtures may be dated beyond wall time. Derive their read-only display
+        clock from actual row evidence rather than inventing a publication lag.
+        Real-market consumers must always supply their actual observation time.
+        """
+        if self.snapshot.manifest.mode != "synthetic_fixture":
+            raise ValueError("Synthetic observation clock requires fixture mode")
+        session_date = TypeAdapter(SessionDate).validate_python(session_date)
+        scheduled = next(
+            (s for s in self.calendar.sessions if s.session_date == session_date), None
+        )
+        if scheduled is None:
+            raise ValueError("Session is outside the pinned calendar")
+        observations = [scheduled.close_at]
+        for bar in self._rows.values():
+            if bar.session_date == session_date:
+                observations.extend((bar.available_at, bar.ingested_at))
+        return max(observations)
+
     def as_of(
         self,
         cutoff: datetime,

@@ -443,3 +443,88 @@ it("preserves exact uint64 literals in successful upstream JSON bytes", async ()
   expect(response.status).toBe(200);
   expect(await response.text()).toBe(raw);
 });
+
+it("requires an explicit same-origin account creation key and preserves semantic conflicts", async () => {
+  const key = "11111111-1111-4111-8111-111111111111";
+  const make = (origin: string, requestKey?: string) =>
+    new Request("http://web.test/api/v1/portfolios", {
+      method: "POST",
+      headers: {
+        origin,
+        "Content-Type": "application/json",
+        ...(requestKey ? { "Idempotency-Key": requestKey } : {}),
+        authorization: "private",
+        cookie: "private",
+      },
+      body: '{"name":"SYNTHETIC_DATA_ONLY","opening_cash_usd":"1000.00"}',
+    });
+  const fetcher = vi.fn(async (_input, init) => {
+    expect(init.headers).toEqual({
+      Accept: "application/json",
+      "Content-Type": "application/json",
+      "Idempotency-Key": key,
+    });
+    return Response.json(
+      {
+        error: {
+          code: "IDEMPOTENCY_CONFLICT",
+          message: "private provider details",
+        },
+      },
+      { status: 409 },
+    );
+  });
+  expect(
+    (await proxyApi(make("http://web.test"), ["portfolios"], fetcher)).status,
+  ).toBe(422);
+  expect(
+    (await proxyApi(make("http://outside.test", key), ["portfolios"], fetcher))
+      .status,
+  ).toBe(422);
+  expect(fetcher).not.toHaveBeenCalled();
+  const result = await proxyApi(
+    make("http://web.test", key),
+    ["portfolios"],
+    fetcher,
+  );
+  expect(result.status).toBe(409);
+  const response = await result.json();
+  expect(response.error.code).toBe("IDEMPOTENCY_CONFLICT");
+  expect(JSON.stringify(response)).not.toContain("private provider details");
+});
+
+it("exposes only account reads and creation while future authorization and funding paths stay closed", async () => {
+  const id = "11111111-1111-4111-8111-111111111111";
+  const fetcher = vi.fn(async () =>
+    Response.json({ items: [], next_cursor: null }),
+  );
+  for (const [path, parts] of [
+    ["portfolios?mode=synthetic_fixture&limit=1", ["portfolios"]],
+    [`portfolios/${id}`, ["portfolios", id]],
+    [
+      `portfolios/${id}/transactions?limit=1`,
+      ["portfolios", id, "transactions"],
+    ],
+  ] as [string, string[]][]) {
+    expect((await proxyApi(request(path), parts, fetcher)).status).toBe(200);
+  }
+  expect(fetcher).toHaveBeenCalledTimes(3);
+  expect(
+    (
+      await proxyApi(
+        request(`portfolios/${id}?snapshot_id=${id}`),
+        ["portfolios", id],
+        fetcher,
+      )
+    ).status,
+  ).toBe(404);
+  for (const extra of ["apply", "deposit", "withdraw", "recommendations"]) {
+    const response = await proxyApi(
+      request(`portfolios/${id}/${extra}`, "POST"),
+      ["portfolios", id, extra],
+      fetcher,
+    );
+    expect(response.status).toBe(405);
+  }
+  expect(fetcher).toHaveBeenCalledTimes(3);
+});

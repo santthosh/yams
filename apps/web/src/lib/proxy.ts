@@ -39,6 +39,16 @@ export async function proxyApi(
     segments.length === 2 &&
     segments[0] === "strategy-evaluations" &&
     UUID_PATTERN.test(segments[1]);
+  const portfolios = segments.length === 1 && segments[0] === "portfolios";
+  const portfolioDetail =
+    segments.length === 2 &&
+    segments[0] === "portfolios" &&
+    UUID_PATTERN.test(segments[1]);
+  const portfolioTransactions =
+    segments.length === 3 &&
+    segments[0] === "portfolios" &&
+    UUID_PATTERN.test(segments[1]) &&
+    segments[2] === "transactions";
   const experiments = segments.length === 1 && segments[0] === "experiments";
   const experimentDetail =
     segments.length === 2 &&
@@ -69,6 +79,7 @@ export async function proxyApi(
     !(
       request.method === "POST" &&
       (refresh ||
+        portfolios ||
         evaluate ||
         readStrategies ||
         strategyVersions ||
@@ -84,12 +95,16 @@ export async function proxyApi(
   const allowed =
     request.method === "POST"
       ? refresh ||
+        portfolios ||
         evaluate ||
         readStrategies ||
         strategyVersions ||
         experiments ||
         cancelJob
-      : experiments ||
+      : portfolios ||
+        portfolioDetail ||
+        portfolioTransactions ||
+        experiments ||
         experimentDetail ||
         experimentSamples ||
         readData ||
@@ -103,19 +118,23 @@ export async function proxyApi(
           segments[0] === "jobs" &&
           UUID_PATTERN.test(segments[1]));
   const queryKeys =
-    experiments && request.method === "GET"
-      ? ["limit", "cursor"]
-      : experimentSamples
-        ? ["limit", "cursor", "start_session", "end_session_exclusive"]
-        : readData
-          ? segments[1] === "assets"
-            ? ["mode", "snapshot_id", "query", "limit", "cursor"]
-            : segments[1] === "snapshots"
-              ? ["mode", "limit", "cursor"]
-              : ["mode"]
-          : (readStrategies || strategyVersions) && request.method === "GET"
-            ? ["limit", "cursor"]
-            : [];
+    portfolios && request.method === "GET"
+      ? ["mode", "limit", "cursor"]
+      : portfolioTransactions
+        ? ["limit", "cursor"]
+        : experiments && request.method === "GET"
+          ? ["limit", "cursor"]
+          : experimentSamples
+            ? ["limit", "cursor", "start_session", "end_session_exclusive"]
+            : readData
+              ? segments[1] === "assets"
+                ? ["mode", "snapshot_id", "query", "limit", "cursor"]
+                : segments[1] === "snapshots"
+                  ? ["mode", "limit", "cursor"]
+                  : ["mode"]
+              : (readStrategies || strategyVersions) && request.method === "GET"
+                ? ["limit", "cursor"]
+                : [];
   if (
     !allowed ||
     [...url.searchParams.keys()].some((key) => !queryKeys.includes(key))
@@ -140,10 +159,10 @@ export async function proxyApi(
         422,
       );
     const key = request.headers.get("Idempotency-Key");
-    if (refresh && (!key || !UUID_PATTERN.test(key)))
+    if ((refresh || portfolios) && (!key || !UUID_PATTERN.test(key)))
       return safeError(
         "VALIDATION_ERROR",
-        "Refresh requires a valid request key.",
+        "This operation requires a valid request key.",
         422,
       );
     const reader = request.body?.getReader();
@@ -169,7 +188,7 @@ export async function proxyApi(
     }
     payload = new TextDecoder().decode(bytes);
     headers["Content-Type"] = "application/json";
-    if (refresh && key) headers["Idempotency-Key"] = key;
+    if ((refresh || portfolios) && key) headers["Idempotency-Key"] = key;
   }
   try {
     const origin = new URL(
@@ -241,7 +260,10 @@ export async function proxyApi(
         const code =
           error && "code" in error && error.code === "STALE_DATA"
             ? "STALE_DATA"
-            : refresh
+            : refresh ||
+                (error &&
+                  "code" in error &&
+                  error.code === "IDEMPOTENCY_CONFLICT")
               ? "IDEMPOTENCY_CONFLICT"
               : "STATE_CONFLICT";
         return safeError(
