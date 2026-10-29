@@ -1,5 +1,9 @@
 # Complete core release gate — 0.0.5
 
+The [published release verification](verification/0.0.5-release/README.md) records
+the completed native/publication gates and exact immutable source/image evidence.
+The source-preparation checkpoint below is retained as historical evidence.
+
 Owner: [#53](https://github.com/santthosh/yams/issues/53), under
 [epic #6](https://github.com/santthosh/yams/issues/6) and the recorded decisions in
 [#72](https://github.com/santthosh/yams/issues/72). This document defines reproducible

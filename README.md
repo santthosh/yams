@@ -4,7 +4,12 @@ Yet Another Market Simulator is a local, single-user paper research workspace. I
 
 ## Current state
 
-The 0.0.5 source increment provides the first complete local core workflow:
+[v0.0.5](https://github.com/santthosh/yams/releases/tag/v0.0.5) is published with
+verified anonymous native linux/amd64 and linux/arm64 installations. See
+[release verification](docs/verification/0.0.5-release/README.md) for exact source,
+final image digests, public checksums/provenance and the complete browser/restart proof.
+
+The 0.0.5 increment provides the first complete local core workflow:
 load labeled offline data, discover scored candidates, test an immutable strategy,
 create a synthetic $1,000 account, review a constrained target and numerical
 90-calendar-day scenarios, authorize paper orders, observe pending work and inspect
@@ -62,8 +67,8 @@ create explicit fair reruns and preserve one-rule forks with their original evid
 is published with verified native linux/amd64 and linux/arm64 installations. See
 [release evidence](docs/verification/0.0.4-release/README.md) for exact source,
 final image digests, anonymous asset/checksum checks, browser-created accounts,
-actual private-worker fills and cached restart proof. Public approval and forecasts
-remain staged for 0.0.5. Historical and paper accounting demonstrations use labeled
+actual private-worker fills and cached restart proof. That earlier release stages
+public approval and forecasts, now delivered in 0.0.5. Historical and paper accounting demonstrations use labeled
 synthetic fixtures; real feeds remain diagnostic-only.
 
 The earlier [v0.0.3 Strategy Lab](https://github.com/santthosh/yams/releases/tag/v0.0.3)
