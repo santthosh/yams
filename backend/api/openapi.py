@@ -134,6 +134,17 @@ def build_openapi(app: FastAPI) -> dict[str, Any]:
             if {**actual, "default": None} != expected:
                 raise ValueError("Conflicting portfolio snapshot schema")
             portfolio_request["properties"]["snapshot_id"] = expected
+    # The optional ADR-014 pair has the same narrowly verified DTO null-default
+    # omission. Preserve the canonical typed definition without masking drift.
+    execution_context = schemas.get("ExecutionContext")
+    if execution_context is not None:
+        for field in ("execution_snapshot_id", "execution_snapshot_sha256"):
+            actual = execution_context["properties"][field]
+            expected = bundle["$defs"]["ExecutionContext"]["properties"][field]
+            if actual != expected:
+                if {**actual, "default": None} != expected:
+                    raise ValueError("Conflicting execution provenance schema")
+                execution_context["properties"][field] = expected
     for name, definition in bundle["$defs"].items():
         if name in schemas and schemas[name] != definition:
             raise ValueError(f"Conflicting OpenAPI schema: {name}")

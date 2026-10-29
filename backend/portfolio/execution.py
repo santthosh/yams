@@ -115,6 +115,8 @@ DEFAULT_EXECUTION_POLICY = ExecutionPolicy()
 class ExecutionContext(Contract):
     snapshot_id: UUID
     snapshot_sha256: Hash256
+    execution_snapshot_id: UUID | None = Field(default=None, exclude_if=lambda v: v is None)
+    execution_snapshot_sha256: Hash256 | None = Field(default=None, exclude_if=lambda v: v is None)
     calendar_sha256: Hash256
     mode: SourceMode
     engine_version: Annotated[str, Field(strict=True, min_length=1)]
@@ -122,6 +124,12 @@ class ExecutionContext(Contract):
     decision_session: SessionDate
     decision_cutoff: UTCTimestamp
     approved_at: UTCTimestamp
+
+    @model_validator(mode="after")
+    def execution_reference_pair(self) -> Self:
+        if (self.execution_snapshot_id is None) != (self.execution_snapshot_sha256 is None):
+            raise ValueError("Execution snapshot ID and digest must be supplied together")
+        return self
 
 
 class MarketEvidence(Contract):
@@ -251,8 +259,8 @@ def verify_context(
     if calendar_digest(calendar) != context.calendar_sha256:
         raise ValueError("Calendar digest mismatch")
     if (market.snapshot_id, market.snapshot_sha256, market.mode) != (
-        context.snapshot_id,
-        context.snapshot_sha256,
+        context.execution_snapshot_id or context.snapshot_id,
+        context.execution_snapshot_sha256 or context.snapshot_sha256,
         context.mode,
     ):
         raise ValueError("Execution market lineage mismatch")

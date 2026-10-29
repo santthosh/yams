@@ -790,6 +790,16 @@ export interface components {
        */
       execution_mode: "current_paper" | "historical_replay";
       /**
+       * Execution Snapshot Id
+       * @default null
+       */
+      execution_snapshot_id: string | null;
+      /**
+       * Execution Snapshot Sha256
+       * @default null
+       */
+      execution_snapshot_sha256: string | null;
+      /**
        * Mode
        * @enum {string}
        */

@@ -24,6 +24,7 @@ from backend.backtesting.errors import SAFE_BACKTEST_REASONS, BacktestFailure
 from backend.backtesting.publication import seal_report
 from backend.backtesting.service import seal_core
 from backend.domain.common import ErrorCode
+from backend.jobs.handlers.apply_scheduled_fills import apply_scheduled_fills
 from backend.jobs.handlers.backtest import backtest, backtest_core
 from backend.jobs.handlers.evaluate_strategy import EvaluationFailure, evaluate_strategy
 from backend.jobs.handlers.refresh_market_data import refresh_market_data
@@ -32,6 +33,7 @@ from backend.jobs.registry import AttemptMetrics, DiagnosticPayload, JobLimits
 from backend.market_data.providers.yahoo import ProviderFailure
 from backend.market_data.snapshots import PublicationFenceError, publish_snapshot
 from backend.persistence.database import Settings, database_engine
+from backend.portfolio.fills import enqueue_due_batches, seal_fill
 from backend.strategies.evaluations import seal_evaluation
 
 logger = logging.getLogger(__name__)
@@ -192,13 +194,16 @@ class Worker:
     def schedule_if_due(self) -> None:
         if time.monotonic() >= self.next_schedule_tick:
             self.queue.catch_up(self.queue.limits.catchup_batch)
+            enqueue_due_batches(self.queue)
             self.next_schedule_tick = time.monotonic() + self.queue.limits.scheduler_tick_seconds
 
     def execute(self, lease: Lease) -> None:
         handler = self.handler
         stage: Path | None = None
         store = self.artifact_root / "snapshots"
-        if lease.kind == "refresh_market_data":
+        if lease.kind == "apply_scheduled_fills":
+            handler = partial(apply_scheduled_fills, root=self.artifact_root)
+        elif lease.kind == "refresh_market_data":
             staging = self.artifact_root / "snapshot-staging"
             staging.mkdir(mode=0o700, parents=True, exist_ok=True)
             store.mkdir(mode=0o700, parents=True, exist_ok=True)
@@ -329,7 +334,11 @@ class Worker:
                 self.queue.fail(lease, failure)
             elif process.exitcode == 0 and message and message[0] == "ok":
                 try:
-                    if lease.kind == "refresh_market_data":
+                    if lease.kind == "apply_scheduled_fills":
+                        if not isinstance(message[1], str):
+                            raise ValueError("Invalid fill preparation")
+                        seal_fill(self.queue, lease, message[1])
+                    elif lease.kind == "refresh_market_data":
                         assert stage is not None
                         if not isinstance(message[1], str):
                             raise ValueError("Invalid refresh completion")

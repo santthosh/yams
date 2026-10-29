@@ -524,6 +524,12 @@ the original decision source. Compatible calendar extension cannot move the
 original eligible opening. Coordinated implementation/generated types and runtime
 proofs remain with #46; this decision does not activate a handler or change prices.
 
+The [private #46 batch/worker service](operations/paper-batches.md) implements
+authorization, cancellation and typed batch inspection for future transport. It
+registers only the closed internal `apply_scheduled_fills` job; public approval
+and `GET /order-batches/{id}` remain assigned to #50. Its optional execution-source
+context pair is additive; absent fields retain legacy serialized bytes.
+
 [ADR-004](adr/0004-portfolio-ledger.md) ratifies event schemas, numeric scales, portfolio locking with revision checks, one active batch as the exclusive reservation, partial-result termination, corrections, replay and staged migration ownership. Batch/order responses include `terminal` and filled/pending/cancelled-or-skipped quantities so a terminal cash-reduced fill is not mistaken for an outstanding order.
 
 1. `Idempotency-Key` is required on paper authorization and creation of any posting command. Key + semantic request payload hash + portfolio ID defines retry identity; same key/different payload returns `409 IDEMPOTENCY_CONFLICT`.

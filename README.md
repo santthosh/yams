@@ -8,14 +8,17 @@ The source checkout includes the market repository, immutable snapshots and
 strategy registry, shared momentum/allocation engine, and asynchronous candidate
 inspection backed by PostgreSQL and a supervised worker. The synthetic Docker
 journey produces measured candidates, exclusions and feasible targets, with
-reproducible results retained through restart. Portfolio approval and
-forecasts remain with their later milestone owners. The 0.0.4
+reproducible results retained through restart. Public recommendation approval and
+forecasts remain with their 0.0.5 owners. The 0.0.4
 [internal paper ledger](docs/operations/paper-ledger.md) now persists exact-cent
 funding, authorized shared-kernel effects, corporate actions and replayable
 projections atomically. The [paper account API](docs/operations/paper-portfolio-api.md)
 creates independent cash accounts and serves coherent holdings/valuation and paginated
-immutable transactions. Approval/execution orchestration and the portfolio UI remain
-with #46/#47; public apply follows in0.0.5. Startup creates no accounts or recommendations.
+immutable transactions. The [private authorization and fill worker](docs/operations/paper-batches.md)
+reserves approved intent and posts lease-fenced synthetic effects, with explicit
+fixture replay and separate decision/execution provenance. The portfolio UI
+remains with #47; public apply follows in 0.0.5. Startup creates no accounts or
+recommendations.
 
 The 0.0.3 Strategy Lab increment adds named strategy creation, detail and immutable
 version publication/history APIs over the existing registry, plus the ratified

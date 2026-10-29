@@ -453,6 +453,7 @@ def post_order(
     market: MarketEvidence,
     observed_at: datetime,
     actions: tuple[CorporateAction, ...] = (),
+    execution_calendar: Calendar | None = None,
 ) -> UUID | None:
     """Post one authorized order using preloaded, verified backend evidence.
 
@@ -471,240 +472,350 @@ def post_order(
         )
         assert owner is not None
     with Session(engine) as session, session.begin():
-        account = _locked(session, owner)
-        batch = session.scalar(
-            select(PaperOrderBatch).where(PaperOrderBatch.id == row.batch_id).with_for_update()
-        )
-        order = session.scalar(
-            select(PaperOrder).where(PaperOrder.id == order_id).with_for_update()
-        )
-        assert batch is not None and order is not None
-        context = ExecutionContext.model_validate(batch.context)
-        policy = ExecutionPolicy.model_validate(batch.policy)
-        eligible = verify_context(context, calendar, market)
-        key = "execution:" + digest(
-            [str(order_id), policy.id, eligible.session_date.isoformat(), 0]
-        )
-        # Refresh observation time and additional unrelated bars are not new
-        # economic commands. Only the order's eligible raw bar is fingerprinted.
-        bar = next(
-            (
-                b
-                for b in market.bars
-                if b.asset_id == order.asset_id and b.session_date == eligible.session_date
-            ),
-            None,
-        )
-        command = {
-            "order_id": str(order_id),
-            "intent_sha256": batch.intent_sha256,
-            "context": batch.context,
-            "policy": batch.policy,
-            "bar": bar.model_dump(mode="json") if bar else None,
-        }
-        previous = _existing(session, account.id, key, digest(command))
-        if previous is not None:
-            return previous.id
-        if order.terminal or batch.terminal:
-            return None  # Cancellation/rejection is retained; never resurrect intent.
-        before = _check_projection(session, account)
-        if account.status != "active":
-            raise LedgerConflict("Paper portfolio is not active")
-        snapshot = session.get(DatasetSnapshot, batch.snapshot_id)
-        recommendation = session.get(RecommendationReference, batch.recommendation_id)
-        version = session.get(StrategyVersion, batch.strategy_version_id)
-        if (
-            snapshot is None
-            or recommendation is None
-            or version is None
-            or snapshot.manifest_hash != context.snapshot_sha256
-            or snapshot.id != context.snapshot_id
-            or snapshot.source_mode != context.mode
-            or snapshot.source_mode != account.source_mode
-            or snapshot.quality == "blocked"
-            or batch.snapshot_sha256 != context.snapshot_sha256
-            or batch.calendar_sha256 != context.calendar_sha256
-            or batch.approved_at != context.approved_at
-            or batch.decision_cutoff != context.decision_cutoff
-            or batch.eligible_open_at != eligible.open_at
-            or batch.strategy_version_id != account.strategy_version_id
-            or recommendation.disposition != "applied"
-            or recommendation.portfolio_revision != batch.approved_revision
-            or recommendation.decision_cutoff != context.decision_cutoff
-            or recommendation.as_of_session != context.decision_session
-            or recommendation.source_mode != context.mode
-            or digest(batch.intent) != batch.intent_sha256
-            or digest(recommendation.content) != recommendation.content_sha256
-        ):
-            raise LedgerConflict("Approved execution lineage does not match pinned evidence")
-        manifest = SnapshotManifestV1.model_validate(snapshot.manifest)
-        if (
-            manifest.manifest_hash() != snapshot.manifest_hash
-            or manifest.snapshot_id() != snapshot.id
-            or manifest.calendar.version != calendar_digest(calendar)
-            or order.asset_id not in manifest.coverage.asset_ids
-        ):
-            raise LedgerConflict("Registered snapshot identity/calendar/asset differs")
-        authorized = TypeAdapter(tuple[OrderIntent, ...]).validate_python(batch.intent["orders"])
-        stored = list(
-            session.scalars(
-                select(PaperOrder)
-                .where(PaperOrder.batch_id == batch.id)
-                .order_by(PaperOrder.ordinal)
-            )
-        )
-        actual = tuple(
-            OrderIntent.model_validate(
-                {
-                    "key": item.intent_key,
-                    "asset_id": item.asset_id,
-                    "sector": item.sector,
-                    "side": item.side,
-                    "requested_quantity": format(item.requested_quantity, ".6f"),
-                }
-            )
-            for item in stored
-        )
-        if (
-            len({item.key for item in authorized}) != len(authorized)
-            or any(
-                a.model_dump(exclude={"requested_quantity"})
-                != b.model_dump(exclude={"requested_quantity"})
-                or Decimal(a.requested_quantity) != Decimal(b.requested_quantity)
-                for a, b in zip(actual, authorized, strict=False)
-            )
-            or len(actual) != len(authorized)
-        ):
-            raise LedgerConflict("Persisted orders differ from immutable approved intent")
-        # Proceeds are usable only after the sell stage has durably resolved.
-        if (
-            order.side == "BUY"
-            and session.scalar(
-                select(PaperOrder.id)
-                .where(
-                    PaperOrder.batch_id == batch.id, PaperOrder.side == "SELL", ~PaperOrder.terminal
-                )
-                .limit(1)
-            )
-            is not None
-        ):
-            return None
-        # Caller supplies the complete verified action set for this snapshot.
-        # An unprocessed action must not be skipped just because a raw open exists.
-        applied = {item.key: item.payload_sha256 for item in before.applied_actions}
-        for action in actions:
-            if (
-                action.asset_id == order.asset_id
-                and action.effective_session <= eligible.session_date
-                and action.visible(timestamp, context.execution_mode == "current_paper")
-            ):
-                key_hash = applied.get(action_key(action))
-                if key_hash is not None and key_hash != action_hash(action):
-                    raise LedgerConflict("Revised action requires explicit correction")
-                if action.kind == "split" and key_hash is None:
-                    return None
-                if action.kind == "dividend" and (
-                    not any(item.key == action_key(action) for item in before.entitlements)
-                    or (
-                        action.payable_session is not None
-                        and action.payable_session <= eligible.session_date
-                        and key_hash is None
-                    )
-                ):
-                    return None
-        phase = sorted(
-            session.scalars(
-                select(PaperOrder).where(PaperOrder.batch_id == batch.id, ~PaperOrder.terminal)
-            ),
-            key=lambda item: (0 if item.side == "SELL" else 1, item.asset_id, item.ordinal),
-        )
-        if phase and phase[0].id != order.id:
-            return None
-        config = StrategyConfigV1.model_validate(version.config)
-        result = execute_order(
-            before,
-            OrderIntent(
-                key=order.intent_key,
-                asset_id=order.asset_id,
-                sector=order.sector,
-                side=TypeAdapter(Literal["BUY", "SELL"]).validate_python(order.side),
-                requested_quantity=format(order.requested_quantity, ".6f"),
-            ),
-            context,
-            calendar,
-            market,
-            observed_at=timestamp,
-            min_trade_usd=config.portfolio.min_trade_usd,
-            policy=policy,
-        )
-        if not result.terminal:
-            order.reason = result.reason
-            return None
-        event = _append(
+        return _post_order(
             session,
-            account,
-            key=key,
-            kind="fill" if result.fill else "order_closed",
-            before=before,
-            after=result.state_after,
-            command=command,
-            recorded_at=timestamp,
-            effective_at=result.fill.execution_at if result.fill else timestamp,
-            cash_entry=result.fill is not None,
-            order_id=order.id,
-            snapshot_id=batch.snapshot_id,
-            details={"execution": result.model_dump(mode="json")},
+            order_id,
+            owner=owner,
+            calendar=calendar,
+            market=market,
+            observed_at=timestamp,
+            actions=actions,
+            execution_calendar=execution_calendar,
         )
-        if result.fill is not None:
-            fill = result.fill
-            session.add(
-                PaperFill(
-                    id=uuid5(event.id, "fill"),
-                    order_id=order.id,
-                    event_id=event.id,
-                    fill_event_key=key,
-                    execution_session=fill.execution_session,
-                    raw_price=Decimal(fill.raw_price),
-                    executed_price=Decimal(fill.executed_price),
-                    quantity=Decimal(fill.quantity),
-                    gross_usd=Decimal(fill.gross_usd),
-                    fee_usd=Decimal(fill.commission_usd),
-                    slippage_usd=Decimal(fill.slippage_usd),
-                    cash_delta_usd=Decimal(fill.cash_delta_usd),
-                    removed_basis_usd=Decimal(fill.removed_basis_usd),
-                    realized_pnl_usd=Decimal(fill.realized_pnl_usd),
-                    posted_at=timestamp,
-                )
+
+
+def _post_order(
+    session: Session,
+    order_id: UUID,
+    *,
+    owner: UUID,
+    calendar: Calendar,
+    market: MarketEvidence,
+    observed_at: datetime,
+    actions: tuple[CorporateAction, ...] = (),
+    execution_calendar: Calendar | None = None,
+    execution_engine_version: str | None = None,
+) -> UUID | None:
+    """Caller-owned transaction permits a job lease fence and fill to seal together."""
+    timestamp = TypeAdapter(UTCTimestamp).validate_python(observed_at)
+    account = _locked(session, owner)
+    row = session.get(PaperOrder, order_id)
+    if row is None:
+        raise LookupError("Paper order does not exist")
+    batch = session.scalar(
+        select(PaperOrderBatch).where(PaperOrderBatch.id == row.batch_id).with_for_update()
+    )
+    order = session.scalar(select(PaperOrder).where(PaperOrder.id == order_id).with_for_update())
+    assert batch is not None and order is not None
+    context = ExecutionContext.model_validate(batch.context)
+    separate = (
+        market.snapshot_id != context.snapshot_id
+        or market.snapshot_sha256 != context.snapshot_sha256
+    )
+    if separate:
+        context = ExecutionContext.model_validate(
+            context.model_dump(mode="json")
+            | {
+                "execution_snapshot_id": market.snapshot_id,
+                "execution_snapshot_sha256": market.snapshot_sha256,
+            }
+        )
+    policy = ExecutionPolicy.model_validate(batch.policy)
+    eligible = verify_context(context, calendar, market)
+    key = "execution:" + digest([str(order_id), policy.id, eligible.session_date.isoformat(), 0])
+    # Refresh observation time and additional unrelated bars are not new
+    # economic commands. Only the order's eligible raw bar is fingerprinted.
+    bar = next(
+        (
+            b
+            for b in market.bars
+            if b.asset_id == order.asset_id and b.session_date == eligible.session_date
+        ),
+        None,
+    )
+    command = {
+        "order_id": str(order_id),
+        "intent_sha256": batch.intent_sha256,
+        "context": context.model_dump(mode="json"),
+        "policy": batch.policy,
+        "bar": bar.model_dump(mode="json") if bar else None,
+    }
+    if execution_engine_version is not None:
+        command["execution_engine_version"] = execution_engine_version
+    if separate and execution_calendar is not None:
+        command["execution_calendar_sha256"] = calendar_digest(execution_calendar)
+    previous = _existing(session, account.id, key, digest(command))
+    if previous is not None:
+        return previous.id
+    if order.terminal or batch.terminal:
+        return None  # Cancellation/rejection is retained; never resurrect intent.
+    before = _check_projection(session, account)
+    if account.status != "active":
+        raise LedgerConflict("Paper portfolio is not active")
+    if (
+        session.scalar(
+            select(PaperFill.id)
+            .join(LedgerEvent, PaperFill.event_id == LedgerEvent.id)
+            .where(
+                LedgerEvent.portfolio_id == account.id,
+                PaperFill.execution_session > eligible.session_date,
             )
-        order.filled_quantity = Decimal(result.filled_quantity)
-        order.pending_quantity = Decimal(result.pending_quantity)
-        order.closed_quantity = Decimal(result.skipped_quantity)
-        order.terminal = result.terminal
-        order.status = "rejected" if result.status == "skipped" else result.status
-        order.reason = result.reason
-        session.flush()
-        orders = list(session.scalars(select(PaperOrder).where(PaperOrder.batch_id == batch.id)))
-        batch.terminal = all(item.terminal for item in orders)
-        if batch.terminal:
-            batch.status = (
-                "filled"
-                if all(item.status == "filled" for item in orders)
-                else "partially_filled"
-                if any(item.filled_quantity > 0 for item in orders)
-                else "rejected"
+            .limit(1)
+        )
+        is not None
+    ):
+        raise LedgerConflict("Posted state advanced beyond the original execution session")
+    for event, evidence in session.execute(
+        select(LedgerEvent, ActionEvidence)
+        .join(ActionEvidence, LedgerEvent.action_evidence_id == ActionEvidence.id)
+        .where(LedgerEvent.portfolio_id == account.id)
+    ):
+        action = CorporateAction.model_validate(evidence.payload)
+        if (
+            action.effective_session > eligible.session_date
+            or (
+                event.kind in {"dividend", "correction"}
+                and action.payable_session is not None
+                and action.payable_session > eligible.session_date
             )
-        elif any(item.filled_quantity > 0 for item in orders):
-            batch.status = "partially_filled"
-        batch.reason = next(
+            or (event.kind == "correction" and event.recorded_at > eligible.close_at)
+        ):
+            raise LedgerConflict("Later action/correction cannot finance an earlier pending order")
+    snapshot = session.get(DatasetSnapshot, batch.snapshot_id)
+    recommendation = session.get(RecommendationReference, batch.recommendation_id)
+    version = session.get(StrategyVersion, batch.strategy_version_id)
+    if (
+        snapshot is None
+        or recommendation is None
+        or version is None
+        or snapshot.manifest_hash != context.snapshot_sha256
+        or snapshot.id != context.snapshot_id
+        or snapshot.source_mode != context.mode
+        or snapshot.source_mode != account.source_mode
+        or snapshot.quality == "blocked"
+        or batch.snapshot_sha256 != context.snapshot_sha256
+        or batch.calendar_sha256 != context.calendar_sha256
+        or batch.approved_at != context.approved_at
+        or batch.decision_cutoff != context.decision_cutoff
+        or batch.eligible_open_at != eligible.open_at
+        or batch.strategy_version_id != account.strategy_version_id
+        or recommendation.disposition != "applied"
+        or recommendation.portfolio_revision != batch.approved_revision
+        or recommendation.decision_cutoff != context.decision_cutoff
+        or recommendation.as_of_session != context.decision_session
+        or recommendation.source_mode != context.mode
+        or digest(batch.intent) != batch.intent_sha256
+        or digest(recommendation.content) != recommendation.content_sha256
+    ):
+        raise LedgerConflict("Approved execution lineage does not match pinned evidence")
+    manifest = SnapshotManifestV1.model_validate(snapshot.manifest)
+    if (
+        manifest.manifest_hash() != snapshot.manifest_hash
+        or manifest.snapshot_id() != snapshot.id
+        or manifest.calendar.version != calendar_digest(calendar)
+        or order.asset_id not in manifest.coverage.asset_ids
+    ):
+        raise LedgerConflict("Registered snapshot identity/calendar/asset differs")
+    if separate:
+        execution_source = session.get(DatasetSnapshot, market.snapshot_id)
+        if execution_source is None or execution_calendar is None:
+            raise LedgerConflict("Separate execution source/calendar is not registered")
+        execution_manifest = SnapshotManifestV1.model_validate(execution_source.manifest)
+        session_match = next(
             (
-                item.reason
-                for item in sorted(orders, key=lambda item: item.ordinal)
-                if item.reason is not None and item.status != "filled"
+                item
+                for item in execution_calendar.sessions
+                if item.session_date == eligible.session_date
             ),
             None,
         )
-        session.flush()
-        return event.id
+        if (
+            execution_source.manifest_hash != market.snapshot_sha256
+            or execution_manifest.manifest_hash() != market.snapshot_sha256
+            or execution_manifest.snapshot_id() != market.snapshot_id
+            or execution_source.source_mode != context.mode
+            or execution_source.quality == "blocked"
+            or execution_manifest.mode != manifest.mode
+            or execution_manifest.source.provider != manifest.source.provider
+            or execution_manifest.source.normalization_version
+            != manifest.source.normalization_version
+            or execution_manifest.price_basis != manifest.price_basis
+            or execution_manifest.calendar.version != calendar_digest(execution_calendar)
+            or (calendar.id, calendar.timezone)
+            != (execution_calendar.id, execution_calendar.timezone)
+            or session_match != eligible
+            or order.asset_id not in execution_manifest.coverage.asset_ids
+        ):
+            raise LedgerConflict("Execution source/calendar is incompatible with approved decision")
+        command["execution_calendar_sha256"] = calendar_digest(execution_calendar)
+    authorized = TypeAdapter(tuple[OrderIntent, ...]).validate_python(batch.intent["orders"])
+    stored = list(
+        session.scalars(
+            select(PaperOrder).where(PaperOrder.batch_id == batch.id).order_by(PaperOrder.ordinal)
+        )
+    )
+    actual = tuple(
+        OrderIntent.model_validate(
+            {
+                "key": item.intent_key,
+                "asset_id": item.asset_id,
+                "sector": item.sector,
+                "side": item.side,
+                "requested_quantity": format(item.requested_quantity, ".6f"),
+            }
+        )
+        for item in stored
+    )
+    if (
+        len({item.key for item in authorized}) != len(authorized)
+        or any(
+            a.model_dump(exclude={"requested_quantity"})
+            != b.model_dump(exclude={"requested_quantity"})
+            or Decimal(a.requested_quantity) != Decimal(b.requested_quantity)
+            for a, b in zip(actual, authorized, strict=False)
+        )
+        or len(actual) != len(authorized)
+    ):
+        raise LedgerConflict("Persisted orders differ from immutable approved intent")
+    # Proceeds are usable only after the sell stage has durably resolved.
+    if (
+        order.side == "BUY"
+        and session.scalar(
+            select(PaperOrder.id)
+            .where(PaperOrder.batch_id == batch.id, PaperOrder.side == "SELL", ~PaperOrder.terminal)
+            .limit(1)
+        )
+        is not None
+    ):
+        return None
+    # Caller supplies the complete verified action set for this snapshot.
+    # An unprocessed action must not be skipped just because a raw open exists.
+    applied = {item.key: item.payload_sha256 for item in before.applied_actions}
+    for action in actions:
+        if (
+            action.asset_id == order.asset_id
+            and action.effective_session <= eligible.session_date
+            and action.visible(timestamp, context.execution_mode == "current_paper")
+        ):
+            key_hash = applied.get(action_key(action))
+            if key_hash is not None and key_hash != action_hash(action):
+                raise LedgerConflict("Revised action requires explicit correction")
+            if action.kind == "split" and key_hash is None:
+                return None
+            if action.kind == "dividend" and (
+                (
+                    action.payable_session is None
+                    and any(
+                        item.key == action_key(action) and Decimal(item.quantity) > 0
+                        for item in before.entitlements
+                    )
+                )
+                or not any(item.key == action_key(action) for item in before.entitlements)
+                or (
+                    action.payable_session is not None
+                    and action.payable_session <= eligible.session_date
+                    and key_hash is None
+                )
+            ):
+                return None
+    phase = sorted(
+        session.scalars(
+            select(PaperOrder).where(PaperOrder.batch_id == batch.id, ~PaperOrder.terminal)
+        ),
+        key=lambda item: (0 if item.side == "SELL" else 1, item.asset_id, item.ordinal),
+    )
+    if phase and phase[0].id != order.id:
+        return None
+    config = StrategyConfigV1.model_validate(version.config)
+    result = execute_order(
+        before,
+        OrderIntent(
+            key=order.intent_key,
+            asset_id=order.asset_id,
+            sector=order.sector,
+            side=TypeAdapter(Literal["BUY", "SELL"]).validate_python(order.side),
+            requested_quantity=format(order.requested_quantity, ".6f"),
+        ),
+        context,
+        calendar,
+        market,
+        observed_at=timestamp,
+        min_trade_usd=config.portfolio.min_trade_usd,
+        policy=policy,
+    )
+    if not result.terminal:
+        order.reason = result.reason
+        return None
+    event = _append(
+        session,
+        account,
+        key=key,
+        kind="fill" if result.fill else "order_closed",
+        before=before,
+        after=result.state_after,
+        command=command,
+        recorded_at=timestamp,
+        effective_at=result.fill.execution_at if result.fill else timestamp,
+        cash_entry=result.fill is not None,
+        order_id=order.id,
+        snapshot_id=market.snapshot_id,
+        details={"execution": result.model_dump(mode="json")}
+        | (
+            {"execution_engine_version": execution_engine_version}
+            if execution_engine_version
+            else {}
+        ),
+    )
+    if result.fill is not None:
+        fill = result.fill
+        session.add(
+            PaperFill(
+                id=uuid5(event.id, "fill"),
+                order_id=order.id,
+                event_id=event.id,
+                fill_event_key=key,
+                execution_session=fill.execution_session,
+                raw_price=Decimal(fill.raw_price),
+                executed_price=Decimal(fill.executed_price),
+                quantity=Decimal(fill.quantity),
+                gross_usd=Decimal(fill.gross_usd),
+                fee_usd=Decimal(fill.commission_usd),
+                slippage_usd=Decimal(fill.slippage_usd),
+                cash_delta_usd=Decimal(fill.cash_delta_usd),
+                removed_basis_usd=Decimal(fill.removed_basis_usd),
+                realized_pnl_usd=Decimal(fill.realized_pnl_usd),
+                posted_at=timestamp,
+            )
+        )
+    order.filled_quantity = Decimal(result.filled_quantity)
+    order.pending_quantity = Decimal(result.pending_quantity)
+    order.closed_quantity = Decimal(result.skipped_quantity)
+    order.terminal = result.terminal
+    order.status = "rejected" if result.status == "skipped" else result.status
+    order.reason = result.reason
+    session.flush()
+    orders = list(session.scalars(select(PaperOrder).where(PaperOrder.batch_id == batch.id)))
+    batch.terminal = all(item.terminal for item in orders)
+    if batch.terminal:
+        batch.status = (
+            "filled"
+            if all(item.status == "filled" for item in orders)
+            else "partially_filled"
+            if any(item.filled_quantity > 0 for item in orders)
+            else "rejected"
+        )
+    elif any(item.filled_quantity > 0 for item in orders):
+        batch.status = "partially_filled"
+    batch.reason = next(
+        (
+            item.reason
+            for item in sorted(orders, key=lambda item: item.ordinal)
+            if item.reason is not None and item.status != "filled"
+        ),
+        None,
+    )
+    session.flush()
+    return event.id
 
 
 def post_action(
@@ -724,170 +835,199 @@ def post_action(
     Revised economic evidence is never implicitly paid as another distribution.
     """
     timestamp = TypeAdapter(UTCTimestamp).validate_python(observed_at)
-    fingerprint = action_hash(action)
-    source_key = action_key(action)
     with Session(engine) as session, session.begin():
-        account = _locked(session, identity)
-        source = session.get(DatasetSnapshot, snapshot_id)
-        if (
-            source is None
-            or source.quality == "blocked"
-            or source.source_mode != account.source_mode
-        ):
-            raise LedgerConflict("Usable corporate-action snapshot is required")
-        if source.manifest["calendar"]["version"] != calendar_digest(calendar):
-            raise LedgerConflict("Corporate-action calendar differs from snapshot")
-        before = _check_projection(session, account)
-        if account.status == "closed":
-            raise LedgerConflict("Paper portfolio is closed")
-        if action.kind == "dividend":
-            # Persisted source history distinguishes learning a previously absent
-            # payable date (supported) from changing a known date (correction).
-            for original in session.scalars(
-                select(ActionEvidence).where(
-                    ActionEvidence.portfolio_id == identity,
-                    ActionEvidence.source_key == source_key,
-                )
-            ):
-                prior = CorporateAction.model_validate(original.payload)
-                if prior.payable_session is not None and original.payload_sha256 != fingerprint:
-                    raise LedgerConflict("Revised dividend evidence requires explicit correction")
-                if (
-                    prior.payable_session is None
-                    and action_hash(
-                        prior.model_copy(update={"payable_session": action.payable_session})
-                    )
-                    != fingerprint
-                ):
-                    raise LedgerConflict("Revised dividend evidence requires explicit correction")
-        needs_capture = action.kind == "split" or not any(
-            item.key == source_key for item in before.entitlements
-        )
-        already_applied = any(item.key == source_key for item in before.applied_actions)
-        if (
-            needs_capture
-            and not already_applied
-            and session.scalar(
-                select(PaperFill.id)
-                .join(LedgerEvent, PaperFill.event_id == LedgerEvent.id)
-                .where(
-                    LedgerEvent.portfolio_id == identity,
-                    PaperFill.execution_session >= action.effective_session,
-                )
-                .limit(1)
-            )
-            is not None
-        ):
-            raise LedgerConflict("Chronological replay required before affected-session trades")
-        result = apply_action(
-            before,
-            action,
-            session=session_date,
+        return _post_action(
+            session,
+            identity,
+            action=action,
+            snapshot_id=snapshot_id,
+            calendar=calendar,
+            session_date=session_date,
             observed_at=timestamp,
             live=live,
-            calendar=calendar,
         )
-        if result.state_after == before:
-            if (
-                action.kind == "dividend"
-                and action.payable_session is not None
-                and result.status == "pending"
-                and any(item.key == source_key for item in before.entitlements)
-                and session.scalar(
-                    select(ActionEvidence.id).where(
-                        ActionEvidence.portfolio_id == identity,
-                        ActionEvidence.source_key == source_key,
-                        ActionEvidence.payload_sha256 == fingerprint,
-                    )
-                )
-                is None
-            ):
-                # A reliable payable date can arrive before payment is due. Keep
-                # that observation immutable so a later refresh cannot move it.
-                session.add(
-                    ActionEvidence(
-                        id=uuid5(identity, "action:" + fingerprint + digest(source_key)),
-                        portfolio_id=identity,
-                        source_key=source_key,
-                        payload_sha256=fingerprint,
-                        payload=action.model_dump(mode="json"),
-                        recorded_at=timestamp,
-                    )
-                )
-            if result.status == "already_applied":
-                posted = session.scalar(
-                    select(LedgerEvent.id)
-                    .join(ActionEvidence, LedgerEvent.action_evidence_id == ActionEvidence.id)
-                    .where(
-                        LedgerEvent.portfolio_id == identity,
-                        ActionEvidence.source_key == source_key,
-                        ActionEvidence.payload_sha256 == fingerprint,
-                        LedgerEvent.kind.in_(("split", "dividend")),
-                    )
-                )
-                return posted
-            return None
-        # Unadjusted pending intent needs explicit audited transformation (#46).
-        # Freeze execution instead of silently resizing authorized shares.
-        if (
-            action.kind == "split"
-            and session.scalar(
-                select(PaperOrderBatch.id)
-                .where(PaperOrderBatch.portfolio_id == identity, ~PaperOrderBatch.terminal)
-                .limit(1)
-            )
-            is not None
-        ):
-            raise LedgerConflict("Pending order adjustment requires reevaluation")
-        evidence = session.scalar(
+
+
+def _post_action(
+    session: Session,
+    identity: UUID,
+    *,
+    action: CorporateAction,
+    snapshot_id: UUID,
+    calendar: Calendar,
+    session_date: date,
+    observed_at: datetime,
+    live: bool,
+    execution_engine_version: str | None = None,
+) -> UUID | None:
+    """Caller owns the portfolio lock and any worker publication fence."""
+    timestamp = TypeAdapter(UTCTimestamp).validate_python(observed_at)
+    fingerprint = action_hash(action)
+    source_key = action_key(action)
+    account = _locked(session, identity)
+    source = session.get(DatasetSnapshot, snapshot_id)
+    if source is None or source.quality == "blocked" or source.source_mode != account.source_mode:
+        raise LedgerConflict("Usable corporate-action snapshot is required")
+    if source.manifest["calendar"]["version"] != calendar_digest(calendar):
+        raise LedgerConflict("Corporate-action calendar differs from snapshot")
+    before = _check_projection(session, account)
+    if account.status == "closed":
+        raise LedgerConflict("Paper portfolio is closed")
+    if action.kind == "dividend":
+        # Persisted source history distinguishes learning a previously absent
+        # payable date (supported) from changing a known date (correction).
+        for original in session.scalars(
             select(ActionEvidence).where(
                 ActionEvidence.portfolio_id == identity,
                 ActionEvidence.source_key == source_key,
-                ActionEvidence.payload_sha256 == fingerprint,
             )
+        ):
+            prior = CorporateAction.model_validate(original.payload)
+            if prior.payable_session is not None and original.payload_sha256 != fingerprint:
+                raise LedgerConflict("Revised dividend evidence requires explicit correction")
+            if (
+                prior.payable_session is None
+                and action_hash(
+                    prior.model_copy(update={"payable_session": action.payable_session})
+                )
+                != fingerprint
+            ):
+                raise LedgerConflict("Revised dividend evidence requires explicit correction")
+    needs_capture = action.kind == "split" or not any(
+        item.key == source_key for item in before.entitlements
+    )
+    already_applied = any(item.key == source_key for item in before.applied_actions)
+    if (
+        needs_capture
+        and not already_applied
+        and session.scalar(
+            select(PaperFill.id)
+            .join(LedgerEvent, PaperFill.event_id == LedgerEvent.id)
+            .where(
+                LedgerEvent.portfolio_id == identity,
+                PaperFill.execution_session >= action.effective_session,
+            )
+            .limit(1)
         )
-        if evidence is None:
-            evidence = ActionEvidence(
-                id=uuid5(identity, "action:" + fingerprint + digest(source_key)),
-                portfolio_id=identity,
-                source_key=source_key,
-                payload_sha256=fingerprint,
-                payload=action.model_dump(mode="json"),
-                recorded_at=timestamp,
+        is not None
+    ):
+        raise LedgerConflict("Chronological replay required before affected-session trades")
+    result = apply_action(
+        before,
+        action,
+        session=session_date,
+        observed_at=timestamp,
+        live=live,
+        calendar=calendar,
+    )
+    if result.state_after == before:
+        if (
+            action.kind == "dividend"
+            and action.payable_session is not None
+            and result.status == "pending"
+            and any(item.key == source_key for item in before.entitlements)
+            and session.scalar(
+                select(ActionEvidence.id).where(
+                    ActionEvidence.portfolio_id == identity,
+                    ActionEvidence.source_key == source_key,
+                    ActionEvidence.payload_sha256 == fingerprint,
+                )
             )
-            session.add(evidence)
-            session.flush()
-        kind = action.kind if result.status == "applied" else "entitlement"
-        command = {
-            "source_key": source_key,
-            "payload_sha256": fingerprint,
-            "phase": kind,
-            "snapshot_id": str(snapshot_id),
-            "calendar_sha256": calendar_digest(calendar),
-        }
-        key = "action:" + digest([source_key, kind])
-        existing = _existing(session, identity, key, digest(command))
-        if existing is not None:
-            return existing.id
-        event = _append(
-            session,
-            account,
-            key=key,
-            kind=kind,
-            before=before,
-            after=result.state_after,
-            command=command,
+            is None
+        ):
+            # A reliable payable date can arrive before payment is due. Keep
+            # that observation immutable so a later refresh cannot move it.
+            session.add(
+                ActionEvidence(
+                    id=uuid5(identity, "action:" + fingerprint + digest(source_key)),
+                    portfolio_id=identity,
+                    source_key=source_key,
+                    payload_sha256=fingerprint,
+                    payload=action.model_dump(mode="json"),
+                    recorded_at=timestamp,
+                )
+            )
+        if result.status == "already_applied":
+            posted = session.scalar(
+                select(LedgerEvent.id)
+                .join(ActionEvidence, LedgerEvent.action_evidence_id == ActionEvidence.id)
+                .where(
+                    LedgerEvent.portfolio_id == identity,
+                    ActionEvidence.source_key == source_key,
+                    ActionEvidence.payload_sha256 == fingerprint,
+                    LedgerEvent.kind.in_(("split", "dividend")),
+                )
+            )
+            return posted
+        return None
+    # Unadjusted pending intent needs explicit audited transformation (#46).
+    # Freeze execution instead of silently resizing authorized shares.
+    if (
+        action.kind == "split"
+        and session.scalar(
+            select(PaperOrderBatch.id)
+            .where(PaperOrderBatch.portfolio_id == identity, ~PaperOrderBatch.terminal)
+            .limit(1)
+        )
+        is not None
+    ):
+        raise LedgerConflict("Pending order adjustment requires reevaluation")
+    evidence = session.scalar(
+        select(ActionEvidence).where(
+            ActionEvidence.portfolio_id == identity,
+            ActionEvidence.source_key == source_key,
+            ActionEvidence.payload_sha256 == fingerprint,
+        )
+    )
+    if evidence is None:
+        evidence = ActionEvidence(
+            id=uuid5(identity, "action:" + fingerprint + digest(source_key)),
+            portfolio_id=identity,
+            source_key=source_key,
+            payload_sha256=fingerprint,
+            payload=action.model_dump(mode="json"),
             recorded_at=timestamp,
-            effective_at=timestamp,
-            cash_entry=kind == "dividend",
-            action_evidence_id=evidence.id,
-            snapshot_id=snapshot_id,
-            details={
-                "action": result.model_dump(mode="json"),
-                "recognized_cash_usd": result.cash_delta_usd,
-            },
         )
-        return event.id
+        session.add(evidence)
+        session.flush()
+    kind = action.kind if result.status == "applied" else "entitlement"
+    command = {
+        "source_key": source_key,
+        "payload_sha256": fingerprint,
+        "phase": kind,
+        "snapshot_id": str(snapshot_id),
+        "calendar_sha256": calendar_digest(calendar),
+    }
+    if execution_engine_version is not None:
+        command["execution_engine_version"] = execution_engine_version
+    key = "action:" + digest([source_key, kind])
+    existing = _existing(session, identity, key, digest(command))
+    if existing is not None:
+        return existing.id
+    event = _append(
+        session,
+        account,
+        key=key,
+        kind=kind,
+        before=before,
+        after=result.state_after,
+        command=command,
+        recorded_at=timestamp,
+        effective_at=timestamp,
+        cash_entry=kind == "dividend",
+        action_evidence_id=evidence.id,
+        snapshot_id=snapshot_id,
+        details={
+            "action": result.model_dump(mode="json"),
+            "recognized_cash_usd": result.cash_delta_usd,
+        }
+        | (
+            {"execution_engine_version": execution_engine_version}
+            if execution_engine_version
+            else {}
+        ),
+    )
+    return event.id
 
 
 def correct_dividend(
