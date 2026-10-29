@@ -16,7 +16,9 @@ describe("foundation shell", () => {
         Response.json(
           request.url.endsWith("/health")
             ? fixtures.health
-            : fixtures.workspace,
+            : request.url.endsWith("/portfolios?limit=25")
+              ? { items: [], next_cursor: null }
+              : fixtures.workspace,
         ),
       ),
     );
@@ -32,7 +34,7 @@ describe("foundation shell", () => {
     expect(screen.getByText("SYNTHETIC_DATA_ONLY")).toBeTruthy();
     expect(
       screen
-        .getByRole("link", { name: "Open paper portfolios →" })
+        .getByRole("link", { name: "Create or browse paper accounts →" })
         .getAttribute("href"),
     ).toBe("/portfolios");
     expect(screen.queryByText("No paper portfolio yet")).toBeNull();

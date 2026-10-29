@@ -290,6 +290,23 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/portfolios/{portfolio_id}/decision-inputs": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Inputs */
+    get: operations["inputs_api_v1_portfolios__portfolio_id__decision_inputs_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/v1/portfolios/{portfolio_id}/recommendations": {
     parameters: {
       query?: never;
@@ -385,6 +402,23 @@ export interface paths {
     };
     /** Recover */
     get: operations["recover_api_v1_recommendations__recommendation_id__apply_result_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/recommendations/{recommendation_id}/approval-preview": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Preview */
+    get: operations["preview_api_v1_recommendations__recommendation_id__approval_preview_get"];
     put?: never;
     post?: never;
     delete?: never;
@@ -603,6 +637,31 @@ export interface components {
       /** Expected Revision */
       expected_revision: number;
     };
+    /** ApprovalPreviewV1 */
+    ApprovalPreviewV1: {
+      /** Expected Revision */
+      expected_revision: number;
+      /** Indicative Eligible Open At */
+      indicative_eligible_open_at: string | null;
+      /**
+       * Limitation
+       * @default READONLY_NOT_RESERVED_REVALIDATE_ON_APPLY
+       * @constant
+       */
+      limitation: "READONLY_NOT_RESERVED_REVALIDATE_ON_APPLY";
+      /**
+       * Portfolio Id
+       * Format: uuid
+       */
+      portfolio_id: string;
+      /**
+       * Recommendation Id
+       * Format: uuid
+       */
+      recommendation_id: string;
+      /** Unavailable Reason */
+      unavailable_reason: string | null;
+    };
     /** ArtifactReference */
     ArtifactReference: {
       /**
@@ -809,6 +868,44 @@ export interface components {
       status: "empty" | "ready" | "refreshing" | "failed";
       /** Warnings */
       warnings: string[];
+    };
+    /** DecisionInputsV1 */
+    DecisionInputsV1: {
+      /**
+       * Clock At
+       * Format: date-time
+       */
+      clock_at: string;
+      /**
+       * Data Status
+       * @enum {string}
+       */
+      data_status: "synthetic_fixture" | "research_market_data";
+      /**
+       * Limitation
+       * @default CALENDAR_SUPPORT_NOT_PRICE_COMPLETENESS
+       * @constant
+       */
+      limitation: "CALENDAR_SUPPORT_NOT_PRICE_COMPLETENESS";
+      /**
+       * Portfolio Id
+       * Format: uuid
+       */
+      portfolio_id: string;
+      /**
+       * Selection Policy
+       * @default EARLIEST_PINNED_HISTORY_AND_HORIZON
+       * @constant
+       */
+      selection_policy: "EARLIEST_PINNED_HISTORY_AND_HORIZON";
+      /** Snapshot Id */
+      snapshot_id: string | null;
+      /** Suggested Cutoff Utc */
+      suggested_cutoff_utc: string | null;
+      /** Suggested Session */
+      suggested_session: string | null;
+      /** Unavailable Reason */
+      unavailable_reason: string | null;
     };
     /** DividendEntitlement */
     DividendEntitlement: {
@@ -4811,6 +4908,64 @@ export interface operations {
       };
     };
   };
+  inputs_api_v1_portfolios__portfolio_id__decision_inputs_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        portfolio_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["DecisionInputsV1"];
+        };
+      };
+      /** @description Not Found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Conflict */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Unprocessable Content */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Service Unavailable */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+    };
+  };
   list_recommendations_api_v1_portfolios__portfolio_id__recommendations_get: {
     parameters: {
       query?: {
@@ -5188,6 +5343,64 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["PaperApprovalAccepted"];
+        };
+      };
+      /** @description Not Found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Conflict */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Unprocessable Content */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Service Unavailable */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+    };
+  };
+  preview_api_v1_recommendations__recommendation_id__approval_preview_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        recommendation_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApprovalPreviewV1"];
         };
       };
       /** @description Not Found */

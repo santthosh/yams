@@ -427,6 +427,8 @@ Scheduling does not approve trades, replace frozen fill chronology or implement
 | `POST /portfolios` | Create paper account, default $1,000 | 201 portfolio | 0.0.4 | #45 |
 | `GET /portfolios/{id}` | Valuation, holdings, cash | 200 portfolio | 0.0.4 | #45 |
 | `GET /portfolios/{id}/transactions` | Fills/ledger and cash history | 200 paginated | 0.0.4 | #45 |
+| `GET /portfolios/{id}/decision-inputs` | Readonly pinned-calendar review suggestion; no clock advance or admission | 200 context / 503 unavailable | 0.0.5 | #52 |
+| `GET /recommendations/{id}/approval-preview` | Indicative eligible opening and current approval reason; no reservation | 200 context / 409 pending / 503 unavailable | 0.0.5 | #52 |
 | `GET /portfolios/{id}/schedule` | Readonly monthly review/clock/catch-up diagnostics | 200 status / 503 unavailable | 0.0.5 | #51 |
 | `POST /portfolios/{id}/recommendations` | Evaluate strategy against holdings | 202 job | 0.0.5 | #49 |
 | `GET /portfolios/{id}/recommendations` | Recommendation history | 200 paginated | 0.0.5 | #49 |
@@ -637,3 +639,21 @@ Every time-series endpoint returns `mode` and source warnings: `synthetic_fixtur
 - 0.0.7 extends the core flow with Journal evidence and maturity; it is not a prerequisite for earlier releases.
 
 **Contract change policy:** an incompatible schema or lifecycle update requires a reviewed ADR or tracked API contract issue, regeneration of clients, updated fixtures, migration strategy and at least one cross-layer integration test. No agent can redefine semantics locally inside its assigned module.
+
+
+### Decision Center readonly composition (#52)
+
+`DecisionInputsV1` reports the current durable account clock and registered accounting
+snapshot, plus the earliest covered pinned session on/after that clock with253 calendar
+closes and a supported 90-calendar-day horizon. It does not inspect returns or promise
+complete price history; the engine retains all eligibility/history failures. Null
+suggestion/cutoff carries an unavailable reason. GET never advances time or admits
+work. Explicit submission remains the original closed `RecommendationRequest`.
+
+`ApprovalPreviewV1` reports the original expected portfolio revision, an indicative
+eligible opening derived by the shared `next_eligible_session` and operator-clock
+helpers, and an unavailable reason for stale/nonready/no-order/active-batch cases.
+It does not reserve an opening or authorize orders. Approval revalidates the actual
+current state under its existing lock. Exact keyed recovery remains independent
+of source freshness/files. Both routes are readonly, accept no query parameters
+or caller clocks/prices, and are exposed through the existing same-origin proxy.

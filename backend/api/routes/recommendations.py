@@ -11,6 +11,7 @@ from sqlalchemy import Engine
 from backend.api.errors import error_response
 from backend.api.routing import ContractRoute
 from backend.domain.common import Cursor, ErrorDetail, ErrorEnvelope, PageRequest
+from backend.domain.decision_context import ApprovalPreviewV1, DecisionInputsV1
 from backend.domain.recommendation_api import (
     RecommendationAccepted,
     RecommendationDetailV1,
@@ -20,6 +21,7 @@ from backend.domain.recommendation_api import (
 from backend.jobs.queue import IdempotencyConflict
 from backend.persistence.database import Settings
 from backend.portfolio.accounts import AccountError
+from backend.portfolio.decision_context import approval_preview, decision_inputs
 from backend.portfolio.recommendation_queries import (
     RecommendationPending,
     RecommendationQueryError,
@@ -55,6 +57,38 @@ def recommendations_router(engine: Engine | None, settings: Settings) -> APIRout
         if error is not None:
             logger.warning("Recommendation unavailable error_type=%s", type(error).__name__)
         return error_response("NOT_READY", "Recommendation storage or integrity is unavailable.")
+
+    @router.get(
+        "/portfolios/{portfolio_id}/decision-inputs",
+        response_model=DecisionInputsV1,
+        responses=errors,
+    )
+    def inputs(portfolio_id: UUID) -> DecisionInputsV1 | JSONResponse:
+        if engine is None:
+            return unavailable()
+        try:
+            return decision_inputs(engine, settings.artifact_root, portfolio_id)
+        except LookupError:
+            return error_response("NOT_FOUND", "Portfolio was not found.")
+        except Exception as error:
+            return unavailable(error)
+
+    @router.get(
+        "/recommendations/{recommendation_id}/approval-preview",
+        response_model=ApprovalPreviewV1,
+        responses=errors,
+    )
+    def preview(recommendation_id: UUID) -> ApprovalPreviewV1 | JSONResponse:
+        if engine is None:
+            return unavailable()
+        try:
+            return approval_preview(engine, settings.artifact_root, recommendation_id)
+        except LookupError:
+            return error_response("NOT_FOUND", "Recommendation was not found.")
+        except RecommendationPending as error:
+            return pending_response(error)
+        except Exception as error:
+            return unavailable(error)
 
     @router.post(
         "/portfolios/{portfolio_id}/recommendations",

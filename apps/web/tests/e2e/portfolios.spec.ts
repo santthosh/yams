@@ -244,7 +244,7 @@ test("posted holdings and paginated ledger use exact backend values", async ({
     page.getByText("Commission $0.00 · Slippage $0.20"),
   ).toBeVisible();
   await expect(
-    page.getByText("Order batch inspection comes in 0.0.5"),
+    page.getByRole("link", { name: "Decision Center →", exact: true }),
   ).toBeVisible();
   await page.getByRole("button", { name: "Load older transactions" }).click();
   await expect(

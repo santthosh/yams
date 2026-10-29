@@ -918,8 +918,23 @@ def main() -> None:
 
         verify_paper_batch()
         verify_portfolio_screens("initial")
+        subprocess.run(
+            ["pnpm", "--filter", "@yams/web", "exec", "node", "tests/decision-browser.mjs"],
+            cwd=ROOT,
+            env={
+                **env,
+                "YAMS_SMOKE_URL": f"http://{address}",
+                "YAMS_SMOKE_EVIDENCE": str(destination),
+            },
+            check=True,
+        )
         evidence["checks"].append(
-            "real portfolio holdings/fees/history, staged batch controls and Axe at360/1280"
+            "real Decision Center at360/1280, common-shock scenarios, keyboard confirmation, "
+            "response-loss reload recovery, duplicate suppression, unchanged approval cash, "
+            "explicit replay, durable fills, actionable dashboard and Axe"
+        )
+        evidence["checks"].append(
+            "real portfolio holdings/fees/history, Decision Center entry and Axe at360/1280"
         )
         evidence["paper_batch"] = paper_batch
         evidence["checks"].append("private explicit fixture approval and real worker atomic fill")

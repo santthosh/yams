@@ -278,3 +278,24 @@ Use explicit labels: `Estimated`, `Forecast scenario`, `Simulated fill`, `Histor
 ## 12. Handoff rules
 
 Frontend engineers use `DOMAIN_AND_API_CONTRACTS.md` as the only authoritative request/response contract and generated TypeScript client types as the source for runtime shapes. Never hardcode demo prices or ranks into production UI routes; wire state from APIs and show fixture status. Backends must emit reason codes, timestamps, nullable/unavailable states and risk warnings sufficient to render these screens. Missing UI states are actionable implementation issues, not reasons for agents to invent financial semantics.
+
+
+### Delivered Decision Center source flow (#52)
+
+At `/portfolios/{id}/decisions`, review 1) posted cash/holdings, 2) server targets and risk
+with candidate/exclusion evidence, 3) common-shock 90-calendar-day scenarios in accessible
+tables, then 4) explicit paper authorization. Missing marks/forecast outcomes are unavailable,
+never zero. HOLD/cash-only decisions remain inspectable; no executable orders means
+no approval. A readonly server context suggests the earliest calendar-supported session,
+without selecting by returns. Changing/submitting a later synthetic session explicitly
+observes its virtual cutoff without trading; the explanation precedes submission.
+
+The confirmation names portfolio/revision/version/as-of, estimated quantities/costs
+and indicative future opening. The server revalidates it. Original request keys and
+bodies persist before mutation, so response loss/reload recovers the original result.
+A changed-state conflict requires fresh review. Approval and pending states show no
+optimistic holdings update. Explicit fixture steps are separate actions; missing quote
+availability can leave a batch pending. Cancellation closes only remaining quantities;
+posted fills and original decision/scenario evidence remain visible. The dashboard
+shows real account state, pending work and next-due/supervisor diagnostics; no accounts
+or balances are invented on startup. Other future routes remain staged.
