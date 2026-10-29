@@ -21,7 +21,7 @@
 | Nullability | Nullable only when genuinely unavailable; unavailable reason/status mandatory |
 | Currency | USD for v1, explicit `currency` on money-like records |
 | Pagination | `limit` (default 25, max 100), `cursor` (opaque); response `items`, `next_cursor` |
-| Mutating paper commands | `Idempotency-Key: <client-generated UUID>` required; persisted result reused on exact retry |
+| Mutating paper commands | Creating accounts/approval/fixture steps requires UUID `Idempotency-Key`; exact retry reuses the result. Target-idempotent dismiss/cancel uses closed `{}` under its owning lifecycle contract. Manual evaluation keys remain optional. |
 | Errors | Typed error envelope, stable code, human message, details and correlation ID |
 | Heavy actions | `202 Accepted` + `job_id` and resource references; poll `GET /jobs/{id}` |
 | Deletion | Avoid physical deletion of referenced strategy versions, fills, forecasts or decision evidence |
@@ -342,7 +342,7 @@ An optional portfolio-scoped UUID `Idempotency-Key` retains the original evaluat
 on exact retry and conflicts on changed inputs.
 
 Synthetic accounts require explicit `synthetic_replay`. Their result `created_at`
-is the later of request admission and the authored decision cutoff; `computed_at`
+is the later of actual admission, authored decision cutoff and durable replay observation; `computed_at`
 records actual UTC publication. History timestamps retain actual admission time.
 These fields and `data_status` disclose replay chronology; they do not backdate
 real-market observation or operator approval. Posted state observed after a
@@ -383,6 +383,26 @@ for accounting. Actual operator UTC audit is separate from synthetic replay time
 Original eligibility, immutable evidence and exact ledger arithmetic remain under
 ADR-001/004/014; scheduling and screens belong to #51/#52.
 
+### 5.3 Monthly review scheduling (#51)
+
+[ADR-016](adr/0016-portfolio-review-scheduler.md) and the
+[operational contract](operations/portfolio-schedules.md) define persisted monthly
+occurrences, bounded chronological catch-up, atomic job/checkpoint linkage and
+manual/scheduled semantic deduplication. Explicit manual synthetic session selection
+is a durable clock observation; it changes no money or authorization. Background
+reviews require an elapsed cutoff and cannot advance that observation. Actual UTC
+admission/computation remains separate from logical replay timing. Exact request
+aliases preserve original canonical input and recover before freshness.
+
+`GET /portfolios/{id}/schedule` returns `PortfolioScheduleV1`: current/last-observed
+clock, latest explicit review cutoff, next due or reason, bounded recent outcomes,
+real linked jobs, active batch identity, nullable backlog and supervisor observations.
+GET is readonly. Heartbeat gaps are unobserved intervals, not exact shutdown times;
+monitoring runs only while Docker is active. Missing/obsolete evidence produces
+waiting, missed or skipped outcomes without a fabricated historical decision.
+Scheduling does not approve trades, replace frozen fill chronology or implement
+#52's screen. Current real accounting remains unsupported.
+
 ## 6. Resource endpoints (minimum contracts)
 
 | Method & route | Action | Response | Milestone | Primary owner |
@@ -407,6 +427,7 @@ ADR-001/004/014; scheduling and screens belong to #51/#52.
 | `POST /portfolios` | Create paper account, default $1,000 | 201 portfolio | 0.0.4 | #45 |
 | `GET /portfolios/{id}` | Valuation, holdings, cash | 200 portfolio | 0.0.4 | #45 |
 | `GET /portfolios/{id}/transactions` | Fills/ledger and cash history | 200 paginated | 0.0.4 | #45 |
+| `GET /portfolios/{id}/schedule` | Readonly monthly review/clock/catch-up diagnostics | 200 status / 503 unavailable | 0.0.5 | #51 |
 | `POST /portfolios/{id}/recommendations` | Evaluate strategy against holdings | 202 job | 0.0.5 | #49 |
 | `GET /portfolios/{id}/recommendations` | Recommendation history | 200 paginated | 0.0.5 | #49 |
 | `GET /recommendations/{id}` | Full proposed orders/explanations | 200 immutable recommendation | 0.0.5 | #49 |

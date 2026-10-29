@@ -40,7 +40,12 @@ def job_status(queue: Queue, identity: UUID) -> str:
 
 
 def pending_recommendation(
-    database: Engine, tmp_path: Path, *, decision_only: bool = False, cash: str = "1000.00"
+    database: Engine,
+    tmp_path: Path,
+    *,
+    decision_only: bool = False,
+    cash: str = "1000.00",
+    opened_at: datetime | None = None,
 ) -> tuple[UUID, UUID, PinnedSnapshot, datetime]:
     source = prepare(database, tmp_path)
     if decision_only:
@@ -63,7 +68,7 @@ def pending_recommendation(
         strategy_version_id=DEFAULT_VERSION_ID,
         name="SYNTHETIC_DATA_ONLY",
         opening_cash_usd=cash,
-        created_at=cutoff,
+        created_at=opened_at or cutoff,
     )
     intent = ExecutionIntentV1(
         engine_version="authored-test-1",

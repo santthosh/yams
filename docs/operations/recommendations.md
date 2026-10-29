@@ -1,8 +1,8 @@
 # Immutable portfolio recommendations
 
 The source implementation for 0.0.5 adds recommendation production and forecast
-read APIs. Public approval/dismissal/batch transport delegates through the [#50 controls](paper-controls.md); scheduling remains #51,
-and Decision Center screens #52. This source work does not publish 0.0.5 or change
+read APIs. Public approval/dismissal/batch transport delegates through the [#50 controls](paper-controls.md); [monthly scheduling](portfolio-schedules.md) is implemented in the source increment,
+and Decision Center screens remain #52. This source work does not publish 0.0.5 or change
 the immutable 0.0.4 bundle.
 
 Capital, orders and holdings are synthetic. Current real providers remain
@@ -128,3 +128,17 @@ with `expired` disposition. Later changes are reported through `is_current`,
 `current_portfolio_revision` and `stale_reasons` without changing original content.
 The eventual approval controller still verifies current state atomically; a GET
 response is not authorization. Normal restart/upgrade never resets volumes.
+
+
+## Explicit synthetic review observation (#51)
+
+Selecting a manual synthetic as-of session records its canonical cutoff as a
+durable clock observation, including for an all-cash account. It changes no
+holdings, orders or authorization. New logical request/creation time cannot
+precede the current durable replay clock; actual run admission/history and
+computation UTC remain separate. Rejected/rolled-back admission advances nothing;
+accepted failed/cancelled computation retains the chosen observation. Background
+monthly reviews must already be due and cannot advance time themselves. Existing
+immutable payloads/results retain their original bytes and provenance. See
+[monthly schedules](portfolio-schedules.md) for semantic deduplication, exact-key
+alias recovery, next-due status and paused/unobserved intervals.

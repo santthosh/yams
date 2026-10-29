@@ -51,6 +51,11 @@ export async function proxyApi(
     segments[0] === "portfolios" &&
     UUID_PATTERN.test(segments[1]) &&
     segments[2] === "transactions";
+  const portfolioSchedule =
+    segments.length === 3 &&
+    segments[0] === "portfolios" &&
+    UUID_PATTERN.test(segments[1]) &&
+    segments[2] === "schedule";
   const portfolioRecommendations =
     segments.length === 3 &&
     segments[0] === "portfolios" &&
@@ -149,6 +154,7 @@ export async function proxyApi(
         portfolios ||
         portfolioDetail ||
         portfolioTransactions ||
+        portfolioSchedule ||
         portfolioRecommendations ||
         recommendationDetail ||
         forecastDetail ||

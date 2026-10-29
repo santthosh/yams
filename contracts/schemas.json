@@ -12859,6 +12859,1278 @@
     "title": "PortfolioCreateRequest",
     "type": "object"
   },
+  "PortfolioScheduleV1.serialization": {
+    "$defs": {
+      "ErrorDetail": {
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "enum": [
+              "VALIDATION_ERROR",
+              "NOT_FOUND",
+              "METHOD_NOT_ALLOWED",
+              "HTTP_ERROR",
+              "NOT_READY",
+              "STATE_CONFLICT",
+              "IDEMPOTENCY_CONFLICT",
+              "STALE_DATA",
+              "INSUFFICIENT_MARKET_DATA",
+              "LIMIT_EXCEEDED",
+              "PROVIDER_UNAVAILABLE",
+              "FORECAST_UNAVAILABLE",
+              "JOB_FAILED",
+              "INTERNAL_ERROR",
+              "WORKLOAD_LIMIT",
+              "RESOURCE_EXHAUSTED",
+              "TIME_LIMIT"
+            ],
+            "title": "Code",
+            "type": "string"
+          },
+          "correlation_id": {
+            "format": "uuid",
+            "title": "Correlation Id",
+            "type": "string"
+          },
+          "details": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "boolean"
+                },
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                }
+              ]
+            },
+            "title": "Details",
+            "type": "object"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "retryable": {
+            "title": "Retryable",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "code",
+          "message",
+          "details",
+          "retryable",
+          "correlation_id"
+        ],
+        "title": "ErrorDetail",
+        "type": "object"
+      },
+      "JobResult": {
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "enum": [
+              "diagnostic",
+              "resource"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "resource_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resource Id"
+          }
+        },
+        "required": [
+          "kind",
+          "resource_id",
+          "message"
+        ],
+        "title": "JobResult",
+        "type": "object"
+      },
+      "JobV1": {
+        "additionalProperties": false,
+        "properties": {
+          "attempts": {
+            "minimum": 0,
+            "title": "Attempts",
+            "type": "integer"
+          },
+          "created_at": {
+            "format": "date-time",
+            "pattern": "Z$",
+            "title": "Created At",
+            "type": "string"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/ErrorDetail"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "max_attempts": {
+            "minimum": 1,
+            "title": "Max Attempts",
+            "type": "integer"
+          },
+          "progress": {
+            "ge": 0,
+            "le": 100,
+            "title": "Progress",
+            "type": "number"
+          },
+          "result": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/JobResult"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "status": {
+            "enum": [
+              "queued",
+              "running",
+              "cancel_requested",
+              "completed",
+              "failed",
+              "cancelled"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "pattern": "Z$",
+            "title": "Updated At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "status",
+          "attempts",
+          "max_attempts",
+          "progress",
+          "created_at",
+          "updated_at",
+          "result",
+          "error"
+        ],
+        "title": "JobV1",
+        "type": "object"
+      },
+      "ReviewOccurrenceV1": {
+        "additionalProperties": false,
+        "properties": {
+          "as_of_session": {
+            "format": "date",
+            "title": "As Of Session",
+            "type": "string"
+          },
+          "created_at": {
+            "format": "date-time",
+            "pattern": "Z$",
+            "title": "Created At",
+            "type": "string"
+          },
+          "first_observed_clock_at": {
+            "format": "date-time",
+            "pattern": "Z$",
+            "title": "First Observed Clock At",
+            "type": "string"
+          },
+          "handled_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "pattern": "Z$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Handled At"
+          },
+          "handled_clock_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "pattern": "Z$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Handled Clock At"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "intended_due_at": {
+            "format": "date-time",
+            "pattern": "Z$",
+            "title": "Intended Due At",
+            "type": "string"
+          },
+          "job": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/JobV1"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "observed_snapshot_id": {
+            "format": "uuid",
+            "title": "Observed Snapshot Id",
+            "type": "string"
+          },
+          "observed_snapshot_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Observed Snapshot Sha256",
+            "type": "string"
+          },
+          "opportunity_end_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "pattern": "Z$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Opportunity End At"
+          },
+          "outcome": {
+            "enum": [
+              "waiting",
+              "admitted",
+              "missed",
+              "skipped"
+            ],
+            "title": "Outcome",
+            "type": "string"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "pattern": "^[A-Z][A-Z0-9_]*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          },
+          "recommendation_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Recommendation Id"
+          }
+        },
+        "required": [
+          "id",
+          "as_of_session",
+          "intended_due_at",
+          "opportunity_end_at",
+          "first_observed_clock_at",
+          "observed_snapshot_id",
+          "observed_snapshot_sha256",
+          "created_at",
+          "outcome",
+          "reason",
+          "handled_at",
+          "handled_clock_at",
+          "recommendation_id",
+          "job"
+        ],
+        "title": "ReviewOccurrenceV1",
+        "type": "object"
+      },
+      "SupervisorObservationV1": {
+        "additionalProperties": false,
+        "properties": {
+          "last_seen_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "pattern": "Z$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Seen At"
+          },
+          "last_unobserved_end_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "pattern": "Z$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Unobserved End At"
+          },
+          "last_unobserved_start_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "pattern": "Z$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Unobserved Start At"
+          },
+          "limitation": {
+            "const": "OBSERVATION_NOT_EXACT_SHUTDOWN",
+            "default": "OBSERVATION_NOT_EXACT_SHUTDOWN",
+            "title": "Limitation",
+            "type": "string"
+          },
+          "measured_at": {
+            "format": "date-time",
+            "pattern": "Z$",
+            "title": "Measured At",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "unobserved",
+              "fresh",
+              "stale"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status",
+          "measured_at",
+          "last_seen_at",
+          "last_unobserved_start_at",
+          "last_unobserved_end_at"
+        ],
+        "title": "SupervisorObservationV1",
+        "type": "object"
+      }
+    },
+    "additionalProperties": false,
+    "properties": {
+      "account_state": {
+        "enum": [
+          "active",
+          "paused",
+          "closed"
+        ],
+        "title": "Account State",
+        "type": "string"
+      },
+      "active_batch_controls_available": {
+        "title": "Active Batch Controls Available",
+        "type": "boolean"
+      },
+      "active_order_batch_id": {
+        "anyOf": [
+          {
+            "format": "uuid",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Active Order Batch Id"
+      },
+      "backlog_unavailable_reason": {
+        "anyOf": [
+          {
+            "pattern": "^[A-Z][A-Z0-9_]*$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Backlog Unavailable Reason"
+      },
+      "clock_at": {
+        "format": "date-time",
+        "pattern": "Z$",
+        "title": "Clock At",
+        "type": "string"
+      },
+      "clock_mode": {
+        "enum": [
+          "synthetic_replay",
+          "current_paper"
+        ],
+        "title": "Clock Mode",
+        "type": "string"
+      },
+      "data_status": {
+        "enum": [
+          "synthetic_fixture",
+          "research_market_data"
+        ],
+        "title": "Data Status",
+        "type": "string"
+      },
+      "due_backlog": {
+        "anyOf": [
+          {
+            "type": "boolean"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Due Backlog"
+      },
+      "frequency": {
+        "const": "monthly",
+        "default": "monthly",
+        "title": "Frequency",
+        "type": "string"
+      },
+      "last_explicit_review_cutoff": {
+        "anyOf": [
+          {
+            "format": "date-time",
+            "pattern": "Z$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Last Explicit Review Cutoff"
+      },
+      "last_observed_at": {
+        "anyOf": [
+          {
+            "format": "date-time",
+            "pattern": "Z$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Last Observed At"
+      },
+      "last_observed_state": {
+        "enum": [
+          "waiting",
+          "review_admitted",
+          "unavailable",
+          "paused",
+          "up_to_date",
+          "catching_up",
+          "unobserved"
+        ],
+        "title": "Last Observed State",
+        "type": "string"
+      },
+      "next_review_due_at": {
+        "anyOf": [
+          {
+            "format": "date-time",
+            "pattern": "Z$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Next Review Due At"
+      },
+      "next_review_session": {
+        "anyOf": [
+          {
+            "format": "date",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Next Review Session"
+      },
+      "observed_clock_at": {
+        "anyOf": [
+          {
+            "format": "date-time",
+            "pattern": "Z$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Observed Clock At"
+      },
+      "paper_only": {
+        "const": true,
+        "default": true,
+        "title": "Paper Only",
+        "type": "boolean"
+      },
+      "portfolio_id": {
+        "format": "uuid",
+        "title": "Portfolio Id",
+        "type": "string"
+      },
+      "reason": {
+        "anyOf": [
+          {
+            "pattern": "^[A-Z][A-Z0-9_]*$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Reason"
+      },
+      "recent_occurrences": {
+        "items": {
+          "$ref": "#/$defs/ReviewOccurrenceV1"
+        },
+        "maxItems": 25,
+        "title": "Recent Occurrences",
+        "type": "array"
+      },
+      "reconciliation_required": {
+        "title": "Reconciliation Required",
+        "type": "boolean"
+      },
+      "supervisor": {
+        "$ref": "#/$defs/SupervisorObservationV1"
+      }
+    },
+    "required": [
+      "portfolio_id",
+      "data_status",
+      "clock_mode",
+      "account_state",
+      "reconciliation_required",
+      "last_observed_state",
+      "reason",
+      "last_observed_at",
+      "clock_at",
+      "observed_clock_at",
+      "last_explicit_review_cutoff",
+      "next_review_session",
+      "next_review_due_at",
+      "due_backlog",
+      "backlog_unavailable_reason",
+      "active_order_batch_id",
+      "active_batch_controls_available",
+      "recent_occurrences",
+      "supervisor"
+    ],
+    "title": "PortfolioScheduleV1",
+    "type": "object"
+  },
+  "PortfolioScheduleV1.validation": {
+    "$defs": {
+      "ErrorDetail": {
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "enum": [
+              "VALIDATION_ERROR",
+              "NOT_FOUND",
+              "METHOD_NOT_ALLOWED",
+              "HTTP_ERROR",
+              "NOT_READY",
+              "STATE_CONFLICT",
+              "IDEMPOTENCY_CONFLICT",
+              "STALE_DATA",
+              "INSUFFICIENT_MARKET_DATA",
+              "LIMIT_EXCEEDED",
+              "PROVIDER_UNAVAILABLE",
+              "FORECAST_UNAVAILABLE",
+              "JOB_FAILED",
+              "INTERNAL_ERROR",
+              "WORKLOAD_LIMIT",
+              "RESOURCE_EXHAUSTED",
+              "TIME_LIMIT"
+            ],
+            "title": "Code",
+            "type": "string"
+          },
+          "correlation_id": {
+            "format": "uuid",
+            "title": "Correlation Id",
+            "type": "string"
+          },
+          "details": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "boolean"
+                },
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                }
+              ]
+            },
+            "title": "Details",
+            "type": "object"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "retryable": {
+            "title": "Retryable",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "code",
+          "message",
+          "details",
+          "retryable",
+          "correlation_id"
+        ],
+        "title": "ErrorDetail",
+        "type": "object"
+      },
+      "JobResult": {
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "enum": [
+              "diagnostic",
+              "resource"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "resource_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resource Id"
+          }
+        },
+        "required": [
+          "kind",
+          "resource_id",
+          "message"
+        ],
+        "title": "JobResult",
+        "type": "object"
+      },
+      "JobV1": {
+        "additionalProperties": false,
+        "properties": {
+          "attempts": {
+            "minimum": 0,
+            "title": "Attempts",
+            "type": "integer"
+          },
+          "created_at": {
+            "format": "date-time",
+            "pattern": "Z$",
+            "title": "Created At",
+            "type": "string"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/ErrorDetail"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "max_attempts": {
+            "minimum": 1,
+            "title": "Max Attempts",
+            "type": "integer"
+          },
+          "progress": {
+            "ge": 0,
+            "le": 100,
+            "title": "Progress",
+            "type": "number"
+          },
+          "result": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/JobResult"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "status": {
+            "enum": [
+              "queued",
+              "running",
+              "cancel_requested",
+              "completed",
+              "failed",
+              "cancelled"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "pattern": "Z$",
+            "title": "Updated At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "status",
+          "attempts",
+          "max_attempts",
+          "progress",
+          "created_at",
+          "updated_at",
+          "result",
+          "error"
+        ],
+        "title": "JobV1",
+        "type": "object"
+      },
+      "ReviewOccurrenceV1": {
+        "additionalProperties": false,
+        "properties": {
+          "as_of_session": {
+            "format": "date",
+            "title": "As Of Session",
+            "type": "string"
+          },
+          "created_at": {
+            "format": "date-time",
+            "pattern": "Z$",
+            "title": "Created At",
+            "type": "string"
+          },
+          "first_observed_clock_at": {
+            "format": "date-time",
+            "pattern": "Z$",
+            "title": "First Observed Clock At",
+            "type": "string"
+          },
+          "handled_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "pattern": "Z$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Handled At"
+          },
+          "handled_clock_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "pattern": "Z$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Handled Clock At"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "intended_due_at": {
+            "format": "date-time",
+            "pattern": "Z$",
+            "title": "Intended Due At",
+            "type": "string"
+          },
+          "job": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/JobV1"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "observed_snapshot_id": {
+            "format": "uuid",
+            "title": "Observed Snapshot Id",
+            "type": "string"
+          },
+          "observed_snapshot_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Observed Snapshot Sha256",
+            "type": "string"
+          },
+          "opportunity_end_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "pattern": "Z$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Opportunity End At"
+          },
+          "outcome": {
+            "enum": [
+              "waiting",
+              "admitted",
+              "missed",
+              "skipped"
+            ],
+            "title": "Outcome",
+            "type": "string"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "pattern": "^[A-Z][A-Z0-9_]*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          },
+          "recommendation_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Recommendation Id"
+          }
+        },
+        "required": [
+          "id",
+          "as_of_session",
+          "intended_due_at",
+          "opportunity_end_at",
+          "first_observed_clock_at",
+          "observed_snapshot_id",
+          "observed_snapshot_sha256",
+          "created_at",
+          "outcome",
+          "reason",
+          "handled_at",
+          "handled_clock_at",
+          "recommendation_id",
+          "job"
+        ],
+        "title": "ReviewOccurrenceV1",
+        "type": "object"
+      },
+      "SupervisorObservationV1": {
+        "additionalProperties": false,
+        "properties": {
+          "last_seen_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "pattern": "Z$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Seen At"
+          },
+          "last_unobserved_end_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "pattern": "Z$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Unobserved End At"
+          },
+          "last_unobserved_start_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "pattern": "Z$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Unobserved Start At"
+          },
+          "limitation": {
+            "const": "OBSERVATION_NOT_EXACT_SHUTDOWN",
+            "default": "OBSERVATION_NOT_EXACT_SHUTDOWN",
+            "title": "Limitation",
+            "type": "string"
+          },
+          "measured_at": {
+            "format": "date-time",
+            "pattern": "Z$",
+            "title": "Measured At",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "unobserved",
+              "fresh",
+              "stale"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status",
+          "measured_at",
+          "last_seen_at",
+          "last_unobserved_start_at",
+          "last_unobserved_end_at"
+        ],
+        "title": "SupervisorObservationV1",
+        "type": "object"
+      }
+    },
+    "additionalProperties": false,
+    "properties": {
+      "account_state": {
+        "enum": [
+          "active",
+          "paused",
+          "closed"
+        ],
+        "title": "Account State",
+        "type": "string"
+      },
+      "active_batch_controls_available": {
+        "title": "Active Batch Controls Available",
+        "type": "boolean"
+      },
+      "active_order_batch_id": {
+        "anyOf": [
+          {
+            "format": "uuid",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Active Order Batch Id"
+      },
+      "backlog_unavailable_reason": {
+        "anyOf": [
+          {
+            "pattern": "^[A-Z][A-Z0-9_]*$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Backlog Unavailable Reason"
+      },
+      "clock_at": {
+        "format": "date-time",
+        "pattern": "Z$",
+        "title": "Clock At",
+        "type": "string"
+      },
+      "clock_mode": {
+        "enum": [
+          "synthetic_replay",
+          "current_paper"
+        ],
+        "title": "Clock Mode",
+        "type": "string"
+      },
+      "data_status": {
+        "enum": [
+          "synthetic_fixture",
+          "research_market_data"
+        ],
+        "title": "Data Status",
+        "type": "string"
+      },
+      "due_backlog": {
+        "anyOf": [
+          {
+            "type": "boolean"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Due Backlog"
+      },
+      "frequency": {
+        "const": "monthly",
+        "default": "monthly",
+        "title": "Frequency",
+        "type": "string"
+      },
+      "last_explicit_review_cutoff": {
+        "anyOf": [
+          {
+            "format": "date-time",
+            "pattern": "Z$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Last Explicit Review Cutoff"
+      },
+      "last_observed_at": {
+        "anyOf": [
+          {
+            "format": "date-time",
+            "pattern": "Z$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Last Observed At"
+      },
+      "last_observed_state": {
+        "enum": [
+          "waiting",
+          "review_admitted",
+          "unavailable",
+          "paused",
+          "up_to_date",
+          "catching_up",
+          "unobserved"
+        ],
+        "title": "Last Observed State",
+        "type": "string"
+      },
+      "next_review_due_at": {
+        "anyOf": [
+          {
+            "format": "date-time",
+            "pattern": "Z$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Next Review Due At"
+      },
+      "next_review_session": {
+        "anyOf": [
+          {
+            "format": "date",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Next Review Session"
+      },
+      "observed_clock_at": {
+        "anyOf": [
+          {
+            "format": "date-time",
+            "pattern": "Z$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Observed Clock At"
+      },
+      "paper_only": {
+        "const": true,
+        "default": true,
+        "title": "Paper Only",
+        "type": "boolean"
+      },
+      "portfolio_id": {
+        "format": "uuid",
+        "title": "Portfolio Id",
+        "type": "string"
+      },
+      "reason": {
+        "anyOf": [
+          {
+            "pattern": "^[A-Z][A-Z0-9_]*$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Reason"
+      },
+      "recent_occurrences": {
+        "items": {
+          "$ref": "#/$defs/ReviewOccurrenceV1"
+        },
+        "maxItems": 25,
+        "title": "Recent Occurrences",
+        "type": "array"
+      },
+      "reconciliation_required": {
+        "title": "Reconciliation Required",
+        "type": "boolean"
+      },
+      "supervisor": {
+        "$ref": "#/$defs/SupervisorObservationV1"
+      }
+    },
+    "required": [
+      "portfolio_id",
+      "data_status",
+      "clock_mode",
+      "account_state",
+      "reconciliation_required",
+      "last_observed_state",
+      "reason",
+      "last_observed_at",
+      "clock_at",
+      "observed_clock_at",
+      "last_explicit_review_cutoff",
+      "next_review_session",
+      "next_review_due_at",
+      "due_backlog",
+      "backlog_unavailable_reason",
+      "active_order_batch_id",
+      "active_batch_controls_available",
+      "recent_occurrences",
+      "supervisor"
+    ],
+    "title": "PortfolioScheduleV1",
+    "type": "object"
+  },
   "PortfolioTransactionPageV1.serialization": {
     "$defs": {
       "PortfolioFillV1": {
@@ -19705,6 +20977,692 @@
       "status"
     ],
     "title": "RecommendationV1",
+    "type": "object"
+  },
+  "ReviewOccurrenceV1.serialization": {
+    "$defs": {
+      "ErrorDetail": {
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "enum": [
+              "VALIDATION_ERROR",
+              "NOT_FOUND",
+              "METHOD_NOT_ALLOWED",
+              "HTTP_ERROR",
+              "NOT_READY",
+              "STATE_CONFLICT",
+              "IDEMPOTENCY_CONFLICT",
+              "STALE_DATA",
+              "INSUFFICIENT_MARKET_DATA",
+              "LIMIT_EXCEEDED",
+              "PROVIDER_UNAVAILABLE",
+              "FORECAST_UNAVAILABLE",
+              "JOB_FAILED",
+              "INTERNAL_ERROR",
+              "WORKLOAD_LIMIT",
+              "RESOURCE_EXHAUSTED",
+              "TIME_LIMIT"
+            ],
+            "title": "Code",
+            "type": "string"
+          },
+          "correlation_id": {
+            "format": "uuid",
+            "title": "Correlation Id",
+            "type": "string"
+          },
+          "details": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "boolean"
+                },
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                }
+              ]
+            },
+            "title": "Details",
+            "type": "object"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "retryable": {
+            "title": "Retryable",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "code",
+          "message",
+          "details",
+          "retryable",
+          "correlation_id"
+        ],
+        "title": "ErrorDetail",
+        "type": "object"
+      },
+      "JobResult": {
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "enum": [
+              "diagnostic",
+              "resource"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "resource_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resource Id"
+          }
+        },
+        "required": [
+          "kind",
+          "resource_id",
+          "message"
+        ],
+        "title": "JobResult",
+        "type": "object"
+      },
+      "JobV1": {
+        "additionalProperties": false,
+        "properties": {
+          "attempts": {
+            "minimum": 0,
+            "title": "Attempts",
+            "type": "integer"
+          },
+          "created_at": {
+            "format": "date-time",
+            "pattern": "Z$",
+            "title": "Created At",
+            "type": "string"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/ErrorDetail"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "max_attempts": {
+            "minimum": 1,
+            "title": "Max Attempts",
+            "type": "integer"
+          },
+          "progress": {
+            "ge": 0,
+            "le": 100,
+            "title": "Progress",
+            "type": "number"
+          },
+          "result": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/JobResult"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "status": {
+            "enum": [
+              "queued",
+              "running",
+              "cancel_requested",
+              "completed",
+              "failed",
+              "cancelled"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "pattern": "Z$",
+            "title": "Updated At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "status",
+          "attempts",
+          "max_attempts",
+          "progress",
+          "created_at",
+          "updated_at",
+          "result",
+          "error"
+        ],
+        "title": "JobV1",
+        "type": "object"
+      }
+    },
+    "additionalProperties": false,
+    "properties": {
+      "as_of_session": {
+        "format": "date",
+        "title": "As Of Session",
+        "type": "string"
+      },
+      "created_at": {
+        "format": "date-time",
+        "pattern": "Z$",
+        "title": "Created At",
+        "type": "string"
+      },
+      "first_observed_clock_at": {
+        "format": "date-time",
+        "pattern": "Z$",
+        "title": "First Observed Clock At",
+        "type": "string"
+      },
+      "handled_at": {
+        "anyOf": [
+          {
+            "format": "date-time",
+            "pattern": "Z$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Handled At"
+      },
+      "handled_clock_at": {
+        "anyOf": [
+          {
+            "format": "date-time",
+            "pattern": "Z$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Handled Clock At"
+      },
+      "id": {
+        "format": "uuid",
+        "title": "Id",
+        "type": "string"
+      },
+      "intended_due_at": {
+        "format": "date-time",
+        "pattern": "Z$",
+        "title": "Intended Due At",
+        "type": "string"
+      },
+      "job": {
+        "anyOf": [
+          {
+            "$ref": "#/$defs/JobV1"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "observed_snapshot_id": {
+        "format": "uuid",
+        "title": "Observed Snapshot Id",
+        "type": "string"
+      },
+      "observed_snapshot_sha256": {
+        "pattern": "^[0-9a-f]{64}$",
+        "title": "Observed Snapshot Sha256",
+        "type": "string"
+      },
+      "opportunity_end_at": {
+        "anyOf": [
+          {
+            "format": "date-time",
+            "pattern": "Z$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Opportunity End At"
+      },
+      "outcome": {
+        "enum": [
+          "waiting",
+          "admitted",
+          "missed",
+          "skipped"
+        ],
+        "title": "Outcome",
+        "type": "string"
+      },
+      "reason": {
+        "anyOf": [
+          {
+            "pattern": "^[A-Z][A-Z0-9_]*$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Reason"
+      },
+      "recommendation_id": {
+        "anyOf": [
+          {
+            "format": "uuid",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Recommendation Id"
+      }
+    },
+    "required": [
+      "id",
+      "as_of_session",
+      "intended_due_at",
+      "opportunity_end_at",
+      "first_observed_clock_at",
+      "observed_snapshot_id",
+      "observed_snapshot_sha256",
+      "created_at",
+      "outcome",
+      "reason",
+      "handled_at",
+      "handled_clock_at",
+      "recommendation_id",
+      "job"
+    ],
+    "title": "ReviewOccurrenceV1",
+    "type": "object"
+  },
+  "ReviewOccurrenceV1.validation": {
+    "$defs": {
+      "ErrorDetail": {
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "enum": [
+              "VALIDATION_ERROR",
+              "NOT_FOUND",
+              "METHOD_NOT_ALLOWED",
+              "HTTP_ERROR",
+              "NOT_READY",
+              "STATE_CONFLICT",
+              "IDEMPOTENCY_CONFLICT",
+              "STALE_DATA",
+              "INSUFFICIENT_MARKET_DATA",
+              "LIMIT_EXCEEDED",
+              "PROVIDER_UNAVAILABLE",
+              "FORECAST_UNAVAILABLE",
+              "JOB_FAILED",
+              "INTERNAL_ERROR",
+              "WORKLOAD_LIMIT",
+              "RESOURCE_EXHAUSTED",
+              "TIME_LIMIT"
+            ],
+            "title": "Code",
+            "type": "string"
+          },
+          "correlation_id": {
+            "format": "uuid",
+            "title": "Correlation Id",
+            "type": "string"
+          },
+          "details": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "boolean"
+                },
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                }
+              ]
+            },
+            "title": "Details",
+            "type": "object"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "retryable": {
+            "title": "Retryable",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "code",
+          "message",
+          "details",
+          "retryable",
+          "correlation_id"
+        ],
+        "title": "ErrorDetail",
+        "type": "object"
+      },
+      "JobResult": {
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "enum": [
+              "diagnostic",
+              "resource"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "resource_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resource Id"
+          }
+        },
+        "required": [
+          "kind",
+          "resource_id",
+          "message"
+        ],
+        "title": "JobResult",
+        "type": "object"
+      },
+      "JobV1": {
+        "additionalProperties": false,
+        "properties": {
+          "attempts": {
+            "minimum": 0,
+            "title": "Attempts",
+            "type": "integer"
+          },
+          "created_at": {
+            "format": "date-time",
+            "pattern": "Z$",
+            "title": "Created At",
+            "type": "string"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/ErrorDetail"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "max_attempts": {
+            "minimum": 1,
+            "title": "Max Attempts",
+            "type": "integer"
+          },
+          "progress": {
+            "ge": 0,
+            "le": 100,
+            "title": "Progress",
+            "type": "number"
+          },
+          "result": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/JobResult"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "status": {
+            "enum": [
+              "queued",
+              "running",
+              "cancel_requested",
+              "completed",
+              "failed",
+              "cancelled"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "pattern": "Z$",
+            "title": "Updated At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "status",
+          "attempts",
+          "max_attempts",
+          "progress",
+          "created_at",
+          "updated_at",
+          "result",
+          "error"
+        ],
+        "title": "JobV1",
+        "type": "object"
+      }
+    },
+    "additionalProperties": false,
+    "properties": {
+      "as_of_session": {
+        "format": "date",
+        "title": "As Of Session",
+        "type": "string"
+      },
+      "created_at": {
+        "format": "date-time",
+        "pattern": "Z$",
+        "title": "Created At",
+        "type": "string"
+      },
+      "first_observed_clock_at": {
+        "format": "date-time",
+        "pattern": "Z$",
+        "title": "First Observed Clock At",
+        "type": "string"
+      },
+      "handled_at": {
+        "anyOf": [
+          {
+            "format": "date-time",
+            "pattern": "Z$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Handled At"
+      },
+      "handled_clock_at": {
+        "anyOf": [
+          {
+            "format": "date-time",
+            "pattern": "Z$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Handled Clock At"
+      },
+      "id": {
+        "format": "uuid",
+        "title": "Id",
+        "type": "string"
+      },
+      "intended_due_at": {
+        "format": "date-time",
+        "pattern": "Z$",
+        "title": "Intended Due At",
+        "type": "string"
+      },
+      "job": {
+        "anyOf": [
+          {
+            "$ref": "#/$defs/JobV1"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "observed_snapshot_id": {
+        "format": "uuid",
+        "title": "Observed Snapshot Id",
+        "type": "string"
+      },
+      "observed_snapshot_sha256": {
+        "pattern": "^[0-9a-f]{64}$",
+        "title": "Observed Snapshot Sha256",
+        "type": "string"
+      },
+      "opportunity_end_at": {
+        "anyOf": [
+          {
+            "format": "date-time",
+            "pattern": "Z$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Opportunity End At"
+      },
+      "outcome": {
+        "enum": [
+          "waiting",
+          "admitted",
+          "missed",
+          "skipped"
+        ],
+        "title": "Outcome",
+        "type": "string"
+      },
+      "reason": {
+        "anyOf": [
+          {
+            "pattern": "^[A-Z][A-Z0-9_]*$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Reason"
+      },
+      "recommendation_id": {
+        "anyOf": [
+          {
+            "format": "uuid",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Recommendation Id"
+      }
+    },
+    "required": [
+      "id",
+      "as_of_session",
+      "intended_due_at",
+      "opportunity_end_at",
+      "first_observed_clock_at",
+      "observed_snapshot_id",
+      "observed_snapshot_sha256",
+      "created_at",
+      "outcome",
+      "reason",
+      "handled_at",
+      "handled_clock_at",
+      "recommendation_id",
+      "job"
+    ],
+    "title": "ReviewOccurrenceV1",
     "type": "object"
   },
   "SnapshotManifestV1.serialization": {
@@ -27731,6 +29689,154 @@
       "published_at"
     ],
     "title": "StrategyVersionV1",
+    "type": "object"
+  },
+  "SupervisorObservationV1.serialization": {
+    "additionalProperties": false,
+    "properties": {
+      "last_seen_at": {
+        "anyOf": [
+          {
+            "format": "date-time",
+            "pattern": "Z$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Last Seen At"
+      },
+      "last_unobserved_end_at": {
+        "anyOf": [
+          {
+            "format": "date-time",
+            "pattern": "Z$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Last Unobserved End At"
+      },
+      "last_unobserved_start_at": {
+        "anyOf": [
+          {
+            "format": "date-time",
+            "pattern": "Z$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Last Unobserved Start At"
+      },
+      "limitation": {
+        "const": "OBSERVATION_NOT_EXACT_SHUTDOWN",
+        "default": "OBSERVATION_NOT_EXACT_SHUTDOWN",
+        "title": "Limitation",
+        "type": "string"
+      },
+      "measured_at": {
+        "format": "date-time",
+        "pattern": "Z$",
+        "title": "Measured At",
+        "type": "string"
+      },
+      "status": {
+        "enum": [
+          "unobserved",
+          "fresh",
+          "stale"
+        ],
+        "title": "Status",
+        "type": "string"
+      }
+    },
+    "required": [
+      "status",
+      "measured_at",
+      "last_seen_at",
+      "last_unobserved_start_at",
+      "last_unobserved_end_at"
+    ],
+    "title": "SupervisorObservationV1",
+    "type": "object"
+  },
+  "SupervisorObservationV1.validation": {
+    "additionalProperties": false,
+    "properties": {
+      "last_seen_at": {
+        "anyOf": [
+          {
+            "format": "date-time",
+            "pattern": "Z$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Last Seen At"
+      },
+      "last_unobserved_end_at": {
+        "anyOf": [
+          {
+            "format": "date-time",
+            "pattern": "Z$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Last Unobserved End At"
+      },
+      "last_unobserved_start_at": {
+        "anyOf": [
+          {
+            "format": "date-time",
+            "pattern": "Z$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Last Unobserved Start At"
+      },
+      "limitation": {
+        "const": "OBSERVATION_NOT_EXACT_SHUTDOWN",
+        "default": "OBSERVATION_NOT_EXACT_SHUTDOWN",
+        "title": "Limitation",
+        "type": "string"
+      },
+      "measured_at": {
+        "format": "date-time",
+        "pattern": "Z$",
+        "title": "Measured At",
+        "type": "string"
+      },
+      "status": {
+        "enum": [
+          "unobserved",
+          "fresh",
+          "stale"
+        ],
+        "title": "Status",
+        "type": "string"
+      }
+    },
+    "required": [
+      "status",
+      "measured_at",
+      "last_seen_at",
+      "last_unobserved_start_at",
+      "last_unobserved_end_at"
+    ],
+    "title": "SupervisorObservationV1",
     "type": "object"
   },
   "WorkspaceV1.serialization": {

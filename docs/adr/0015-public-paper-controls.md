@@ -54,7 +54,10 @@ no extra financial event.
 The public controller selects its clock under the same portfolio lock as the
 operation. For synthetic replay, the durable clock floor includes original
 approval/decision timing, posted ledger chronology and accepted fixture-fill
-observation clocks. Accepted failed/cancelled step jobs still document an
+observation clocks. [ADR-016](0016-portfolio-review-scheduler.md) adds explicitly
+requested manual synthetic review cutoffs as durable clock observations so cash-only
+portfolios can progress without inventing a batch. Scheduled reviews must already
+be due and cannot advance the clock themselves. Accepted failed/cancelled step jobs still document an
 operator-issued clock advance. Their original immutable payloads prevent a later
 request from rewinding time merely because no fill posted.
 

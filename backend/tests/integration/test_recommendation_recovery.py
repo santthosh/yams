@@ -82,6 +82,7 @@ def test_populated_forecast_schema_upgrade_preserves_original_jobs_and_accounts(
 ) -> None:
     prior = tmp_path / "prior-migrations"
     shutil.copytree(MIGRATIONS, prior)
+    (prior / "versions/0009_portfolio_reviews.py").unlink()
     (prior / "versions/0008_recommendations.py").unlink()
     root = tmp_path / "artifacts"
     with monkeypatch.context() as scoped:
