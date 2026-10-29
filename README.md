@@ -134,9 +134,11 @@ Migration `0002_jobs` adds immutable job envelopes, attempt history, fixed-inter
 schedules and one idempotent diagnostic effect per job. The PostgreSQL queue uses
 fenced leases and bounded recovery; a Linux supervisor renews heartbeats while a
 separate resource-limited process executes the handler. Registered kinds are
-`diagnostic`, `refresh_market_data` and `evaluate_strategy`. Backtest, forecast and
-durable trade-posting handlers remain unavailable. `GET /api/v1/jobs/{job_id}` is
-read-only; public cancellation is owned by #41.
+`diagnostic`, `refresh_market_data`, `evaluate_strategy`, `backtest_core`,
+`backtest` and `apply_scheduled_fills`. The private fill handler posts fenced
+synthetic effects; public recommendation/apply controls and forecast jobs remain
+staged for 0.0.5. `GET /api/v1/jobs/{job_id}` is read-only; public experiment
+cancellation is implemented, while paper batch cancellation transport follows in #50.
 
 See [worker operations](docs/operations/durable-jobs.md) for configuration,
 enqueue/schedule/cancel service examples, guarantees and deployment limitations.
@@ -148,8 +150,8 @@ measured environment and committed evidence; these are not financial benchmarks.
 
 ## Web shell and same-origin transport
 
-Dashboard and Settings are implemented in `apps/web/src/app`. Unavailable Lab,
-Portfolios, Arena and Journal routes are hidden. Global paper scope, source/as-of
+Dashboard, Settings, Strategy Lab and Paper Portfolios are implemented in
+`apps/web/src/app`. Arena and Journal routes remain hidden. Global paper scope, source/as-of
 metadata and last-checked job status stay visible. Settings exposes persisted
 workspace preferences read-only and a job-ID lookup; it does not enqueue or cancel
 work. Missing monetary values display `Unavailable`, never a substituted zero.
@@ -157,8 +159,9 @@ work. Missing monetary values display `Unavailable`, never a substituted zero.
 Set `API_INTERNAL_ORIGIN` only in the web server environment. Its default is
 `http://api:8000` for the private Compose network; native development uses
 `http://127.0.0.1:8000`. It is not a `NEXT_PUBLIC_` setting and is not sent to the
-browser. The browser uses same-origin `/api/v1` routes. The proxy allows the owned health/workspace/job, data/asset/default-strategy and
-diagnostic evaluation routes, with closed methods, paths and query parameters,
+browser. The browser uses same-origin `/api/v1` routes. The proxy allows the owned health/workspace/job, data/asset, strategy/version,
+diagnostic evaluation, experiment/comparison and portfolio/transaction routes,
+with closed methods, paths and query parameters,
 does not forward cookies/authorization, rejects redirects, and bounds upstream
 requests at three seconds. Failures carry safe correlation IDs.
 
@@ -239,7 +242,7 @@ action accounting, historical publication evidence and paper execution remain
 unsupported; no order or holding changes occur in Candidate inspection. Credentials
 do not authorize redistribution of cached source data.
 
-Source for planned 0.0.3 includes the shared backtest core and immutable internal
+The delivered 0.0.3 increment includes the shared backtest core and immutable internal
 core persistence; see the [core handoff](docs/operations/backtest-core.md).
 [Q12 reporting](docs/operations/backtest-reporting.md) adds net metrics,
 development/holdout sections, aligned SPY/cash references and shared exposure

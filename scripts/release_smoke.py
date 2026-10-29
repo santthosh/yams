@@ -282,9 +282,68 @@ def main() -> None:
                     assert get(f"strategies/{identity}/versions") == history
 
             verify_reports()
+            subprocess.run(
+                ["pnpm", "--filter", "@yams/web", "exec", "node", "tests/portfolio-browser.mjs"],
+                cwd=ROOT,
+                env={**browser_env, "YAMS_SMOKE_PORTFOLIO_PHASE": "create"},
+                check=True,
+            )
+            # This owned fixture exercises private authorization, never an invented
+            # public recommendation endpoint or a live provider/account.
+            paper_batch = json.loads(python((ROOT / "scripts/paper_smoke_fixture.py").read_text()))
+            deadline = time.monotonic() + 60
+            while get(f"jobs/{paper_batch['job_id']}")["status"] in {"queued", "running"}:
+                if time.monotonic() >= deadline:
+                    raise AssertionError("Private paper batch worker did not complete")
+                time.sleep(0.2)
+
+            def verify_portfolios(stage: str) -> None:
+                assert get(f"jobs/{paper_batch['job_id']}")["status"] == "completed"
+                posted = get(f"portfolios/{paper_batch['portfolio_id']}")
+                assert posted["cash_usd"] == "859.76" and posted["revision"] == 3
+                assert posted["holdings"][0]["quantity"] == "2.000000"
+                transactions = get(f"portfolios/{paper_batch['portfolio_id']}/transactions")
+                assert {row["kind"] for row in transactions["items"]} == {
+                    "opening_funding",
+                    "batch_approval",
+                    "fill",
+                }
+                subprocess.run(
+                    [
+                        "pnpm",
+                        "--filter",
+                        "@yams/web",
+                        "exec",
+                        "node",
+                        "tests/portfolio-browser.mjs",
+                    ],
+                    cwd=ROOT,
+                    env={
+                        **browser_env,
+                        "YAMS_SMOKE_URL": f"http://{address()}",
+                        "YAMS_SMOKE_PORTFOLIO_PHASE": "inspect",
+                        "YAMS_SMOKE_PORTFOLIO_STAGE": stage,
+                        "YAMS_SMOKE_POSTED_PORTFOLIO": paper_batch["portfolio_id"],
+                    },
+                    check=True,
+                )
+                evidence["paper_posted_account"] = posted
+                evidence["paper_transactions"] = transactions
+
+            verify_portfolios("initial")
+            evidence["paper_batch"] = paper_batch
+            evidence["paper_cash_accounts"] = json.loads(
+                (destination / "portfolio-browser-accounts.json").read_text()
+            )
+            evidence["checks"].append(
+                "native real browser independent cash creation/keyed retries, private "
+                "authorization and worker fill, exact posted holdings/fees/ledger, "
+                "keyboard/Axe at360/1280; public apply remains staged"
+            )
             run("down")
             run("up", "-d", "--wait", "--wait-timeout", "120", "--pull", "never")
             assert get("workspace")["id"] == workspace["id"]
+            verify_portfolios("restart")
             verify_reports()
             assert get("strategies") == strategies
             assert get(f"strategies/{strategy_id}/versions") == versions
@@ -309,7 +368,7 @@ def main() -> None:
             evidence["checks"].append(
                 "cached restart preserves workspace/job/artifact, exact experiment reports "
                 "and challenge "
-                "versions with only loopback web published"
+                "versions and paper account/key/history/fill state with only loopback web published"
             )
             evidence["passed"] = True
         finally:
