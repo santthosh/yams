@@ -55,7 +55,7 @@ export async function proxyApi(
     segments.length === 3 &&
     segments[0] === "portfolios" &&
     UUID_PATTERN.test(segments[1]) &&
-    segments[2] === "schedule";
+    ["schedule", "decision-inputs"].includes(segments[2]);
   const portfolioRecommendations =
     segments.length === 3 &&
     segments[0] === "portfolios" &&
@@ -74,7 +74,7 @@ export async function proxyApi(
     segments.length === 3 &&
     segments[0] === "recommendations" &&
     UUID_PATTERN.test(segments[1]) &&
-    segments[2] === "apply-result";
+    ["apply-result", "approval-preview"].includes(segments[2]);
   const batchDetail =
     segments.length === 2 &&
     segments[0] === "order-batches" &&
@@ -254,7 +254,11 @@ export async function proxyApi(
     )
       headers["Idempotency-Key"] = key;
   }
-  if (request.method === "GET" && approvalRecovery) {
+  if (
+    request.method === "GET" &&
+    approvalRecovery &&
+    segments[2] === "apply-result"
+  ) {
     const key = request.headers.get("Idempotency-Key");
     if (!key || !UUID_PATTERN.test(key))
       return safeError(

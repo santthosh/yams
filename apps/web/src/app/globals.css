@@ -1142,3 +1142,29 @@ input::placeholder {
   overflow-wrap: anywhere;
   white-space: normal;
 }
+
+.decision-page label {
+  display: grid;
+  gap: 0.5rem;
+}
+.decision-page select,
+.decision-page input {
+  max-width: 100%;
+  min-width: 0;
+}
+.decision-page code,
+.decision-confirm code {
+  overflow-wrap: anywhere;
+}
+.decision-json {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-size: 0.8rem;
+}
+.decision-confirm {
+  max-height: 85dvh;
+  overflow-y: auto;
+}
+.decision-confirm .button {
+  margin: 0.5rem 0.5rem 0 0;
+}

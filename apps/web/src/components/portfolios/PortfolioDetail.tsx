@@ -15,7 +15,6 @@ import {
 } from "../evidence";
 import { Button } from "../ui/button";
 import { HoldingsTable } from "./HoldingsTable";
-import { OrderBatchState } from "./OrderBatchState";
 
 type S = components["schemas"];
 export function PortfolioDetail({ id }: { id: string }) {
@@ -225,7 +224,14 @@ export function PortfolioDetail({ id }: { id: string }) {
             <HoldingsTable holdings={account.holdings} />
           </Card>
           <Card title="Order lifecycle">
-            <OrderBatchState batch={null} />
+            <p>
+              Inspect live pending orders, original decisions, and explicit
+              paper controls in the{" "}
+              <Link href={`/portfolios/${id}/decisions`}>
+                Decision Center →
+              </Link>
+              . Posted holdings and ledger events remain below.
+            </p>
           </Card>
           <Card title="Immutable transaction history">
             <p>

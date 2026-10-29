@@ -142,9 +142,7 @@ try {
         }),
       ).toBeVisible();
       await expect(
-        page.getByText("Order batch inspection comes in 0.0.5", {
-          exact: true,
-        }),
+        page.getByRole("link", { name: "Decision Center →", exact: true }),
       ).toBeVisible();
       await page
         .getByText("Inspect event lineage", { exact: true })

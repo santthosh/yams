@@ -774,3 +774,34 @@ it("allows readonly portfolio schedule status without forwarding credentials or 
   ).toBe(405);
   expect(fetcher).toHaveBeenCalledTimes(1);
 });
+
+it.each([
+  ["portfolios", "decision-inputs"],
+  ["recommendations", "approval-preview"],
+])(
+  "forwards readonly %s context without credentials or a command key",
+  async (resource, suffix) => {
+    const id = "33333333-3333-4333-8333-333333333333";
+    const parts = [resource, id, suffix];
+    const fetcher = vi.fn(async (_input, init) => {
+      expect(init.headers).toEqual({ Accept: "application/json" });
+      return Response.json({ available: true });
+    });
+    expect(
+      (await proxyApi(request(parts.join("/")), parts, fetcher)).status,
+    ).toBe(200);
+    expect(
+      (await proxyApi(request(parts.join("/"), "POST"), parts, fetcher)).status,
+    ).toBe(405);
+    expect(
+      (
+        await proxyApi(
+          request(parts.join("/") + "?as_of=2028-01-01"),
+          parts,
+          fetcher,
+        )
+      ).status,
+    ).toBe(404);
+    expect(fetcher).toHaveBeenCalledTimes(1);
+  },
+);

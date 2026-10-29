@@ -188,6 +188,65 @@
         "title": "ApplyRecommendationRequest",
         "type": "object"
       },
+      "ApprovalPreviewV1": {
+        "additionalProperties": false,
+        "properties": {
+          "expected_revision": {
+            "title": "Expected Revision",
+            "type": "integer"
+          },
+          "indicative_eligible_open_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "pattern": "Z$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Indicative Eligible Open At"
+          },
+          "limitation": {
+            "const": "READONLY_NOT_RESERVED_REVALIDATE_ON_APPLY",
+            "default": "READONLY_NOT_RESERVED_REVALIDATE_ON_APPLY",
+            "title": "Limitation",
+            "type": "string"
+          },
+          "portfolio_id": {
+            "format": "uuid",
+            "title": "Portfolio Id",
+            "type": "string"
+          },
+          "recommendation_id": {
+            "format": "uuid",
+            "title": "Recommendation Id",
+            "type": "string"
+          },
+          "unavailable_reason": {
+            "anyOf": [
+              {
+                "pattern": "^[A-Z][A-Z0-9_]*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unavailable Reason"
+          }
+        },
+        "required": [
+          "recommendation_id",
+          "portfolio_id",
+          "expected_revision",
+          "indicative_eligible_open_at",
+          "unavailable_reason"
+        ],
+        "title": "ApprovalPreviewV1",
+        "type": "object"
+      },
       "ArtifactReference": {
         "additionalProperties": false,
         "properties": {
@@ -739,6 +798,102 @@
           "freshness"
         ],
         "title": "DataHealthV1",
+        "type": "object"
+      },
+      "DecisionInputsV1": {
+        "additionalProperties": false,
+        "properties": {
+          "clock_at": {
+            "format": "date-time",
+            "pattern": "Z$",
+            "title": "Clock At",
+            "type": "string"
+          },
+          "data_status": {
+            "enum": [
+              "synthetic_fixture",
+              "research_market_data"
+            ],
+            "title": "Data Status",
+            "type": "string"
+          },
+          "limitation": {
+            "const": "CALENDAR_SUPPORT_NOT_PRICE_COMPLETENESS",
+            "default": "CALENDAR_SUPPORT_NOT_PRICE_COMPLETENESS",
+            "title": "Limitation",
+            "type": "string"
+          },
+          "portfolio_id": {
+            "format": "uuid",
+            "title": "Portfolio Id",
+            "type": "string"
+          },
+          "selection_policy": {
+            "const": "EARLIEST_PINNED_HISTORY_AND_HORIZON",
+            "default": "EARLIEST_PINNED_HISTORY_AND_HORIZON",
+            "title": "Selection Policy",
+            "type": "string"
+          },
+          "snapshot_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Snapshot Id"
+          },
+          "suggested_cutoff_utc": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "pattern": "Z$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Suggested Cutoff Utc"
+          },
+          "suggested_session": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Suggested Session"
+          },
+          "unavailable_reason": {
+            "anyOf": [
+              {
+                "pattern": "^[A-Z][A-Z0-9_]*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unavailable Reason"
+          }
+        },
+        "required": [
+          "portfolio_id",
+          "data_status",
+          "snapshot_id",
+          "clock_at",
+          "suggested_session",
+          "suggested_cutoff_utc",
+          "unavailable_reason"
+        ],
+        "title": "DecisionInputsV1",
         "type": "object"
       },
       "DividendEntitlement": {
@@ -9489,6 +9644,76 @@
         "summary": "Detail"
       }
     },
+    "/api/v1/portfolios/{portfolio_id}/decision-inputs": {
+      "get": {
+        "operationId": "inputs_api_v1_portfolios__portfolio_id__decision_inputs_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "portfolio_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Portfolio Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DecisionInputsV1"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "summary": "Inputs"
+      }
+    },
     "/api/v1/portfolios/{portfolio_id}/recommendations": {
       "get": {
         "operationId": "list_recommendations_api_v1_portfolios__portfolio_id__recommendations_get",
@@ -10082,6 +10307,76 @@
           }
         },
         "summary": "Recover"
+      }
+    },
+    "/api/v1/recommendations/{recommendation_id}/approval-preview": {
+      "get": {
+        "operationId": "preview_api_v1_recommendations__recommendation_id__approval_preview_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "recommendation_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Recommendation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApprovalPreviewV1"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "summary": "Preview"
       }
     },
     "/api/v1/recommendations/{recommendation_id}/dismiss": {

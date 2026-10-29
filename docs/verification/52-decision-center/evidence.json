@@ -1,0 +1,1918 @@
+{
+  "checks": [
+    "clean boot and real same-origin API readiness",
+    "same-origin keyed paper account funding, exact retry and read-only ledger history",
+    "real persisted diagnostic job completed by bounded worker",
+    "warm-up plus three diagnostic batches with concurrent API/DB reads",
+    "real Docker browser Dashboard/Settings/job at both widths",
+    "real browser cash creation, independent accounts and keyed retries",
+    "real browser same-origin strategy creation, immutable append, conflict and pagination",
+    "real browser candidate/target reruns and cash-only cases via supervised worker",
+    "real browser public experiment rerun, pages, cancellation and fingerprints",
+    "real mobile/desktop experiment form, charts/tables/Axe, exact uint64 rerun, original preservation and cancellation",
+    "real mobile/desktop aligned and mismatched comparison, one-rule challenge, shared-setting exact-seed reruns and immutable source evidence",
+    "internal core admission, actual supervised next-open replay and sealed artifact",
+    "worker-side Q12 metrics, aligned SPY/cash, continuing holdout and exposure",
+    "real same-origin recommendation, shared order preview and numeric forecast; exact uint64 retry and unchanged account",
+    "public computed approval leaves cash unchanged; explicit unavailable fixture close remains pending; later step posts actual worker fills",
+    "stopped worker exposes backlog immediately after explicit clock selection; restart deduplicates the next monthly/manual review without trading",
+    "explicit manual cash review advances only synthetic observation; 18 missed months retain chronology; monthly/manual dedup produces one actual worker job and numeric forecast with unchanged1000cash",
+    "real Decision Center at360/1280, common-shock scenarios, keyboard confirmation, response-loss reload recovery, duplicate suppression, unchanged approval cash, explicit replay, durable fills, actionable dashboard and Axe",
+    "real portfolio holdings/fees/history, Decision Center entry and Axe at360/1280",
+    "private explicit fixture approval and real worker atomic fill",
+    "private real-worker seeded common-shock scenarios and immutable artifacts; no portfolio effects",
+    "API and worker external routing blocked",
+    "restart retains paper account identity, funding and original creation retry",
+    "restart preserves workspace, job, fixtures and artifact hash",
+    "rebuild/recreate preserves named-volume state",
+    "restart and rebuild preserve original recommendation/forecast and readonly account",
+    "public approval key, replay clock, original decision, posted fills and ledger survive actual restart and rebuild",
+    "monthly review checkpoints, original request key, logical clock, forecast and readonly ledger survive actual restart/rebuild with fresh supervisor observations",
+    "actual private ports and aggregate 4 CPU/4.5 GiB caps",
+    "failed migration blocks application startup; repair preserves workspace"
+  ],
+  "classification": "RECORDED_APPLICATION_OUTPUT_NOT_INDEPENDENT_ORACLE",
+  "data_label": "SYNTHETIC_DATA_ONLY",
+  "decision_browser": {
+    "classification": "RECORDED_APPLICATION_OUTPUT_NOT_INDEPENDENT_ORACLE",
+    "evidence": [
+      {
+        "accepted": {
+          "job_id": "173f828c-fea8-42f7-bfc1-f7b4cd655198",
+          "recommendation_id": "7f928224-1421-58af-bb18-a785413c9541"
+        },
+        "account_id": "f5a0212f-cabd-5990-a027-254428f63a7f",
+        "approval_requests": [
+          {
+            "body": {
+              "expected_revision": 1
+            },
+            "key": "dea45d05-568e-4202-8919-6b9512e4d301"
+          }
+        ],
+        "axe_violations": [],
+        "batch": {
+          "advance_unavailable_reason": "BATCH_TERMINAL",
+          "approval_idempotency_key": "dea45d05-568e-4202-8919-6b9512e4d301",
+          "approved_at": "2028-07-18T12:30:00Z",
+          "approved_revision": 1,
+          "calendar_version": "e3d2312d54e172d7aada8239f296eecf38c6038d66b5a203c5c5690ede82d660",
+          "can_advance_fixture": false,
+          "clock_mode": "synthetic_replay",
+          "current_portfolio_revision": 5,
+          "data_status": "synthetic_fixture",
+          "decision_cutoff_utc": "2028-07-18T12:30:00Z",
+          "eligible_open_at": "2028-07-18T13:30:00Z",
+          "execution_policy_id": "us_eod_next_open_v1",
+          "fixture_clock_at": "2028-07-19T20:00:00Z",
+          "id": "3d326054-40fd-5c1f-9032-62f6b3ea7f79",
+          "latest_fill_job": {
+            "attempts": 1,
+            "created_at": "2026-10-29T12:19:31.430576Z",
+            "error": null,
+            "id": "366a46fe-e78b-49eb-871a-0900b020f8cd",
+            "kind": "apply_scheduled_fills",
+            "max_attempts": 3,
+            "progress": 100,
+            "result": {
+              "kind": "resource",
+              "message": "Paper batch attempt committed; inspect batch for pending or terminal state.",
+              "resource_id": "3d326054-40fd-5c1f-9032-62f6b3ea7f79"
+            },
+            "status": "completed",
+            "updated_at": "2026-10-29T12:19:32.240099Z"
+          },
+          "operator_recorded_at": "2026-10-29T12:19:19.896290Z",
+          "orders": [
+            {
+              "asset_id": "SYN:AAA",
+              "cancelled_or_skipped_quantity": "0.000000",
+              "earliest_fill_session": "2028-07-18",
+              "filled_quantity": "2.857142",
+              "id": "5be139eb-72ad-5fef-ad7c-561d14cd09c2",
+              "pending_quantity": "0.000000",
+              "reason": null,
+              "requested_quantity": "2.857142",
+              "side": "BUY",
+              "status": "filled",
+              "terminal": true
+            },
+            {
+              "asset_id": "SYN:BBB",
+              "cancelled_or_skipped_quantity": "0.000000",
+              "earliest_fill_session": "2028-07-18",
+              "filled_quantity": "2.857142",
+              "id": "61815e34-7239-5c3a-b961-468215679e08",
+              "pending_quantity": "0.000000",
+              "reason": null,
+              "requested_quantity": "2.857142",
+              "side": "BUY",
+              "status": "filled",
+              "terminal": true
+            },
+            {
+              "asset_id": "SYN:CCC",
+              "cancelled_or_skipped_quantity": "0.000000",
+              "earliest_fill_session": "2028-07-18",
+              "filled_quantity": "2.985074",
+              "id": "7e2b65ba-d0be-5c76-b1a6-5281d7528eb3",
+              "pending_quantity": "0.000000",
+              "reason": null,
+              "requested_quantity": "2.985074",
+              "side": "BUY",
+              "status": "filled",
+              "terminal": true
+            }
+          ],
+          "paper_only": true,
+          "portfolio_id": "f5a0212f-cabd-5990-a027-254428f63a7f",
+          "reason": null,
+          "recommendation_id": "7f928224-1421-58af-bb18-a785413c9541",
+          "snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+          "snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+          "status": "filled",
+          "terminal": true
+        },
+        "before": {
+          "benchmark_symbol": "SPY",
+          "cash_usd": "1000.00",
+          "created_at": "2026-10-29T12:19:16.968800Z",
+          "currency": "USD",
+          "execution_policy_id": "us_eod_next_open_v1",
+          "holdings": [],
+          "id": "f5a0212f-cabd-5990-a027-254428f63a7f",
+          "last_sequence": 2,
+          "name": "Decision browser 360",
+          "opening_cash_usd": "1000.00",
+          "opening_snapshot_id": null,
+          "paper_only": true,
+          "reconciliation_failed": false,
+          "revision": 2,
+          "risk_policy": {
+            "max_position_weight": "0.2",
+            "max_positions": 8,
+            "max_sector_weight": "0.4",
+            "min_cash_weight": "0.05",
+            "min_trade_usd": "5",
+            "rebalance_band_absolute_weight": "0.02",
+            "weighting": "inverse_volatility"
+          },
+          "state": "active",
+          "strategy_version_id": "184f4ef7-c542-5387-a5aa-9bd4d162efde",
+          "total_value_usd": "1000.00",
+          "valuation": {
+            "as_of_session": null,
+            "cash_weight": "1",
+            "checked_at": "2026-10-29T12:19:20.139420Z",
+            "missing_assets": [],
+            "reason": "CASH_ONLY",
+            "snapshot_id": null,
+            "snapshot_sha256": null,
+            "status": "available",
+            "total_value_usd": "1000.00",
+            "warnings": [
+              "SYNTHETIC_DATA_ONLY"
+            ]
+          },
+          "valuation_as_of_session": null,
+          "valuation_mode": "synthetic_fixture"
+        },
+        "dismissed_review": {
+          "accepted": {
+            "job_id": "ded6a4fd-f62f-4c7b-8240-6b9ef86c0dbc",
+            "recommendation_id": "d31f10b1-059d-5cbe-b68b-49f6eb64f248"
+          },
+          "disposition": "dismissed",
+          "ledger_unchanged": true,
+          "summary_action": "HOLD"
+        },
+        "keyboard_confirmation": true,
+        "lost_response_recovered_after_reload": true,
+        "no_horizontal_overflow": true,
+        "original": {
+          "actions": [
+            {
+              "asset_id": "SYN:AAA",
+              "current_weight": "0",
+              "estimated_notional_usd": "200.00",
+              "estimated_quantity": "2.857142",
+              "evidence": {
+                "current_weight": "0",
+                "position_cap": "0.2"
+              },
+              "explanation": "Buy SYN:AAA: current weight 0, target 0.2; target rebalance. Estimated quantity 2.857142; paper preview only.",
+              "label": "INCREASE",
+              "reason_codes": [
+                "TARGET_REBALANCE"
+              ],
+              "side": "BUY",
+              "target_weight": "0.2"
+            },
+            {
+              "asset_id": "SYN:BBB",
+              "current_weight": "0",
+              "estimated_notional_usd": "200.00",
+              "estimated_quantity": "2.857142",
+              "evidence": {
+                "current_weight": "0",
+                "position_cap": "0.2"
+              },
+              "explanation": "Buy SYN:BBB: current weight 0, target 0.2; target rebalance. Estimated quantity 2.857142; paper preview only.",
+              "label": "INCREASE",
+              "reason_codes": [
+                "TARGET_REBALANCE"
+              ],
+              "side": "BUY",
+              "target_weight": "0.2"
+            },
+            {
+              "asset_id": "SYN:CCC",
+              "current_weight": "0",
+              "estimated_notional_usd": "200.00",
+              "estimated_quantity": "2.985074",
+              "evidence": {
+                "current_weight": "0",
+                "position_cap": "0.2"
+              },
+              "explanation": "Buy SYN:CCC: current weight 0, target 0.2; target rebalance. Estimated quantity 2.985074; paper preview only.",
+              "label": "INCREASE",
+              "reason_codes": [
+                "TARGET_REBALANCE"
+              ],
+              "side": "BUY",
+              "target_weight": "0.2"
+            }
+          ],
+          "as_of_session": "2028-07-17",
+          "calendar_sha256": "e3d2312d54e172d7aada8239f296eecf38c6038d66b5a203c5c5690ede82d660",
+          "candidates": [
+            {
+              "asset_id": "SYN:AAA",
+              "contributions": [
+                {
+                  "name": "momentum_long_z",
+                  "unavailable_reason": null,
+                  "value": 0.7071067811865471
+                },
+                {
+                  "name": "momentum_short_z",
+                  "unavailable_reason": null,
+                  "value": -0.7071067811865476
+                },
+                {
+                  "name": "volatility_z",
+                  "unavailable_reason": null,
+                  "value": -0.7071067811865476
+                },
+                {
+                  "name": "momentum_long_contribution",
+                  "unavailable_reason": null,
+                  "value": 0.4242640687119283
+                },
+                {
+                  "name": "momentum_short_contribution",
+                  "unavailable_reason": null,
+                  "value": -0.1767766952966369
+                },
+                {
+                  "name": "volatility_contribution",
+                  "unavailable_reason": null,
+                  "value": 0.10606601717798213
+                }
+              ],
+              "exclusion_reasons": [],
+              "features": [
+                {
+                  "name": "momentum_long",
+                  "unavailable_reason": null,
+                  "value": 0.0989010989010989
+                },
+                {
+                  "name": "momentum_short",
+                  "unavailable_reason": null,
+                  "value": 0.04712041884816754
+                },
+                {
+                  "name": "volatility",
+                  "unavailable_reason": null,
+                  "value": 0.00014776165676800922
+                }
+              ],
+              "score": 0.3535533905932735
+            },
+            {
+              "asset_id": "SYN:BBB",
+              "contributions": [
+                {
+                  "name": "momentum_long_z",
+                  "unavailable_reason": null,
+                  "value": 0.7071067811865471
+                },
+                {
+                  "name": "momentum_short_z",
+                  "unavailable_reason": null,
+                  "value": -0.7071067811865476
+                },
+                {
+                  "name": "volatility_z",
+                  "unavailable_reason": null,
+                  "value": -0.7071067811865476
+                },
+                {
+                  "name": "momentum_long_contribution",
+                  "unavailable_reason": null,
+                  "value": 0.4242640687119283
+                },
+                {
+                  "name": "momentum_short_contribution",
+                  "unavailable_reason": null,
+                  "value": -0.1767766952966369
+                },
+                {
+                  "name": "volatility_contribution",
+                  "unavailable_reason": null,
+                  "value": 0.10606601717798213
+                }
+              ],
+              "exclusion_reasons": [],
+              "features": [
+                {
+                  "name": "momentum_long",
+                  "unavailable_reason": null,
+                  "value": 0.0989010989010989
+                },
+                {
+                  "name": "momentum_short",
+                  "unavailable_reason": null,
+                  "value": 0.04712041884816754
+                },
+                {
+                  "name": "volatility",
+                  "unavailable_reason": null,
+                  "value": 0.00014776165676800922
+                }
+              ],
+              "score": 0.3535533905932735
+            },
+            {
+              "asset_id": "SYN:CCC",
+              "contributions": [
+                {
+                  "name": "momentum_long_z",
+                  "unavailable_reason": null,
+                  "value": -1.4142135623730956
+                },
+                {
+                  "name": "momentum_short_z",
+                  "unavailable_reason": null,
+                  "value": 1.4142135623730951
+                },
+                {
+                  "name": "volatility_z",
+                  "unavailable_reason": null,
+                  "value": 1.4142135623730951
+                },
+                {
+                  "name": "momentum_long_contribution",
+                  "unavailable_reason": null,
+                  "value": -0.8485281374238574
+                },
+                {
+                  "name": "momentum_short_contribution",
+                  "unavailable_reason": null,
+                  "value": 0.3535533905932738
+                },
+                {
+                  "name": "volatility_contribution",
+                  "unavailable_reason": null,
+                  "value": -0.21213203435596426
+                }
+              ],
+              "exclusion_reasons": [],
+              "features": [
+                {
+                  "name": "momentum_long",
+                  "unavailable_reason": null,
+                  "value": 0.08134280180761781
+                },
+                {
+                  "name": "momentum_short",
+                  "unavailable_reason": null,
+                  "value": 0.07234314980793854
+                },
+                {
+                  "name": "volatility",
+                  "unavailable_reason": null,
+                  "value": 0.49420961736983665
+                }
+              ],
+              "score": -0.7071067811865478
+            },
+            {
+              "asset_id": "SYN:SPY",
+              "contributions": [],
+              "exclusion_reasons": [
+                "UNSUPPORTED_INSTRUMENT"
+              ],
+              "features": [],
+              "score": null
+            },
+            {
+              "asset_id": "SYN:ZERO",
+              "contributions": [],
+              "exclusion_reasons": [
+                "NONPOSITIVE_TREND"
+              ],
+              "features": [],
+              "score": null
+            }
+          ],
+          "cash_target_weight": "0.4",
+          "clock_mode": "synthetic_replay",
+          "computed_at": "2026-10-29T12:19:18.195380Z",
+          "config_sha256": "2093c63d190815eba052508d6d42d8ae0c93400cf777602d2c5f759627f43f21",
+          "created_at": "2028-07-18T12:30:00Z",
+          "current_portfolio_revision": 1,
+          "data_status": "synthetic_fixture",
+          "decision_cutoff_utc": "2028-07-18T12:30:00Z",
+          "engine_version": "30738eb757dca7143df47e504a10e2e0d1be009cba1a04eb5d2f29292b91d8da",
+          "estimated_total_trade_cost_usd": "0.60",
+          "forecast": {
+            "as_of_session": "2028-07-17",
+            "block_length_sessions": 5,
+            "calendar_version": "e3d2312d54e172d7aada8239f296eecf38c6038d66b5a203c5c5690ede82d660",
+            "cash_return_fraction": 0,
+            "comparability": "common_shock_paths",
+            "current_allocation": {
+              "cash_weight": "1",
+              "upfront_cost_usd": "0.00",
+              "weights": []
+            },
+            "data_status": "synthetic_fixture",
+            "decision_cutoff_utc": "2028-07-18T12:30:00Z",
+            "engine_version": "30738eb757dca7143df47e504a10e2e0d1be009cba1a04eb5d2f29292b91d8da",
+            "fingerprint": "250abfa34dda4aa6a53a386e40a73cf45374d41f196a3f43e4d41b37d805481a",
+            "fingerprint_schema_version": 1,
+            "future_sessions": [
+              "2028-07-18",
+              "2028-07-19",
+              "2028-07-20",
+              "2028-07-21",
+              "2028-07-24",
+              "2028-07-25",
+              "2028-07-26",
+              "2028-07-27",
+              "2028-07-28",
+              "2028-07-31",
+              "2028-08-01",
+              "2028-08-02",
+              "2028-08-03",
+              "2028-08-04",
+              "2028-08-07",
+              "2028-08-08",
+              "2028-08-09",
+              "2028-08-10",
+              "2028-08-11",
+              "2028-08-14",
+              "2028-08-15",
+              "2028-08-16",
+              "2028-08-17",
+              "2028-08-18",
+              "2028-08-21",
+              "2028-08-22",
+              "2028-08-23",
+              "2028-08-24",
+              "2028-08-25",
+              "2028-08-28",
+              "2028-08-29",
+              "2028-08-30",
+              "2028-08-31",
+              "2028-09-01",
+              "2028-09-04",
+              "2028-09-05",
+              "2028-09-06",
+              "2028-09-07",
+              "2028-09-08",
+              "2028-09-11",
+              "2028-09-12",
+              "2028-09-13",
+              "2028-09-14",
+              "2028-09-15",
+              "2028-09-18",
+              "2028-09-19",
+              "2028-09-20",
+              "2028-09-21",
+              "2028-09-22",
+              "2028-09-25",
+              "2028-09-26",
+              "2028-09-27",
+              "2028-09-28",
+              "2028-09-29",
+              "2028-10-02",
+              "2028-10-03",
+              "2028-10-04",
+              "2028-10-05",
+              "2028-10-06",
+              "2028-10-09",
+              "2028-10-10",
+              "2028-10-11",
+              "2028-10-12",
+              "2028-10-13"
+            ],
+            "hold_unchanged": {
+              "median_ending_value_usd": "1000.00",
+              "median_return_fraction": 0,
+              "p10_return_fraction": 0,
+              "p90_return_fraction": 0,
+              "probability_of_loss": 0
+            },
+            "horizon_calendar_days": 90,
+            "horizon_end_at": "2028-10-16T12:30:00Z",
+            "horizon_trading_sessions": 64,
+            "id": "5666b797-877f-58e5-a8ee-d95576b1e048",
+            "initial_value_usd": "1000.00",
+            "input_array_sha256": "18d3859cb8497029fee86ce293bbf81f2c6c8645efd05f56b5759e15adbc010e",
+            "limitations": [
+              "CONSTANT_WEIGHT_APPROXIMATION",
+              "ESTIMATED_UPFRONT_COST",
+              "SCENARIO_NOT_CALIBRATED_PREDICTION",
+              "SYNTHETIC_DATA_ONLY",
+              "ZERO_CASH_YIELD"
+            ],
+            "lookback_sessions": 252,
+            "median_return_delta_fraction": 0.034157289802597024,
+            "method": "multivariate_block_bootstrap_v1",
+            "proposed": {
+              "median_ending_value_usd": "1034.16",
+              "median_return_fraction": 0.034157289802597024,
+              "p10_return_fraction": 0.006364618895775845,
+              "p90_return_fraction": 0.06283124421289563,
+              "probability_of_loss": 0.0752
+            },
+            "proposed_allocation": {
+              "cash_weight": "0.3996398486508459890304685040383206465959022899101170356603559905720136808747411463",
+              "upfront_cost_usd": "0.60",
+              "weights": [
+                {
+                  "asset_id": "SYN:AAA",
+                  "weight": "0.200120044446114869192124083574246086679873966519494272721705204038666254016342956"
+                },
+                {
+                  "asset_id": "SYN:BBB",
+                  "weight": "0.200120044446114869192124083574246086679873966519494272721705204038666254016342956"
+                },
+                {
+                  "asset_id": "SYN:CCC",
+                  "weight": "0.20012006245692427258528332881318718004434977705089441889623360135065381109257294"
+                }
+              ]
+            },
+            "rng": {
+              "generator": "PCG64",
+              "initial_state": {
+                "id": "2d40eea3-5324-5bc7-8e16-e15b9b6bfd8f",
+                "schema_version": 1,
+                "sha256": "f7eeadec4bb6327d9c1e417fbdb8433721abcc3f1c62a370fd34905c51973c03"
+              },
+              "numpy_version": "2.5.4",
+              "sampling_version": "noncircular_c_order_v1"
+            },
+            "sampled_indices": {
+              "id": "f06ffa7f-4f07-5eca-8735-0c24051544b0",
+              "schema_version": 1,
+              "sha256": "b7795d3889530bb259a8b5a3e42cf41663dd7555bfe2d0f5251d7bc0febec332"
+            },
+            "seed": 42,
+            "simulation_count": 5000,
+            "snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+            "snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+            "status": "available",
+            "unavailable_reason": null
+          },
+          "forecast_id": "5666b797-877f-58e5-a8ee-d95576b1e048",
+          "forecast_inputs_canonical_json": "{\"as_of_session\":\"2028-07-17\",\"calendar_sha256\":\"e3d2312d54e172d7aada8239f296eecf38c6038d66b5a203c5c5690ede82d660\",\"config_sha256\":\"2093c63d190815eba052508d6d42d8ae0c93400cf777602d2c5f759627f43f21\",\"current_allocation\":{\"cash_weight\":\"1\",\"upfront_cost_usd\":\"0.00\",\"weights\":[]},\"decision_cutoff_utc\":\"2028-07-18T12:30:00Z\",\"initial_value_usd\":\"1000.00\",\"portfolio_id\":\"f5a0212f-cabd-5990-a027-254428f63a7f\",\"portfolio_revision\":1,\"proposed_allocation\":{\"cash_weight\":\"0.3996398486508459890304685040383206465959022899101170356603559905720136808747411463\",\"upfront_cost_usd\":\"0.60\",\"weights\":[{\"asset_id\":\"SYN:AAA\",\"weight\":\"0.200120044446114869192124083574246086679873966519494272721705204038666254016342956\"},{\"asset_id\":\"SYN:BBB\",\"weight\":\"0.200120044446114869192124083574246086679873966519494272721705204038666254016342956\"},{\"asset_id\":\"SYN:CCC\",\"weight\":\"0.20012006245692427258528332881318718004434977705089441889623360135065381109257294\"}]},\"seed\":42,\"snapshot_id\":\"5c223992-90ec-59a7-a1e7-7889b76cacea\",\"snapshot_sha256\":\"40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add\",\"source_mode\":\"synthetic_fixture\",\"strategy_version_id\":\"184f4ef7-c542-5387-a5aa-9bd4d162efde\",\"valuation_as_of_session\":\"2028-07-17\"}",
+          "forecast_job": {
+            "attempts": 1,
+            "created_at": "2026-10-29T12:19:18.198246Z",
+            "error": null,
+            "id": "622f6e87-6ea1-43f7-8a62-ed7e334746b5",
+            "kind": "forecast",
+            "max_attempts": 3,
+            "progress": 100,
+            "result": {
+              "kind": "resource",
+              "message": "Immutable scenario comparison sealed; not a calibrated prediction.",
+              "resource_id": "5666b797-877f-58e5-a8ee-d95576b1e048"
+            },
+            "status": "completed",
+            "updated_at": "2026-10-29T12:19:18.940982Z"
+          },
+          "id": "7f928224-1421-58af-bb18-a785413c9541",
+          "inputs": {
+            "as_of_session": "2028-07-17",
+            "clock_mode": "synthetic_replay",
+            "seed": 42,
+            "snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea"
+          },
+          "inputs_canonical_json": "{\"as_of_session\":\"2028-07-17\",\"clock_mode\":\"synthetic_replay\",\"seed\":42,\"snapshot_id\":\"5c223992-90ec-59a7-a1e7-7889b76cacea\"}",
+          "is_current": true,
+          "job_id": "173f828c-fea8-42f7-bfc1-f7b4cd655198",
+          "portfolio_id": "f5a0212f-cabd-5990-a027-254428f63a7f",
+          "portfolio_revision": 1,
+          "snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+          "snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+          "stale_reasons": [],
+          "status": "ready",
+          "strategy_config": {
+            "display_name": "Risk-Adjusted Momentum",
+            "execution_policy": {
+              "id": "us_eod_next_open_v1"
+            },
+            "portfolio": {
+              "max_position_weight": "0.2",
+              "max_positions": 8,
+              "max_sector_weight": "0.4",
+              "min_cash_weight": "0.05",
+              "min_trade_usd": "5",
+              "rebalance_band_absolute_weight": "0.02",
+              "weighting": "inverse_volatility"
+            },
+            "rebalance": {
+              "frequency": "monthly"
+            },
+            "schema_version": 1,
+            "signals": {
+              "kind": "risk_adjusted_momentum",
+              "momentum_long_sessions": 126,
+              "momentum_short_sessions": 63,
+              "require_positive_trend": true,
+              "trend_sma_sessions": 200,
+              "volatility_sessions": 60,
+              "z_score_weights": {
+                "momentum_long": 0.6,
+                "momentum_short": 0.25,
+                "volatility_penalty": -0.15
+              }
+            },
+            "universe": {
+              "kind": "liquid_us_equities",
+              "min_history_sessions": 252,
+              "min_median_dollar_volume_usd": "1000000",
+              "min_price_usd": "5"
+            }
+          },
+          "strategy_evidence": {
+            "allocation_exclusions": [],
+            "allocation_reasons": [
+              "UNALLOCATABLE_CAPACITY"
+            ],
+            "as_of_session": "2028-07-17",
+            "candidates": [
+              {
+                "allocation_eligible": true,
+                "asset_id": "SYN:AAA",
+                "eligible": true,
+                "features": {
+                  "momentum_long": 0.0989010989010989,
+                  "momentum_short": 0.04712041884816754,
+                  "volatility": 0.00014776165676800922
+                },
+                "input_sha256": "3764a4d80c0941deae6fc157600413b6999244894b8fae68a9ab0a7233f5f41a",
+                "median_dollar_volume": "69525000.000",
+                "rank": 1,
+                "raw_close": "70.000",
+                "reasons": [],
+                "scoring": {
+                  "momentum_long_contribution": 0.4242640687119283,
+                  "momentum_long_z": 0.7071067811865471,
+                  "momentum_short_contribution": -0.1767766952966369,
+                  "momentum_short_z": -0.7071067811865476,
+                  "score": 0.3535533905932735,
+                  "volatility_contribution": 0.10606601717798213,
+                  "volatility_z": -0.7071067811865476
+                },
+                "sector": "Technology",
+                "trend_sma": "65.025"
+              },
+              {
+                "allocation_eligible": true,
+                "asset_id": "SYN:BBB",
+                "eligible": true,
+                "features": {
+                  "momentum_long": 0.0989010989010989,
+                  "momentum_short": 0.04712041884816754,
+                  "volatility": 0.00014776165676800922
+                },
+                "input_sha256": "f4a84b0d93a34ac5869ea498b90d7dbbff4fcc9e1657dedc9f3adf82f79c9ea4",
+                "median_dollar_volume": "69525000.000",
+                "rank": 2,
+                "raw_close": "70.000",
+                "reasons": [],
+                "scoring": {
+                  "momentum_long_contribution": 0.4242640687119283,
+                  "momentum_long_z": 0.7071067811865471,
+                  "momentum_short_contribution": -0.1767766952966369,
+                  "momentum_short_z": -0.7071067811865476,
+                  "score": 0.3535533905932735,
+                  "volatility_contribution": 0.10606601717798213,
+                  "volatility_z": -0.7071067811865476
+                },
+                "sector": "Technology",
+                "trend_sma": "65.025"
+              },
+              {
+                "allocation_eligible": true,
+                "asset_id": "SYN:CCC",
+                "eligible": true,
+                "features": {
+                  "momentum_long": 0.08134280180761781,
+                  "momentum_short": 0.07234314980793854,
+                  "volatility": 0.49420961736983665
+                },
+                "input_sha256": "de3f461382e43db02df96f99f55b22463dee5c8d5120eb998dd1af5336d412a4",
+                "median_dollar_volume": "65620000.000",
+                "rank": 3,
+                "raw_close": "67.000",
+                "reasons": [],
+                "scoring": {
+                  "momentum_long_contribution": -0.8485281374238574,
+                  "momentum_long_z": -1.4142135623730956,
+                  "momentum_short_contribution": 0.3535533905932738,
+                  "momentum_short_z": 1.4142135623730951,
+                  "score": -0.7071067811865478,
+                  "volatility_contribution": -0.21213203435596426,
+                  "volatility_z": 1.4142135623730951
+                },
+                "sector": "Unknown",
+                "trend_sma": "62.020"
+              },
+              {
+                "allocation_eligible": false,
+                "asset_id": "SYN:SPY",
+                "eligible": false,
+                "features": null,
+                "input_sha256": "bcd03efb58d1cb03ddc94347d5db9d898f13c2499be9d9b22816bcba98725f67",
+                "median_dollar_volume": "109762500.000",
+                "rank": null,
+                "raw_close": "110.000",
+                "reasons": [
+                  "UNSUPPORTED_INSTRUMENT"
+                ],
+                "scoring": null,
+                "sector": "Unknown",
+                "trend_sma": "107.5125"
+              },
+              {
+                "allocation_eligible": false,
+                "asset_id": "SYN:ZERO",
+                "eligible": false,
+                "features": null,
+                "input_sha256": "99c1d7a4bc732ff3b1d1c8cb0dbb9d81ac7772685be7c8c1ec736ccdbafb9175",
+                "median_dollar_volume": "50000000.000",
+                "rank": null,
+                "raw_close": "50.000",
+                "reasons": [
+                  "NONPOSITIVE_TREND"
+                ],
+                "scoring": null,
+                "sector": "Unknown",
+                "trend_sma": "50.000"
+              }
+            ],
+            "cash_target_weight": "0.4",
+            "constraint_evidence": {
+              "capped_positions": [
+                "SYN:AAA",
+                "SYN:BBB",
+                "SYN:CCC"
+              ],
+              "cash_floor": "0.05",
+              "cash_weight": "0.4",
+              "compliant": true,
+              "invested_weight": "0.6",
+              "max_position_weight": "0.2",
+              "max_sector_weight": "0.4",
+              "position_count": 3,
+              "position_limit": "0.2",
+              "sector_limit": "0.4",
+              "sectors": [
+                {
+                  "at_cap": true,
+                  "sector": "Technology",
+                  "weight": "0.4"
+                },
+                {
+                  "at_cap": false,
+                  "sector": "Unknown",
+                  "weight": "0.2"
+                }
+              ],
+              "unmet_investable_weight": "0.35",
+              "violations": []
+            },
+            "data_diagnostics": [],
+            "decision_cutoff_utc": "2028-07-18T12:30:00Z",
+            "mode": "synthetic_fixture",
+            "reproducibility": {
+              "calendar_sha256": "e3d2312d54e172d7aada8239f296eecf38c6038d66b5a203c5c5690ede82d660",
+              "config_sha256": "2093c63d190815eba052508d6d42d8ae0c93400cf777602d2c5f759627f43f21",
+              "engine_version": "30738eb757dca7143df47e504a10e2e0d1be009cba1a04eb5d2f29292b91d8da",
+              "snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+              "snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+              "strategy_version_id": "184f4ef7-c542-5387-a5aa-9bd4d162efde"
+            },
+            "schema_version": 1,
+            "selected_ids": [
+              "SYN:AAA",
+              "SYN:BBB",
+              "SYN:CCC"
+            ],
+            "target_weights": [
+              {
+                "asset_id": "SYN:AAA",
+                "sector": "Technology",
+                "weight": "0.2"
+              },
+              {
+                "asset_id": "SYN:BBB",
+                "sector": "Technology",
+                "weight": "0.2"
+              },
+              {
+                "asset_id": "SYN:CCC",
+                "sector": "Unknown",
+                "weight": "0.2"
+              }
+            ],
+            "warnings": [
+              "SYNTHETIC_DATA_ONLY"
+            ]
+          },
+          "strategy_version_id": "184f4ef7-c542-5387-a5aa-9bd4d162efde",
+          "summary_action": "BUY",
+          "target_weights": [
+            {
+              "asset_id": "SYN:AAA",
+              "reason_codes": [
+                "RISK_CONSTRAINED_TARGET"
+              ],
+              "weight": "0.2"
+            },
+            {
+              "asset_id": "SYN:BBB",
+              "reason_codes": [
+                "RISK_CONSTRAINED_TARGET"
+              ],
+              "weight": "0.2"
+            },
+            {
+              "asset_id": "SYN:CCC",
+              "reason_codes": [
+                "RISK_CONSTRAINED_TARGET"
+              ],
+              "weight": "0.2"
+            }
+          ]
+        },
+        "posted": {
+          "benchmark_symbol": "SPY",
+          "cash_usd": "404.98",
+          "created_at": "2026-10-29T12:19:16.968800Z",
+          "currency": "USD",
+          "execution_policy_id": "us_eod_next_open_v1",
+          "holdings": [
+            {
+              "asset_id": "SYN:AAA",
+              "mark_price_usd": "101.800",
+              "market_value_usd": "290.86",
+              "price_as_of_session": "2030-12-31",
+              "quantity": "2.857142",
+              "reason": null,
+              "sector": "Technology",
+              "total_basis_usd": "200.34",
+              "weight": "0.230357312229444043"
+            },
+            {
+              "asset_id": "SYN:BBB",
+              "mark_price_usd": "101.800",
+              "market_value_usd": "290.86",
+              "price_as_of_session": "2030-12-31",
+              "quantity": "2.857142",
+              "reason": null,
+              "sector": "Technology",
+              "total_basis_usd": "200.34",
+              "weight": "0.230357312229444043"
+            },
+            {
+              "asset_id": "SYN:CCC",
+              "mark_price_usd": "92.440",
+              "market_value_usd": "275.94",
+              "price_as_of_session": "2030-12-31",
+              "quantity": "2.985074",
+              "reason": null,
+              "sector": "Unknown",
+              "total_basis_usd": "194.34",
+              "weight": "0.218543270405532563"
+            }
+          ],
+          "id": "f5a0212f-cabd-5990-a027-254428f63a7f",
+          "last_sequence": 5,
+          "name": "Decision browser 360",
+          "opening_cash_usd": "1000.00",
+          "opening_snapshot_id": null,
+          "paper_only": true,
+          "reconciliation_failed": false,
+          "revision": 5,
+          "risk_policy": {
+            "max_position_weight": "0.2",
+            "max_positions": 8,
+            "max_sector_weight": "0.4",
+            "min_cash_weight": "0.05",
+            "min_trade_usd": "5",
+            "rebalance_band_absolute_weight": "0.02",
+            "weighting": "inverse_volatility"
+          },
+          "state": "active",
+          "strategy_version_id": "184f4ef7-c542-5387-a5aa-9bd4d162efde",
+          "total_value_usd": "1262.63",
+          "valuation": {
+            "as_of_session": "2030-12-31",
+            "cash_weight": "0.32074210513557935",
+            "checked_at": "2026-10-29T12:19:32.828705Z",
+            "missing_assets": [],
+            "reason": null,
+            "snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+            "snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+            "status": "available",
+            "total_value_usd": "1262.63",
+            "warnings": [
+              "SYNTHETIC_DATA_ONLY"
+            ]
+          },
+          "valuation_as_of_session": "2030-12-31",
+          "valuation_mode": "synthetic_fixture"
+        },
+        "recovered": {
+          "approval_idempotency_key": "dea45d05-568e-4202-8919-6b9512e4d301",
+          "approved_at": "2028-07-18T12:30:00Z",
+          "approved_revision": 1,
+          "batch_id": "3d326054-40fd-5c1f-9032-62f6b3ea7f79",
+          "clock_mode": "synthetic_replay",
+          "data_status": "synthetic_fixture",
+          "eligible_open_at": "2028-07-18T13:30:00Z",
+          "operator_recorded_at": "2026-10-29T12:19:19.896290Z",
+          "paper_only": true,
+          "portfolio_id": "f5a0212f-cabd-5990-a027-254428f63a7f",
+          "recommendation_id": "7f928224-1421-58af-bb18-a785413c9541"
+        },
+        "width": 360
+      },
+      {
+        "accepted": {
+          "job_id": "5188039a-c564-4268-8eb1-5aa1a117dc20",
+          "recommendation_id": "32c4e59e-5a4a-5dd5-9b67-29d043d42267"
+        },
+        "account_id": "333d79c0-2548-5e58-b6e2-584001c814c2",
+        "approval_requests": [
+          {
+            "body": {
+              "expected_revision": 1
+            },
+            "key": "7d6cad89-b9e2-42e7-9f32-8e4f6637a66e"
+          }
+        ],
+        "axe_violations": [],
+        "batch": {
+          "advance_unavailable_reason": "BATCH_TERMINAL",
+          "approval_idempotency_key": "7d6cad89-b9e2-42e7-9f32-8e4f6637a66e",
+          "approved_at": "2028-07-18T12:30:00Z",
+          "approved_revision": 1,
+          "calendar_version": "e3d2312d54e172d7aada8239f296eecf38c6038d66b5a203c5c5690ede82d660",
+          "can_advance_fixture": false,
+          "clock_mode": "synthetic_replay",
+          "current_portfolio_revision": 5,
+          "data_status": "synthetic_fixture",
+          "decision_cutoff_utc": "2028-07-18T12:30:00Z",
+          "eligible_open_at": "2028-07-18T13:30:00Z",
+          "execution_policy_id": "us_eod_next_open_v1",
+          "fixture_clock_at": "2028-07-19T20:00:00Z",
+          "id": "ce4a259c-cb9f-5d5e-9db3-fcd7c298b488",
+          "latest_fill_job": {
+            "attempts": 1,
+            "created_at": "2026-10-29T12:19:52.082264Z",
+            "error": null,
+            "id": "e4c3dbf7-2115-48bc-824f-1ddc3ca6909d",
+            "kind": "apply_scheduled_fills",
+            "max_attempts": 3,
+            "progress": 100,
+            "result": {
+              "kind": "resource",
+              "message": "Paper batch attempt committed; inspect batch for pending or terminal state.",
+              "resource_id": "ce4a259c-cb9f-5d5e-9db3-fcd7c298b488"
+            },
+            "status": "completed",
+            "updated_at": "2026-10-29T12:19:52.870469Z"
+          },
+          "operator_recorded_at": "2026-10-29T12:19:41.301683Z",
+          "orders": [
+            {
+              "asset_id": "SYN:AAA",
+              "cancelled_or_skipped_quantity": "0.000000",
+              "earliest_fill_session": "2028-07-18",
+              "filled_quantity": "2.857142",
+              "id": "99b24d00-620a-5701-b013-14b8fe9f6360",
+              "pending_quantity": "0.000000",
+              "reason": null,
+              "requested_quantity": "2.857142",
+              "side": "BUY",
+              "status": "filled",
+              "terminal": true
+            },
+            {
+              "asset_id": "SYN:BBB",
+              "cancelled_or_skipped_quantity": "0.000000",
+              "earliest_fill_session": "2028-07-18",
+              "filled_quantity": "2.857142",
+              "id": "15d777ca-71b2-57d1-865e-6d7dce64b4c1",
+              "pending_quantity": "0.000000",
+              "reason": null,
+              "requested_quantity": "2.857142",
+              "side": "BUY",
+              "status": "filled",
+              "terminal": true
+            },
+            {
+              "asset_id": "SYN:CCC",
+              "cancelled_or_skipped_quantity": "0.000000",
+              "earliest_fill_session": "2028-07-18",
+              "filled_quantity": "2.985074",
+              "id": "9f352f92-df96-5485-91cb-0bfd6ba81e35",
+              "pending_quantity": "0.000000",
+              "reason": null,
+              "requested_quantity": "2.985074",
+              "side": "BUY",
+              "status": "filled",
+              "terminal": true
+            }
+          ],
+          "paper_only": true,
+          "portfolio_id": "333d79c0-2548-5e58-b6e2-584001c814c2",
+          "reason": null,
+          "recommendation_id": "32c4e59e-5a4a-5dd5-9b67-29d043d42267",
+          "snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+          "snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+          "status": "filled",
+          "terminal": true
+        },
+        "before": {
+          "benchmark_symbol": "SPY",
+          "cash_usd": "1000.00",
+          "created_at": "2026-10-29T12:19:38.363624Z",
+          "currency": "USD",
+          "execution_policy_id": "us_eod_next_open_v1",
+          "holdings": [],
+          "id": "333d79c0-2548-5e58-b6e2-584001c814c2",
+          "last_sequence": 2,
+          "name": "Decision browser 1280",
+          "opening_cash_usd": "1000.00",
+          "opening_snapshot_id": null,
+          "paper_only": true,
+          "reconciliation_failed": false,
+          "revision": 2,
+          "risk_policy": {
+            "max_position_weight": "0.2",
+            "max_positions": 8,
+            "max_sector_weight": "0.4",
+            "min_cash_weight": "0.05",
+            "min_trade_usd": "5",
+            "rebalance_band_absolute_weight": "0.02",
+            "weighting": "inverse_volatility"
+          },
+          "state": "active",
+          "strategy_version_id": "184f4ef7-c542-5387-a5aa-9bd4d162efde",
+          "total_value_usd": "1000.00",
+          "valuation": {
+            "as_of_session": null,
+            "cash_weight": "1",
+            "checked_at": "2026-10-29T12:19:41.456521Z",
+            "missing_assets": [],
+            "reason": "CASH_ONLY",
+            "snapshot_id": null,
+            "snapshot_sha256": null,
+            "status": "available",
+            "total_value_usd": "1000.00",
+            "warnings": [
+              "SYNTHETIC_DATA_ONLY"
+            ]
+          },
+          "valuation_as_of_session": null,
+          "valuation_mode": "synthetic_fixture"
+        },
+        "dismissed_review": {
+          "accepted": {
+            "job_id": "f4036d46-18ed-45b1-849b-b10efff95b9f",
+            "recommendation_id": "19f83118-9c80-5b8d-8426-b0e97e772494"
+          },
+          "disposition": "dismissed",
+          "ledger_unchanged": true,
+          "summary_action": "HOLD"
+        },
+        "keyboard_confirmation": true,
+        "lost_response_recovered_after_reload": false,
+        "no_horizontal_overflow": true,
+        "original": {
+          "actions": [
+            {
+              "asset_id": "SYN:AAA",
+              "current_weight": "0",
+              "estimated_notional_usd": "200.00",
+              "estimated_quantity": "2.857142",
+              "evidence": {
+                "current_weight": "0",
+                "position_cap": "0.2"
+              },
+              "explanation": "Buy SYN:AAA: current weight 0, target 0.2; target rebalance. Estimated quantity 2.857142; paper preview only.",
+              "label": "INCREASE",
+              "reason_codes": [
+                "TARGET_REBALANCE"
+              ],
+              "side": "BUY",
+              "target_weight": "0.2"
+            },
+            {
+              "asset_id": "SYN:BBB",
+              "current_weight": "0",
+              "estimated_notional_usd": "200.00",
+              "estimated_quantity": "2.857142",
+              "evidence": {
+                "current_weight": "0",
+                "position_cap": "0.2"
+              },
+              "explanation": "Buy SYN:BBB: current weight 0, target 0.2; target rebalance. Estimated quantity 2.857142; paper preview only.",
+              "label": "INCREASE",
+              "reason_codes": [
+                "TARGET_REBALANCE"
+              ],
+              "side": "BUY",
+              "target_weight": "0.2"
+            },
+            {
+              "asset_id": "SYN:CCC",
+              "current_weight": "0",
+              "estimated_notional_usd": "200.00",
+              "estimated_quantity": "2.985074",
+              "evidence": {
+                "current_weight": "0",
+                "position_cap": "0.2"
+              },
+              "explanation": "Buy SYN:CCC: current weight 0, target 0.2; target rebalance. Estimated quantity 2.985074; paper preview only.",
+              "label": "INCREASE",
+              "reason_codes": [
+                "TARGET_REBALANCE"
+              ],
+              "side": "BUY",
+              "target_weight": "0.2"
+            }
+          ],
+          "as_of_session": "2028-07-17",
+          "calendar_sha256": "e3d2312d54e172d7aada8239f296eecf38c6038d66b5a203c5c5690ede82d660",
+          "candidates": [
+            {
+              "asset_id": "SYN:AAA",
+              "contributions": [
+                {
+                  "name": "momentum_long_z",
+                  "unavailable_reason": null,
+                  "value": 0.7071067811865471
+                },
+                {
+                  "name": "momentum_short_z",
+                  "unavailable_reason": null,
+                  "value": -0.7071067811865476
+                },
+                {
+                  "name": "volatility_z",
+                  "unavailable_reason": null,
+                  "value": -0.7071067811865476
+                },
+                {
+                  "name": "momentum_long_contribution",
+                  "unavailable_reason": null,
+                  "value": 0.4242640687119283
+                },
+                {
+                  "name": "momentum_short_contribution",
+                  "unavailable_reason": null,
+                  "value": -0.1767766952966369
+                },
+                {
+                  "name": "volatility_contribution",
+                  "unavailable_reason": null,
+                  "value": 0.10606601717798213
+                }
+              ],
+              "exclusion_reasons": [],
+              "features": [
+                {
+                  "name": "momentum_long",
+                  "unavailable_reason": null,
+                  "value": 0.0989010989010989
+                },
+                {
+                  "name": "momentum_short",
+                  "unavailable_reason": null,
+                  "value": 0.04712041884816754
+                },
+                {
+                  "name": "volatility",
+                  "unavailable_reason": null,
+                  "value": 0.00014776165676800922
+                }
+              ],
+              "score": 0.3535533905932735
+            },
+            {
+              "asset_id": "SYN:BBB",
+              "contributions": [
+                {
+                  "name": "momentum_long_z",
+                  "unavailable_reason": null,
+                  "value": 0.7071067811865471
+                },
+                {
+                  "name": "momentum_short_z",
+                  "unavailable_reason": null,
+                  "value": -0.7071067811865476
+                },
+                {
+                  "name": "volatility_z",
+                  "unavailable_reason": null,
+                  "value": -0.7071067811865476
+                },
+                {
+                  "name": "momentum_long_contribution",
+                  "unavailable_reason": null,
+                  "value": 0.4242640687119283
+                },
+                {
+                  "name": "momentum_short_contribution",
+                  "unavailable_reason": null,
+                  "value": -0.1767766952966369
+                },
+                {
+                  "name": "volatility_contribution",
+                  "unavailable_reason": null,
+                  "value": 0.10606601717798213
+                }
+              ],
+              "exclusion_reasons": [],
+              "features": [
+                {
+                  "name": "momentum_long",
+                  "unavailable_reason": null,
+                  "value": 0.0989010989010989
+                },
+                {
+                  "name": "momentum_short",
+                  "unavailable_reason": null,
+                  "value": 0.04712041884816754
+                },
+                {
+                  "name": "volatility",
+                  "unavailable_reason": null,
+                  "value": 0.00014776165676800922
+                }
+              ],
+              "score": 0.3535533905932735
+            },
+            {
+              "asset_id": "SYN:CCC",
+              "contributions": [
+                {
+                  "name": "momentum_long_z",
+                  "unavailable_reason": null,
+                  "value": -1.4142135623730956
+                },
+                {
+                  "name": "momentum_short_z",
+                  "unavailable_reason": null,
+                  "value": 1.4142135623730951
+                },
+                {
+                  "name": "volatility_z",
+                  "unavailable_reason": null,
+                  "value": 1.4142135623730951
+                },
+                {
+                  "name": "momentum_long_contribution",
+                  "unavailable_reason": null,
+                  "value": -0.8485281374238574
+                },
+                {
+                  "name": "momentum_short_contribution",
+                  "unavailable_reason": null,
+                  "value": 0.3535533905932738
+                },
+                {
+                  "name": "volatility_contribution",
+                  "unavailable_reason": null,
+                  "value": -0.21213203435596426
+                }
+              ],
+              "exclusion_reasons": [],
+              "features": [
+                {
+                  "name": "momentum_long",
+                  "unavailable_reason": null,
+                  "value": 0.08134280180761781
+                },
+                {
+                  "name": "momentum_short",
+                  "unavailable_reason": null,
+                  "value": 0.07234314980793854
+                },
+                {
+                  "name": "volatility",
+                  "unavailable_reason": null,
+                  "value": 0.49420961736983665
+                }
+              ],
+              "score": -0.7071067811865478
+            },
+            {
+              "asset_id": "SYN:SPY",
+              "contributions": [],
+              "exclusion_reasons": [
+                "UNSUPPORTED_INSTRUMENT"
+              ],
+              "features": [],
+              "score": null
+            },
+            {
+              "asset_id": "SYN:ZERO",
+              "contributions": [],
+              "exclusion_reasons": [
+                "NONPOSITIVE_TREND"
+              ],
+              "features": [],
+              "score": null
+            }
+          ],
+          "cash_target_weight": "0.4",
+          "clock_mode": "synthetic_replay",
+          "computed_at": "2026-10-29T12:19:39.592432Z",
+          "config_sha256": "2093c63d190815eba052508d6d42d8ae0c93400cf777602d2c5f759627f43f21",
+          "created_at": "2028-07-18T12:30:00Z",
+          "current_portfolio_revision": 1,
+          "data_status": "synthetic_fixture",
+          "decision_cutoff_utc": "2028-07-18T12:30:00Z",
+          "engine_version": "30738eb757dca7143df47e504a10e2e0d1be009cba1a04eb5d2f29292b91d8da",
+          "estimated_total_trade_cost_usd": "0.60",
+          "forecast": {
+            "as_of_session": "2028-07-17",
+            "block_length_sessions": 5,
+            "calendar_version": "e3d2312d54e172d7aada8239f296eecf38c6038d66b5a203c5c5690ede82d660",
+            "cash_return_fraction": 0,
+            "comparability": "common_shock_paths",
+            "current_allocation": {
+              "cash_weight": "1",
+              "upfront_cost_usd": "0.00",
+              "weights": []
+            },
+            "data_status": "synthetic_fixture",
+            "decision_cutoff_utc": "2028-07-18T12:30:00Z",
+            "engine_version": "30738eb757dca7143df47e504a10e2e0d1be009cba1a04eb5d2f29292b91d8da",
+            "fingerprint": "0c3776d28647f98074088f58e2acfdb09d4273849bfa0fd60ad9971e9751eaba",
+            "fingerprint_schema_version": 1,
+            "future_sessions": [
+              "2028-07-18",
+              "2028-07-19",
+              "2028-07-20",
+              "2028-07-21",
+              "2028-07-24",
+              "2028-07-25",
+              "2028-07-26",
+              "2028-07-27",
+              "2028-07-28",
+              "2028-07-31",
+              "2028-08-01",
+              "2028-08-02",
+              "2028-08-03",
+              "2028-08-04",
+              "2028-08-07",
+              "2028-08-08",
+              "2028-08-09",
+              "2028-08-10",
+              "2028-08-11",
+              "2028-08-14",
+              "2028-08-15",
+              "2028-08-16",
+              "2028-08-17",
+              "2028-08-18",
+              "2028-08-21",
+              "2028-08-22",
+              "2028-08-23",
+              "2028-08-24",
+              "2028-08-25",
+              "2028-08-28",
+              "2028-08-29",
+              "2028-08-30",
+              "2028-08-31",
+              "2028-09-01",
+              "2028-09-04",
+              "2028-09-05",
+              "2028-09-06",
+              "2028-09-07",
+              "2028-09-08",
+              "2028-09-11",
+              "2028-09-12",
+              "2028-09-13",
+              "2028-09-14",
+              "2028-09-15",
+              "2028-09-18",
+              "2028-09-19",
+              "2028-09-20",
+              "2028-09-21",
+              "2028-09-22",
+              "2028-09-25",
+              "2028-09-26",
+              "2028-09-27",
+              "2028-09-28",
+              "2028-09-29",
+              "2028-10-02",
+              "2028-10-03",
+              "2028-10-04",
+              "2028-10-05",
+              "2028-10-06",
+              "2028-10-09",
+              "2028-10-10",
+              "2028-10-11",
+              "2028-10-12",
+              "2028-10-13"
+            ],
+            "hold_unchanged": {
+              "median_ending_value_usd": "1000.00",
+              "median_return_fraction": 0,
+              "p10_return_fraction": 0,
+              "p90_return_fraction": 0,
+              "probability_of_loss": 0
+            },
+            "horizon_calendar_days": 90,
+            "horizon_end_at": "2028-10-16T12:30:00Z",
+            "horizon_trading_sessions": 64,
+            "id": "3616e62b-c792-5904-a6c3-b2032b52a258",
+            "initial_value_usd": "1000.00",
+            "input_array_sha256": "18d3859cb8497029fee86ce293bbf81f2c6c8645efd05f56b5759e15adbc010e",
+            "limitations": [
+              "CONSTANT_WEIGHT_APPROXIMATION",
+              "ESTIMATED_UPFRONT_COST",
+              "SCENARIO_NOT_CALIBRATED_PREDICTION",
+              "SYNTHETIC_DATA_ONLY",
+              "ZERO_CASH_YIELD"
+            ],
+            "lookback_sessions": 252,
+            "median_return_delta_fraction": 0.034157289802597024,
+            "method": "multivariate_block_bootstrap_v1",
+            "proposed": {
+              "median_ending_value_usd": "1034.16",
+              "median_return_fraction": 0.034157289802597024,
+              "p10_return_fraction": 0.006364618895775845,
+              "p90_return_fraction": 0.06283124421289563,
+              "probability_of_loss": 0.0752
+            },
+            "proposed_allocation": {
+              "cash_weight": "0.3996398486508459890304685040383206465959022899101170356603559905720136808747411463",
+              "upfront_cost_usd": "0.60",
+              "weights": [
+                {
+                  "asset_id": "SYN:AAA",
+                  "weight": "0.200120044446114869192124083574246086679873966519494272721705204038666254016342956"
+                },
+                {
+                  "asset_id": "SYN:BBB",
+                  "weight": "0.200120044446114869192124083574246086679873966519494272721705204038666254016342956"
+                },
+                {
+                  "asset_id": "SYN:CCC",
+                  "weight": "0.20012006245692427258528332881318718004434977705089441889623360135065381109257294"
+                }
+              ]
+            },
+            "rng": {
+              "generator": "PCG64",
+              "initial_state": {
+                "id": "2d40eea3-5324-5bc7-8e16-e15b9b6bfd8f",
+                "schema_version": 1,
+                "sha256": "f7eeadec4bb6327d9c1e417fbdb8433721abcc3f1c62a370fd34905c51973c03"
+              },
+              "numpy_version": "2.5.4",
+              "sampling_version": "noncircular_c_order_v1"
+            },
+            "sampled_indices": {
+              "id": "f06ffa7f-4f07-5eca-8735-0c24051544b0",
+              "schema_version": 1,
+              "sha256": "b7795d3889530bb259a8b5a3e42cf41663dd7555bfe2d0f5251d7bc0febec332"
+            },
+            "seed": 42,
+            "simulation_count": 5000,
+            "snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+            "snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+            "status": "available",
+            "unavailable_reason": null
+          },
+          "forecast_id": "3616e62b-c792-5904-a6c3-b2032b52a258",
+          "forecast_inputs_canonical_json": "{\"as_of_session\":\"2028-07-17\",\"calendar_sha256\":\"e3d2312d54e172d7aada8239f296eecf38c6038d66b5a203c5c5690ede82d660\",\"config_sha256\":\"2093c63d190815eba052508d6d42d8ae0c93400cf777602d2c5f759627f43f21\",\"current_allocation\":{\"cash_weight\":\"1\",\"upfront_cost_usd\":\"0.00\",\"weights\":[]},\"decision_cutoff_utc\":\"2028-07-18T12:30:00Z\",\"initial_value_usd\":\"1000.00\",\"portfolio_id\":\"333d79c0-2548-5e58-b6e2-584001c814c2\",\"portfolio_revision\":1,\"proposed_allocation\":{\"cash_weight\":\"0.3996398486508459890304685040383206465959022899101170356603559905720136808747411463\",\"upfront_cost_usd\":\"0.60\",\"weights\":[{\"asset_id\":\"SYN:AAA\",\"weight\":\"0.200120044446114869192124083574246086679873966519494272721705204038666254016342956\"},{\"asset_id\":\"SYN:BBB\",\"weight\":\"0.200120044446114869192124083574246086679873966519494272721705204038666254016342956\"},{\"asset_id\":\"SYN:CCC\",\"weight\":\"0.20012006245692427258528332881318718004434977705089441889623360135065381109257294\"}]},\"seed\":42,\"snapshot_id\":\"5c223992-90ec-59a7-a1e7-7889b76cacea\",\"snapshot_sha256\":\"40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add\",\"source_mode\":\"synthetic_fixture\",\"strategy_version_id\":\"184f4ef7-c542-5387-a5aa-9bd4d162efde\",\"valuation_as_of_session\":\"2028-07-17\"}",
+          "forecast_job": {
+            "attempts": 1,
+            "created_at": "2026-10-29T12:19:39.595358Z",
+            "error": null,
+            "id": "7e8b704f-8160-45ee-aaae-3461613279ad",
+            "kind": "forecast",
+            "max_attempts": 3,
+            "progress": 100,
+            "result": {
+              "kind": "resource",
+              "message": "Immutable scenario comparison sealed; not a calibrated prediction.",
+              "resource_id": "3616e62b-c792-5904-a6c3-b2032b52a258"
+            },
+            "status": "completed",
+            "updated_at": "2026-10-29T12:19:40.348307Z"
+          },
+          "id": "32c4e59e-5a4a-5dd5-9b67-29d043d42267",
+          "inputs": {
+            "as_of_session": "2028-07-17",
+            "clock_mode": "synthetic_replay",
+            "seed": 42,
+            "snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea"
+          },
+          "inputs_canonical_json": "{\"as_of_session\":\"2028-07-17\",\"clock_mode\":\"synthetic_replay\",\"seed\":42,\"snapshot_id\":\"5c223992-90ec-59a7-a1e7-7889b76cacea\"}",
+          "is_current": true,
+          "job_id": "5188039a-c564-4268-8eb1-5aa1a117dc20",
+          "portfolio_id": "333d79c0-2548-5e58-b6e2-584001c814c2",
+          "portfolio_revision": 1,
+          "snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+          "snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+          "stale_reasons": [],
+          "status": "ready",
+          "strategy_config": {
+            "display_name": "Risk-Adjusted Momentum",
+            "execution_policy": {
+              "id": "us_eod_next_open_v1"
+            },
+            "portfolio": {
+              "max_position_weight": "0.2",
+              "max_positions": 8,
+              "max_sector_weight": "0.4",
+              "min_cash_weight": "0.05",
+              "min_trade_usd": "5",
+              "rebalance_band_absolute_weight": "0.02",
+              "weighting": "inverse_volatility"
+            },
+            "rebalance": {
+              "frequency": "monthly"
+            },
+            "schema_version": 1,
+            "signals": {
+              "kind": "risk_adjusted_momentum",
+              "momentum_long_sessions": 126,
+              "momentum_short_sessions": 63,
+              "require_positive_trend": true,
+              "trend_sma_sessions": 200,
+              "volatility_sessions": 60,
+              "z_score_weights": {
+                "momentum_long": 0.6,
+                "momentum_short": 0.25,
+                "volatility_penalty": -0.15
+              }
+            },
+            "universe": {
+              "kind": "liquid_us_equities",
+              "min_history_sessions": 252,
+              "min_median_dollar_volume_usd": "1000000",
+              "min_price_usd": "5"
+            }
+          },
+          "strategy_evidence": {
+            "allocation_exclusions": [],
+            "allocation_reasons": [
+              "UNALLOCATABLE_CAPACITY"
+            ],
+            "as_of_session": "2028-07-17",
+            "candidates": [
+              {
+                "allocation_eligible": true,
+                "asset_id": "SYN:AAA",
+                "eligible": true,
+                "features": {
+                  "momentum_long": 0.0989010989010989,
+                  "momentum_short": 0.04712041884816754,
+                  "volatility": 0.00014776165676800922
+                },
+                "input_sha256": "3764a4d80c0941deae6fc157600413b6999244894b8fae68a9ab0a7233f5f41a",
+                "median_dollar_volume": "69525000.000",
+                "rank": 1,
+                "raw_close": "70.000",
+                "reasons": [],
+                "scoring": {
+                  "momentum_long_contribution": 0.4242640687119283,
+                  "momentum_long_z": 0.7071067811865471,
+                  "momentum_short_contribution": -0.1767766952966369,
+                  "momentum_short_z": -0.7071067811865476,
+                  "score": 0.3535533905932735,
+                  "volatility_contribution": 0.10606601717798213,
+                  "volatility_z": -0.7071067811865476
+                },
+                "sector": "Technology",
+                "trend_sma": "65.025"
+              },
+              {
+                "allocation_eligible": true,
+                "asset_id": "SYN:BBB",
+                "eligible": true,
+                "features": {
+                  "momentum_long": 0.0989010989010989,
+                  "momentum_short": 0.04712041884816754,
+                  "volatility": 0.00014776165676800922
+                },
+                "input_sha256": "f4a84b0d93a34ac5869ea498b90d7dbbff4fcc9e1657dedc9f3adf82f79c9ea4",
+                "median_dollar_volume": "69525000.000",
+                "rank": 2,
+                "raw_close": "70.000",
+                "reasons": [],
+                "scoring": {
+                  "momentum_long_contribution": 0.4242640687119283,
+                  "momentum_long_z": 0.7071067811865471,
+                  "momentum_short_contribution": -0.1767766952966369,
+                  "momentum_short_z": -0.7071067811865476,
+                  "score": 0.3535533905932735,
+                  "volatility_contribution": 0.10606601717798213,
+                  "volatility_z": -0.7071067811865476
+                },
+                "sector": "Technology",
+                "trend_sma": "65.025"
+              },
+              {
+                "allocation_eligible": true,
+                "asset_id": "SYN:CCC",
+                "eligible": true,
+                "features": {
+                  "momentum_long": 0.08134280180761781,
+                  "momentum_short": 0.07234314980793854,
+                  "volatility": 0.49420961736983665
+                },
+                "input_sha256": "de3f461382e43db02df96f99f55b22463dee5c8d5120eb998dd1af5336d412a4",
+                "median_dollar_volume": "65620000.000",
+                "rank": 3,
+                "raw_close": "67.000",
+                "reasons": [],
+                "scoring": {
+                  "momentum_long_contribution": -0.8485281374238574,
+                  "momentum_long_z": -1.4142135623730956,
+                  "momentum_short_contribution": 0.3535533905932738,
+                  "momentum_short_z": 1.4142135623730951,
+                  "score": -0.7071067811865478,
+                  "volatility_contribution": -0.21213203435596426,
+                  "volatility_z": 1.4142135623730951
+                },
+                "sector": "Unknown",
+                "trend_sma": "62.020"
+              },
+              {
+                "allocation_eligible": false,
+                "asset_id": "SYN:SPY",
+                "eligible": false,
+                "features": null,
+                "input_sha256": "bcd03efb58d1cb03ddc94347d5db9d898f13c2499be9d9b22816bcba98725f67",
+                "median_dollar_volume": "109762500.000",
+                "rank": null,
+                "raw_close": "110.000",
+                "reasons": [
+                  "UNSUPPORTED_INSTRUMENT"
+                ],
+                "scoring": null,
+                "sector": "Unknown",
+                "trend_sma": "107.5125"
+              },
+              {
+                "allocation_eligible": false,
+                "asset_id": "SYN:ZERO",
+                "eligible": false,
+                "features": null,
+                "input_sha256": "99c1d7a4bc732ff3b1d1c8cb0dbb9d81ac7772685be7c8c1ec736ccdbafb9175",
+                "median_dollar_volume": "50000000.000",
+                "rank": null,
+                "raw_close": "50.000",
+                "reasons": [
+                  "NONPOSITIVE_TREND"
+                ],
+                "scoring": null,
+                "sector": "Unknown",
+                "trend_sma": "50.000"
+              }
+            ],
+            "cash_target_weight": "0.4",
+            "constraint_evidence": {
+              "capped_positions": [
+                "SYN:AAA",
+                "SYN:BBB",
+                "SYN:CCC"
+              ],
+              "cash_floor": "0.05",
+              "cash_weight": "0.4",
+              "compliant": true,
+              "invested_weight": "0.6",
+              "max_position_weight": "0.2",
+              "max_sector_weight": "0.4",
+              "position_count": 3,
+              "position_limit": "0.2",
+              "sector_limit": "0.4",
+              "sectors": [
+                {
+                  "at_cap": true,
+                  "sector": "Technology",
+                  "weight": "0.4"
+                },
+                {
+                  "at_cap": false,
+                  "sector": "Unknown",
+                  "weight": "0.2"
+                }
+              ],
+              "unmet_investable_weight": "0.35",
+              "violations": []
+            },
+            "data_diagnostics": [],
+            "decision_cutoff_utc": "2028-07-18T12:30:00Z",
+            "mode": "synthetic_fixture",
+            "reproducibility": {
+              "calendar_sha256": "e3d2312d54e172d7aada8239f296eecf38c6038d66b5a203c5c5690ede82d660",
+              "config_sha256": "2093c63d190815eba052508d6d42d8ae0c93400cf777602d2c5f759627f43f21",
+              "engine_version": "30738eb757dca7143df47e504a10e2e0d1be009cba1a04eb5d2f29292b91d8da",
+              "snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+              "snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+              "strategy_version_id": "184f4ef7-c542-5387-a5aa-9bd4d162efde"
+            },
+            "schema_version": 1,
+            "selected_ids": [
+              "SYN:AAA",
+              "SYN:BBB",
+              "SYN:CCC"
+            ],
+            "target_weights": [
+              {
+                "asset_id": "SYN:AAA",
+                "sector": "Technology",
+                "weight": "0.2"
+              },
+              {
+                "asset_id": "SYN:BBB",
+                "sector": "Technology",
+                "weight": "0.2"
+              },
+              {
+                "asset_id": "SYN:CCC",
+                "sector": "Unknown",
+                "weight": "0.2"
+              }
+            ],
+            "warnings": [
+              "SYNTHETIC_DATA_ONLY"
+            ]
+          },
+          "strategy_version_id": "184f4ef7-c542-5387-a5aa-9bd4d162efde",
+          "summary_action": "BUY",
+          "target_weights": [
+            {
+              "asset_id": "SYN:AAA",
+              "reason_codes": [
+                "RISK_CONSTRAINED_TARGET"
+              ],
+              "weight": "0.2"
+            },
+            {
+              "asset_id": "SYN:BBB",
+              "reason_codes": [
+                "RISK_CONSTRAINED_TARGET"
+              ],
+              "weight": "0.2"
+            },
+            {
+              "asset_id": "SYN:CCC",
+              "reason_codes": [
+                "RISK_CONSTRAINED_TARGET"
+              ],
+              "weight": "0.2"
+            }
+          ]
+        },
+        "posted": {
+          "benchmark_symbol": "SPY",
+          "cash_usd": "404.98",
+          "created_at": "2026-10-29T12:19:38.363624Z",
+          "currency": "USD",
+          "execution_policy_id": "us_eod_next_open_v1",
+          "holdings": [
+            {
+              "asset_id": "SYN:AAA",
+              "mark_price_usd": "101.800",
+              "market_value_usd": "290.86",
+              "price_as_of_session": "2030-12-31",
+              "quantity": "2.857142",
+              "reason": null,
+              "sector": "Technology",
+              "total_basis_usd": "200.34",
+              "weight": "0.230357312229444043"
+            },
+            {
+              "asset_id": "SYN:BBB",
+              "mark_price_usd": "101.800",
+              "market_value_usd": "290.86",
+              "price_as_of_session": "2030-12-31",
+              "quantity": "2.857142",
+              "reason": null,
+              "sector": "Technology",
+              "total_basis_usd": "200.34",
+              "weight": "0.230357312229444043"
+            },
+            {
+              "asset_id": "SYN:CCC",
+              "mark_price_usd": "92.440",
+              "market_value_usd": "275.94",
+              "price_as_of_session": "2030-12-31",
+              "quantity": "2.985074",
+              "reason": null,
+              "sector": "Unknown",
+              "total_basis_usd": "194.34",
+              "weight": "0.218543270405532563"
+            }
+          ],
+          "id": "333d79c0-2548-5e58-b6e2-584001c814c2",
+          "last_sequence": 5,
+          "name": "Decision browser 1280",
+          "opening_cash_usd": "1000.00",
+          "opening_snapshot_id": null,
+          "paper_only": true,
+          "reconciliation_failed": false,
+          "revision": 5,
+          "risk_policy": {
+            "max_position_weight": "0.2",
+            "max_positions": 8,
+            "max_sector_weight": "0.4",
+            "min_cash_weight": "0.05",
+            "min_trade_usd": "5",
+            "rebalance_band_absolute_weight": "0.02",
+            "weighting": "inverse_volatility"
+          },
+          "state": "active",
+          "strategy_version_id": "184f4ef7-c542-5387-a5aa-9bd4d162efde",
+          "total_value_usd": "1262.63",
+          "valuation": {
+            "as_of_session": "2030-12-31",
+            "cash_weight": "0.32074210513557935",
+            "checked_at": "2026-10-29T12:19:52.957910Z",
+            "missing_assets": [],
+            "reason": null,
+            "snapshot_id": "5c223992-90ec-59a7-a1e7-7889b76cacea",
+            "snapshot_sha256": "40ed547030f8787b2304c95bd109b0858ea8f3b7686888c95572fda6aa2d4add",
+            "status": "available",
+            "total_value_usd": "1262.63",
+            "warnings": [
+              "SYNTHETIC_DATA_ONLY"
+            ]
+          },
+          "valuation_as_of_session": "2030-12-31",
+          "valuation_mode": "synthetic_fixture"
+        },
+        "recovered": {
+          "approval_idempotency_key": "7d6cad89-b9e2-42e7-9f32-8e4f6637a66e",
+          "approved_at": "2028-07-18T12:30:00Z",
+          "approved_revision": 1,
+          "batch_id": "ce4a259c-cb9f-5d5e-9db3-fcd7c298b488",
+          "clock_mode": "synthetic_replay",
+          "data_status": "synthetic_fixture",
+          "eligible_open_at": "2028-07-18T13:30:00Z",
+          "operator_recorded_at": "2026-10-29T12:19:41.301683Z",
+          "paper_only": true,
+          "portfolio_id": "333d79c0-2548-5e58-b6e2-584001c814c2",
+          "recommendation_id": "32c4e59e-5a4a-5dd5-9b67-29d043d42267"
+        },
+        "width": 1280
+      }
+    ],
+    "source": "SYNTHETIC_DATA_ONLY"
+  },
+  "passed": true,
+  "project": "yams-smoke-e49d653619fa",
+  "verification": {
+    "actual_restart_passed": 11,
+    "backend_unit_contract_passed": 472,
+    "fixture_files_verified": 30,
+    "postgresql_passed": 188,
+    "production_python_source_images": {
+      "yams-backend:local": "sha256:dbb5a3317d1db3a1218f4c03faceb618e4d5dddb3419d656d6acfc4528e2fe01",
+      "yams-it-499973af07d5-test": "sha256:9f8fa22b21012e7817404021e4057eab39e07e5277ae914044fbb6d7d5945d32"
+    },
+    "production_smoke_checks_passed": 30,
+    "web_passed": 84
+  }
+}

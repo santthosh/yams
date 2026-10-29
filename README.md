@@ -10,7 +10,7 @@ inspection backed by PostgreSQL and a supervised worker. The synthetic Docker
 journey produces measured candidates, exclusions and feasible targets, with
 reproducible results retained through restart. Recommendation generation and
 forecast reads are implemented in the source increment described below; public
-approval controls are described below; Decision Center screens remain staged. The 0.0.4
+approval controls and the Decision Center source screens are described below. The 0.0.4
 [internal paper ledger](docs/operations/paper-ledger.md) now persists exact-cent
 funding, authorized shared-kernel effects, corporate actions and replayable
 projections atomically. The [paper account API](docs/operations/paper-portfolio-api.md)
@@ -19,7 +19,7 @@ immutable transactions. The [private authorization and fill worker](docs/operati
 reserves approved intent and posts lease-fenced synthetic effects, with explicit
 fixture replay and separate decision/execution provenance. The [paper account screens](docs/operations/paper-portfolios.md)
 create independent cash accounts and inspect posted holdings, values and ledger
-evidence. Decision Center batch controls follow in 0.0.5. Startup creates
+evidence. The source Decision Center adds live authorization and batch controls. Startup creates
 no accounts or recommendations.
 
 Source work for 0.0.5 includes [immutable recommendation APIs](docs/operations/recommendations.md)
@@ -34,8 +34,13 @@ no balances; only the fenced worker posts fills. Fixture time and actual UTC aud
 remain separate. [Monthly review scheduling](docs/operations/portfolio-schedules.md) now records
 bounded catch-up and readonly next-due/paused diagnostics, with atomic manual/scheduled
 deduplication. Explicit manual synthetic session selection advances review observation
-without trading; background work cannot advance time. Decision Center screens remain
-#52; no0.0.5 release is claimed.
+without trading; background work cannot advance time. The [Decision Center](docs/operations/decision-center.md)
+at `/portfolios/{id}/decisions` reviews posted holdings, engine targets/risk and
+shared-assumption 90-calendar-day scenarios before explicit paper authorization.
+The dashboard shows actual account, pending-batch and next-review status. Mutation
+keys persist locally before submission; uncertain responses recover the original
+operation. Fixture steps require explicit actions. Source functionality is distinct
+from the pending #53 integrated/native release gate; no0.0.5 release is claimed.
 
 The 0.0.3 Strategy Lab increment adds named strategy creation, detail and immutable
 version publication/history APIs over the existing registry, plus the ratified

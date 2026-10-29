@@ -69,6 +69,10 @@ const server = http.createServer(async (request, response) => {
     );
     return;
   }
+  if (request.url === "/api/v1/portfolios?limit=25") {
+    send({ items: [], next_cursor: null });
+    return;
+  }
   if (request.url === "/api/v1/workspace") {
     send(
       mode === "not_ready"

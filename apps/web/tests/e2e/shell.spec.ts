@@ -28,7 +28,10 @@ test("foundation navigation, keyboard and modal at each viewport", async ({
     ).violations,
   ).toEqual([]);
   await expect(
-    page.getByRole("link", { name: "Open paper portfolios →", exact: true }),
+    page.getByRole("link", {
+      name: "Create or browse paper accounts →",
+      exact: true,
+    }),
   ).toBeVisible();
   await expect(
     page.getByRole("link", { name: /Arena|Journal|Portfolios/ }),

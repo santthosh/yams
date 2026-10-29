@@ -3,6 +3,7 @@ import Link from "next/link";
 import { useWorkspace } from "./workspace-provider";
 import { Card, ErrorState, VersionIdentity, WarningsPanel } from "./evidence";
 import { Button } from "./ui/button";
+import { PortfolioDashboard } from "./decisions/PortfolioDashboard";
 import { JobInspector } from "./job-inspector";
 
 function ServiceState() {
@@ -124,18 +125,7 @@ export function Dashboard() {
             from securities markets.
           </p>
         </Card>
-        <Card title="Paper portfolio">
-          <p>
-            Choose an account to inspect its posted cash, holdings and immutable
-            transaction history.
-          </p>
-          <p>
-            <Link href="/portfolios">Open paper portfolios →</Link>
-          </p>
-          <p className="subtle">
-            Recommendation approval and forecasts follow in 0.0.5.
-          </p>
-        </Card>
+        {ready && <PortfolioDashboard />}
       </div>
       <div className="quiet-note">
         <span aria-hidden="true">↳</span>

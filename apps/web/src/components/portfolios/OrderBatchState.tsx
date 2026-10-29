@@ -2,16 +2,15 @@ import type { components } from "../../api/generated/schema";
 import { Quantity } from "../evidence";
 
 type Batch = components["schemas"]["PaperOrderBatchV1"];
-/** Presentational service contract. Live HTTP inspection is owned by #50. */
+/** Server quantities and states; authorization is never presented as a fill. */
 export function OrderBatchState({ batch }: { batch: Batch | null }) {
   if (!batch)
     return (
       <div className="notice" role="note">
-        <strong>Order batch inspection comes in 0.0.5</strong>
+        <strong>No batch selected</strong>
         <p>
-          This release shows posted holdings and immutable ledger events. Live
-          pending quantities and approval controls are not available yet. An
-          approval event alone is not a fill.
+          Inspect an existing approval or explicitly authorize a current
+          decision. An approval event alone is not a fill.
         </p>
       </div>
     );
