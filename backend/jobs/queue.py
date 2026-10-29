@@ -18,6 +18,7 @@ from backend.forecasting.errors import SAFE_FORECAST_REASONS
 from backend.jobs.registry import AttemptMetrics, JobLimits, validate_payload
 from backend.market_data.providers.yahoo import SAFE_PROVIDER_REASONS
 from backend.persistence.models.job import DiagnosticEffect, Job, JobAttempt, Schedule
+from backend.portfolio.recommendation_errors import SAFE_RECOMMENDATION_REASONS
 
 TERMINAL = {"completed", "failed", "cancelled"}
 TRANSIENT_CODES = {"PROVIDER_UNAVAILABLE"}
@@ -433,7 +434,9 @@ class Queue:
         reason: str | None = None,
     ) -> bool:
         allowed_reasons = (
-            SAFE_FORECAST_REASONS
+            SAFE_RECOMMENDATION_REASONS
+            if lease.kind == "evaluate_portfolio"
+            else SAFE_FORECAST_REASONS
             if lease.kind == "forecast"
             else SAFE_BACKTEST_REASONS
             if lease.kind in {"backtest_core", "backtest"}

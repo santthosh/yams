@@ -4781,6 +4781,445 @@
         "title": "RebalanceConfig",
         "type": "object"
       },
+      "RecommendationAccepted": {
+        "additionalProperties": false,
+        "properties": {
+          "job_id": {
+            "format": "uuid",
+            "title": "Job Id",
+            "type": "string"
+          },
+          "recommendation_id": {
+            "format": "uuid",
+            "title": "Recommendation Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "recommendation_id",
+          "job_id"
+        ],
+        "title": "RecommendationAccepted",
+        "type": "object"
+      },
+      "RecommendationDetailV1": {
+        "additionalProperties": false,
+        "description": "Original content plus separately changing disposition and forecast job state.",
+        "properties": {
+          "actions": {
+            "items": {
+              "$ref": "#/components/schemas/RecommendedAction"
+            },
+            "title": "Actions",
+            "type": "array"
+          },
+          "as_of_session": {
+            "format": "date",
+            "title": "As Of Session",
+            "type": "string"
+          },
+          "calendar_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Calendar Sha256",
+            "type": "string"
+          },
+          "candidates": {
+            "items": {
+              "$ref": "#/components/schemas/CandidateEvidence"
+            },
+            "title": "Candidates",
+            "type": "array"
+          },
+          "cash_target_weight": {
+            "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$",
+            "title": "Cash Target Weight",
+            "type": "string"
+          },
+          "clock_mode": {
+            "enum": [
+              "synthetic_replay",
+              "current_paper"
+            ],
+            "title": "Clock Mode",
+            "type": "string"
+          },
+          "computed_at": {
+            "format": "date-time",
+            "pattern": "Z$",
+            "title": "Computed At",
+            "type": "string"
+          },
+          "config_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Config Sha256",
+            "type": "string"
+          },
+          "created_at": {
+            "format": "date-time",
+            "pattern": "Z$",
+            "title": "Created At",
+            "type": "string"
+          },
+          "current_portfolio_revision": {
+            "title": "Current Portfolio Revision",
+            "type": "integer"
+          },
+          "data_status": {
+            "enum": [
+              "synthetic_fixture",
+              "research_market_data"
+            ],
+            "title": "Data Status",
+            "type": "string"
+          },
+          "decision_cutoff_utc": {
+            "format": "date-time",
+            "pattern": "Z$",
+            "title": "Decision Cutoff Utc",
+            "type": "string"
+          },
+          "engine_version": {
+            "title": "Engine Version",
+            "type": "string"
+          },
+          "estimated_total_trade_cost_usd": {
+            "pattern": "^(0|[1-9][0-9]{0,21})(\\.[0-9]{1,2})?$",
+            "title": "Estimated Total Trade Cost Usd",
+            "type": "string"
+          },
+          "forecast": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ForecastV1"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "forecast_id": {
+            "format": "uuid",
+            "title": "Forecast Id",
+            "type": "string"
+          },
+          "forecast_inputs_canonical_json": {
+            "title": "Forecast Inputs Canonical Json",
+            "type": "string"
+          },
+          "forecast_job": {
+            "$ref": "#/components/schemas/JobV1"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "inputs": {
+            "$ref": "#/components/schemas/RecommendationRequest"
+          },
+          "inputs_canonical_json": {
+            "title": "Inputs Canonical Json",
+            "type": "string"
+          },
+          "is_current": {
+            "title": "Is Current",
+            "type": "boolean"
+          },
+          "job_id": {
+            "format": "uuid",
+            "title": "Job Id",
+            "type": "string"
+          },
+          "portfolio_id": {
+            "format": "uuid",
+            "title": "Portfolio Id",
+            "type": "string"
+          },
+          "portfolio_revision": {
+            "minimum": 0,
+            "title": "Portfolio Revision",
+            "type": "integer"
+          },
+          "snapshot_id": {
+            "format": "uuid",
+            "title": "Snapshot Id",
+            "type": "string"
+          },
+          "snapshot_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Snapshot Sha256",
+            "type": "string"
+          },
+          "stale_reasons": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Stale Reasons",
+            "type": "array"
+          },
+          "status": {
+            "enum": [
+              "ready",
+              "applied",
+              "dismissed",
+              "expired"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "strategy_config": {
+            "$ref": "#/components/schemas/StrategyConfigV1"
+          },
+          "strategy_evidence": {
+            "$ref": "#/components/schemas/StrategyEvaluationResultV1"
+          },
+          "strategy_version_id": {
+            "format": "uuid",
+            "title": "Strategy Version Id",
+            "type": "string"
+          },
+          "summary_action": {
+            "enum": [
+              "BUY",
+              "SELL",
+              "HOLD",
+              "REBALANCE",
+              "ALLOCATE_TO_CASH"
+            ],
+            "title": "Summary Action",
+            "type": "string"
+          },
+          "target_weights": {
+            "items": {
+              "$ref": "#/components/schemas/TargetWeight"
+            },
+            "title": "Target Weights",
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "portfolio_id",
+          "portfolio_revision",
+          "strategy_version_id",
+          "snapshot_id",
+          "snapshot_sha256",
+          "as_of_session",
+          "decision_cutoff_utc",
+          "data_status",
+          "summary_action",
+          "target_weights",
+          "cash_target_weight",
+          "actions",
+          "candidates",
+          "estimated_total_trade_cost_usd",
+          "forecast_id",
+          "engine_version",
+          "created_at",
+          "status",
+          "job_id",
+          "inputs",
+          "inputs_canonical_json",
+          "clock_mode",
+          "computed_at",
+          "config_sha256",
+          "calendar_sha256",
+          "strategy_config",
+          "strategy_evidence",
+          "forecast_inputs_canonical_json",
+          "forecast_job",
+          "forecast",
+          "is_current",
+          "current_portfolio_revision",
+          "stale_reasons"
+        ],
+        "title": "RecommendationDetailV1",
+        "type": "object"
+      },
+      "RecommendationPageV1": {
+        "additionalProperties": false,
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/RecommendationSummaryV1"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          }
+        },
+        "required": [
+          "items",
+          "next_cursor"
+        ],
+        "title": "RecommendationPageV1",
+        "type": "object"
+      },
+      "RecommendationRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "as_of_session": {
+            "format": "date",
+            "title": "As Of Session",
+            "type": "string"
+          },
+          "clock_mode": {
+            "enum": [
+              "synthetic_replay",
+              "current_paper"
+            ],
+            "title": "Clock Mode",
+            "type": "string"
+          },
+          "seed": {
+            "default": 42,
+            "maximum": 18446744073709551615,
+            "minimum": 0,
+            "title": "Seed",
+            "type": "integer"
+          },
+          "snapshot_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Snapshot Id"
+          }
+        },
+        "required": [
+          "as_of_session",
+          "clock_mode"
+        ],
+        "title": "RecommendationRequest",
+        "type": "object"
+      },
+      "RecommendationSummaryV1": {
+        "additionalProperties": false,
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "pattern": "Z$",
+            "title": "Created At",
+            "type": "string"
+          },
+          "data_status": {
+            "enum": [
+              "synthetic_fixture",
+              "research_market_data"
+            ],
+            "title": "Data Status",
+            "type": "string"
+          },
+          "disposition": {
+            "anyOf": [
+              {
+                "enum": [
+                  "ready",
+                  "applied",
+                  "dismissed",
+                  "expired"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Disposition"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ErrorDetail"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "inputs": {
+            "$ref": "#/components/schemas/RecommendationRequest"
+          },
+          "inputs_canonical_json": {
+            "title": "Inputs Canonical Json",
+            "type": "string"
+          },
+          "job_id": {
+            "format": "uuid",
+            "title": "Job Id",
+            "type": "string"
+          },
+          "portfolio_id": {
+            "format": "uuid",
+            "title": "Portfolio Id",
+            "type": "string"
+          },
+          "portfolio_revision": {
+            "title": "Portfolio Revision",
+            "type": "integer"
+          },
+          "snapshot_id": {
+            "format": "uuid",
+            "title": "Snapshot Id",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "queued",
+              "running",
+              "cancel_requested",
+              "completed",
+              "failed",
+              "cancelled"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "strategy_version_id": {
+            "format": "uuid",
+            "title": "Strategy Version Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "portfolio_id",
+          "job_id",
+          "status",
+          "disposition",
+          "inputs",
+          "inputs_canonical_json",
+          "portfolio_revision",
+          "strategy_version_id",
+          "snapshot_id",
+          "data_status",
+          "created_at",
+          "error"
+        ],
+        "title": "RecommendationSummaryV1",
+        "type": "object"
+      },
       "RecommendationV1": {
         "additionalProperties": false,
         "properties": {
@@ -7488,6 +7927,76 @@
         "summary": "Trades"
       }
     },
+    "/api/v1/forecasts/{forecast_id}": {
+      "get": {
+        "operationId": "read_api_v1_forecasts__forecast_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "forecast_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Forecast Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ForecastV1"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "summary": "Read"
+      }
+    },
     "/api/v1/health": {
       "get": {
         "operationId": "health_api_v1_health_get",
@@ -7913,6 +8422,202 @@
         "summary": "Detail"
       }
     },
+    "/api/v1/portfolios/{portfolio_id}/recommendations": {
+      "get": {
+        "operationId": "list_recommendations_api_v1_portfolios__portfolio_id__recommendations_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "portfolio_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Portfolio Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 25,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 2048,
+                  "minLength": 1,
+                  "pattern": "^[A-Za-z0-9_-]+$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Cursor"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecommendationPageV1"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "summary": "List Recommendations"
+      },
+      "post": {
+        "operationId": "create_api_v1_portfolios__portfolio_id__recommendations_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "portfolio_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Portfolio Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Idempotency-Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecommendationRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecommendationAccepted"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "summary": "Create"
+      }
+    },
     "/api/v1/portfolios/{portfolio_id}/transactions": {
       "get": {
         "operationId": "transactions_api_v1_portfolios__portfolio_id__transactions_get",
@@ -8010,6 +8715,76 @@
           }
         },
         "summary": "Transactions"
+      }
+    },
+    "/api/v1/recommendations/{recommendation_id}": {
+      "get": {
+        "operationId": "read_api_v1_recommendations__recommendation_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "recommendation_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Recommendation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecommendationDetailV1"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "summary": "Read"
       }
     },
     "/api/v1/strategies": {

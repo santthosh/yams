@@ -8,8 +8,9 @@ The source checkout includes the market repository, immutable snapshots and
 strategy registry, shared momentum/allocation engine, and asynchronous candidate
 inspection backed by PostgreSQL and a supervised worker. The synthetic Docker
 journey produces measured candidates, exclusions and feasible targets, with
-reproducible results retained through restart. Public recommendation approval and
-forecasts remain with their 0.0.5 owners. The 0.0.4
+reproducible results retained through restart. Recommendation generation and
+forecast reads are implemented in the source increment described below; public
+approval and Decision Center screens remain staged for their 0.0.5 owners. The 0.0.4
 [internal paper ledger](docs/operations/paper-ledger.md) now persists exact-cent
 funding, authorized shared-kernel effects, corporate actions and replayable
 projections atomically. The [paper account API](docs/operations/paper-portfolio-api.md)
@@ -21,7 +22,13 @@ create independent cash accounts and inspect posted holdings, values and ledger
 evidence. Live batch controls and public apply follow in 0.0.5. Startup creates
 no accounts or recommendations.
 
-Source work for 0.0.5 also includes the [private scenario engine and worker](docs/operations/scenario-forecasts.md): seeded common-shock comparisons, honest unavailable results and immutable artifacts. They do not post orders or balances. Public recommendation/forecast transport and Decision Center screens remain staged for their owning issues; no 0.0.5 release is claimed.
+Source work for 0.0.5 includes [immutable recommendation APIs](docs/operations/recommendations.md)
+and the [seeded scenario engine](docs/operations/scenario-forecasts.md). Explicit
+synthetic replay freezes posted state and produces measured targets, actions,
+costs and explanations through the shared worker. A separate observable forecast
+job retains common-shock scenarios or an honest unavailable result. These reads
+and previews do not post orders or balances. Public approval/dismissal, scheduling
+and Decision Center screens remain #50–#52; no 0.0.5 release is claimed.
 
 The 0.0.3 Strategy Lab increment adds named strategy creation, detail and immutable
 version publication/history APIs over the existing registry, plus the ratified
@@ -143,9 +150,10 @@ schedules and one idempotent diagnostic effect per job. The PostgreSQL queue use
 fenced leases and bounded recovery; a Linux supervisor renews heartbeats while a
 separate resource-limited process executes the handler. Registered kinds are
 `diagnostic`, `refresh_market_data`, `evaluate_strategy`, `backtest_core`,
-`backtest`, `forecast` and `apply_scheduled_fills`. The private fill handler posts fenced
-synthetic effects; the private `forecast` job now computes immutable scenario
-comparisons. Public recommendation/apply/forecast transport remains staged for 0.0.5. `GET /api/v1/jobs/{job_id}` is read-only; public experiment
+`backtest`, `evaluate_portfolio`, `forecast` and `apply_scheduled_fills`. The private
+fill handler posts fenced synthetic effects. Recommendation publication enqueues
+its immutable forecast job atomically and exposes the two job states separately.
+Public apply transport remains staged for #50. `GET /api/v1/jobs/{job_id}` is read-only; public experiment
 cancellation is implemented, while paper batch cancellation transport follows in #50.
 
 See [worker operations](docs/operations/durable-jobs.md) for configuration,

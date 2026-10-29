@@ -518,7 +518,7 @@ it("exposes only account reads and creation while future authorization and fundi
       )
     ).status,
   ).toBe(404);
-  for (const extra of ["apply", "deposit", "withdraw", "recommendations"]) {
+  for (const extra of ["apply", "deposit", "withdraw"]) {
     const response = await proxyApi(
       request(`portfolios/${id}/${extra}`, "POST"),
       ["portfolios", id, extra],
@@ -528,3 +528,137 @@ it("exposes only account reads and creation while future authorization and fundi
   }
   expect(fetcher).toHaveBeenCalledTimes(3);
 });
+
+it("allows scoped recommendation and forecast reads with exact seed bytes", async () => {
+  const id = "11111111-1111-4111-8111-111111111111";
+  const raw = '{"seed":18446744073709551615,"status":"available"}';
+  const fetcher = vi.fn(
+    async () =>
+      new Response(raw, { headers: { "Content-Type": "application/json" } }),
+  );
+  for (const parts of [
+    ["portfolios", id, "recommendations"],
+    ["recommendations", id],
+    ["forecasts", id],
+  ]) {
+    const response = await proxyApi(request(parts.join("/")), parts, fetcher);
+    expect(response.status).toBe(200);
+    expect(await response.text()).toBe(raw);
+  }
+  expect(
+    (
+      await proxyApi(
+        request(`portfolios/${id}/recommendations?limit=1&cursor=abc`),
+        ["portfolios", id, "recommendations"],
+        fetcher,
+      )
+    ).status,
+  ).toBe(200);
+  expect(
+    (
+      await proxyApi(
+        request(`recommendations/${id}?approved_at=now`),
+        ["recommendations", id],
+        fetcher,
+      )
+    ).status,
+  ).toBe(404);
+  expect(
+    (
+      await proxyApi(
+        request(`forecasts/${id}`, "POST"),
+        ["forecasts", id],
+        fetcher,
+      )
+    ).status,
+  ).toBe(405);
+  expect(
+    (
+      await proxyApi(
+        request(`recommendations/${id}/apply`, "POST"),
+        ["recommendations", id, "apply"],
+        fetcher,
+      )
+    ).status,
+  ).toBe(405);
+});
+
+it("forwards only a valid recommendation key and preserves exact request tokens", async () => {
+  const id = "11111111-1111-4111-8111-111111111111";
+  const parts = ["portfolios", id, "recommendations"];
+  const raw =
+    '{"as_of_session":"2028-07-17","clock_mode":"synthetic_replay","seed":18446744073709551615}';
+  const make = (origin: string, key?: string) =>
+    new Request(`http://web.test/api/v1/${parts.join("/")}`, {
+      method: "POST",
+      headers: {
+        origin,
+        "Content-Type": "application/json",
+        ...(key ? { "Idempotency-Key": key } : {}),
+        cookie: "private",
+        authorization: "private",
+      },
+      body: raw,
+    });
+  const fetcher = vi.fn(async (_input, init) => {
+    expect(init.body).toBe(raw);
+    expect(init.headers).toEqual({
+      Accept: "application/json",
+      "Content-Type": "application/json",
+      "Idempotency-Key": id,
+    });
+    return Response.json(
+      { job_id: id, recommendation_id: id },
+      { status: 202 },
+    );
+  });
+  expect(
+    (await proxyApi(make("http://outside.test", id), parts, fetcher)).status,
+  ).toBe(422);
+  expect(
+    (await proxyApi(make("http://web.test", "invalid"), parts, fetcher)).status,
+  ).toBe(422);
+  expect(fetcher).not.toHaveBeenCalled();
+  expect(
+    (await proxyApi(make("http://web.test", id), parts, fetcher)).status,
+  ).toBe(202);
+});
+
+it.each(["queued", "running", "failed", "cancelled"])(
+  "retains only safe %s forecast job details",
+  async (status) => {
+    const id = "11111111-1111-4111-8111-111111111111";
+    const fetcher = vi.fn(async () =>
+      Response.json(
+        {
+          error: {
+            code: "STATE_CONFLICT",
+            message: "private provider trace",
+            details: {
+              job_id: id,
+              status,
+              kind: "forecast",
+              provider_token: "private credential",
+            },
+            correlation_id: id,
+          },
+        },
+        { status: 409 },
+      ),
+    );
+    const response = await proxyApi(
+      request(`forecasts/${id}`),
+      ["forecasts", id],
+      fetcher,
+    );
+    expect(response.status).toBe(409);
+    const body = await response.json();
+    expect(body.error.details).toEqual({
+      job_id: id,
+      status,
+      kind: "forecast",
+    });
+    expect(body.error.retryable).toBe(["queued", "running"].includes(status));
+    expect(JSON.stringify(body)).not.toContain("private");
+  },
+);

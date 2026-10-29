@@ -541,8 +541,92 @@ def main() -> None:
         evidence["checks"].append(
             "worker-side Q12 metrics, aligned SPY/cash, continuing holdout and exposure"
         )
+        recommendation_key = str(uuid4())
+        recommendation_body = {
+            "as_of_session": "2028-07-17",
+            "snapshot_id": core_result["result"]["inputs"]["snapshot_id"],
+            "clock_mode": "synthetic_replay",
+            "seed": 18446744073709551615,
+        }
+
+        def create_recommendation() -> Any:
+            request = urllib.request.Request(
+                f"http://{address}/api/v1/portfolios/{paper_account['id']}/recommendations",
+                data=json.dumps(recommendation_body).encode(),
+                headers={
+                    "Content-Type": "application/json",
+                    "Origin": f"http://{address}",
+                    "Idempotency-Key": recommendation_key,
+                },
+                method="POST",
+            )
+            with urllib.request.urlopen(request, timeout=5) as response:
+                assert response.status == 202
+                return json.load(response)
+
+        recommendation = create_recommendation()
+        assert create_recommendation() == recommendation
+        for job_id in [recommendation["job_id"]]:
+            deadline = time.monotonic() + 60
+            while get(f"jobs/{job_id}")["status"] in {"queued", "running"}:
+                if time.monotonic() >= deadline:
+                    raise AssertionError("Public recommendation worker did not complete")
+                time.sleep(0.2)
+            assert get(f"jobs/{job_id}")["status"] == "completed"
+        analysis = get(f"recommendations/{recommendation['recommendation_id']}")
+        forecast_job_id = analysis["forecast_job"]["id"]
+        deadline = time.monotonic() + 60
+        while get(f"jobs/{forecast_job_id}")["status"] in {"queued", "running"}:
+            if time.monotonic() >= deadline:
+                raise AssertionError("Public recommendation forecast did not complete")
+            time.sleep(0.2)
+        assert get(f"jobs/{forecast_job_id}")["status"] == "completed"
+        original_recommendation = get(f"recommendations/{recommendation['recommendation_id']}")
+        original_public_forecast = get(f"forecasts/{original_recommendation['forecast_id']}")
+        recommendation_history = get(f"portfolios/{paper_account['id']}/recommendations?limit=1")
+        assert (
+            original_recommendation["is_current"] and original_recommendation["status"] == "ready"
+        )
+        assert original_recommendation["clock_mode"] == "synthetic_replay"
+        assert original_recommendation["summary_action"] == "BUY"
+        assert original_recommendation["estimated_total_trade_cost_usd"] == "0.60"
+        assert {
+            row["asset_id"]: row["estimated_quantity"] for row in original_recommendation["actions"]
+        } == {"SYN:AAA": "2.857142", "SYN:BBB": "2.857142", "SYN:CCC": "2.985074"}
+        assert len(original_recommendation["candidates"]) == 5
+        assert original_recommendation["forecast"] == original_public_forecast
+        assert original_public_forecast["status"] == "available"
+        assert original_public_forecast["seed"] == 18446744073709551615
+        assert original_public_forecast["hold_unchanged"]["median_ending_value_usd"] == "1000.00"
+        assert original_public_forecast["proposed"] is not None
+        assert "18446744073709551615" in original_recommendation["forecast_inputs_canonical_json"]
+
+        def verify_public_recommendation() -> None:
+            saved = get(f"recommendations/{recommendation['recommendation_id']}")
+            # A later owned execution fixture supersedes the workspace snapshot.
+            # Original analysis must survive while applicability is checked anew.
+            changing = {"is_current", "stale_reasons", "current_portfolio_revision", "status"}
+            assert {key: value for key, value in saved.items() if key not in changing} == {
+                key: value for key, value in original_recommendation.items() if key not in changing
+            }
+            assert get(f"forecasts/{saved['forecast_id']}") == original_public_forecast
+            assert (
+                get(f"portfolios/{paper_account['id']}/recommendations?limit=1")
+                == recommendation_history
+            )
+            assert create_recommendation() == recommendation
+            verify_paper_account()
+
+        verify_public_recommendation()
+        evidence["recommendation_request"] = recommendation_body
+        evidence["recommendation_result"] = original_recommendation
+        evidence["recommendation_history"] = recommendation_history
+        evidence["checks"].append(
+            "real same-origin recommendation, shared order preview and numeric forecast; "
+            "exact uint64 retry and unchanged account"
+        )
         # Explicit synthetic relational fixture exercises the private #46 service;
-        # public recommendation/apply transport remains owned by #49/#50.
+        # public apply transport remains #50.
         paper_batch = json.loads(python((ROOT / "scripts/paper_smoke_fixture.py").read_text()))
         deadline = time.monotonic() + 60
         while get(f"jobs/{paper_batch['job_id']}")["status"] in {"queued", "running"}:
@@ -668,6 +752,7 @@ def main() -> None:
         verify_paper_batch()
         verify_portfolio_screens("restart")
         assert scenario_result() == original_scenario
+        verify_public_recommendation()
         assert get("strategies") == strategies
         assert get(f"strategies/{strategy_id}/versions") == versions
         for editor_id, history in editor_versions.items():
@@ -696,6 +781,7 @@ def main() -> None:
         verify_paper_batch()
         verify_portfolio_screens("rebuild")
         assert scenario_result() == original_scenario
+        verify_public_recommendation()
         assert get("strategies") == strategies
         assert get(f"strategies/{strategy_id}/versions") == versions
         for editor_id, history in editor_versions.items():
@@ -711,6 +797,9 @@ def main() -> None:
         )
         verify_paper_account()
         evidence["checks"].append("rebuild/recreate preserves named-volume state")
+        evidence["checks"].append(
+            "restart and rebuild preserve original recommendation/forecast and readonly account"
+        )
         ids = compose("ps", "-q").split()
         inspect = json.loads(subprocess.check_output(["docker", "inspect", *ids], text=True))
         evidence["containers"] = [

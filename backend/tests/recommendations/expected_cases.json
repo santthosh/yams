@@ -1,0 +1,74 @@
+{
+  "label": "SYNTHETIC_DATA_ONLY",
+  "oracle_basis": "Targets and close prices below are explicit authored planner inputs, not a scoring/ranking oracle. Quantities and costs are independently derived arithmetic under ADR-001 and FIX-03. No production function generates expected amounts.",
+  "within_band_hold": {
+    "nav_usd": "1000.00",
+    "current_weight": "0.19",
+    "target_weight": "0.20",
+    "absolute_weight_change": "0.01",
+    "rebalance_band": "0.02",
+    "mandatory_risk_correction": false,
+    "side": "HOLD",
+    "estimated_quantity": "0.000000",
+    "estimated_notional_usd": "0.00",
+    "reason": "WITHIN_REBALANCE_BAND"
+  },
+  "position_cap_reduce": {
+    "nav_usd": "1000.00",
+    "current_weight": "0.21",
+    "target_weight": "0.20",
+    "position_cap": "0.20",
+    "decision_close_usd": "100.00",
+    "absolute_weight_change": "0.01",
+    "mandatory_risk_correction": true,
+    "side": "SELL",
+    "estimated_quantity": "0.100000",
+    "estimated_net_credit_usd": "9.99",
+    "estimated_slippage_usd": "0.01",
+    "reason": "MANDATORY_RISK_CORRECTION",
+    "derivation": "Position-cap correction overrides the band. (0.21-0.20)*1000/100=0.1 shares. At10bps adverse slippage, 0.1*100*0.999=9.99 net credit. This exceeds the5 minimum."
+  },
+  "empty_universe": {
+    "target_weights": [],
+    "cash_target_weight": "1.00",
+    "posted_cash_usd": "1000.00",
+    "forecast_outcome_when_calendar_unavailable": null,
+    "forecast_unavailable_reason": "CALENDAR_UNAVAILABLE"
+  },
+  "cash_account_authored_target_preview": {
+    "as_of_session": "2028-07-17",
+    "decision_cutoff_utc": "2028-07-18T12:30:00Z",
+    "initial_cash_usd": "1000.00",
+    "targets": {
+      "SYN:AAA": "0.2",
+      "SYN:BBB": "0.2",
+      "SYN:CCC": "0.2"
+    },
+    "cash_target_weight": "0.4",
+    "decision_close_usd": {
+      "SYN:AAA": "70.00",
+      "SYN:BBB": "70.00",
+      "SYN:CCC": "67.00"
+    },
+    "estimated_quantity": {
+      "SYN:AAA": "2.857142",
+      "SYN:BBB": "2.857142",
+      "SYN:CCC": "2.985074"
+    },
+    "estimated_debit_usd": {
+      "SYN:AAA": "200.20",
+      "SYN:BBB": "200.20",
+      "SYN:CCC": "200.20"
+    },
+    "estimated_slippage_usd": {
+      "SYN:AAA": "0.20",
+      "SYN:BBB": "0.20",
+      "SYN:CCC": "0.20"
+    },
+    "estimated_total_trade_cost_usd": "0.60",
+    "preview_cash_usd": "399.40",
+    "posted_cash_after_recommendation_usd": "1000.00",
+    "posted_holding_count_after_recommendation": 0,
+    "derivation": "Each target notional is 1000*0.2=200. Quantity is floor((200/raw_close)*10^6)/10^6. Debit is HALF_EVEN cents of quantity*raw_close*1.001. Commission is zero. Each adverse slippage estimate rounds to 0.20; three preview debits total600.60. Preview is not posted cash."
+  }
+}

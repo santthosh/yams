@@ -12,6 +12,7 @@ from backend.domain.types import Contract, Hash256, SourceMode
 from backend.forecasting.contracts import ForecastPayload
 from backend.market_data.research_config import ResearchConfig
 from backend.market_data.tiingo_config import TiingoResearchConfigV1
+from backend.portfolio.recommendation_contracts import RecommendationPayload
 
 
 class JobLimits(Contract):
@@ -85,7 +86,10 @@ def validate_payload(
     | BacktestCorePayload
     | ScheduledFillPayload
     | ForecastPayload
+    | RecommendationPayload
 ):
+    if kind == "evaluate_portfolio":
+        return RecommendationPayload.model_validate(payload)
     if kind == "forecast":
         return ForecastPayload.model_validate(payload)
     if kind == "apply_scheduled_fills":

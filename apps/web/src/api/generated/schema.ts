@@ -136,6 +136,23 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/forecasts/{forecast_id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Read */
+    get: operations["read_api_v1_forecasts__forecast_id__get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/v1/health": {
     parameters: {
       query?: never;
@@ -222,6 +239,24 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/portfolios/{portfolio_id}/recommendations": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List Recommendations */
+    get: operations["list_recommendations_api_v1_portfolios__portfolio_id__recommendations_get"];
+    put?: never;
+    /** Create */
+    post: operations["create_api_v1_portfolios__portfolio_id__recommendations_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/v1/portfolios/{portfolio_id}/transactions": {
     parameters: {
       query?: never;
@@ -231,6 +266,23 @@ export interface paths {
     };
     /** Transactions */
     get: operations["transactions_api_v1_portfolios__portfolio_id__transactions_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/recommendations/{recommendation_id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Read */
+    get: operations["read_api_v1_recommendations__recommendation_id__get"];
     put?: never;
     post?: never;
     delete?: never;
@@ -2204,6 +2256,218 @@ export interface components {
        */
       frequency: "monthly";
     };
+    /** RecommendationAccepted */
+    RecommendationAccepted: {
+      /**
+       * Job Id
+       * Format: uuid
+       */
+      job_id: string;
+      /**
+       * Recommendation Id
+       * Format: uuid
+       */
+      recommendation_id: string;
+    };
+    /**
+     * RecommendationDetailV1
+     * @description Original content plus separately changing disposition and forecast job state.
+     */
+    RecommendationDetailV1: {
+      /** Actions */
+      actions: components["schemas"]["RecommendedAction"][];
+      /**
+       * As Of Session
+       * Format: date
+       */
+      as_of_session: string;
+      /** Calendar Sha256 */
+      calendar_sha256: string;
+      /** Candidates */
+      candidates: components["schemas"]["CandidateEvidence"][];
+      /** Cash Target Weight */
+      cash_target_weight: string;
+      /**
+       * Clock Mode
+       * @enum {string}
+       */
+      clock_mode: "synthetic_replay" | "current_paper";
+      /**
+       * Computed At
+       * Format: date-time
+       */
+      computed_at: string;
+      /** Config Sha256 */
+      config_sha256: string;
+      /**
+       * Created At
+       * Format: date-time
+       */
+      created_at: string;
+      /** Current Portfolio Revision */
+      current_portfolio_revision: number;
+      /**
+       * Data Status
+       * @enum {string}
+       */
+      data_status: "synthetic_fixture" | "research_market_data";
+      /**
+       * Decision Cutoff Utc
+       * Format: date-time
+       */
+      decision_cutoff_utc: string;
+      /** Engine Version */
+      engine_version: string;
+      /** Estimated Total Trade Cost Usd */
+      estimated_total_trade_cost_usd: string;
+      forecast: components["schemas"]["ForecastV1"] | null;
+      /**
+       * Forecast Id
+       * Format: uuid
+       */
+      forecast_id: string;
+      /** Forecast Inputs Canonical Json */
+      forecast_inputs_canonical_json: string;
+      forecast_job: components["schemas"]["JobV1"];
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      inputs: components["schemas"]["RecommendationRequest"];
+      /** Inputs Canonical Json */
+      inputs_canonical_json: string;
+      /** Is Current */
+      is_current: boolean;
+      /**
+       * Job Id
+       * Format: uuid
+       */
+      job_id: string;
+      /**
+       * Portfolio Id
+       * Format: uuid
+       */
+      portfolio_id: string;
+      /** Portfolio Revision */
+      portfolio_revision: number;
+      /**
+       * Snapshot Id
+       * Format: uuid
+       */
+      snapshot_id: string;
+      /** Snapshot Sha256 */
+      snapshot_sha256: string;
+      /** Stale Reasons */
+      stale_reasons: string[];
+      /**
+       * Status
+       * @enum {string}
+       */
+      status: "ready" | "applied" | "dismissed" | "expired";
+      strategy_config: components["schemas"]["StrategyConfigV1"];
+      strategy_evidence: components["schemas"]["StrategyEvaluationResultV1"];
+      /**
+       * Strategy Version Id
+       * Format: uuid
+       */
+      strategy_version_id: string;
+      /**
+       * Summary Action
+       * @enum {string}
+       */
+      summary_action:
+        "BUY" | "SELL" | "HOLD" | "REBALANCE" | "ALLOCATE_TO_CASH";
+      /** Target Weights */
+      target_weights: components["schemas"]["TargetWeight"][];
+    };
+    /** RecommendationPageV1 */
+    RecommendationPageV1: {
+      /** Items */
+      items: components["schemas"]["RecommendationSummaryV1"][];
+      /** Next Cursor */
+      next_cursor: string | null;
+    };
+    /** RecommendationRequest */
+    RecommendationRequest: {
+      /**
+       * As Of Session
+       * Format: date
+       */
+      as_of_session: string;
+      /**
+       * Clock Mode
+       * @enum {string}
+       */
+      clock_mode: "synthetic_replay" | "current_paper";
+      /**
+       * Seed
+       * @default 42
+       */
+      seed: number;
+      /**
+       * Snapshot Id
+       * @default null
+       */
+      snapshot_id: string | null;
+    };
+    /** RecommendationSummaryV1 */
+    RecommendationSummaryV1: {
+      /**
+       * Created At
+       * Format: date-time
+       */
+      created_at: string;
+      /**
+       * Data Status
+       * @enum {string}
+       */
+      data_status: "synthetic_fixture" | "research_market_data";
+      /** Disposition */
+      disposition: ("ready" | "applied" | "dismissed" | "expired") | null;
+      error: components["schemas"]["ErrorDetail"] | null;
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      inputs: components["schemas"]["RecommendationRequest"];
+      /** Inputs Canonical Json */
+      inputs_canonical_json: string;
+      /**
+       * Job Id
+       * Format: uuid
+       */
+      job_id: string;
+      /**
+       * Portfolio Id
+       * Format: uuid
+       */
+      portfolio_id: string;
+      /** Portfolio Revision */
+      portfolio_revision: number;
+      /**
+       * Snapshot Id
+       * Format: uuid
+       */
+      snapshot_id: string;
+      /**
+       * Status
+       * @enum {string}
+       */
+      status:
+        | "queued"
+        | "running"
+        | "cancel_requested"
+        | "completed"
+        | "failed"
+        | "cancelled";
+      /**
+       * Strategy Version Id
+       * Format: uuid
+       */
+      strategy_version_id: string;
+    };
     /** RecommendationV1 */
     RecommendationV1: {
       /** Actions */
@@ -3514,6 +3778,64 @@ export interface operations {
       };
     };
   };
+  read_api_v1_forecasts__forecast_id__get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        forecast_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ForecastV1"];
+        };
+      };
+      /** @description Not Found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Conflict */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Unprocessable Content */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Service Unavailable */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+    };
+  };
   health_api_v1_health_get: {
     parameters: {
       query?: never;
@@ -3834,6 +4156,131 @@ export interface operations {
       };
     };
   };
+  list_recommendations_api_v1_portfolios__portfolio_id__recommendations_get: {
+    parameters: {
+      query?: {
+        limit?: number;
+        cursor?: string | null;
+      };
+      header?: never;
+      path: {
+        portfolio_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["RecommendationPageV1"];
+        };
+      };
+      /** @description Not Found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Conflict */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Unprocessable Content */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Service Unavailable */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+    };
+  };
+  create_api_v1_portfolios__portfolio_id__recommendations_post: {
+    parameters: {
+      query?: never;
+      header?: {
+        "Idempotency-Key"?: string | null;
+      };
+      path: {
+        portfolio_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["RecommendationRequest"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      202: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["RecommendationAccepted"];
+        };
+      };
+      /** @description Not Found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Conflict */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Unprocessable Content */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Service Unavailable */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+    };
+  };
   transactions_api_v1_portfolios__portfolio_id__transactions_get: {
     parameters: {
       query?: {
@@ -3855,6 +4302,64 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["PortfolioTransactionPageV1"];
+        };
+      };
+      /** @description Not Found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Conflict */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Unprocessable Content */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Service Unavailable */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+    };
+  };
+  read_api_v1_recommendations__recommendation_id__get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        recommendation_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["RecommendationDetailV1"];
         };
       };
       /** @description Not Found */

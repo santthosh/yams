@@ -38,6 +38,13 @@ from backend.domain.portfolio import (
     PortfolioTransactionPageV1,
 )
 from backend.domain.recommendation import RecommendationV1
+from backend.domain.recommendation_api import (
+    RecommendationAccepted,
+    RecommendationDetailV1,
+    RecommendationPageV1,
+    RecommendationRequest,
+    RecommendationSummaryV1,
+)
 from backend.domain.registry import StrategyCreateRequest, StrategyV1, StrategyVersionV1
 from backend.domain.strategy import StrategyConfigV1
 from backend.domain.workspace import HealthV1, WorkspaceV1
@@ -58,6 +65,11 @@ MODELS: tuple[type[BaseModel], ...] = (
     AssetV1,
     SnapshotManifestV1,
     RecommendationV1,
+    RecommendationRequest,
+    RecommendationAccepted,
+    RecommendationDetailV1,
+    RecommendationPageV1,
+    RecommendationSummaryV1,
     ForecastV1,
     PaperOrderBatchV1,
     PaperPortfolioV1,
@@ -116,23 +128,31 @@ def build_openapi(app: FastAPI) -> dict[str, Any]:
             schemas.pop(alias)
     # FastAPI's OpenAPI numeric-bound DTO coerces the uint64 ceiling to float.
     # Restore the exact integer constraint from the authoritative typed request.
-    request_schema = schemas.get("ExperimentRequest")
-    if request_schema is not None:
-        seed = request_schema["properties"]["random_seed"]
-        exact_seed = bundle["$defs"]["ExperimentRequest"]["properties"]["random_seed"]
+    for model, field in (
+        ("ExperimentRequest", "random_seed"),
+        ("RecommendationRequest", "seed"),
+        ("ForecastV1", "seed"),
+    ):
+        request_schema = schemas.get(model)
+        if request_schema is None:
+            continue
+        seed = request_schema["properties"][field]
+        exact_seed = bundle["$defs"][model]["properties"][field]
         if seed != exact_seed:
             if seed != {**exact_seed, "maximum": float(exact_seed["maximum"])}:
-                raise ValueError("Conflicting experiment random-seed schema")
-            request_schema["properties"]["random_seed"] = exact_seed
+                raise ValueError(f"Conflicting {model} seed schema")
+            request_schema["properties"][field] = exact_seed
     # FastAPI omits an explicit null default while serializing its OpenAPI DTO.
     # Restore only this proven equivalent optional field from the typed contract.
-    portfolio_request = schemas.get("PortfolioCreateRequest")
-    if portfolio_request is not None:
+    for model in ("PortfolioCreateRequest", "RecommendationRequest"):
+        portfolio_request = schemas.get(model)
+        if portfolio_request is None:
+            continue
         actual = portfolio_request["properties"]["snapshot_id"]
-        expected = bundle["$defs"]["PortfolioCreateRequest"]["properties"]["snapshot_id"]
+        expected = bundle["$defs"][model]["properties"]["snapshot_id"]
         if actual != expected:
             if {**actual, "default": None} != expected:
-                raise ValueError("Conflicting portfolio snapshot schema")
+                raise ValueError(f"Conflicting {model} snapshot schema")
             portfolio_request["properties"]["snapshot_id"] = expected
     # The optional ADR-014 pair has the same narrowly verified DTO null-default
     # omission. Preserve the canonical typed definition without masking drift.

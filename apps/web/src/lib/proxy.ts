@@ -5,13 +5,15 @@ export function safeError(
   message: string,
   status: number,
   correlationId?: string,
+  details: components["schemas"]["ErrorDetail"]["details"] = {},
+  retryable = status === 503,
 ): Response {
   const body: components["schemas"]["ErrorEnvelope"] = {
     error: {
       code,
       message,
-      details: {},
-      retryable: status === 503,
+      details,
+      retryable,
       correlation_id:
         correlationId && UUID_PATTERN.test(correlationId)
           ? correlationId
@@ -49,6 +51,19 @@ export async function proxyApi(
     segments[0] === "portfolios" &&
     UUID_PATTERN.test(segments[1]) &&
     segments[2] === "transactions";
+  const portfolioRecommendations =
+    segments.length === 3 &&
+    segments[0] === "portfolios" &&
+    UUID_PATTERN.test(segments[1]) &&
+    segments[2] === "recommendations";
+  const recommendationDetail =
+    segments.length === 2 &&
+    segments[0] === "recommendations" &&
+    UUID_PATTERN.test(segments[1]);
+  const forecastDetail =
+    segments.length === 2 &&
+    segments[0] === "forecasts" &&
+    UUID_PATTERN.test(segments[1]);
   const experiments = segments.length === 1 && segments[0] === "experiments";
   const experimentDetail =
     segments.length === 2 &&
@@ -80,6 +95,7 @@ export async function proxyApi(
       request.method === "POST" &&
       (refresh ||
         portfolios ||
+        portfolioRecommendations ||
         evaluate ||
         readStrategies ||
         strategyVersions ||
@@ -96,6 +112,7 @@ export async function proxyApi(
     request.method === "POST"
       ? refresh ||
         portfolios ||
+        portfolioRecommendations ||
         evaluate ||
         readStrategies ||
         strategyVersions ||
@@ -104,6 +121,9 @@ export async function proxyApi(
       : portfolios ||
         portfolioDetail ||
         portfolioTransactions ||
+        portfolioRecommendations ||
+        recommendationDetail ||
+        forecastDetail ||
         experiments ||
         experimentDetail ||
         experimentSamples ||
@@ -120,7 +140,8 @@ export async function proxyApi(
   const queryKeys =
     portfolios && request.method === "GET"
       ? ["mode", "limit", "cursor"]
-      : portfolioTransactions
+      : portfolioTransactions ||
+          (portfolioRecommendations && request.method === "GET")
         ? ["limit", "cursor"]
         : experiments && request.method === "GET"
           ? ["limit", "cursor"]
@@ -165,6 +186,8 @@ export async function proxyApi(
         "This operation requires a valid request key.",
         422,
       );
+    if (portfolioRecommendations && key && !UUID_PATTERN.test(key))
+      return safeError("VALIDATION_ERROR", "Request key is invalid.", 422);
     const reader = request.body?.getReader();
     if (!reader)
       return safeError("VALIDATION_ERROR", "Request input is required.", 422);
@@ -188,7 +211,8 @@ export async function proxyApi(
     }
     payload = new TextDecoder().decode(bytes);
     headers["Content-Type"] = "application/json";
-    if ((refresh || portfolios) && key) headers["Idempotency-Key"] = key;
+    if ((refresh || portfolios || portfolioRecommendations) && key)
+      headers["Idempotency-Key"] = key;
   }
   try {
     const origin = new URL(
@@ -257,6 +281,42 @@ export async function proxyApi(
         );
       }
       if (response.status === 409) {
+        if (
+          (recommendationDetail || forecastDetail) &&
+          error &&
+          "code" in error &&
+          error.code === "STATE_CONFLICT" &&
+          "details" in error &&
+          typeof error.details === "object" &&
+          error.details !== null
+        ) {
+          const state = error.details;
+          if (
+            "job_id" in state &&
+            typeof state.job_id === "string" &&
+            UUID_PATTERN.test(state.job_id) &&
+            "status" in state &&
+            typeof state.status === "string" &&
+            [
+              "queued",
+              "running",
+              "cancel_requested",
+              "failed",
+              "cancelled",
+            ].includes(state.status) &&
+            "kind" in state &&
+            typeof state.kind === "string" &&
+            state.kind === (forecastDetail ? "forecast" : "evaluate_portfolio")
+          )
+            return safeError(
+              "STATE_CONFLICT",
+              "Resource has no completed publication; inspect its job status.",
+              409,
+              correlation,
+              { job_id: state.job_id, status: state.status, kind: state.kind },
+              ["queued", "running", "cancel_requested"].includes(state.status),
+            );
+        }
         const code =
           error && "code" in error && error.code === "STALE_DATA"
             ? "STALE_DATA"
