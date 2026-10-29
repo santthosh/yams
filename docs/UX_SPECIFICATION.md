@@ -136,6 +136,13 @@ benchmark gaps, failed submissions and full forks remain explicit.
 
 **Top:** value + change over selected historical period + cash + price as-of + active strategy/version. **Middle:** current actual synthetic holdings table with price, fractional shares, value, current weight, target weight, rationale and sector; cash is explicit. **Bottom:** open order batches, fill history, fees, valuation and ledger reconciliation status. A missing price makes valuation stale/unavailable with a reason rather than carrying forward silently without a warning.
 
+The 0.0.4 [account-screen handoff](operations/paper-portfolios.md) implements
+creation/list/detail and posted ledger inspection. Valuation, quantities and
+weights come from the API. Live pending-batch transport and approval remain
+explicitly staged until #50/#52; a typed service-fixture component separately
+proves pending/terminal-partial/cancelled presentation without a fake endpoint.
+Performance change, targets, rationale and forecasts remain with their producers.
+
 ### 5.6 Decision Center (`/portfolios/[id]/decisions`)
 
 A consistent four-step presentation:

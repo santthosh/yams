@@ -30,8 +30,12 @@ describe("foundation shell", () => {
       expect(screen.getByText("Ready to explore")).toBeTruthy(),
     );
     expect(screen.getByText("SYNTHETIC_DATA_ONLY")).toBeTruthy();
-    expect(screen.getByText("No paper portfolio yet")).toBeTruthy();
-    expect(screen.getByText("Unavailable")).toBeTruthy();
+    expect(
+      screen
+        .getByRole("link", { name: "Open paper portfolios →" })
+        .getAttribute("href"),
+    ).toBe("/portfolios");
+    expect(screen.queryByText("No paper portfolio yet")).toBeNull();
     expect(screen.queryByText("$0.00")).toBeNull();
     expect(
       screen.queryByRole("button", { name: /trade|buy|sell/i }),

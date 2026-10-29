@@ -1,14 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useWorkspace } from "./workspace-provider";
-import {
-  Card,
-  EmptyState,
-  ErrorState,
-  Money,
-  VersionIdentity,
-  WarningsPanel,
-} from "./evidence";
+import { Card, ErrorState, VersionIdentity, WarningsPanel } from "./evidence";
 import { Button } from "./ui/button";
 import { JobInspector } from "./job-inspector";
 
@@ -132,13 +125,16 @@ export function Dashboard() {
           </p>
         </Card>
         <Card title="Paper portfolio">
-          <div className="value-placeholder">
-            <Money value={null} />
-          </div>
-          <EmptyState title="No paper portfolio yet">
-            Portfolio accounts, backtests and forecasts arrive in later
-            milestones. Candidate inspection provides strategy diagnostics.
-          </EmptyState>
+          <p>
+            Choose an account to inspect its posted cash, holdings and immutable
+            transaction history.
+          </p>
+          <p>
+            <Link href="/portfolios">Open paper portfolios →</Link>
+          </p>
+          <p className="subtle">
+            Recommendation approval and forecasts follow in 0.0.5.
+          </p>
         </Card>
       </div>
       <div className="quiet-note">

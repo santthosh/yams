@@ -16,9 +16,10 @@ projections atomically. The [paper account API](docs/operations/paper-portfolio-
 creates independent cash accounts and serves coherent holdings/valuation and paginated
 immutable transactions. The [private authorization and fill worker](docs/operations/paper-batches.md)
 reserves approved intent and posts lease-fenced synthetic effects, with explicit
-fixture replay and separate decision/execution provenance. The portfolio UI
-remains with #47; public apply follows in 0.0.5. Startup creates no accounts or
-recommendations.
+fixture replay and separate decision/execution provenance. The [paper account screens](docs/operations/paper-portfolios.md)
+create independent cash accounts and inspect posted holdings, values and ledger
+evidence. Live batch controls and public apply follow in 0.0.5. Startup creates
+no accounts or recommendations.
 
 The 0.0.3 Strategy Lab increment adds named strategy creation, detail and immutable
 version publication/history APIs over the existing registry, plus the ratified

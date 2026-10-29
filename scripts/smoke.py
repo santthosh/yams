@@ -266,6 +266,21 @@ def main() -> None:
             check=True,
         )
         evidence["checks"].append("real Docker browser Dashboard/Settings/job at both widths")
+        subprocess.run(
+            ["pnpm", "--filter", "@yams/web", "exec", "node", "tests/portfolio-browser.mjs"],
+            cwd=ROOT,
+            env={
+                **env,
+                "YAMS_SMOKE_URL": f"http://{address}",
+                "YAMS_SMOKE_EVIDENCE": str(destination),
+                "YAMS_SMOKE_PORTFOLIO_PHASE": "create",
+            },
+            check=True,
+        )
+        evidence["checks"].append(
+            "real browser cash creation, independent accounts and keyed retries"
+        )
+
         publication = json.loads((destination / "strategy-publication.json").read_text())
         strategy_id = publication["created"]["body"]["id"]
         versions = get(f"strategies/{strategy_id}/versions")
@@ -598,7 +613,26 @@ def main() -> None:
                 "fill",
             }
 
+        def verify_portfolio_screens(stage: str) -> None:
+            subprocess.run(
+                ["pnpm", "--filter", "@yams/web", "exec", "node", "tests/portfolio-browser.mjs"],
+                cwd=ROOT,
+                env={
+                    **env,
+                    "YAMS_SMOKE_URL": f"http://{address}",
+                    "YAMS_SMOKE_EVIDENCE": str(destination),
+                    "YAMS_SMOKE_PORTFOLIO_PHASE": "inspect",
+                    "YAMS_SMOKE_PORTFOLIO_STAGE": stage,
+                    "YAMS_SMOKE_POSTED_PORTFOLIO": paper_batch["portfolio_id"],
+                },
+                check=True,
+            )
+
         verify_paper_batch()
+        verify_portfolio_screens("initial")
+        evidence["checks"].append(
+            "real portfolio holdings/fees/history, staged batch controls and Axe at360/1280"
+        )
         evidence["paper_batch"] = paper_batch
         evidence["checks"].append("private explicit fixture approval and real worker atomic fill")
         for service in ("api", "worker"):
@@ -629,6 +663,7 @@ def main() -> None:
         assert metrics_report() == report
         verify_public_runs()
         verify_paper_batch()
+        verify_portfolio_screens("restart")
         assert get("strategies") == strategies
         assert get(f"strategies/{strategy_id}/versions") == versions
         for editor_id, history in editor_versions.items():
@@ -655,6 +690,7 @@ def main() -> None:
         assert metrics_report() == report
         verify_public_runs()
         verify_paper_batch()
+        verify_portfolio_screens("rebuild")
         assert get("strategies") == strategies
         assert get(f"strategies/{strategy_id}/versions") == versions
         for editor_id, history in editor_versions.items():
