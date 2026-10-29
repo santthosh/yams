@@ -515,6 +515,15 @@ Every approved batch records `approved_at`, original input snapshot, approval id
 
 ## 8. Idempotency, consistency and concurrency rules
 
+[ADR-014](adr/0014-decision-and-execution-snapshots.md) defines the #46 execution
+lineage extension: original decision snapshot/approval/calendar/intent stay
+immutable; an optional paired execution snapshot ID/hash identifies later raw
+opening evidence. Legacy same-source output must retain its canonical bytes.
+Ledger fill events identify the actual execution source while their batch retains
+the original decision source. Compatible calendar extension cannot move the
+original eligible opening. Coordinated implementation/generated types and runtime
+proofs remain with #46; this decision does not activate a handler or change prices.
+
 [ADR-004](adr/0004-portfolio-ledger.md) ratifies event schemas, numeric scales, portfolio locking with revision checks, one active batch as the exclusive reservation, partial-result termination, corrections, replay and staged migration ownership. Batch/order responses include `terminal` and filled/pending/cancelled-or-skipped quantities so a terminal cash-reduced fill is not mistaken for an outstanding order.
 
 1. `Idempotency-Key` is required on paper authorization and creation of any posting command. Key + semantic request payload hash + portfolio ID defines retry identity; same key/different payload returns `409 IDEMPOTENCY_CONFLICT`.
