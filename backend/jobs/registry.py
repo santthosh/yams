@@ -7,6 +7,7 @@ from pydantic import Field, field_validator, model_validator
 
 from backend.backtesting.contracts import BacktestCorePayload
 from backend.domain.evaluation import StrategyEvaluationPayload
+from backend.domain.fill_job import ScheduledFillPayload
 from backend.domain.types import Contract, Hash256, SourceMode
 from backend.market_data.research_config import ResearchConfig
 from backend.market_data.tiingo_config import TiingoResearchConfigV1
@@ -76,7 +77,15 @@ class RefreshPayload(Contract):
 
 def validate_payload(
     kind: str, payload: object
-) -> DiagnosticPayload | RefreshPayload | StrategyEvaluationPayload | BacktestCorePayload:
+) -> (
+    DiagnosticPayload
+    | RefreshPayload
+    | StrategyEvaluationPayload
+    | BacktestCorePayload
+    | ScheduledFillPayload
+):
+    if kind == "apply_scheduled_fills":
+        return ScheduledFillPayload.model_validate(payload)
     if kind in {"backtest_core", "backtest"}:
         return BacktestCorePayload.model_validate(payload)
     if kind == "diagnostic":

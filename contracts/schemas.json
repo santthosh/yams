@@ -7236,6 +7236,32 @@
             "title": "Execution Mode",
             "type": "string"
           },
+          "execution_snapshot_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Execution Snapshot Id"
+          },
+          "execution_snapshot_sha256": {
+            "anyOf": [
+              {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Execution Snapshot Sha256"
+          },
           "mode": {
             "enum": [
               "synthetic_fixture",
@@ -7764,6 +7790,32 @@
             ],
             "title": "Execution Mode",
             "type": "string"
+          },
+          "execution_snapshot_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Execution Snapshot Id"
+          },
+          "execution_snapshot_sha256": {
+            "anyOf": [
+              {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Execution Snapshot Sha256"
           },
           "mode": {
             "enum": [

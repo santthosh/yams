@@ -1,8 +1,8 @@
 # ADR-014: Separate decision and execution snapshot provenance
 
-Status: Proposed under #46; accepted when this decision PR merges. Implementation,
-coordinated models, fixtures and worker proofs remain with #46. This document
-activates no endpoint, handler or provider capability.
+Status: Accepted by PR #131 on 2026-10-29 under #46. Coordinated implementation
+and worker proofs belong to #46. This decision itself activates no endpoint,
+handler or provider capability.
 
 ## Problem and authority
 
